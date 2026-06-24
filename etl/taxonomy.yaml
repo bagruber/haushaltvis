@@ -1,0 +1,142 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Themen-Taxonomie für die Moosburg-Haushaltsvisualisierung
+#
+# Das kamerale Rückgrat (Einzelplan > Gliederung > Gruppierung) bleibt unberührt.
+# Diese Datei legt EINE laienfreundliche Themen-Schicht DARÜBER (many-to-many).
+#
+# Zuordnung passiert auf Abschnitts-Ebene (2-stellige GLZ) als Standard,
+# mit Overrides je Gliederung (4-stellig) für Ausnahmen. Ein Posten kann
+# mehreren Themen zugeordnet sein; die Gewichte je Posten werden vom
+# classify-Skript auf Summe 1.0 normalisiert (kein Doppelzählen in Summen).
+#
+# Bearbeiten: Themen umbenennen, Farben ändern, Abschnitte verschieben.
+# Danach `python etl/classify.py` ausführen -> erzeugt data/processed/themes.json
+# ─────────────────────────────────────────────────────────────────────────────
+
+themes:
+  verwaltung:
+    label: "Verwaltung & Rathaus"
+    color: "#8a8170"
+    description: "Bürgermeister, Stadtrat, Kämmerei, Standesamt, EDV — der laufende Betrieb der Stadtverwaltung."
+  sicherheit:
+    label: "Sicherheit & Feuerwehr"
+    color: "#e5202e"
+    description: "Öffentliche Ordnung, Feuerwehr und Katastrophenschutz."
+  bildung:
+    label: "Bildung & Schulen"
+    color: "#009ac7"
+    description: "Grundschule, Schülerbeförderung und Volkshochschule."
+  kinder_jugend:
+    label: "Kinder, Jugend & Familie"
+    color: "#f4830a"
+    description: "Kindertagesstätten, Krippen und Einrichtungen der Jugendarbeit."
+  soziales:
+    label: "Soziales & Wohnen"
+    color: "#e91e8c"
+    description: "Soziale Sicherung, Obdachlosenhilfe und Wohnungsbauförderung."
+  kultur:
+    label: "Kultur & Heimat"
+    color: "#6b3e7a"
+    description: "Museum, Heimatpflege, Städtepartnerschaften, Kirchen und Ausstellungen."
+  sport_freizeit:
+    label: "Sport & Freizeit"
+    color: "#0a9e4c"
+    description: "Sportförderung, Sportanlagen, Freibad und Kleingärten."
+  gruen_umwelt:
+    label: "Grün, Natur & Umwelt"
+    color: "#78be1e"
+    description: "Naturschutz, Park- und Grünanlagen, Gewässer und Stadtwald."
+  strassen_verkehr:
+    label: "Straßen, Wege & Verkehr"
+    color: "#3b3f9a"
+    description: "Gemeindestraßen, Brücken, Straßenbeleuchtung, Parkplätze und Bauhof."
+  wasser_entsorgung:
+    label: "Wasser, Abwasser & Entsorgung"
+    color: "#18ada4"
+    description: "Kanalnetz, Kläranlage, Wertstoffhof und Bestattungswesen."
+  stadtentwicklung:
+    label: "Stadtplanung & Bauen"
+    color: "#b8964e"
+    description: "Bauamt, Städtebauplanung und der bebaute Grundbesitz der Stadt."
+  wirtschaft:
+    label: "Wirtschaft & Märkte"
+    color: "#f5d400"
+    description: "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Vereinshaus."
+  energie:
+    label: "Energieversorgung"
+    color: "#a50d24"
+    description: "Städtische Elektrizitätsversorgung."
+  finanzen:
+    label: "Finanzen, Steuern & Schulden"
+    color: "#1a1a1a"
+    description: "Steuern, allgemeine Zuweisungen/Umlagen, Kredite und Schuldendienst."
+
+# Standard-Zuordnung je Abschnitt (2-stellige GLZ).
+# Liste = ein oder mehrere Themen (gleichgewichtet). Für gewichtete Mehrfach-
+# zuordnung: {theme: bildung, weight: 2} schreiben.
+abschnitt_themes:
+  "00": [verwaltung]      # Bürgermeister und Stadträte
+  "02": [verwaltung]      # Geschäftsleitung
+  "03": [verwaltung, finanzen]   # Stadtkämmerei
+  "05": [verwaltung]      # Standesamt
+  "06": [verwaltung]      # EDV-Abteilung
+  "08": [verwaltung]      # Einrichtungen für Verwaltungsangehörige
+  "10": [sicherheit]      # Sicherheit/Ordnung – Verwaltung
+  "11": [sicherheit]      # Öffentliche Ordnung
+  "13": [sicherheit]      # Feuerwehr Moosburg
+  "14": [sicherheit]      # Katastrophenschutz
+  "21": [bildung]         # Anton-Vitzthum-Grundschule
+  "22": [bildung]         # (weitere Schule, falls vorhanden)
+  "29": [bildung, strassen_verkehr]   # Schülerbeförderung
+  "30": [kultur]          # Kult. Angelegenheiten / Städtepartnerschaft
+  "32": [kultur]          # Heimatmuseum im Kloster
+  "34": [kultur]          # Heimat- und Kulturpflege
+  "35": [bildung, kultur] # VHS - Haus der Bildung
+  "36": [gruen_umwelt]    # Naturschutz und Landschaftspflege
+  "37": [kultur]          # Kirchliche Angelegenheiten
+  "40": [soziales]        # Allgemeine Sozialverwaltung
+  "42": [soziales]        # (Soziales, falls vorhanden)
+  "43": [soziales]        # Obdachlosenunterkunft
+  "46": [kinder_jugend]   # Einrichtungen der Jugendarbeit / Kitas
+  "47": [soziales]        # Soziale Einrichtungen
+  "49": [soziales]        # Sonst. soziale Angelegenheiten
+  "55": [sport_freizeit]  # Förderung des Sports
+  "56": [sport_freizeit]  # Sportanlagen
+  "57": [sport_freizeit]  # Freibad
+  "58": [gruen_umwelt]    # Park-/Grünanlagen
+  "59": [sport_freizeit, gruen_umwelt]   # Kleingartenanlage
+  "60": [stadtentwicklung]   # Stadtbau- u. Tiefbauamt
+  "61": [stadtentwicklung]   # Städtebauliche Planung
+  "62": [soziales]        # Wohnungsbauförderung
+  "63": [strassen_verkehr]   # Gemeindestraßen
+  "64": [strassen_verkehr]   # Brücken
+  "66": [strassen_verkehr]   # Verkehrsanlagen (sonstige)
+  "67": [strassen_verkehr]   # Straßenbeleuchtung
+  "68": [strassen_verkehr]   # Parkplätze
+  "69": [gruen_umwelt]    # Wasserläufe, Wasserbau
+  "70": [wasser_entsorgung]  # Kanalnetz u. Kläranlage
+  "71": [wasser_entsorgung]  # WC-Anlage
+  "72": [wasser_entsorgung]  # Wertstoffhof
+  "73": [wirtschaft]      # Wochen- u. Jahrmärkte
+  "75": [wasser_entsorgung, kultur]   # Friedhöfe / Bestattung
+  "76": [wirtschaft, kultur]   # Haus der Vereine
+  "77": [strassen_verkehr]   # Bauhof
+  "78": [kultur]          # Ausstellungshalle
+  "79": [wirtschaft]      # Öffentlichkeitsarbeit / Wirtschaftsförderung
+  "81": [energie]         # Elektrizitätsversorgung
+  "85": [gruen_umwelt]    # Stadtwald
+  "87": [wirtschaft]      # Sonstige wirtschaftliche Unternehmen
+  "88": [stadtentwicklung]   # Bebauter Grundbesitz
+  "89": [soziales]        # Wohltätigkeitsstiftung
+  "90": [finanzen]        # Steuern, Zuweisungen, Umlagen
+  "91": [finanzen]        # Kredite, Schuldendienst
+  "92": [finanzen]        # Abwicklung der Vorjahre
+  "96": [finanzen]        # Rücklagen
+
+# Overrides je Gliederung (4-stellig). Gewinnen gegen den Abschnitts-Standard.
+# Beispiel:
+#   "5700": [sport_freizeit, gesundheit]
+gliederung_overrides: {}
+
+# Fallback, wenn ein Abschnitt nirgends gemappt ist:
+default_theme: finanzen

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Haushalt Moosburg — Wohin fließt das Geld?</title>
+    <meta
+      name="description"
+      content="Der Haushalt der Stadt Moosburg an der Isar, interaktiv und verständlich aufbereitet — Einnahmen, Ausgaben und ihre Entwicklung über die Jahre."
+    />
+    <script>
+      // SPA redirect handshake with 404.html — restores the path the user asked for.
+      (function () {
+        var q = window.location.search;
+        if (q && q.indexOf("p=") !== -1) {
+          var params = new URLSearchParams(q);
+          var p = params.get("p") || "";
+          var qq = params.get("q") || "";
+          window.history.replaceState(
+            null,
+            "",
+            window.location.pathname.replace(/\/$/, "") +
+              p.replace(/~and~/g, "&") +
+              (qq ? "?" + qq.replace(/~and~/g, "&") : "") +
+              window.location.hash
+          );
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

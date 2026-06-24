@@ -1,0 +1,93 @@
+import { useMemo } from "react";
+import type { EChartsOption } from "echarts";
+import { EChart } from "@/components/EChart";
+import { useData, expenseTreemap, totals, latestYear } from "@/lib/data";
+import { fmtEur, fmtEurShort } from "@/lib/format";
+
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-lg border border-ink-line bg-white px-5 py-4 shadow-soft">
+      <div className="text-xs uppercase tracking-wide text-ink-muted">{label}</div>
+      <div className="mt-1 font-display text-2xl font-bold text-ink">{value}</div>
+      {hint && <div className="text-xs text-ink-muted mt-0.5">{hint}</div>}
+    </div>
+  );
+}
+
+export function Home() {
+  const { data, error } = useData();
+
+  const { option, year, t } = useMemo(() => {
+    if (!data) return { option: null, year: 0, t: { einnahmen: 0, ausgaben: 0 } };
+    const year = latestYear(data.budget);
+    const tree = expenseTreemap(data, year);
+    const t = totals(data.budget, year);
+    const option: EChartsOption = {
+      tooltip: {
+        formatter: (info: unknown) => {
+          const i = info as { name: string; value: number; treePathInfo?: { name: string }[] };
+          const path = (i.treePathInfo ?? []).map((p) => p.name).filter(Boolean).join(" › ");
+          return `<b>${i.name}</b><br/>${fmtEur(i.value)}${path ? `<br/><span style="color:#888">${path}</span>` : ""}`;
+        },
+      },
+      series: [
+        {
+          type: "treemap",
+          name: "Ausgaben",
+          roam: false,
+          nodeClick: "zoomToNode",
+          data: tree,
+          leafDepth: 2,
+          breadcrumb: { show: true, top: "bottom" },
+          label: { show: true, formatter: "{b}", overflow: "truncate" },
+          upperLabel: { show: true, height: 26, color: "#fff", fontWeight: "bold" },
+          levels: [
+            {
+              itemStyle: { borderColor: "#faf7f2", borderWidth: 3, gapWidth: 3 },
+            },
+            {
+              colorSaturation: [0.35, 0.6],
+              itemStyle: { borderColorSaturation: 0.7, gapWidth: 1, borderWidth: 1 },
+            },
+          ],
+        },
+      ],
+    };
+    return { option, year, t };
+  }, [data]);
+
+  if (error)
+    return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
+
+  return (
+    <div className="space-y-8">
+      <section className="space-y-3">
+        <h1 className="font-display text-4xl font-bold text-ink">Wohin fließt das Geld?</h1>
+        <p className="max-w-2xl text-ink-soft">
+          Der Haushalt der Stadt Moosburg an der Isar — nach Themen geordnet, statt nach
+          Aktenzeichen. Jede Fläche ist eine Ausgabe; je größer, desto mehr Geld.
+        </p>
+      </section>
+
+      {data && (
+        <section className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <Stat label={`Ausgaben ${year}`} value={fmtEurShort(t.ausgaben)} hint="Ansatz, beide Haushalte" />
+          <Stat label={`Einnahmen ${year}`} value={fmtEurShort(t.einnahmen)} hint="Ansatz, beide Haushalte" />
+          <Stat label="Zeitraum" value={`${data.budget.meta.years[0]}–${year}`} hint={`${data.budget.meta.years.length} Jahre`} />
+        </section>
+      )}
+
+      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+        <div className="flex items-baseline justify-between mb-2">
+          <h2 className="font-display text-xl font-bold">Ausgaben nach Themen ({year})</h2>
+          <span className="text-xs text-ink-muted">Klick auf eine Kachel zum Hineinzoomen</span>
+        </div>
+        {option ? (
+          <EChart option={option} style={{ height: 560 }} />
+        ) : (
+          <div className="h-[560px] grid place-items-center text-ink-muted">Lade Daten …</div>
+        )}
+      </section>
+    </div>
+  );
+}

@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/600.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/playfair-display/900.css";
+
+@theme {
+  /* Moosburg civic identity — red + gold, cream ground, ink text */
+  --color-red-500: #c8102e;
+  --color-red-600: #b00e28;
+  --color-red-700: #a50d24;
+  --color-red-900: #6d0818;
+
+  --color-gold-200: #e8d5a3;
+  --color-gold-500: #b8964e;
+  --color-gold-600: #967a40;
+  --color-gold-700: #6e5a30;
+
+  --color-cream: #faf7f2;
+  --color-cream-dark: #f1ece1;
+
+  --color-ink: #1c1c1c;
+  --color-ink-soft: #555555;
+  --color-ink-muted: #888888;
+  --color-ink-line: #e4e0d7;
+
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 2px 12px rgb(0 0 0 / 0.07);
+  --shadow-lift: 0 4px 24px rgb(0 0 0 / 0.1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
