@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Manuell gepflegte Ereignisse zum Haushalt.
+#
+# Werden in der Detailansicht als Marker auf der Zeitachse und als Liste gezeigt.
+# Zusätzlich leitet build_web.py automatisch faktische Ereignisse aus den Daten
+# ab (neu hinzugekommene / aufgegebene größere Posten) und mischt sie dazu.
+#
+# scope: theme | abschnitt | hhst
+#   theme     -> id ist die Themen-ID aus taxonomy.yaml (z. B. "sport_freizeit")
+#   abschnitt -> id ist die 2-stellige Gliederung (z. B. "57" = Freibad)
+#   hhst      -> id ist die volle Haushaltsstelle "GLZ.GRZ"
+#
+# Beispiel (auskommentiert – zum Aktivieren das '#' entfernen und anpassen):
+# events:
+#   - scope: abschnitt
+#     id: "57"
+#     year: 2023
+#     title: "Sanierung Freibad"
+#     text: "Erhöhter Ansatz wegen der Generalsanierung der Beckentechnik."
+
+events: []

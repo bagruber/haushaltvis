@@ -47,9 +47,20 @@ export interface Themes {
   assignment: Record<string, ThemeTag[]>;
 }
 
+export type EventScope = "theme" | "abschnitt" | "hhst";
+
+export interface BudgetEvent {
+  scope: EventScope;
+  id: string; // theme id, 2-digit Abschnitt, or hhst_id
+  year: number;
+  title: string;
+  text?: string;
+}
+
 export interface Data {
   budget: Budget;
   themes: Themes;
+  events: BudgetEvent[];
 }
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
@@ -61,7 +72,10 @@ export function loadData(): Promise<Data> {
     cache = Promise.all([
       fetch(`${base}data/budget.json`).then((r) => r.json() as Promise<Budget>),
       fetch(`${base}data/themes.json`).then((r) => r.json() as Promise<Themes>),
-    ]).then(([budget, themes]) => ({ budget, themes }));
+      fetch(`${base}data/events.json`)
+        .then((r) => (r.ok ? (r.json() as Promise<{ events: BudgetEvent[] }>) : { events: [] }))
+        .catch(() => ({ events: [] })),
+    ]).then(([budget, themes, ev]) => ({ budget, themes, events: ev.events ?? [] }));
   }
   return cache;
 }
@@ -168,4 +182,108 @@ export function totals(b: Budget, year: number): Totals {
     else ausgaben += f.ansatz;
   }
   return { einnahmen, ausgaben };
+}
+
+// ── Theme detail selectors ──────────────────────────────────────────────────
+
+export interface YearSeries {
+  years: number[];
+  ansatz: (number | null)[];
+  ergebnis: (number | null)[];
+  /** years for which ergebnis is provisional Ist (e.g. 2024) */
+  provisional: Set<number>;
+}
+
+/**
+ * Weighted Ansatz/Ergebnis per year for one theme, filtered by E/A.
+ * Each Posten contributes amount × theme-weight, so no double-counting.
+ */
+export function themeYearSeries(data: Data, themeId: string, ea: EA): YearSeries {
+  const { budget, themes } = data;
+  const years = budget.meta.years;
+  const aMap = new Map<number, number>();
+  const eMap = new Map<number, number>();
+  const provisional = new Set<number>();
+  for (const f of budget.facts) {
+    const p = budget.posten[f.hhst_id];
+    if (!p || p.ea !== ea) continue;
+    const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
+    if (!tag) continue;
+    if (f.ansatz != null) aMap.set(f.year, (aMap.get(f.year) ?? 0) + f.ansatz * tag.weight);
+    if (f.ergebnis != null) {
+      eMap.set(f.year, (eMap.get(f.year) ?? 0) + f.ergebnis * tag.weight);
+      if (f.provisional) provisional.add(f.year);
+    }
+  }
+  return {
+    years,
+    ansatz: years.map((y) => (aMap.has(y) ? Math.round(aMap.get(y)!) : null)),
+    ergebnis: years.map((y) => (eMap.has(y) ? Math.round(eMap.get(y)!) : null)),
+    provisional,
+  };
+}
+
+export interface NamedAmount {
+  key: string;
+  label: string;
+  value: number;
+}
+
+/** Whether a theme has meaningful Einnahmen (to decide if the E/A toggle matters). */
+export function themeHasEinnahmen(data: Data, themeId: string, year: number): boolean {
+  return breakdownByAbschnitt(data, themeId, "E", year).reduce((s, x) => s + x.value, 0) > 0;
+}
+
+/** Weighted amounts per Abschnitt for a theme (one year, given E/A), sorted desc. */
+export function breakdownByAbschnitt(
+  data: Data,
+  themeId: string,
+  ea: EA,
+  year: number,
+): NamedAmount[] {
+  const { budget, themes } = data;
+  const acc = new Map<string, number>();
+  for (const f of budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = budget.posten[f.hhst_id];
+    if (!p || p.ea !== ea) continue;
+    const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
+    if (!tag) continue;
+    const ab = p.glz.slice(0, 2);
+    acc.set(ab, (acc.get(ab) ?? 0) + f.ansatz * tag.weight);
+  }
+  const labels = abschnittLabels(budget);
+  return [...acc.entries()]
+    .map(([ab, v]) => ({ key: ab, label: labels.get(ab) ?? ab, value: Math.round(v) }))
+    .filter((x) => x.value > 0)
+    .sort((a, b) => b.value - a.value);
+}
+
+/** Top individual Posten for a theme (one year, given E/A) — drives the explanation text. */
+export function topPosten(
+  data: Data,
+  themeId: string,
+  ea: EA,
+  year: number,
+  limit = 8,
+): NamedAmount[] {
+  const { budget, themes } = data;
+  const out: NamedAmount[] = [];
+  for (const f of budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = budget.posten[f.hhst_id];
+    if (!p || p.ea !== ea) continue;
+    const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
+    if (!tag) continue;
+    const label = [p.grz_text, p.kontotext].filter(Boolean).join(" – ") || p.hhst_id;
+    const context = p.glz_text ? ` (${p.glz_text.replace(/\s+/g, " ").trim()})` : "";
+    out.push({ key: f.hhst_id, label: label + context, value: Math.round(f.ansatz * tag.weight) });
+  }
+  return out.sort((a, b) => b.value - a.value).slice(0, limit);
+}
+
+export function eventsFor(data: Data, scope: EventScope, id: string): BudgetEvent[] {
+  return data.events
+    .filter((e) => e.scope === scope && e.id === id)
+    .sort((a, b) => a.year - b.year);
 }
