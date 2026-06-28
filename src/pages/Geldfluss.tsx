@@ -15,8 +15,8 @@ export function Geldfluss() {
   const view = useMemo(() => {
     if (!data) return null;
     const y = year ?? latestYear(data.budget);
-    const inc = incomeSources(data, y, hideInternal);
-    const exp = expenseThemes(data, y, hideInternal);
+    const inc = incomeSources(data, y, hideInternal, "verwaltung");
+    const exp = expenseThemes(data, y, hideInternal, "verwaltung");
 
     const nodes = [
       ...inc.map((s, i) => ({
@@ -49,11 +49,13 @@ export function Geldfluss() {
         {
           type: "sankey",
           left: 8,
-          right: 160,
+          right: 200,
           top: 10,
           bottom: 10,
           nodeWidth: 14,
-          nodeGap: 10,
+          nodeGap: 11,
+          nodeAlign: "left",
+          layoutIterations: 64,
           emphasis: { focus: "adjacency" },
           data: nodes,
           links,
@@ -74,8 +76,9 @@ export function Geldfluss() {
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-bold">Geldfluss</h1>
         <p className="max-w-2xl text-ink-soft">
-          Woher das Geld kommt und wohin es fließt: links die Einnahmequellen, rechts die
-          Ausgaben nach Themen. Die Breite jedes Bandes entspricht dem Betrag.
+          Der laufende Betrieb (Verwaltungshaushalt): links die Einnahmequellen, rechts die
+          Ausgaben nach Themen. Die Breite jedes Bandes entspricht dem Betrag. Investitionen
+          stehen auf den jeweiligen Themenseiten.
         </p>
       </header>
 
@@ -124,8 +127,9 @@ export function Geldfluss() {
       </section>
 
       <p className="text-xs text-ink-muted max-w-2xl">
-        Methodik: Beträge sind Haushaltsansätze. „Interne Verrechnungen" (Zuführungen zwischen
-        Verwaltungs- und Vermögenshaushalt, innere Verrechnungen, Rücklagen, kalkulatorische
+        Methodik: Beträge sind Haushaltsansätze des Verwaltungshaushalts (laufender Betrieb).
+        Der Vermögenshaushalt (Investitionen) ist hier nicht enthalten. „Interne Verrechnungen"
+        (Zuführungen zwischen den Haushalten, innere Verrechnungen, Rücklagen, kalkulatorische
         Kosten) sind standardmäßig ausgeblendet, da sie sonst doppelt zählen würden. Dadurch
         weichen Einnahmen- und Ausgabensumme leicht voneinander ab.
       </p>

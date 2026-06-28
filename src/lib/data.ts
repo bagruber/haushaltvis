@@ -146,7 +146,7 @@ export interface TreeNode {
  * Weighted expense treemap: Theme → Abschnitt. Each Posten's Ansatz for `year`
  * is split across its themes by weight, so totals never double-count.
  */
-export function expenseTreemap(data: Data, year: number): TreeNode[] {
+export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): TreeNode[] {
   const { budget, themes } = data;
   // theme -> abschnitt -> amount
   const acc = new Map<string, Map<string, number>>();
@@ -154,6 +154,7 @@ export function expenseTreemap(data: Data, year: number): TreeNode[] {
     if (f.year !== year || f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== "A") continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
     const tags = themes.assignment[f.hhst_id] ?? [];
     const ab = p.glz.slice(0, 2);
     for (const { theme, weight } of tags) {
@@ -327,22 +328,44 @@ export function isInternal(p: Posten): boolean {
   );
 }
 
-const INCOME_SOURCE: Record<string, string> = {
-  "0": "Steuern & Schlüsselzuweisungen",
-  "1": "Gebühren, Beiträge & Entgelte",
-  "2": "Zinsen & sonstige Einnahmen",
-  "3": "Investitionseinnahmen (Zuschüsse, Verkäufe, Kredite)",
-};
+/**
+ * Laien-friendly income category for one Posten, finer than Hauptgruppe:
+ * splits the big taxes (Gewerbesteuer, Einkommensteuer-Anteil, …) apart.
+ */
+export function incomeCategory(p: Posten): string {
+  const g = p.grz;
+  if (p.haushalt === "vermoegen") {
+    if (g.startsWith("34")) return "Vermögensveräußerung";
+    if (g.startsWith("36")) return "Investitionszuschüsse";
+    if (g.startsWith("377") || g.startsWith("378")) return "Kreditaufnahmen";
+    return "Sonstige Investitionseinnahmen";
+  }
+  // Verwaltungshaushalt income (Hauptgruppen 0, 1, 2)
+  if (g === "0030") return "Gewerbesteuer";
+  if (g === "0000" || g === "0010" || g === "0020") return "Grundsteuer";
+  if (g === "0100" || g === "0615") return "Einkommensteuer-Anteil";
+  if (g === "0120") return "Umsatzsteuer-Anteil";
+  if (g.startsWith("04") || g === "0611") return "Schlüsselzuweisungen & Finanzausgleich";
+  if (g[0] === "0") return "Sonstige Steuern & Zuweisungen";
+  if (g[0] === "1") return "Gebühren, Beiträge & Entgelte";
+  return "Zinsen, Konzession & sonstige Einnahmen"; // Hauptgruppe 2
+}
 
-/** Einnahmen grouped into a few laien-friendly sources (E side, one year). */
-export function incomeSources(data: Data, year: number, hideInternal = true): NamedAmount[] {
+/** Einnahmen grouped into laien-friendly sources (E side, one year). */
+export function incomeSources(
+  data: Data,
+  year: number,
+  hideInternal = true,
+  haushalt?: Haushalt,
+): NamedAmount[] {
   const acc = new Map<string, number>();
   for (const f of data.budget.facts) {
     if (f.year !== year || f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "E") continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
     if (hideInternal && isInternal(p)) continue;
-    const src = INCOME_SOURCE[p.grz[0]] ?? "Sonstige Einnahmen";
+    const src = incomeCategory(p);
     acc.set(src, (acc.get(src) ?? 0) + f.ansatz);
   }
   return [...acc.entries()]
@@ -352,12 +375,18 @@ export function incomeSources(data: Data, year: number, hideInternal = true): Na
 }
 
 /** Weighted Ausgaben per theme (A side, one year). */
-export function expenseThemes(data: Data, year: number, hideInternal = true): NamedAmount[] {
+export function expenseThemes(
+  data: Data,
+  year: number,
+  hideInternal = true,
+  haushalt?: Haushalt,
+): NamedAmount[] {
   const acc = new Map<string, number>();
   for (const f of data.budget.facts) {
     if (f.year !== year || f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "A") continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
     if (hideInternal && isInternal(p)) continue;
     for (const { theme, weight } of data.themes.assignment[f.hhst_id] ?? []) {
       acc.set(theme, (acc.get(theme) ?? 0) + f.ansatz * weight);
@@ -396,12 +425,15 @@ export interface SankeyData {
 }
 
 const ZUSCHUSS = "Zuschuss aus allg. Haushalt";
+const MAX_LEAVES = 6; // per group, before collapsing the tail into "Weitere"
 
 /**
  * Verwaltungshaushalt money flow for one theme, one year:
  *   [income sources + Zuschuss] → [theme hub] → [Unterabschnitt group] → [Posten].
  * Income can't be attributed to individual Posten, so it pools at the hub; the
  * gap between earmarked income and expense is shown as "Zuschuss aus allg. Haushalt".
+ * Groups are keyed by 3-digit Unterabschnitt code (not label) so distinct groups
+ * never merge; leaf columns are capped to keep the diagram readable.
  */
 export function themeSankey(data: Data, themeId: string, year: number): SankeyData {
   const { budget, themes, labels } = data;
@@ -409,7 +441,7 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   const hub = def?.label ?? themeId;
 
   const income = new Map<string, number>();
-  // group(label) -> { total, leaves: Map<leafLabel, value> }
+  // 3-digit code -> { total, leaves }
   const groups = new Map<string, { total: number; leaves: Map<string, number> }>();
   let totalEx = 0;
 
@@ -422,50 +454,77 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
     const amt = f.ansatz * tag.weight;
     if (p.ea === "E") {
       if (isInternal(p)) continue;
-      const src = INCOME_SOURCE[p.grz[0]] ?? "Sonstige Einnahmen";
+      const src = incomeCategory(p);
       income.set(src, (income.get(src) ?? 0) + amt);
     } else {
-      const gl = groupLabel(labels, p.glz);
+      const code = p.glz.slice(0, 3);
       const leaf = (p.glz_text ?? p.hhst_id).replace(/\s+/g, " ").trim();
-      const g = groups.get(gl) ?? { total: 0, leaves: new Map() };
+      const g = groups.get(code) ?? { total: 0, leaves: new Map() };
       g.total += amt;
       g.leaves.set(leaf, (g.leaves.get(leaf) ?? 0) + amt);
-      groups.set(gl, g);
+      groups.set(code, g);
       totalEx += amt;
     }
   }
+
+  // Resolve group labels, disambiguating any that collide (shared abschnitt fallback)
+  const codes = [...groups.keys()];
+  const rawLabel = new Map(codes.map((c) => [c, groupLabel(labels, c)]));
+  const labelCount = new Map<string, number>();
+  for (const l of rawLabel.values()) labelCount.set(l, (labelCount.get(l) ?? 0) + 1);
+  const groupName = new Map(
+    codes.map((c) => {
+      const l = rawLabel.get(c)!;
+      return [c, (labelCount.get(l) ?? 0) > 1 ? `${l} (${c})` : l];
+    }),
+  );
 
   const totalIn = [...income.values()].reduce((s, v) => s + v, 0);
   const zuschuss = Math.max(0, totalEx - totalIn);
 
   const nodes: SankeyNode[] = [];
   const links: SankeyLink[] = [];
+  const used = new Set<string>();
   const gold = "#b8964e";
   const themeColor = def?.color ?? "#999";
+  const addNode = (name: string, color: string): string => {
+    let n = name;
+    while (used.has(n)) n += " ";
+    used.add(n);
+    nodes.push({ name: n, itemStyle: { color } });
+    return n;
+  };
 
-  // income column
-  for (const [src, v] of income) {
+  // income column → hub
+  for (const [src, v] of [...income.entries()].sort((a, b) => b[1] - a[1])) {
     if (v <= 0) continue;
-    nodes.push({ name: src, itemStyle: { color: gold } });
-    links.push({ source: src, target: hub, value: Math.round(v) });
+    links.push({ source: addNode(src, gold), target: hub, value: Math.round(v) });
   }
   if (zuschuss > 0) {
-    nodes.push({ name: ZUSCHUSS, itemStyle: { color: "#c0392b" } });
-    links.push({ source: ZUSCHUSS, target: hub, value: Math.round(zuschuss) });
+    links.push({ source: addNode(ZUSCHUSS, "#c0392b"), target: hub, value: Math.round(zuschuss) });
   }
-  // hub
-  nodes.push({ name: hub, itemStyle: { color: themeColor } });
-  // groups + leaves
-  for (const [gl, g] of [...groups.entries()].sort((a, b) => b[1].total - a[1].total)) {
-    nodes.push({ name: gl, itemStyle: { color: themeColor } });
-    links.push({ source: hub, target: gl, value: Math.round(g.total) });
-    // only expand into a 4th column when the group actually splits into several
-    if (g.leaves.size <= 1) continue;
-    for (const [leaf, v] of [...g.leaves.entries()].sort((a, b) => b[1] - a[1])) {
+  addNode(hub, themeColor);
+
+  // hub → group → (leaves, capped)
+  for (const [code, g] of [...groups.entries()].sort((a, b) => b[1].total - a[1].total)) {
+    const gName = addNode(groupName.get(code)!, themeColor);
+    links.push({ source: hub, target: gName, value: Math.round(g.total) });
+    if (g.leaves.size <= 1) continue; // single item: group node already represents it
+
+    const sorted = [...g.leaves.entries()].sort((a, b) => b[1] - a[1]);
+    const head = sorted.slice(0, MAX_LEAVES);
+    const tail = sorted.slice(MAX_LEAVES);
+    for (const [leaf, v] of head) {
       if (v <= 0) continue;
-      const leafName = leaf === gl ? `${leaf} ` : leaf; // keep node names unique
-      nodes.push({ name: leafName, itemStyle: { color: themeColor } });
-      links.push({ source: gl, target: leafName, value: Math.round(v) });
+      links.push({ source: gName, target: addNode(leaf, themeColor), value: Math.round(v) });
+    }
+    const rest = tail.reduce((s, [, v]) => s + v, 0);
+    if (rest > 0) {
+      links.push({
+        source: gName,
+        target: addNode(`Weitere (${tail.length})`, themeColor),
+        value: Math.round(rest),
+      });
     }
   }
 
