@@ -57,10 +57,16 @@ export interface BudgetEvent {
   text?: string;
 }
 
+export interface Labels {
+  abschnitt?: Record<string, string>;
+  unterabschnitt?: Record<string, string>;
+}
+
 export interface Data {
   budget: Budget;
   themes: Themes;
   events: BudgetEvent[];
+  labels: Labels;
 }
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
@@ -75,9 +81,30 @@ export function loadData(): Promise<Data> {
       fetch(`${base}data/events.json`)
         .then((r) => (r.ok ? (r.json() as Promise<{ events: BudgetEvent[] }>) : { events: [] }))
         .catch(() => ({ events: [] })),
-    ]).then(([budget, themes, ev]) => ({ budget, themes, events: ev.events ?? [] }));
+      fetch(`${base}data/labels.json`)
+        .then((r) => (r.ok ? (r.json() as Promise<Labels>) : {}))
+        .catch(() => ({}) as Labels),
+    ]).then(([budget, themes, ev, labels]) => ({
+      budget,
+      themes,
+      events: ev.events ?? [],
+      labels,
+    }));
   }
   return cache;
+}
+
+/** Label for a 3-digit Unterabschnitt group, falling back to Abschnitt name. */
+export function groupLabel(labels: Labels, glz: string): string {
+  return (
+    labels.unterabschnitt?.[glz.slice(0, 3)] ??
+    labels.abschnitt?.[glz.slice(0, 2)] ??
+    glz.slice(0, 3)
+  );
+}
+
+export function abschnittName(labels: Labels, ab: string): string {
+  return labels.abschnitt?.[ab] ?? ab;
 }
 
 export function useData() {
@@ -135,13 +162,11 @@ export function expenseTreemap(data: Data, year: number): TreeNode[] {
       inner.set(ab, (inner.get(ab) ?? 0) + f.ansatz * weight);
     }
   }
-  // abschnitt label lookup (first Posten text)
-  const abLabel = abschnittLabels(budget);
   const nodes: TreeNode[] = [];
   for (const [theme, inner] of acc) {
     const def = themes.themes[theme];
     const children = [...inner.entries()]
-      .map(([ab, v]) => ({ name: abLabel.get(ab) ?? ab, value: Math.round(v) }))
+      .map(([ab, v]) => ({ name: abschnittName(data.labels, ab), value: Math.round(v) }))
       .filter((c) => c.value > 0)
       .sort((a, b) => b.value - a.value);
     const total = children.reduce((s, c) => s + c.value, 0);
@@ -154,15 +179,6 @@ export function expenseTreemap(data: Data, year: number): TreeNode[] {
     });
   }
   return nodes.sort((a, b) => b.value - a.value);
-}
-
-function abschnittLabels(b: Budget): Map<string, string> {
-  const m = new Map<string, string>();
-  for (const p of Object.values(b.posten)) {
-    const ab = p.glz.slice(0, 2);
-    if (p.glz_text && !m.has(ab)) m.set(ab, p.glz_text.replace(/\s+/g, " ").trim());
-  }
-  return m;
 }
 
 export interface Totals {
@@ -198,7 +214,12 @@ export interface YearSeries {
  * Weighted Ansatz/Ergebnis per year for one theme, filtered by E/A.
  * Each Posten contributes amount × theme-weight, so no double-counting.
  */
-export function themeYearSeries(data: Data, themeId: string, ea: EA): YearSeries {
+export function themeYearSeries(
+  data: Data,
+  themeId: string,
+  ea: EA,
+  haushalt?: Haushalt,
+): YearSeries {
   const { budget, themes } = data;
   const years = budget.meta.years;
   const aMap = new Map<number, number>();
@@ -207,6 +228,7 @@ export function themeYearSeries(data: Data, themeId: string, ea: EA): YearSeries
   for (const f of budget.facts) {
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== ea) continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
     const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
     if (!tag) continue;
     if (f.ansatz != null) aMap.set(f.year, (aMap.get(f.year) ?? 0) + f.ansatz * tag.weight);
@@ -252,9 +274,8 @@ export function breakdownByAbschnitt(
     const ab = p.glz.slice(0, 2);
     acc.set(ab, (acc.get(ab) ?? 0) + f.ansatz * tag.weight);
   }
-  const labels = abschnittLabels(budget);
   return [...acc.entries()]
-    .map(([ab, v]) => ({ key: ab, label: labels.get(ab) ?? ab, value: Math.round(v) }))
+    .map(([ab, v]) => ({ key: ab, label: abschnittName(data.labels, ab), value: Math.round(v) }))
     .filter((x) => x.value > 0)
     .sort((a, b) => b.value - a.value);
 }
@@ -266,6 +287,7 @@ export function topPosten(
   ea: EA,
   year: number,
   limit = 8,
+  haushalt?: Haushalt,
 ): NamedAmount[] {
   const { budget, themes } = data;
   const out: NamedAmount[] = [];
@@ -273,6 +295,7 @@ export function topPosten(
     if (f.year !== year || f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== ea) continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
     const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
     if (!tag) continue;
     const label = [p.grz_text, p.kontotext].filter(Boolean).join(" – ") || p.hhst_id;
@@ -350,4 +373,162 @@ export function eventsFor(data: Data, scope: EventScope, id: string): BudgetEven
   return data.events
     .filter((e) => e.scope === scope && e.id === id)
     .sort((a, b) => a.year - b.year);
+}
+
+// ── Theme-scoped Sankey (Verwaltungshaushalt) ───────────────────────────────
+
+export interface SankeyNode {
+  name: string;
+  itemStyle?: { color: string };
+  depth?: number;
+}
+export interface SankeyLink {
+  source: string;
+  target: string;
+  value: number;
+}
+export interface SankeyData {
+  nodes: SankeyNode[];
+  links: SankeyLink[];
+  income: number;
+  zuschuss: number;
+  total: number;
+}
+
+const ZUSCHUSS = "Zuschuss aus allg. Haushalt";
+
+/**
+ * Verwaltungshaushalt money flow for one theme, one year:
+ *   [income sources + Zuschuss] → [theme hub] → [Unterabschnitt group] → [Posten].
+ * Income can't be attributed to individual Posten, so it pools at the hub; the
+ * gap between earmarked income and expense is shown as "Zuschuss aus allg. Haushalt".
+ */
+export function themeSankey(data: Data, themeId: string, year: number): SankeyData {
+  const { budget, themes, labels } = data;
+  const def = themes.themes[themeId];
+  const hub = def?.label ?? themeId;
+
+  const income = new Map<string, number>();
+  // group(label) -> { total, leaves: Map<leafLabel, value> }
+  const groups = new Map<string, { total: number; leaves: Map<string, number> }>();
+  let totalEx = 0;
+
+  for (const f of budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = budget.posten[f.hhst_id];
+    if (!p || p.haushalt !== "verwaltung") continue;
+    const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
+    if (!tag) continue;
+    const amt = f.ansatz * tag.weight;
+    if (p.ea === "E") {
+      if (isInternal(p)) continue;
+      const src = INCOME_SOURCE[p.grz[0]] ?? "Sonstige Einnahmen";
+      income.set(src, (income.get(src) ?? 0) + amt);
+    } else {
+      const gl = groupLabel(labels, p.glz);
+      const leaf = (p.glz_text ?? p.hhst_id).replace(/\s+/g, " ").trim();
+      const g = groups.get(gl) ?? { total: 0, leaves: new Map() };
+      g.total += amt;
+      g.leaves.set(leaf, (g.leaves.get(leaf) ?? 0) + amt);
+      groups.set(gl, g);
+      totalEx += amt;
+    }
+  }
+
+  const totalIn = [...income.values()].reduce((s, v) => s + v, 0);
+  const zuschuss = Math.max(0, totalEx - totalIn);
+
+  const nodes: SankeyNode[] = [];
+  const links: SankeyLink[] = [];
+  const gold = "#b8964e";
+  const themeColor = def?.color ?? "#999";
+
+  // income column
+  for (const [src, v] of income) {
+    if (v <= 0) continue;
+    nodes.push({ name: src, itemStyle: { color: gold } });
+    links.push({ source: src, target: hub, value: Math.round(v) });
+  }
+  if (zuschuss > 0) {
+    nodes.push({ name: ZUSCHUSS, itemStyle: { color: "#c0392b" } });
+    links.push({ source: ZUSCHUSS, target: hub, value: Math.round(zuschuss) });
+  }
+  // hub
+  nodes.push({ name: hub, itemStyle: { color: themeColor } });
+  // groups + leaves
+  for (const [gl, g] of [...groups.entries()].sort((a, b) => b[1].total - a[1].total)) {
+    nodes.push({ name: gl, itemStyle: { color: themeColor } });
+    links.push({ source: hub, target: gl, value: Math.round(g.total) });
+    // only expand into a 4th column when the group actually splits into several
+    if (g.leaves.size <= 1) continue;
+    for (const [leaf, v] of [...g.leaves.entries()].sort((a, b) => b[1] - a[1])) {
+      if (v <= 0) continue;
+      const leafName = leaf === gl ? `${leaf} ` : leaf; // keep node names unique
+      nodes.push({ name: leafName, itemStyle: { color: themeColor } });
+      links.push({ source: gl, target: leafName, value: Math.round(v) });
+    }
+  }
+
+  return { nodes, links, income: totalIn, zuschuss, total: totalEx };
+}
+
+// ── Net investments (Vermögenshaushalt) ─────────────────────────────────────
+
+export interface Investment {
+  glz: string;
+  label: string;
+  invest: number; // gross expense (HG 9)
+  foerderung: number; // earmarked income (HG 3)
+  netto: number;
+}
+
+function isFinancing(p: Posten): boolean {
+  const t = `${p.grz_text ?? ""}`.toLowerCase();
+  return (
+    p.glz.startsWith("91") ||
+    p.glz.startsWith("96") ||
+    t.includes("kredit") ||
+    t.includes("tilgung") ||
+    t.includes("schuldendienst")
+  );
+}
+
+/**
+ * Per-investment net cost for one theme/year: gross expense (HG 9) minus the
+ * earmarked funding booked at the same Gliederung (HG 3). Financing/transfer
+ * bookings are excluded.
+ */
+export function investmentNet(data: Data, themeId: string, year: number, limit = 12): Investment[] {
+  const { budget, themes } = data;
+  const invest = new Map<string, number>();
+  const foerder = new Map<string, number>();
+  const label = new Map<string, string>();
+
+  for (const f of budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = budget.posten[f.hhst_id];
+    if (!p || p.haushalt !== "vermoegen") continue;
+    if (isInternal(p) || isFinancing(p)) continue;
+    const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
+    if (!tag) continue;
+    const amt = f.ansatz * tag.weight;
+    if (p.grz[0] === "9") invest.set(p.glz, (invest.get(p.glz) ?? 0) + amt);
+    else if (p.grz[0] === "3") foerder.set(p.glz, (foerder.get(p.glz) ?? 0) + amt);
+    if (p.glz_text && !label.has(p.glz)) label.set(p.glz, p.glz_text.replace(/\s+/g, " ").trim());
+  }
+
+  return [...invest.entries()]
+    .map(([glz, a]) => {
+      const f = foerder.get(glz) ?? 0;
+      return {
+        glz,
+        label: label.get(glz) ?? glz,
+        invest: Math.round(a),
+        foerderung: Math.round(f),
+        netto: Math.round(a - f),
+      };
+    })
+    .filter((x) => x.invest > 0)
+    .sort((a, b) => b.invest - a.invest)
+    .slice(0, limit);
 }

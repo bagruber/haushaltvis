@@ -5,11 +5,11 @@ import { EChart } from "@/components/EChart";
 import {
   useData,
   themeYearSeries,
-  breakdownByAbschnitt,
+  themeSankey,
+  investmentNet,
   topPosten,
-  themeHasEinnahmen,
+  breakdownByAbschnitt,
   latestYear,
-  type EA,
   type Data,
   type BudgetEvent,
 } from "@/lib/data";
@@ -30,64 +30,113 @@ function gatherEvents(data: Data, themeId: string): BudgetEvent[] {
     .sort((a, b) => a.year - b.year);
 }
 
+function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <h3 className="font-display text-lg font-bold">{title}</h3>
+      {hint && <p className="text-xs text-ink-muted mb-2">{hint}</p>}
+      <div className={hint ? "" : "mt-2"}>{children}</div>
+    </section>
+  );
+}
+
 export function ThemeDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
-  const [ea, setEa] = useState<EA>("A");
+  const [year] = useState<number | null>(null);
 
   const view = useMemo(() => {
     if (!data) return null;
     const def = data.themes.themes[id];
     if (!def) return { def: null } as const;
-    const year = latestYear(data.budget);
-    const hasE = themeHasEinnahmen(data, id, year);
-    const series = themeYearSeries(data, id, ea);
-    const breakdown = breakdownByAbschnitt(data, id, ea, year);
-    const top = topPosten(data, id, ea, year);
-    const events = gatherEvents(data, id);
-    const evColor = "#a50d24";
+    const y = year ?? latestYear(data.budget);
 
-    const timeline: EChartsOption = {
-      color: [def.color, def.color],
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : fmtEur(v as number)) },
-      legend: { bottom: 0 },
-      grid: { left: 64, right: 24, top: 24, bottom: 56 },
-      xAxis: { type: "category", data: series.years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+    const sankey = themeSankey(data, id, y);
+    const vwSeries = themeYearSeries(data, id, "A", "verwaltung");
+    const vwTop = topPosten(data, id, "A", y, 8, "verwaltung");
+    const invest = investmentNet(data, id, y);
+    const vmTotal = invest.reduce((s, x) => s + x.invest, 0);
+    const vmFoerder = invest.reduce((s, x) => s + x.foerderung, 0);
+    const events = gatherEvents(data, id);
+
+    const sankeyOpt: EChartsOption = {
+      tooltip: {
+        trigger: "item",
+        formatter: (p: unknown) => {
+          const i = p as { dataType: string; name?: string; value?: number; data?: { source?: string; target?: string } };
+          if (i.dataType === "edge") return `${i.data?.source} → ${i.data?.target}<br/><b>${fmtEur(i.value!)}</b>`;
+          return `<b>${i.name}</b><br/>${fmtEur(i.value!)}`;
+        },
+      },
       series: [
         {
-          name: "Ansatz (Plan)",
-          type: "line",
-          data: series.ansatz,
-          symbol: "circle",
-          symbolSize: 7,
-          lineStyle: { width: 3 },
-          connectNulls: true,
-          markLine: events.length
-            ? {
-                symbol: "none",
-                lineStyle: { color: evColor, type: "dashed", opacity: 0.6 },
-                label: { show: false },
-                data: [...new Set(events.map((e) => e.year))].map((y) => ({
-                  xAxis: String(y),
-                })),
-              }
-            : undefined,
-        },
-        {
-          name: "Ergebnis (Ist)",
-          type: "line",
-          data: series.ergebnis,
-          symbol: "emptyCircle",
-          symbolSize: 7,
-          lineStyle: { width: 2, type: "dashed" },
-          itemStyle: { color: "#967a40" },
-          connectNulls: true,
+          type: "sankey",
+          left: 8,
+          right: 180,
+          top: 10,
+          bottom: 10,
+          nodeWidth: 12,
+          nodeGap: 8,
+          draggable: false,
+          emphasis: { focus: "adjacency" },
+          data: sankey.nodes,
+          links: sankey.links,
+          label: { color: "#1c1c1c", fontSize: 11 },
+          lineStyle: { color: "gradient", opacity: 0.45, curveness: 0.5 },
         },
       ],
     };
-    return { def, year, hasE, breakdown, top, events, timeline };
-  }, [data, id, ea]);
+
+    const timelineOpt: EChartsOption = {
+      color: [def.color, "#967a40"],
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : fmtEur(v as number)) },
+      legend: { bottom: 0 },
+      grid: { left: 64, right: 20, top: 16, bottom: 48 },
+      xAxis: { type: "category", data: vwSeries.years.map(String) },
+      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+      series: [
+        { name: "Ansatz (Plan)", type: "line", data: vwSeries.ansatz, symbolSize: 7, lineStyle: { width: 3 }, connectNulls: true },
+        { name: "Ergebnis (Ist)", type: "line", data: vwSeries.ergebnis, symbol: "emptyCircle", symbolSize: 7, lineStyle: { width: 2, type: "dashed" }, connectNulls: true },
+      ],
+    };
+
+    const investOpt: EChartsOption | null = invest.length
+      ? {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: { type: "shadow" },
+            valueFormatter: (v) => fmtEur(v as number),
+          },
+          legend: { bottom: 0 },
+          grid: { left: 8, right: 24, top: 16, bottom: 48, containLabel: true },
+          xAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+          yAxis: {
+            type: "category",
+            inverse: true,
+            data: invest.map((i) => i.label),
+            axisLabel: { width: 160, overflow: "truncate", fontSize: 11 },
+          },
+          series: [
+            {
+              name: "Förderung / Einnahmen",
+              type: "bar",
+              stack: "x",
+              data: invest.map((i) => i.foerderung),
+              itemStyle: { color: "#0a9e4c" },
+            },
+            {
+              name: "Netto-Eigenanteil der Stadt",
+              type: "bar",
+              stack: "x",
+              data: invest.map((i) => Math.max(0, i.netto)),
+              itemStyle: { color: def.color },
+            },
+          ],
+        }
+      : null;
+
+    return { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events };
+  }, [data, id, year]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
@@ -98,10 +147,11 @@ export function ThemeDetail() {
       </p>
     );
 
-  const { def, year, hasE, breakdown, top, events, timeline } = view;
+  const { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events } = view;
+  const sankeyHeight = Math.max(360, sankey.nodes.length * 26);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <nav className="text-sm text-ink-muted">
         <Link to="/themen" className="hover:text-ink">Themen</Link> ›{" "}
         <span className="text-ink">{def.label}</span>
@@ -115,94 +165,72 @@ export function ThemeDetail() {
         <p className="max-w-2xl text-ink-soft">{def.description}</p>
       </header>
 
-      {hasE && (
-        <div className="inline-flex rounded-lg border border-ink-line bg-white p-0.5 text-sm">
-          {(["A", "E"] as EA[]).map((k) => (
-            <button
-              key={k}
-              onClick={() => setEa(k)}
-              className={
-                "px-4 py-1.5 rounded-md transition-colors " +
-                (ea === k ? "bg-red-600 text-cream" : "text-ink-soft hover:text-ink")
-              }
-            >
-              {k === "A" ? "Ausgaben" : "Einnahmen"}
-            </button>
-          ))}
+      {/* ── Verwaltungshaushalt ───────────────────────────────── */}
+      <div className="space-y-4">
+        <div className="flex items-baseline gap-3 border-b border-ink-line pb-1">
+          <h2 className="font-display text-2xl font-bold">Laufender Betrieb</h2>
+          <span className="text-sm text-ink-muted">Verwaltungshaushalt {y}</span>
+        </div>
+
+        <Card
+          title="Geldfluss"
+          hint={`Woher das Geld kommt und wofür es im laufenden Betrieb ausgegeben wird. Eigene Einnahmen ${fmtEurShort(sankey.income)}, Zuschuss aus allgemeinen Haushaltsmitteln ${fmtEurShort(sankey.zuschuss)}.`}
+        >
+          {sankey.links.length ? (
+            <EChart option={sankeyOpt} style={{ height: sankeyHeight }} />
+          ) : (
+            <p className="text-sm text-ink-muted">Kein laufender Aufwand in diesem Thema.</p>
+          )}
+        </Card>
+
+        <div className="grid lg:grid-cols-2 gap-4">
+          <Card title="Entwicklung der Ausgaben" hint={`Plan (Ansatz) gegen Ergebnis (Ist), 2018–${y}. Wert ${y} vorläufig.`}>
+            <EChart option={timelineOpt} style={{ height: 300 }} />
+          </Card>
+          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y}`}>
+            <ol className="space-y-1.5 text-sm">
+              {vwTop.map((p) => (
+                <li key={p.key} className="flex justify-between gap-3 border-b border-ink-line/60 pb-1.5">
+                  <span className="text-ink-soft">{p.label}</span>
+                  <span className="tabular-nums shrink-0 font-medium">{fmtEur(p.value)}</span>
+                </li>
+              ))}
+            </ol>
+          </Card>
+        </div>
+      </div>
+
+      {/* ── Vermögenshaushalt ─────────────────────────────────── */}
+      {invest.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-baseline gap-3 border-b border-ink-line pb-1">
+            <h2 className="font-display text-2xl font-bold">Investitionen</h2>
+            <span className="text-sm text-ink-muted">Vermögenshaushalt {y}</span>
+          </div>
+
+          <Card
+            title="Was Investitionen netto kosten"
+            hint={`Brutto-Investitionen ${fmtEurShort(vmTotal)}, davon durch Förderungen/Einnahmen gedeckt ${fmtEurShort(vmFoerder)}. Der farbige Teil bleibt an der Stadt hängen.`}
+          >
+            {investOpt && <EChart option={investOpt} style={{ height: Math.max(280, invest.length * 36 + 80) }} />}
+          </Card>
         </div>
       )}
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
-        <h2 className="font-display text-xl font-bold mb-1">
-          Entwicklung {ea === "A" ? "der Ausgaben" : "der Einnahmen"}
-        </h2>
-        <p className="text-xs text-ink-muted mb-2">
-          Plan (Ansatz) gegen tatsächliches Ergebnis. Wert {year} vorläufig.
-          {events.length > 0 && " Gestrichelte Linien markieren hinterlegte Ereignisse."}
-        </p>
-        <EChart option={timeline} style={{ height: 380 }} />
-      </section>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
-          <h2 className="font-display text-xl font-bold mb-3">
-            Verteilung {year} ({ea === "A" ? "Ausgaben" : "Einnahmen"})
-          </h2>
-          <ul className="space-y-2">
-            {breakdown.slice(0, 10).map((b) => {
-              const max = breakdown[0].value;
-              return (
-                <li key={b.key} className="text-sm">
-                  <div className="flex justify-between gap-2">
-                    <span className="truncate">{b.label}</span>
-                    <span className="tabular-nums text-ink-soft shrink-0">{fmtEur(b.value)}</span>
-                  </div>
-                  <div className="mt-1 h-1.5 rounded bg-cream-dark">
-                    <div
-                      className="h-1.5 rounded"
-                      style={{ width: `${(b.value / max) * 100}%`, background: def.color }}
-                    />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
-          <h2 className="font-display text-xl font-bold mb-1">Größte Einzelposten {year}</h2>
-          <p className="text-xs text-ink-muted mb-3">
-            Worauf entfällt das Geld konkret in diesem Thema?
-          </p>
-          <ol className="space-y-1.5 text-sm">
-            {top.map((p) => (
-              <li key={p.key} className="flex justify-between gap-3 border-b border-ink-line/60 pb-1.5">
-                <span className="text-ink-soft">{p.label}</span>
-                <span className="tabular-nums shrink-0 font-medium">{fmtEur(p.value)}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </div>
-
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
-        <h2 className="font-display text-xl font-bold mb-3">Ereignisse</h2>
+      {/* ── Ereignisse ────────────────────────────────────────── */}
+      <Card title="Ereignisse">
         {events.length === 0 ? (
           <p className="text-sm text-ink-muted">Noch keine Ereignisse hinterlegt.</p>
         ) : (
           <ul className="space-y-3">
             {events.map((e, i) => (
               <li key={i} className="flex gap-3">
-                <span className="font-display font-bold text-red-600 tabular-nums shrink-0 w-12">
-                  {e.year}
-                </span>
+                <span className="font-display font-bold text-red-600 tabular-nums shrink-0 w-12">{e.year}</span>
                 <div>
                   <div className="font-medium">
                     {e.title}
                     {(e as { _auto?: boolean })._auto && (
-                      <span className="ml-2 text-[10px] uppercase tracking-wide text-ink-muted">
-                        automatisch erkannt
-                      </span>
+                      <span className="ml-2 text-[10px] uppercase tracking-wide text-ink-muted">automatisch erkannt</span>
                     )}
                   </div>
                   {e.text && <div className="text-sm text-ink-muted">{e.text}</div>}
@@ -211,7 +239,7 @@ export function ThemeDetail() {
             ))}
           </ul>
         )}
-      </section>
+      </Card>
     </div>
   );
 }

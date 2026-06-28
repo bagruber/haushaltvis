@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "data/processed"
 DST = ROOT / "public/data"
 EVENTS_YAML = ROOT / "etl/events.yaml"
+LABELS_YAML = ROOT / "etl/labels.yaml"
 
 # Threshold for auto-derived "Posten neu/aufgegeben" events (in €, peak value).
 AUTO_EVENT_MIN = 200_000
@@ -116,6 +117,14 @@ def main():
         encoding="utf-8",
     )
     print(f"events.json    -> {len(manual)} manuell + {len(auto)} automatisch")
+
+    labels = yaml.safe_load(LABELS_YAML.read_text(encoding="utf-8")) if LABELS_YAML.exists() else {}
+    (DST / "labels.json").write_text(
+        json.dumps(labels, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    print(f"labels.json    -> {len(labels.get('abschnitt', {}))} Abschnitte, "
+          f"{len(labels.get('unterabschnitt', {}))} Unterabschnitte")
 
 
 if __name__ == "__main__":
