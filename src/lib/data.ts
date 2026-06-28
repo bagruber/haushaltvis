@@ -282,6 +282,70 @@ export function topPosten(
   return out.sort((a, b) => b.value - a.value).slice(0, limit);
 }
 
+// ── Sankey: income sources → Haushalt → expense themes ──────────────────────
+
+/**
+ * Internal / technical bookings that would double-count in a cash-flow Sankey:
+ * transfers between the two Haushalte, internal cost allocations, reserves,
+ * calculatory costs and year-end balancing entries.
+ */
+export function isInternal(p: Posten): boolean {
+  const t = `${p.grz_text ?? ""} ${p.kontotext ?? ""}`.toLowerCase();
+  return (
+    t.includes("innere verrechnung") ||
+    t.includes("kalkulatorisch") ||
+    t.includes("zuführung") ||
+    t.includes("deckungsreserve") ||
+    t.includes("rücklage") ||
+    t.includes("abschlusstechni") ||
+    t.includes("fehlbetrag") ||
+    t.includes("überschuss") ||
+    t.includes("haushaltstechnische verrechnung")
+  );
+}
+
+const INCOME_SOURCE: Record<string, string> = {
+  "0": "Steuern & Schlüsselzuweisungen",
+  "1": "Gebühren, Beiträge & Entgelte",
+  "2": "Zinsen & sonstige Einnahmen",
+  "3": "Investitionseinnahmen (Zuschüsse, Verkäufe, Kredite)",
+};
+
+/** Einnahmen grouped into a few laien-friendly sources (E side, one year). */
+export function incomeSources(data: Data, year: number, hideInternal = true): NamedAmount[] {
+  const acc = new Map<string, number>();
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "E") continue;
+    if (hideInternal && isInternal(p)) continue;
+    const src = INCOME_SOURCE[p.grz[0]] ?? "Sonstige Einnahmen";
+    acc.set(src, (acc.get(src) ?? 0) + f.ansatz);
+  }
+  return [...acc.entries()]
+    .map(([key, value]) => ({ key, label: key, value: Math.round(value) }))
+    .filter((x) => x.value > 0)
+    .sort((a, b) => b.value - a.value);
+}
+
+/** Weighted Ausgaben per theme (A side, one year). */
+export function expenseThemes(data: Data, year: number, hideInternal = true): NamedAmount[] {
+  const acc = new Map<string, number>();
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "A") continue;
+    if (hideInternal && isInternal(p)) continue;
+    for (const { theme, weight } of data.themes.assignment[f.hhst_id] ?? []) {
+      acc.set(theme, (acc.get(theme) ?? 0) + f.ansatz * weight);
+    }
+  }
+  return [...acc.entries()]
+    .map(([key, value]) => ({ key, label: data.themes.themes[key]?.label ?? key, value: Math.round(value) }))
+    .filter((x) => x.value > 0)
+    .sort((a, b) => b.value - a.value);
+}
+
 export function eventsFor(data: Data, scope: EventScope, id: string): BudgetEvent[] {
   return data.events
     .filter((e) => e.scope === scope && e.id === id)
