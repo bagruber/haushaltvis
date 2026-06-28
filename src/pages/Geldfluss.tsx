@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, incomeSources, expenseThemes, latestYear } from "@/lib/data";
+import { shades, GOLD_BASE, NEUTRAL_HUB } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const HUB = "Haushalt Moosburg";
-const INCOME_COLORS = ["#b8964e", "#967a40", "#c8a86a", "#6e5a30", "#d8c08a"];
 
 export function Geldfluss() {
   const { data, error } = useData();
+  const navigate = useNavigate();
   const [year, setYear] = useState<number | null>(null);
   const [hideInternal, setHideInternal] = useState(true);
 
@@ -17,16 +19,16 @@ export function Geldfluss() {
     const y = year ?? latestYear(data.budget);
     const inc = incomeSources(data, y, hideInternal, "verwaltung");
     const exp = expenseThemes(data, y, hideInternal, "verwaltung");
+    const goldShades = shades(GOLD_BASE, inc.length);
+    const themeByLabel = new Map(exp.map((t) => [t.label, t.key]));
 
     const nodes = [
-      ...inc.map((s, i) => ({
-        name: s.label,
-        itemStyle: { color: INCOME_COLORS[i % INCOME_COLORS.length] },
-      })),
-      { name: HUB, itemStyle: { color: "#c8102e" } },
+      ...inc.map((s, i) => ({ name: s.label, itemStyle: { color: goldShades[i] }, depth: 0 })),
+      { name: HUB, itemStyle: { color: NEUTRAL_HUB }, depth: 1 },
       ...exp.map((t) => ({
         name: t.label,
         itemStyle: { color: data.themes.themes[t.key]?.color ?? "#999" },
+        depth: 2,
       })),
     ];
     const links = [
@@ -66,8 +68,20 @@ export function Geldfluss() {
     };
     const totalIn = inc.reduce((s, x) => s + x.value, 0);
     const totalEx = exp.reduce((s, x) => s + x.value, 0);
-    return { option, y, totalIn, totalEx };
+    return { option, y, totalIn, totalEx, themeByLabel };
   }, [data, year, hideInternal]);
+
+  const onEvents = useMemo(
+    () => ({
+      click: (p: unknown) => {
+        const i = p as { dataType?: string; name?: string };
+        if (i.dataType !== "node") return;
+        const id = view?.themeByLabel.get(i.name ?? "");
+        if (id) navigate(`/themen/${id}`);
+      },
+    }),
+    [view, navigate],
+  );
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
 
@@ -119,8 +133,9 @@ export function Geldfluss() {
       )}
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+        <p className="text-xs text-ink-muted mb-1">Klick auf ein Ausgaben-Thema öffnet die Themenseite.</p>
         {view ? (
-          <EChart option={view.option} style={{ height: 640 }} />
+          <EChart option={view.option} onEvents={onEvents} style={{ height: 640 }} />
         ) : (
           <div className="h-[640px] grid place-items-center text-ink-muted">Lade Daten …</div>
         )}

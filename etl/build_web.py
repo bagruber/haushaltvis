@@ -20,6 +20,7 @@ SRC = ROOT / "data/processed"
 DST = ROOT / "public/data"
 EVENTS_YAML = ROOT / "etl/events.yaml"
 LABELS_YAML = ROOT / "etl/labels.yaml"
+CONTEXT_YAML = ROOT / "etl/context.yaml"
 
 # Threshold for auto-derived "Posten neu/aufgegeben" events (in €, peak value).
 AUTO_EVENT_MIN = 200_000
@@ -125,6 +126,14 @@ def main():
     )
     print(f"labels.json    -> {len(labels.get('abschnitt', {}))} Abschnitte, "
           f"{len(labels.get('unterabschnitt', {}))} Unterabschnitte")
+
+    context = yaml.safe_load(CONTEXT_YAML.read_text(encoding="utf-8")) if CONTEXT_YAML.exists() else {}
+    (DST / "context.json").write_text(
+        json.dumps(context, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    print(f"context.json   -> {len(context.get('population', {}))} Jahre Einwohner, "
+          f"{len(context.get('cpi', {}))} Jahre CPI")
 
 
 if __name__ == "__main__":

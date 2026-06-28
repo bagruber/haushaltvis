@@ -9,9 +9,11 @@ import {
   investmentNet,
   topPosten,
   breakdownByAbschnitt,
+  adjustSeries,
   latestYear,
   type Data,
   type BudgetEvent,
+  type TimeMode,
 } from "@/lib/data";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -44,15 +46,18 @@ export function ThemeDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
   const [year] = useState<number | null>(null);
+  const [mode, setMode] = useState<TimeMode>({});
 
   const view = useMemo(() => {
     if (!data) return null;
     const def = data.themes.themes[id];
     if (!def) return { def: null } as const;
     const y = year ?? latestYear(data.budget);
+    const unit = mode.perCapita ? " €/Kopf" : "";
+    const fmt = (v: number) => (mode.perCapita ? `${fmtEur(v)}${unit}` : fmtEur(v));
 
     const sankey = themeSankey(data, id, y);
-    const vwSeries = themeYearSeries(data, id, "A", "verwaltung");
+    const vwSeries = adjustSeries(themeYearSeries(data, id, "A", "verwaltung"), data.context, mode, y);
     const vwTop = topPosten(data, id, "A", y, 8, "verwaltung");
     const invest = investmentNet(data, id, y);
     const vmTotal = invest.reduce((s, x) => s + x.invest, 0);
@@ -91,11 +96,11 @@ export function ThemeDetail() {
 
     const timelineOpt: EChartsOption = {
       color: [def.color, "#967a40"],
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : fmtEur(v as number)) },
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : fmt(v as number)) },
       legend: { bottom: 0 },
       grid: { left: 64, right: 20, top: 16, bottom: 48 },
       xAxis: { type: "category", data: vwSeries.years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+      yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? `${fmtEur(v)}${unit}` : fmtEurShort(v)) } },
       series: [
         { name: "Ansatz (Plan)", type: "line", data: vwSeries.ansatz, symbolSize: 7, lineStyle: { width: 3 }, connectNulls: true },
         { name: "Ergebnis (Ist)", type: "line", data: vwSeries.ergebnis, symbol: "emptyCircle", symbolSize: 7, lineStyle: { width: 2, type: "dashed" }, connectNulls: true },
@@ -137,8 +142,9 @@ export function ThemeDetail() {
         }
       : null;
 
-    return { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events };
-  }, [data, id, year]);
+    const hasContext = !!(data.context.cpi || data.context.population);
+    return { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext };
+  }, [data, id, year, mode]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
@@ -149,7 +155,7 @@ export function ThemeDetail() {
       </p>
     );
 
-  const { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events } = view;
+  const { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext } = view;
   const sankeyHeight = Math.max(360, sankey.nodes.length * 26);
 
   return (
@@ -186,7 +192,34 @@ export function ThemeDetail() {
         </Card>
 
         <div className="grid lg:grid-cols-2 gap-4">
-          <Card title="Entwicklung der Ausgaben" hint={`Plan (Ansatz) gegen Ergebnis (Ist), 2018–${y}. Wert ${y} vorläufig.`}>
+          <Card
+            title="Entwicklung der Ausgaben"
+            hint={
+              `Plan (Ansatz) gegen Ergebnis (Ist), 2018–${y}. Wert ${y} vorläufig.` +
+              (mode.real ? ` Inflationsbereinigt in Preisen von ${y}.` : "") +
+              (mode.perCapita ? " Je Einwohner." : "")
+            }
+          >
+            {hasContext && (
+              <div className="flex flex-wrap gap-4 text-xs mb-1">
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!mode.real}
+                    onChange={(e) => setMode((m) => ({ ...m, real: e.target.checked }))}
+                  />
+                  <span>inflationsbereinigt</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!mode.perCapita}
+                    onChange={(e) => setMode((m) => ({ ...m, perCapita: e.target.checked }))}
+                  />
+                  <span>je Einwohner</span>
+                </label>
+              </div>
+            )}
             <EChart option={timelineOpt} style={{ height: 300 }} />
           </Card>
           <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y}`}>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { shades, GOLD_BASE, ZUSCHUSS_RED } from "./colors";
 
 // ── Types mirroring the ETL output (see etl/*.py) ───────────────────────────
 export type Haushalt = "verwaltung" | "vermoegen";
@@ -62,11 +63,17 @@ export interface Labels {
   unterabschnitt?: Record<string, string>;
 }
 
+export interface Context {
+  population?: Record<string, number>;
+  cpi?: Record<string, number>;
+}
+
 export interface Data {
   budget: Budget;
   themes: Themes;
   events: BudgetEvent[];
   labels: Labels;
+  context: Context;
 }
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
@@ -84,11 +91,15 @@ export function loadData(): Promise<Data> {
       fetch(`${base}data/labels.json`)
         .then((r) => (r.ok ? (r.json() as Promise<Labels>) : {}))
         .catch(() => ({}) as Labels),
-    ]).then(([budget, themes, ev, labels]) => ({
+      fetch(`${base}data/context.json`)
+        .then((r) => (r.ok ? (r.json() as Promise<Context>) : {}))
+        .catch(() => ({}) as Context),
+    ]).then(([budget, themes, ev, labels, context]) => ({
       budget,
       themes,
       events: ev.events ?? [],
       labels,
+      context,
     }));
   }
   return cache;
@@ -246,6 +257,45 @@ export function themeYearSeries(
   };
 }
 
+export interface TimeMode {
+  perCapita?: boolean;
+  real?: boolean;
+}
+
+/**
+ * Re-express a YearSeries in real terms (deflated to `baseYear` € via CPI)
+ * and/or per inhabitant. Missing context for a year yields null (gap).
+ */
+export function adjustSeries(
+  series: YearSeries,
+  ctx: Context,
+  mode: TimeMode,
+  baseYear: number,
+): YearSeries {
+  const cpiBase = ctx.cpi?.[String(baseYear)];
+  const adj = (v: number | null, year: number): number | null => {
+    if (v == null) return null;
+    let x = v;
+    if (mode.real && ctx.cpi && cpiBase) {
+      const c = ctx.cpi[String(year)];
+      if (!c) return null;
+      x = (x * cpiBase) / c;
+    }
+    if (mode.perCapita) {
+      const pop = ctx.population?.[String(year)];
+      if (!pop) return null;
+      x = x / pop;
+    }
+    return x;
+  };
+  return {
+    years: series.years,
+    ansatz: series.years.map((y, i) => adj(series.ansatz[i], y)),
+    ergebnis: series.years.map((y, i) => adj(series.ergebnis[i], y)),
+    provisional: series.provisional,
+  };
+}
+
 export interface NamedAmount {
   key: string;
   label: string;
@@ -341,14 +391,26 @@ export function incomeCategory(p: Posten): string {
     return "Sonstige Investitionseinnahmen";
   }
   // Verwaltungshaushalt income (Hauptgruppen 0, 1, 2)
+  // Steuern & allgemeine Zuweisungen (HG 0)
   if (g === "0030") return "Gewerbesteuer";
   if (g === "0000" || g === "0010" || g === "0020") return "Grundsteuer";
   if (g === "0100" || g === "0615") return "Einkommensteuer-Anteil";
   if (g === "0120") return "Umsatzsteuer-Anteil";
   if (g.startsWith("04") || g === "0611") return "Schlüsselzuweisungen & Finanzausgleich";
   if (g[0] === "0") return "Sonstige Steuern & Zuweisungen";
-  if (g[0] === "1") return "Gebühren, Beiträge & Entgelte";
-  return "Zinsen, Konzession & sonstige Einnahmen"; // Hauptgruppe 2
+  // Einnahmen aus Verwaltung & Betrieb (HG 1) — aufgedröselt
+  if (g === "1111") return "Abwassergebühren";
+  if (g === "1171") return "Wassergebühren";
+  if (g === "1194" || g === "1195") return "Kita-Beiträge & -Entgelte";
+  if (g.startsWith("10")) return "Verwaltungsgebühren";
+  if (g.startsWith("11")) return "Sonstige Benutzungsgebühren";
+  if (g.startsWith("14")) return "Mieten & Pachten";
+  if (g.startsWith("16")) return "Erstattungen";
+  if (g.startsWith("17")) return "Zuweisungen & Zuschüsse (laufend)";
+  if (g[0] === "1") return "Sonstige Entgelte";
+  // Finanzeinnahmen (HG 2)
+  if (g.startsWith("22")) return "Konzessionsabgaben";
+  return "Zinsen & sonstige Einnahmen";
 }
 
 /** Einnahmen grouped into laien-friendly sources (E side, one year). */
@@ -485,48 +547,54 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   const nodes: SankeyNode[] = [];
   const links: SankeyLink[] = [];
   const used = new Set<string>();
-  const gold = "#b8964e";
   const themeColor = def?.color ?? "#999";
-  const addNode = (name: string, color: string): string => {
+  const addNode = (name: string, color: string, depth: number): string => {
     let n = name;
     while (used.has(n)) n += " ";
     used.add(n);
-    nodes.push({ name: n, itemStyle: { color } });
+    nodes.push({ name: n, itemStyle: { color }, depth });
     return n;
   };
 
-  // income column → hub
-  for (const [src, v] of [...income.entries()].sort((a, b) => b[1] - a[1])) {
-    if (v <= 0) continue;
-    links.push({ source: addNode(src, gold), target: hub, value: Math.round(v) });
-  }
+  // Depths: Zuschuss starts one column further left (0), income at 1, hub 2,
+  // groups 3, leaves 4 — so the cross-subsidy reads as a distinct origin.
+  const incomeEntries = [...income.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  const goldShades = shades(GOLD_BASE, incomeEntries.length);
   if (zuschuss > 0) {
-    links.push({ source: addNode(ZUSCHUSS, "#c0392b"), target: hub, value: Math.round(zuschuss) });
+    links.push({ source: addNode(ZUSCHUSS, ZUSCHUSS_RED, 0), target: hub, value: Math.round(zuschuss) });
   }
-  addNode(hub, themeColor);
+  incomeEntries.forEach(([src, v], i) => {
+    links.push({ source: addNode(src, goldShades[i], 1), target: hub, value: Math.round(v) });
+  });
+  addNode(hub, themeColor, 2);
 
-  // hub → group → (leaves, capped)
-  for (const [code, g] of [...groups.entries()].sort((a, b) => b[1].total - a[1].total)) {
-    const gName = addNode(groupName.get(code)!, themeColor);
+  // hub → group → (leaves, capped). Each group a shade of the theme colour,
+  // its leaves lighter tints of that shade.
+  const groupEntries = [...groups.entries()].sort((a, b) => b[1].total - a[1].total);
+  const groupShades = shades(themeColor, groupEntries.length);
+  groupEntries.forEach(([code, g], gi) => {
+    const gColor = groupShades[gi];
+    const gName = addNode(groupName.get(code)!, gColor, 3);
     links.push({ source: hub, target: gName, value: Math.round(g.total) });
-    if (g.leaves.size <= 1) continue; // single item: group node already represents it
+    if (g.leaves.size <= 1) return; // single item: group node already represents it
 
     const sorted = [...g.leaves.entries()].sort((a, b) => b[1] - a[1]);
     const head = sorted.slice(0, MAX_LEAVES);
     const tail = sorted.slice(MAX_LEAVES);
-    for (const [leaf, v] of head) {
-      if (v <= 0) continue;
-      links.push({ source: gName, target: addNode(leaf, themeColor), value: Math.round(v) });
-    }
+    const leafShades = shades(gColor, head.length + (tail.length ? 1 : 0), 0.1, 0.55);
+    head.forEach(([leaf, v], li) => {
+      if (v <= 0) return;
+      links.push({ source: gName, target: addNode(leaf, leafShades[li], 4), value: Math.round(v) });
+    });
     const rest = tail.reduce((s, [, v]) => s + v, 0);
     if (rest > 0) {
       links.push({
         source: gName,
-        target: addNode(`Weitere (${tail.length})`, themeColor),
+        target: addNode(`Weitere (${tail.length})`, leafShades[head.length], 4),
         value: Math.round(rest),
       });
     }
-  }
+  });
 
   return { nodes, links, income: totalIn, zuschuss, total: totalEx };
 }
