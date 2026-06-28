@@ -169,12 +169,84 @@ def ingest_a(posten: dict, facts: list, glz_text_map: dict, grz_text_map: dict):
     return n
 
 
+import re
+
+RE_OLD = re.compile(r"bis\s*2022\s*-?\s*(\d{4,6})", re.I)   # text on NEW code names the OLD code
+RE_NEW = re.compile(r"ab\s*202[23]\s*-?\s*(\d{4,6})", re.I)  # text on OLD code names the NEW code
+
+
+def build_crosswalk(posten: dict) -> dict:
+    """
+    Map renumbered Gliederungen (recoding ~2022/2023) old->new, parsed from the
+    'bis 2022 - XXXX' / 'ab 2023 XXXX' annotations in the GLZ texts. Ambiguous
+    splits (one old code -> several new codes) are left unmapped.
+    """
+    edges: dict[str, set] = {}
+    for p in posten.values():
+        new_glz = p["glz"]
+        tx = p.get("glz_text") or ""
+        m = RE_OLD.search(tx)
+        if m:
+            edges.setdefault(m.group(1).zfill(4), set()).add(new_glz)
+        for m2 in RE_NEW.finditer(tx):
+            edges.setdefault(new_glz, set()).add(m2.group(1).zfill(4))
+
+    direct = {old: next(iter(news)) for old, news in edges.items()
+              if len(news) == 1 and next(iter(news)) != old}
+
+    def resolve(c: str) -> str:
+        seen = set()
+        while c in direct and c not in seen:
+            seen.add(c)
+            c = direct[c]
+        return c
+
+    return {old: resolve(old) for old in direct}
+
+
+def apply_crosswalk(posten: dict, facts: list, cw: dict,
+                    glz_text_map: dict, grz_text_map: dict) -> int:
+    """Remap facts on old GLZ codes to their current code; merge and tidy posten."""
+    remapped = 0
+    for f in facts:
+        glz, grz = f["hhst_id"].split(".")
+        if glz in cw:
+            f["hhst_id"] = f"{cw[glz]}.{grz}"
+            remapped += 1
+
+    # merge facts that now share (hhst_id, year)
+    merged: dict[tuple, dict] = {}
+    for f in facts:
+        key = (f["hhst_id"], f["year"])
+        if key in merged:
+            cur = merged[key]
+            for col in ("ansatz", "ergebnis"):
+                if f[col] is not None:
+                    cur[col] = (cur[col] or 0) + f[col]
+        else:
+            merged[key] = f
+    facts[:] = list(merged.values())
+
+    used = {f["hhst_id"] for f in facts}
+    for hh in list(posten):
+        if hh not in used:
+            del posten[hh]
+    for hh in used:
+        if hh not in posten:
+            glz, grz = hh.split(".")
+            register(posten, glz, grz, glz_text_map.get(glz), grz_text_map.get(grz))
+    return remapped
+
+
 def main():
     posten: dict = {}
     facts: list = []
 
     glz_text_map, grz_text_map, nb = ingest_b(posten, facts)
     na = ingest_a(posten, facts, glz_text_map, grz_text_map)
+
+    crosswalk = build_crosswalk(posten)
+    n_remap = apply_crosswalk(posten, facts, crosswalk, glz_text_map, grz_text_map)
 
     years = sorted({f["year"] for f in facts})
     out = {
@@ -183,9 +255,11 @@ def main():
             "years": years,
             "sources": {"2018-2023": SRC_A.name, "2024": SRC_B.name},
             "counts": {"posten": len(posten), "facts": len(facts),
-                       "facts_2024": nb, "facts_hist": na},
+                       "facts_2024": nb, "facts_hist": na,
+                       "crosswalk_codes": len(crosswalk), "facts_remapped": n_remap},
             "note": "2024 ergebnis is provisional Ist-Vollzug, not final RechErg.",
         },
+        "crosswalk": crosswalk,
         "posten": posten,
         "facts": facts,
     }
@@ -194,6 +268,9 @@ def main():
 
     # Stats for verification
     print(f"posten={len(posten)} facts={len(facts)} years={years}")
+    print(f"crosswalk: {len(crosswalk)} alte Codes -> neu, {n_remap} Fakten umgehängt")
+    for old, new in sorted(crosswalk.items()):
+        print(f"    {old} -> {new}")
     missing_glz = sum(1 for p in posten.values() if not p["glz_text"])
     missing_grz = sum(1 for p in posten.values() if not p["grz_text"])
     print(f"posten without glz_text={missing_glz}, without grz_text={missing_grz}")

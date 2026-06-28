@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-06-24T18:28:02",
-  "n_posten": 4283,
+  "generated": "2026-06-28T19:10:03",
+  "n_posten": 3960,
   "n_themes": 14,
   "multi_tagged": 358
  },
@@ -2726,24 +2726,6 @@
     "weight": 1.0
    }
   ],
-  "4620.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4620.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4620.7009": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "4640.1681": [
    {
     "theme": "kinder_jugend",
@@ -4011,12 +3993,6 @@
    }
   ],
   "46439.7041": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.1194": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -19332,31 +19308,7 @@
     "weight": 1.0
    }
   ],
-  "4620.1559": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "4640.1680": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.1414": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.1714": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -19380,48 +19332,6 @@
     "weight": 1.0
    }
   ],
-  "4642.1194": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.1419": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.1430": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "4643.1195": [
    {
     "theme": "kinder_jugend",
@@ -19440,343 +19350,7 @@
     "weight": 1.0
    }
   ],
-  "4644.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.1541": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.1760": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "46440.1559": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1194": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1541": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1559": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1740": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.1782": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1194": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1559": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1684": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.1760": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1100": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1194": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1459": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1559": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1699": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.1760": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.1460": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.1346": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1194": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1541": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1710": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.1194": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.1199": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.1541": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.1599": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.1714": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.1195": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.1419": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.1430": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.1559": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.1714": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -21658,12 +21232,6 @@
     "weight": 1.0
    }
   ],
-  "4620.7008": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "4640.4140": [
    {
     "theme": "kinder_jugend",
@@ -21677,252 +21245,6 @@
    }
   ],
   "4640.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.7008": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.7009": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.7040": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5220": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5420": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5600": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5622": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.7008": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.7009": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.7040": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -21959,1362 +21281,6 @@
    }
   ],
   "4643.7039": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5442": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5622": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6322": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6369": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6799": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.4169": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5220": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5420": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5421": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5430": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5442": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5622": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6322": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6369": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6521": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5220": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5420": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5430": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5600": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5622": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6322": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6369": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6521": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5220": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5420": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5421": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5430": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5600": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5622": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6322": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6369": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6521": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6799": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.5090": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.6551": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.7008": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.7009": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.7039": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.5300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.7008": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.7009": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.7180": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5220": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5330": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5420": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5430": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6322": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.4590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5200": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5220": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5431": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5441": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5620": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5622": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5715": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5810": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.5822": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6300": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6322": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6329": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6369": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6510": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6520": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6525": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6540": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6799": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6800": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.6850": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.4140": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.4340": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.4440": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.5010": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.5163": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.5400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.7008": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.7009": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4689.7040": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -24806,73 +22772,13 @@
     "weight": 1.0
    }
   ],
-  "4641.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "46415.3671": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
    }
   ],
-  "4642.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "4643.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.3671": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.3671": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.3619": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.3610": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.3671": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -26016,277 +23922,7 @@
     "weight": 1.0
    }
   ],
-  "4641.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.9400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.9412": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4641.9535": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9412": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9490": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9535": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9870": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4642.9880": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
   "4643.9870": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.9359": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4644.9450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.9359": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4645.9500": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.9359": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.9450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4646.9535": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.9359": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.9450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.9490": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4647.9535": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.9321": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.9870": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4648.9880": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4649.9870": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.9450": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4680.9535": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9412": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9420": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9490": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9535": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4681.9590": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.9350": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.9359": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.9400": [
-   {
-    "theme": "kinder_jugend",
-    "weight": 1.0
-   }
-  ],
-  "4682.9535": [
    {
     "theme": "kinder_jugend",
     "weight": 1.0
@@ -27205,6 +24841,432 @@
   "9699.9999": [
    {
     "theme": "finanzen",
+    "weight": 1.0
+   }
+  ],
+  "46412.1430": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.5441": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46414.5450": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.9880": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46431.9412": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.5420": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.3610": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.9321": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46431.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.1699": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46439.1559": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46411.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46413.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46413.6799": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.1419": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.5600": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46431.3610": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.5600": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.1559": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.1782": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.9490": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.6799": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46414.9359": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.9880": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.6521": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.7008": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.5450": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46411.9590": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46413.3610": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46439.1430": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.5442": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46413.9400": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46410.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46410.5430": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.9350": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.4169": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.5431": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.6551": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.6521": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.9500": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46413.1541": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46410.3610": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46413.3671": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.1100": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46434.3619": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.6521": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.9870": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.9412": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.9450": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46431.9350": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.1559": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.6440": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46448.5090": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.9535": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46410.5420": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46434.9870": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46415.9359": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46431.9400": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46414.5442": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.9870": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46417.5420": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.7040": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46411.9420": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.1559": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46416.5420": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46414.3671": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46410.1710": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46414.6799": [
+   {
+    "theme": "kinder_jugend",
+    "weight": 1.0
+   }
+  ],
+  "46412.7009": [
+   {
+    "theme": "kinder_jugend",
     "weight": 1.0
    }
   ]
