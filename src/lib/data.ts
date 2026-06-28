@@ -149,13 +149,16 @@ export function latestYear(b: Budget): number {
 export interface TreeNode {
   name: string;
   value: number;
+  /** theme id, only set on top-level nodes (used for navigation) */
+  id?: string;
   itemStyle?: { color: string };
   children?: TreeNode[];
 }
 
 /**
- * Weighted expense treemap: Theme → Abschnitt. Each Posten's Ansatz for `year`
- * is split across its themes by weight, so totals never double-count.
+ * Weighted expense hierarchy: Theme → Abschnitt. Each Posten's Ansatz for `year`
+ * is split across its themes by weight, so totals never double-count. Children
+ * are coloured as shades of the theme colour. Shared by treemap/sunburst/circles.
  */
 export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): TreeNode[] {
   const { budget, themes } = data;
@@ -177,16 +180,24 @@ export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): T
   const nodes: TreeNode[] = [];
   for (const [theme, inner] of acc) {
     const def = themes.themes[theme];
-    const children = [...inner.entries()]
+    const color = def?.color ?? "#999";
+    const sorted = [...inner.entries()]
       .map(([ab, v]) => ({ name: abschnittName(data.labels, ab), value: Math.round(v) }))
       .filter((c) => c.value > 0)
       .sort((a, b) => b.value - a.value);
+    const childShades = shades(color, sorted.length, 0.0, 0.55);
+    const children: TreeNode[] = sorted.map((c, i) => ({
+      ...c,
+      id: theme, // leaves carry their theme id so a click can navigate
+      itemStyle: { color: childShades[i] },
+    }));
     const total = children.reduce((s, c) => s + c.value, 0);
     if (total <= 0) continue;
     nodes.push({
       name: def?.label ?? theme,
+      id: theme,
       value: total,
-      itemStyle: { color: def?.color ?? "#999" },
+      itemStyle: { color },
       children,
     });
   }
