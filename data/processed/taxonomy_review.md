@@ -133,12 +133,15 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Stadtbücherei [3521] — 142.350 € ⚠️anteilig
     - Sonstige Volksbildung [3551] — 4.650 € ⚠️anteilig
 
-## Wasser, Abwasser & Entsorgung — 10.187.780 €
+## Ver- & Entsorgung — 10.507.580 €
 - **Abwasser (Kanal & Kläranlage)** [70] — 5.117.330 €
     - Kanalnetz u. Kläranlage [7000] — 5.116.480 €
     - Abwasserbeseitigung in Aich [7005] — 850 €
-- **Elektrizitätsversorgung** [81] — 4.745.900 €
+- **Strom- & Wasserversorgung** [81] — 5.065.700 €
     - Wasserversorgung [8151] — 4.745.900 €
+    - Elektrizitätsversorgung [8100] — 319.800 €
+    - Elektrizitätsversorgung SWM u. Bayernwerk [8101] — 0 €
+    - Erdgas Südbayern [8131] — 0 €
 - **Abfall & Wertstoffhof** [72] — 285.150 €
     - Wertstoffhof [7201] — 139.450 €
     - Allgemeine Entsorgung [7200] — 130.400 €
@@ -270,12 +273,6 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Wochen- u. Jahrmärkte [7300] — 43.600 €
 - **Sonstige wirtschaftliche Unternehmen** [87] — 3.600 €
     - Sonstige wirtschaftliche Unternehmen [8700] — 3.600 €
-
-## Energieversorgung — 319.800 €
-- **Elektrizitätsversorgung** [81] — 319.800 €
-    - Elektrizitätsversorgung [8100] — 319.800 €
-    - Elektrizitätsversorgung SWM u. Bayernwerk [8101] — 0 €
-    - Erdgas Südbayern [8131] — 0 €
 
 ## Soziales & Wohnen — 258.100 €
 - **Sonstige soziale Angelegenheiten** [49] — 85.000 €

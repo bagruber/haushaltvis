@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated": "2026-06-29T19:02:40",
+  "generated": "2026-06-29T19:10:46",
   "n_posten": 3960,
-  "n_themes": 14,
+  "n_themes": 13,
   "multi_tagged": 339
  },
  "themes": {
@@ -51,10 +51,10 @@
    "color": "#3b3f9a",
    "description": "Gemeindestraßen, Brücken, Straßenbeleuchtung, Parkplätze und Bauhof."
   },
-  "wasser_entsorgung": {
-   "label": "Wasser, Abwasser & Entsorgung",
+  "ver_entsorgung": {
+   "label": "Ver- & Entsorgung",
    "color": "#18ada4",
-   "description": "Kanalnetz, Kläranlage, Wertstoffhof und Bestattungswesen."
+   "description": "Städtische Daseinsvorsorge: Strom, Wasser, Abwasser und Abfall. (Untergliedert in eigene Bereiche.)"
   },
   "stadtentwicklung": {
    "label": "Stadtplanung & Bauen",
@@ -65,11 +65,6 @@
    "label": "Wirtschaft & Märkte",
    "color": "#f5d400",
    "description": "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Vereinshaus."
-  },
-  "energie": {
-   "label": "Energieversorgung",
-   "color": "#a50d24",
-   "description": "Städtische Elektrizitätsversorgung."
   },
   "finanzen": {
    "label": "Finanzen, Steuern & Schulden",
@@ -5472,49 +5467,49 @@
   ],
   "7000.2050": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.4590": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.5622": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.6550": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.6751": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7191.5400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7191.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -5532,73 +5527,73 @@
   ],
   "7201.1450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.5180": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.5620": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6361": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6410": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6412": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6530": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6720": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -5650,49 +5645,49 @@
   ],
   "7201.4590": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.5010": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6361": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6410": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6412": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6530": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6540": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -5708,31 +5703,31 @@
   ],
   "7202.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7202.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7202.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7202.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.1540": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -5744,19 +5739,19 @@
   ],
   "7203.5010": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7203.5441": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7203.5450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -5960,7 +5955,7 @@
   ],
   "7196.1116": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -6036,13 +6031,13 @@
   ],
   "7000.1460": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.1770": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -6068,31 +6063,31 @@
   ],
   "7200.1198": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.1555": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.1621": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.1000": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.1198": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -6134,31 +6129,31 @@
   ],
   "7201.1555": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.1600": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.1629": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7202.1621": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7203.1347": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -6364,163 +6359,163 @@
   ],
   "8100.1555": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8100.1600": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8100.6329": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8100.6412": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8100.6421": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8101.1198": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8101.1600": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8101.6412": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8131.1198": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8131.1600": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8131.6412": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1174": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1540": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1550": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1600": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1621": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.4590": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6329": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6421": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6530": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6540": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6560": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6720": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6792": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6800": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6850": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -8364,19 +8359,19 @@
   ],
   "7000.3536": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.3539": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.9350": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -8408,25 +8403,25 @@
   ],
   "8151.3569": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9350": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9412": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9500": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9156,7 +9151,7 @@
   ],
   "8151.6500": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9222,7 +9217,7 @@
   ],
   "8151.9504": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9606,7 +9601,7 @@
   ],
   "8100.9400": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9642,7 +9637,7 @@
   ],
   "7201.6329": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10126,19 +10121,19 @@
   ],
   "8151.9352": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6320": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.6540": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10190,7 +10185,7 @@
   ],
   "8151.5622": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10430,7 +10425,7 @@
   ],
   "8151.1555": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10614,7 +10609,7 @@
   ],
   "7000.6770": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10744,7 +10739,7 @@
   ],
   "7000.9850": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10802,7 +10797,7 @@
   ],
   "7201.6369": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10848,7 +10843,7 @@
   ],
   "8151.6412": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10924,7 +10919,7 @@
   ],
   "8151.3561": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10982,7 +10977,7 @@
   ],
   "8151.6325": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11106,7 +11101,7 @@
   ],
   "8151.5620": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11180,7 +11175,7 @@
   ],
   "8151.6510": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11328,7 +11323,7 @@
   ],
   "8151.6550": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11404,7 +11399,7 @@
   ],
   "8151.9502": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11422,7 +11417,7 @@
   ],
   "7191.5010": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11540,7 +11535,7 @@
   ],
   "8151.5510": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11588,7 +11583,7 @@
   ],
   "8151.9501": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11600,7 +11595,7 @@
   ],
   "7000.5620": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11630,7 +11625,7 @@
   ],
   "8151.5030": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11818,7 +11813,7 @@
   ],
   "8151.5041": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11842,7 +11837,7 @@
   ],
   "7000.3531": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11890,7 +11885,7 @@
   ],
   "8151.6322": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12090,7 +12085,7 @@
   ],
   "8151.5450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12114,7 +12109,7 @@
   ],
   "8151.5042": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12156,7 +12151,7 @@
   ],
   "8151.5100": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12248,7 +12243,7 @@
   ],
   "7201.6520": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12270,7 +12265,7 @@
   ],
   "7200.6498": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12318,19 +12313,19 @@
   ],
   "7201.5400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6410": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6369": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12432,7 +12427,7 @@
   ],
   "8151.5400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12460,7 +12455,7 @@
   ],
   "8151.9509": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12496,7 +12491,7 @@
   ],
   "8151.6551": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12614,7 +12609,7 @@
   ],
   "8131.2200": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12808,7 +12803,7 @@
   ],
   "8151.5010": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13178,7 +13173,7 @@
   ],
   "7201.5600": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13308,7 +13303,7 @@
   ],
   "7191.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13358,7 +13353,7 @@
   ],
   "7201.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13438,7 +13433,7 @@
   ],
   "7201.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13450,13 +13445,13 @@
   ],
   "7201.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13532,7 +13527,7 @@
   ],
   "7000.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13584,7 +13579,7 @@
   ],
   "7000.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13748,7 +13743,7 @@
   ],
   "7191.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13812,7 +13807,7 @@
   ],
   "7191.5431": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13830,7 +13825,7 @@
   ],
   "8151.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13914,7 +13909,7 @@
   ],
   "8151.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13996,7 +13991,7 @@
   ],
   "7191.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14026,7 +14021,7 @@
   ],
   "8100.1198": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14038,7 +14033,7 @@
   ],
   "8151.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14102,7 +14097,7 @@
   ],
   "8151.6580": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14144,7 +14139,7 @@
   ],
   "8151.6520": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14190,7 +14185,7 @@
   ],
   "7201.5450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14256,7 +14251,7 @@
   ],
   "8100.2100": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14404,7 +14399,7 @@
   ],
   "8100.6410": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14476,7 +14471,7 @@
   ],
   "8151.1173": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14556,7 +14551,7 @@
   ],
   "8151.5550": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14626,7 +14621,7 @@
   ],
   "8151.5560": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14742,7 +14737,7 @@
   ],
   "7191.5450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14866,7 +14861,7 @@
   ],
   "8151.6450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14992,7 +14987,7 @@
   ],
   "8151.5040": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15096,7 +15091,7 @@
   ],
   "8151.5220": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15318,7 +15313,7 @@
   ],
   "8151.6400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15358,7 +15353,7 @@
   ],
   "8151.6610": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15370,7 +15365,7 @@
   ],
   "7200.6369": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15482,7 +15477,7 @@
   ],
   "8151.1172": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15512,7 +15507,7 @@
   ],
   "8151.5601": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15696,7 +15691,7 @@
   ],
   "8101.2200": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15880,7 +15875,7 @@
   ],
   "8151.5431": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15898,7 +15893,7 @@
   ],
   "8151.1171": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15944,7 +15939,7 @@
   ],
   "7005.6320": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16044,7 +16039,7 @@
   ],
   "8151.1198": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16078,7 +16073,7 @@
   ],
   "7203.1340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16108,7 +16103,7 @@
   ],
   "7000.6495": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16284,7 +16279,7 @@
   ],
   "7000.7150": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16436,7 +16431,7 @@
   ],
   "8151.3250": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16470,7 +16465,7 @@
   ],
   "7000.3250": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16716,7 +16711,7 @@
   ],
   "7200.6329": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16740,7 +16735,7 @@
   ],
   "8151.5250": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16806,7 +16801,7 @@
   ],
   "8151.5200": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16934,7 +16929,7 @@
   ],
   "7202.1620": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17124,7 +17119,7 @@
   ],
   "7196.6496": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17318,7 +17313,7 @@
   ],
   "7192.1119": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17396,7 +17391,7 @@
   ],
   "8151.1598": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17450,7 +17445,7 @@
   ],
   "7201.1430": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17566,7 +17561,7 @@
   ],
   "7200.6320": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17590,7 +17585,7 @@
   ],
   "7200.1122": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17612,7 +17607,7 @@
   ],
   "8151.6351": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17696,7 +17691,7 @@
   ],
   "8151.9532": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17934,7 +17929,7 @@
   ],
   "7201.1541": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18034,7 +18029,7 @@
   ],
   "7000.1118": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18296,7 +18291,7 @@
   ],
   "8100.6400": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18476,7 +18471,7 @@
   ],
   "8151.9400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18506,7 +18501,7 @@
   ],
   "7201.6342": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18564,7 +18559,7 @@
   ],
   "8151.6342": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18588,7 +18583,7 @@
   ],
   "7000.6400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18616,7 +18611,7 @@
   ],
   "7000.1111": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18628,7 +18623,7 @@
   ],
   "8151.6321": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18656,13 +18651,13 @@
   ],
   "8151.1599": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8100.6550": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18708,7 +18703,7 @@
   ],
   "8100.6320": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -19476,37 +19471,37 @@
   ],
   "7000.1110": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.1559": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.1650": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.2070": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.1125": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.1597": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -19676,19 +19671,19 @@
   ],
   "8100.1700": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8100.1710": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1411": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -21634,121 +21629,121 @@
   ],
   "7000.5040": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.6320": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.6329": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7005.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7005.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7005.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7005.5450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7005.6342": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7005.6496": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7191.4590": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7191.5600": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7191.6360": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7192.6369": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.5622": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7200.6520": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.5180": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.5620": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.5622": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.6720": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7202.5189": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -22048,19 +22043,19 @@
   ],
   "8100.7180": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8101.6410": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8131.6410": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -23036,43 +23031,43 @@
   ],
   "7000.3270": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.3619": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.3650": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.3660": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7008.3610": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.3610": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.3620": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -23108,13 +23103,13 @@
   ],
   "8100.3670": [
    {
-    "theme": "energie",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.3454": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -24354,61 +24349,61 @@
   ],
   "7000.9250": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.9270": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7000.9500": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7003.9535": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7006.9535": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7007.9535": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7008.9535": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7191.9450": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.9400": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "7201.9490": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
@@ -24530,13 +24525,13 @@
   ],
   "8151.9250": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9357": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "ver_entsorgung",
     "weight": 1.0
    }
   ],

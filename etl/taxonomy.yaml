@@ -50,10 +50,10 @@ themes:
     label: "Straßen, Wege & Verkehr"
     color: "#3b3f9a"
     description: "Gemeindestraßen, Brücken, Straßenbeleuchtung, Parkplätze und Bauhof."
-  wasser_entsorgung:
-    label: "Wasser, Abwasser & Entsorgung"
+  ver_entsorgung:
+    label: "Ver- & Entsorgung"
     color: "#18ada4"
-    description: "Kanalnetz, Kläranlage, Wertstoffhof und Bestattungswesen."
+    description: "Städtische Daseinsvorsorge: Strom, Wasser, Abwasser und Abfall. (Untergliedert in eigene Bereiche.)"
   stadtentwicklung:
     label: "Stadtplanung & Bauen"
     color: "#b8964e"
@@ -62,10 +62,6 @@ themes:
     label: "Wirtschaft & Märkte"
     color: "#f5d400"
     description: "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Vereinshaus."
-  energie:
-    label: "Energieversorgung"
-    color: "#a50d24"
-    description: "Städtische Elektrizitätsversorgung."
   finanzen:
     label: "Finanzen, Steuern & Schulden"
     color: "#1a1a1a"
@@ -114,16 +110,16 @@ abschnitt_themes:
   "67": [strassen_verkehr]   # Straßenbeleuchtung
   "68": [strassen_verkehr]   # Parkplätze
   "69": [gruen_umwelt]    # Wasserläufe, Wasserbau
-  "70": [wasser_entsorgung]  # Kanalnetz u. Kläranlage
-  "71": [wasser_entsorgung]  # WC-Anlage
-  "72": [wasser_entsorgung]  # Wertstoffhof
+  "70": [ver_entsorgung]  # Kanalnetz u. Kläranlage (Abwasser)
+  "71": [ver_entsorgung]  # WC-Anlage
+  "72": [ver_entsorgung]  # Wertstoffhof (Abfall)
   "73": [wirtschaft]      # Wochen- u. Jahrmärkte
   "75": [soziales]   # Friedhöfe / Bestattung (kommunale Daseinsvorsorge)
   "76": [wirtschaft, kultur]   # Haus der Vereine
   "77": [strassen_verkehr]   # Bauhof
   "78": [kultur]          # Ausstellungshalle
   "79": [wirtschaft]      # Öffentlichkeitsarbeit / Wirtschaftsförderung
-  "81": [energie]         # Elektrizitätsversorgung
+  "81": [ver_entsorgung]  # Strom- & Wasserversorgung
   "85": [gruen_umwelt]    # Stadtwald
   "87": [wirtschaft]      # Sonstige wirtschaftliche Unternehmen
   "88": [stadtentwicklung]   # Bebauter Grundbesitz
@@ -136,7 +132,7 @@ abschnitt_themes:
 # Overrides je Gliederung (4-/5-stellig). Gewinnen gegen den Abschnitts-Standard.
 # Für Posten, die im Abschnitt thematisch aus der Reihe tanzen.
 gliederung_overrides:
-  "8151": [wasser_entsorgung]   # Wasserversorgung (liegt im Abschnitt 81 Elektrizität)
+  "8151": [ver_entsorgung]   # Wasserversorgung (eigene Einrichtung im Bereich 81)
   "1141": [gruen_umwelt]        # Klimaschutzmanagement (liegt im Abschnitt 11 Öff. Ordnung)
   "3650": [kultur]              # Denkmalschutz & -pflege (liegt im Abschnitt 36 Naturschutz)
 
