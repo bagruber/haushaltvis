@@ -66,11 +66,11 @@ export function PostenDetail() {
   return (
     <div className="space-y-6">
       <nav className="text-sm text-ink-muted flex flex-wrap items-center gap-1.5">
-        <span>{crumb.aufgabenbereich}</span>
+        <Link to={`/einzelplan/${p.einzelplan}`} className="hover:text-ink underline-offset-2 hover:underline">{crumb.aufgabenbereich}</Link>
         <span>›</span>
         <span>{crumb.bereich}</span>
         <span>›</span>
-        <span className="text-ink-soft">{crumb.einrichtung}</span>
+        <Link to={`/einrichtung/${p.glz}`} className="text-ink-soft hover:text-ink underline-offset-2 hover:underline">{crumb.einrichtung}</Link>
       </nav>
 
       <header className="space-y-2">

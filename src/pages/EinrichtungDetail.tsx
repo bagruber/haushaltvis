@@ -66,7 +66,7 @@ export function EinrichtungDetail() {
   return (
     <div className="space-y-6">
       <nav className="text-sm text-ink-muted flex flex-wrap items-center gap-1.5">
-        <span>{info.crumb.aufgabenbereich}</span>
+        <Link to={`/einzelplan/${info.glz[0]}`} className="hover:text-ink underline-offset-2 hover:underline">{info.crumb.aufgabenbereich}</Link>
         <span>›</span>
         <span className="text-ink-soft">{info.crumb.bereich}</span>
       </nav>

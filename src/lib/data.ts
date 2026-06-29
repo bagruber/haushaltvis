@@ -956,3 +956,107 @@ export function einzelplanSections(
     .filter((s) => s.total > 0)
     .sort((a, b) => b.total - a.total);
 }
+
+// ── Both-sides exploratory tree + income page (Schiene A) ────────────────────
+
+/**
+ * Top-level money picture: Gesamthaushalt → {Einnahmen, Ausgaben} → {Einnahme-
+ * arten | Einzelpläne}. Two subtrees off one root → planar (no bowtie crossing).
+ * Internal transfers are excluded so the picture isn't double-counted.
+ */
+export function kameralBothSidesTree(data: Data, year: number): KameralTree {
+  const eps = new Map<string, { total: number; name: string }>();
+  const inc = new Map<string, number>();
+  let totEx = 0;
+  let totIn = 0;
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || isInternal(p)) continue;
+    if (p.ea === "A") {
+      const e = eps.get(p.einzelplan) ?? { total: 0, name: p.einzelplan_name };
+      e.total += f.ansatz;
+      eps.set(p.einzelplan, e);
+      totEx += f.ansatz;
+    } else {
+      const c = incomeCategory(p);
+      inc.set(c, (inc.get(c) ?? 0) + f.ansatz);
+      totIn += f.ansatz;
+    }
+  }
+
+  const nodes: SankeyNode[] = [];
+  const links: SankeyLink[] = [];
+  const nav: Record<string, string> = {};
+  const used = new Set<string>();
+  const add = (name: string, color: string, depth: number): string => {
+    let n = name;
+    while (used.has(n)) n += " ";
+    used.add(n);
+    nodes.push({ name: n, itemStyle: { color }, depth });
+    return n;
+  };
+
+  const root = add(`Haushalt ${year}`, "#a8a193", 0);
+  const inNode = add("Einnahmen", GOLD_BASE, 1);
+  const exNode = add("Ausgaben", "#7d756a", 1);
+  nav[inNode] = "/einnahmen";
+  links.push({ source: root, target: inNode, value: Math.round(totIn) });
+  links.push({ source: root, target: exNode, value: Math.round(totEx) });
+
+  const incEntries = [...inc.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  const goldShades = shades(GOLD_BASE, incEntries.length);
+  incEntries.forEach(([cat, v], i) => {
+    const n = add(cat, goldShades[i], 2);
+    nav[n] = "/einnahmen";
+    links.push({ source: inNode, target: n, value: Math.round(v) });
+  });
+
+  for (const ep of EINZELPLAN_ORDER) {
+    const e = eps.get(ep);
+    if (!e || e.total <= 0) continue;
+    const n = add(`${ep} · ${e.name}`, EINZELPLAN_COLORS[ep] ?? "#999", 2);
+    nav[n] = `/einzelplan/${ep}`;
+    links.push({ source: exNode, target: n, value: Math.round(e.total) });
+  }
+
+  return { nodes, links, nav, total: totEx };
+}
+
+export interface IncomeGroup {
+  key: string;
+  label: string;
+  value: number;
+  posten: NamedAmount[];
+}
+
+/** Einnahmen grouped into laien categories, each with its biggest Posten. */
+export function incomeByCategory(data: Data, year: number, hideInternal = true): IncomeGroup[] {
+  const groups = new Map<string, { value: number; posten: Map<string, { label: string; value: number }> }>();
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "E") continue;
+    if (hideInternal && isInternal(p)) continue;
+    const cat = incomeCategory(p);
+    const g = groups.get(cat) ?? { value: 0, posten: new Map() };
+    g.value += f.ansatz;
+    const label = [p.grz_text, p.glz_text ? `(${p.glz_text.replace(/\s+/g, " ").trim()})` : ""].filter(Boolean).join(" ");
+    const cur = g.posten.get(f.hhst_id) ?? { label: label || f.hhst_id, value: 0 };
+    cur.value += f.ansatz;
+    g.posten.set(f.hhst_id, cur);
+    groups.set(cat, g);
+  }
+  return [...groups.entries()]
+    .map(([key, g]) => ({
+      key,
+      label: key,
+      value: Math.round(g.value),
+      posten: [...g.posten.entries()]
+        .map(([hhst, x]) => ({ key: hhst, label: x.label, value: Math.round(x.value) }))
+        .filter((x) => x.value > 0)
+        .sort((a, b) => b.value - a.value),
+    }))
+    .filter((g) => g.value > 0)
+    .sort((a, b) => b.value - a.value);
+}
