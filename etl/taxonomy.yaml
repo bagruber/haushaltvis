@@ -118,7 +118,7 @@ abschnitt_themes:
   "71": [wasser_entsorgung]  # WC-Anlage
   "72": [wasser_entsorgung]  # Wertstoffhof
   "73": [wirtschaft]      # Wochen- u. Jahrmärkte
-  "75": [wasser_entsorgung, kultur]   # Friedhöfe / Bestattung
+  "75": [wasser_entsorgung]   # Friedhöfe / Bestattung (Pflege & Entsorgung; Themenzuordnung offen)
   "76": [wirtschaft, kultur]   # Haus der Vereine
   "77": [strassen_verkehr]   # Bauhof
   "78": [kultur]          # Ausstellungshalle

@@ -561,6 +561,60 @@ export function topMovers(data: Data, fromYear: number, toYear: number, limit = 
   return out.sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta)).slice(0, limit);
 }
 
+// ── Einrichtung (Gliederung) selectors ──────────────────────────────────────
+
+/** All Posten (Haushaltsstellen) belonging to one Gliederung (Einrichtung). */
+export function einrichtungPosten(data: Data, glz: string): Posten[] {
+  return Object.values(data.budget.posten)
+    .filter((p) => p.glz === glz)
+    .sort((a, b) => (a.ea === b.ea ? a.grz.localeCompare(b.grz) : a.ea === "A" ? -1 : 1));
+}
+
+/** Aggregated Ansatz/Ergebnis per year for one Einrichtung, filtered by E/A. */
+export function einrichtungSeries(data: Data, glz: string, ea: EA): YearSeries {
+  const years = data.budget.meta.years;
+  const a = new Map<number, number>();
+  const e = new Map<number, number>();
+  const provisional = new Set<number>();
+  for (const f of data.budget.facts) {
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.glz !== glz || p.ea !== ea) continue;
+    if (f.ansatz != null) a.set(f.year, (a.get(f.year) ?? 0) + f.ansatz);
+    if (f.ergebnis != null) {
+      e.set(f.year, (e.get(f.year) ?? 0) + f.ergebnis);
+      if (f.provisional) provisional.add(f.year);
+    }
+  }
+  return {
+    years,
+    ansatz: years.map((y) => (a.has(y) ? Math.round(a.get(y)!) : null)),
+    ergebnis: years.map((y) => (e.has(y) ? Math.round(e.get(y)!) : null)),
+    provisional,
+  };
+}
+
+export interface EinrichtungInfo {
+  glz: string;
+  label: string;
+  crumb: Crumb;
+  themes: ThemeTag[];
+  hasVermoegen: boolean;
+}
+
+/** Identity (label, breadcrumb, themes) for an Einrichtung, or null if unknown. */
+export function einrichtungInfo(data: Data, glz: string): EinrichtungInfo | null {
+  const posten = einrichtungPosten(data, glz);
+  if (!posten.length) return null;
+  const rep = posten.find((p) => p.glz_text) ?? posten[0];
+  return {
+    glz,
+    label: (rep.glz_text ?? glz).replace(/\s+/g, " ").trim(),
+    crumb: postenCrumb(data, rep),
+    themes: data.themes.assignment[posten[0].hhst_id] ?? [],
+    hasVermoegen: posten.some((p) => p.haushalt === "vermoegen"),
+  };
+}
+
 // ── Theme-scoped Sankey (Verwaltungshaushalt) ───────────────────────────────
 
 export interface SankeyNode {
@@ -579,18 +633,21 @@ export interface SankeyData {
   income: number;
   zuschuss: number;
   total: number;
+  /** node name → navigation target (Einrichtung-Gliederung), for click-through */
+  nav: Record<string, string>;
 }
 
 const ZUSCHUSS = "Zuschuss aus allg. Haushalt";
-const MAX_LEAVES = 6; // per group, before collapsing the tail into "Weitere"
+const MAX_LEAVES = 7; // per Bereich, before collapsing the tail into "Weitere"
 
 /**
  * Verwaltungshaushalt money flow for one theme, one year:
- *   [income sources + Zuschuss] → [theme hub] → [Unterabschnitt group] → [Posten].
+ *   [income sources + Zuschuss] → [theme hub] → [Bereich] → [Einrichtung].
  * Income can't be attributed to individual Posten, so it pools at the hub; the
  * gap between earmarked income and expense is shown as "Zuschuss aus allg. Haushalt".
- * Groups are keyed by 3-digit Unterabschnitt code (not label) so distinct groups
- * never merge; leaf columns are capped to keep the diagram readable.
+ * Expenses group by 2-digit Bereich (Abschnitt, well-labelled) with their
+ * Einrichtungen (Gliederungen) as leaves — every branch reaches the leaf column,
+ * so single-item Bereiche pull through and bands don't cross.
  */
 export function themeSankey(data: Data, themeId: string, year: number): SankeyData {
   const { budget, themes, labels } = data;
@@ -598,8 +655,8 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   const hub = def?.label ?? themeId;
 
   const income = new Map<string, number>();
-  // 3-digit code -> { total, leaves }
-  const groups = new Map<string, { total: number; leaves: Map<string, number> }>();
+  // 2-digit Bereich -> { total, leaves: glz -> {label, value} }
+  const bereiche = new Map<string, { total: number; leaves: Map<string, { label: string; value: number }> }>();
   let totalEx = 0;
 
   for (const f of budget.facts) {
@@ -614,25 +671,27 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
       const src = incomeCategory(p);
       income.set(src, (income.get(src) ?? 0) + amt);
     } else {
-      const code = p.glz.slice(0, 3);
-      const leaf = (p.glz_text ?? p.hhst_id).replace(/\s+/g, " ").trim();
-      const g = groups.get(code) ?? { total: 0, leaves: new Map() };
-      g.total += amt;
-      g.leaves.set(leaf, (g.leaves.get(leaf) ?? 0) + amt);
-      groups.set(code, g);
+      const ab = p.glz.slice(0, 2);
+      const b = bereiche.get(ab) ?? { total: 0, leaves: new Map() };
+      b.total += amt;
+      const label = (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim();
+      const leaf = b.leaves.get(p.glz) ?? { label, value: 0 };
+      leaf.value += amt;
+      b.leaves.set(p.glz, leaf);
+      bereiche.set(ab, b);
       totalEx += amt;
     }
   }
 
-  // Resolve group labels, disambiguating any that collide (shared abschnitt fallback)
-  const codes = [...groups.keys()];
-  const rawLabel = new Map(codes.map((c) => [c, groupLabel(labels, c)]));
+  // Bereich labels, disambiguating any that collide (e.g. 21 & 22 both "Schulen")
+  const abs = [...bereiche.keys()];
+  const rawLabel = new Map(abs.map((ab) => [ab, abschnittName(labels, ab)]));
   const labelCount = new Map<string, number>();
   for (const l of rawLabel.values()) labelCount.set(l, (labelCount.get(l) ?? 0) + 1);
-  const groupName = new Map(
-    codes.map((c) => {
-      const l = rawLabel.get(c)!;
-      return [c, (labelCount.get(l) ?? 0) > 1 ? `${l} (${c})` : l];
+  const bereichName = new Map(
+    abs.map((ab) => {
+      const l = rawLabel.get(ab)!;
+      return [ab, (labelCount.get(l) ?? 0) > 1 ? `${l} (${ab})` : l];
     }),
   );
 
@@ -641,6 +700,7 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
 
   const nodes: SankeyNode[] = [];
   const links: SankeyLink[] = [];
+  const nav: Record<string, string> = {};
   const used = new Set<string>();
   const themeColor = def?.color ?? "#999";
   const addNode = (name: string, color: string, depth: number): string => {
@@ -663,35 +723,36 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   });
   addNode(hub, themeColor, 1);
 
-  // hub → group → (leaves, capped). Each group a shade of the theme colour,
-  // its leaves lighter tints of that shade.
-  const groupEntries = [...groups.entries()].sort((a, b) => b[1].total - a[1].total);
-  const groupShades = shades(themeColor, groupEntries.length);
-  groupEntries.forEach(([code, g], gi) => {
-    const gColor = groupShades[gi];
-    const gName = addNode(groupName.get(code)!, gColor, 2);
-    links.push({ source: hub, target: gName, value: Math.round(g.total) });
-    if (g.leaves.size <= 1) return; // single item: group node already represents it
+  // hub → Bereich (depth 2) → Einrichtung (depth 3). Each Bereich a shade of the
+  // theme colour; its Einrichtungen are lighter tints and link to their detail page.
+  const bereichEntries = [...bereiche.entries()].sort((a, b) => b[1].total - a[1].total);
+  const bereichShades = shades(themeColor, bereichEntries.length);
+  bereichEntries.forEach(([ab, b], bi) => {
+    const bColor = bereichShades[bi];
+    const bName = addNode(bereichName.get(ab)!, bColor, 2);
+    links.push({ source: hub, target: bName, value: Math.round(b.total) });
 
-    const sorted = [...g.leaves.entries()].sort((a, b) => b[1] - a[1]);
+    const sorted = [...b.leaves.entries()].sort((a, c) => c[1].value - a[1].value);
     const head = sorted.slice(0, MAX_LEAVES);
     const tail = sorted.slice(MAX_LEAVES);
-    const leafShades = shades(gColor, head.length + (tail.length ? 1 : 0), 0.1, 0.55);
-    head.forEach(([leaf, v], li) => {
-      if (v <= 0) return;
-      links.push({ source: gName, target: addNode(leaf, leafShades[li], 3), value: Math.round(v) });
+    const leafShades = shades(bColor, head.length + (tail.length ? 1 : 0), 0.1, 0.55);
+    head.forEach(([glz, leaf], li) => {
+      if (leaf.value <= 0) return;
+      const lName = addNode(leaf.label, leafShades[li], 3);
+      nav[lName] = glz;
+      links.push({ source: bName, target: lName, value: Math.round(leaf.value) });
     });
-    const rest = tail.reduce((s, [, v]) => s + v, 0);
+    const rest = tail.reduce((s, [, l]) => s + l.value, 0);
     if (rest > 0) {
       links.push({
-        source: gName,
+        source: bName,
         target: addNode(`Weitere (${tail.length})`, leafShades[head.length], 3),
         value: Math.round(rest),
       });
     }
   });
 
-  return { nodes, links, income: totalIn, zuschuss, total: totalEx };
+  return { nodes, links, income: totalIn, zuschuss, total: totalEx, nav };
 }
 
 // ── Net investments (Vermögenshaushalt) ─────────────────────────────────────

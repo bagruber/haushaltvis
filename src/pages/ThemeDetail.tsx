@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import {
@@ -45,6 +45,7 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
 export function ThemeDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
+  const navigate = useNavigate();
   const [year] = useState<number | null>(null);
   const [mode, setMode] = useState<TimeMode>({});
 
@@ -157,6 +158,14 @@ export function ThemeDetail() {
 
   const { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext } = view;
   const sankeyHeight = Math.max(360, sankey.nodes.length * 26);
+  const sankeyEvents = {
+    click: (p: unknown) => {
+      const i = p as { dataType?: string; name?: string };
+      if (i.dataType !== "node") return;
+      const glz = sankey.nav[i.name ?? ""];
+      if (glz) navigate(`/einrichtung/${glz}`);
+    },
+  };
 
   return (
     <div className="space-y-10">
@@ -185,7 +194,10 @@ export function ThemeDetail() {
           hint={`Woher das Geld kommt und wofür es im laufenden Betrieb ausgegeben wird. Eigene Einnahmen ${fmtEurShort(sankey.income)}, Zuschuss aus allgemeinen Haushaltsmitteln ${fmtEurShort(sankey.zuschuss)}.`}
         >
           {sankey.links.length ? (
-            <EChart option={sankeyOpt} style={{ height: sankeyHeight }} />
+            <>
+              <p className="text-xs text-ink-muted mb-1">Klick auf eine Einrichtung öffnet ihre Detailseite.</p>
+              <EChart option={sankeyOpt} onEvents={sankeyEvents} style={{ height: sankeyHeight }} />
+            </>
           ) : (
             <p className="text-sm text-ink-muted">Kein laufender Aufwand in diesem Thema.</p>
           )}

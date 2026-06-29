@@ -1,9 +1,9 @@
 {
  "meta": {
-  "generated": "2026-06-28T19:10:03",
+  "generated": "2026-06-29T17:57:32",
   "n_posten": 3960,
   "n_themes": 14,
-  "multi_tagged": 358
+  "multi_tagged": 339
  },
  "themes": {
   "verwaltung": {
@@ -5801,51 +5801,31 @@
   "7512.4140": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.4340": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.4440": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.5010": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.6790": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7610.6520": [
@@ -9381,11 +9361,7 @@
   "7501.6329": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1312.5431": [
@@ -11411,11 +11387,7 @@
   "7501.6365": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1313.5400": [
@@ -16255,11 +16227,7 @@
   "7501.1670": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "9000.0220": [
@@ -16435,11 +16403,7 @@
   "7511.5350": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1432": [
@@ -16455,11 +16419,7 @@
   "7512.1145": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8806.1411": [
@@ -17835,11 +17795,7 @@
   "7501.1680": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6300.5137": [
@@ -21817,61 +21773,37 @@
   "7501.4140": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7501.4340": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7501.4440": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7501.6610": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7511.6329": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.5370": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7605.4140": [
@@ -24489,21 +24421,13 @@
   "7512.9535": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.9880": [
    {
     "theme": "wasser_entsorgung",
-    "weight": 0.5
-   },
-   {
-    "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7610.9630": [
