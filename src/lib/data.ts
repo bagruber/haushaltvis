@@ -576,15 +576,25 @@ export function einrichtungPosten(data: Data, glz: string): Posten[] {
     .sort((a, b) => (a.ea === b.ea ? a.grz.localeCompare(b.grz) : a.ea === "A" ? -1 : 1));
 }
 
-/** Aggregated Ansatz/Ergebnis per year for one Einrichtung, filtered by E/A. */
-export function einrichtungSeries(data: Data, glz: string, ea: EA): YearSeries {
+/** Aggregated Ansatz/Ergebnis per year for one Einrichtung, filtered by E/A and Haushalt. */
+export function einrichtungSeries(data: Data, glz: string, ea: EA, haushalt?: Haushalt): YearSeries {
+  return aggSeries(data, (p) => p.glz === glz && p.ea === ea && (!haushalt || p.haushalt === haushalt));
+}
+
+/** Aggregated Ansatz/Ergebnis per year for one Bereich (2-digit Abschnitt). */
+export function bereichSeries(data: Data, ab: string, ea: EA, haushalt?: Haushalt): YearSeries {
+  return aggSeries(data, (p) => p.glz.slice(0, 2) === ab && p.ea === ea && (!haushalt || p.haushalt === haushalt));
+}
+
+/** Shared aggregation: sum Ansatz/Ergebnis per year over Posten matching `pred`. */
+function aggSeries(data: Data, pred: (p: Posten) => boolean): YearSeries {
   const years = data.budget.meta.years;
   const a = new Map<number, number>();
   const e = new Map<number, number>();
   const provisional = new Set<number>();
   for (const f of data.budget.facts) {
     const p = data.budget.posten[f.hhst_id];
-    if (!p || p.glz !== glz || p.ea !== ea) continue;
+    if (!p || !pred(p)) continue;
     if (f.ansatz != null) a.set(f.year, (a.get(f.year) ?? 0) + f.ansatz);
     if (f.ergebnis != null) {
       e.set(f.year, (e.get(f.year) ?? 0) + f.ergebnis);
@@ -627,6 +637,7 @@ export interface SankeyNode {
   name: string;
   itemStyle?: { color: string };
   depth?: number;
+  label?: { position?: "left" | "right" | "top" | "bottom" | "inside" };
 }
 export interface SankeyLink {
   source: string;
@@ -989,38 +1000,45 @@ export function kameralBothSidesTree(data: Data, year: number): KameralTree {
   const links: SankeyLink[] = [];
   const nav: Record<string, string> = {};
   const used = new Set<string>();
-  const add = (name: string, color: string, depth: number): string => {
+  const add = (name: string, color: string, depth: number, labelPos?: "left" | "right"): string => {
     let n = name;
     while (used.has(n)) n += " ";
     used.add(n);
-    nodes.push({ name: n, itemStyle: { color }, depth });
+    nodes.push({ name: n, itemStyle: { color }, depth, ...(labelPos ? { label: { position: labelPos } } : {}) });
     return n;
   };
 
-  const root = add(`Haushalt ${year}`, "#a8a193", 0);
-  const inNode = add("Einnahmen", GOLD_BASE, 1);
-  const exNode = add("Ausgaben", "#7d756a", 1);
-  nav[inNode] = "/einnahmen";
-  links.push({ source: root, target: inNode, value: Math.round(totIn) });
-  links.push({ source: root, target: exNode, value: Math.round(totEx) });
+  // Bidirectional: Einnahmearten (left, depth 0) → Haushalt (center, depth 1)
+  // → Einzelpläne (right, depth 2). A residual balances the two sides so the
+  // central node reads cleanly (deficit covered by reserves, or surplus saved).
+  const hub = add(`Haushalt ${year}`, "#a8a193", 1);
 
   const incEntries = [...inc.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
   const goldShades = shades(GOLD_BASE, incEntries.length);
   incEntries.forEach(([cat, v], i) => {
-    const n = add(cat, goldShades[i], 2);
+    const n = add(cat, goldShades[i], 0, "left");
     nav[n] = "/einnahmen";
-    links.push({ source: inNode, target: n, value: Math.round(v) });
+    links.push({ source: n, target: hub, value: Math.round(v) });
   });
+  if (totEx > totIn) {
+    const n = add("Rücklagen / Finanzierung", "#b39f7a", 0, "left");
+    nav[n] = "/einnahmen";
+    links.push({ source: n, target: hub, value: Math.round(totEx - totIn) });
+  }
 
   for (const ep of EINZELPLAN_ORDER) {
     const e = eps.get(ep);
     if (!e || e.total <= 0) continue;
     const n = add(`${ep} · ${e.name}`, EINZELPLAN_COLORS[ep] ?? "#999", 2);
     nav[n] = `/einzelplan/${ep}`;
-    links.push({ source: exNode, target: n, value: Math.round(e.total) });
+    links.push({ source: hub, target: n, value: Math.round(e.total) });
+  }
+  if (totIn > totEx) {
+    const n = add("Rücklagenzuführung / Tilgung", "#7d756a", 2);
+    links.push({ source: hub, target: n, value: Math.round(totIn - totEx) });
   }
 
-  return { nodes, links, nav, total: totEx };
+  return { nodes, links, nav, total: Math.max(totIn, totEx) };
 }
 
 export interface IncomeGroup {

@@ -1,30 +1,28 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { EChartsOption } from "echarts";
-import { EChart } from "@/components/EChart";
+import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import {
   useData,
   einrichtungInfo,
   einrichtungPosten,
   einrichtungSeries,
-  adjustSeries,
   latestYear,
-  type TimeMode,
 } from "@/lib/data";
-import { fmtEur, fmtEurShort } from "@/lib/format";
+import { fmtEur } from "@/lib/format";
 
 export function EinrichtungDetail() {
   const { glz = "" } = useParams();
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimeMode>({});
+  const [mode, setMode] = useState<TimelineMode>({});
 
   const view = useMemo(() => {
     if (!data) return null;
     const info = einrichtungInfo(data, glz);
     if (!info) return { info: null } as const;
     const y = latestYear(data.budget);
-    const unit = mode.perCapita ? " €/Kopf" : "";
-    const ausgaben = adjustSeries(einrichtungSeries(data, glz, "A"), data.context, mode, y);
+    const laufend = einrichtungSeries(data, glz, "A", "verwaltung");
+    const invest = einrichtungSeries(data, glz, "A", "vermoegen");
+    const hasInvest = invest.ansatz.some((v) => v) || invest.ergebnis.some((v) => v);
     const posten = einrichtungPosten(data, glz);
 
     // latest Ansatz per Posten for the list
@@ -33,21 +31,8 @@ export function EinrichtungDetail() {
       if (f.year === y && f.ansatz != null) latest.set(f.hhst_id, f.ansatz);
     }
 
-    const opt: EChartsOption = {
-      color: ["#c8102e", "#967a40"],
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : `${fmtEur(v as number)}${unit}`) },
-      legend: { bottom: 0 },
-      grid: { left: 64, right: 20, top: 16, bottom: 48 },
-      xAxis: { type: "category", data: ausgaben.years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? `${fmtEur(v)}${unit}` : fmtEurShort(v)) } },
-      series: [
-        { name: "Ansatz (Plan)", type: "line", data: ausgaben.ansatz, symbolSize: 7, lineStyle: { width: 3 }, connectNulls: true },
-        { name: "Ergebnis (Ist)", type: "line", data: ausgaben.ergebnis, symbol: "emptyCircle", symbolSize: 7, lineStyle: { width: 2, type: "dashed" }, connectNulls: true },
-      ],
-    };
-
     const hasContext = !!(data.context.cpi || data.context.population);
-    return { info, opt, posten, latest, y, hasContext };
+    return { info, laufend, invest, hasInvest, posten, latest, y, hasContext };
   }, [data, glz, mode]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
@@ -59,7 +44,7 @@ export function EinrichtungDetail() {
       </p>
     );
 
-  const { info, opt, posten, latest, y, hasContext } = view;
+  const { info, laufend, invest, hasInvest, posten, latest, y, hasContext } = view;
   const ausgabenPosten = posten.filter((p) => p.ea === "A");
   const einnahmenPosten = posten.filter((p) => p.ea === "E");
 
@@ -89,22 +74,17 @@ export function EinrichtungDetail() {
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
-          <h2 className="font-display text-lg font-bold">Ausgaben über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Wert {y} vorläufig.</span>
+          <h2 className="font-display text-lg font-bold">Laufende Ausgaben über die Jahre</h2>
+          <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. Wert {y} vorläufig.</span>
         </div>
-        {hasContext && (
-          <div className="flex flex-wrap gap-4 text-xs mb-1">
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input type="checkbox" checked={!!mode.real} onChange={(e) => setMode((m) => ({ ...m, real: e.target.checked }))} />
-              <span>inflationsbereinigt</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input type="checkbox" checked={!!mode.perCapita} onChange={(e) => setMode((m) => ({ ...m, perCapita: e.target.checked }))} />
-              <span>je Einwohner</span>
-            </label>
-          </div>
+        <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={hasInvest} />
+        <Timeline laufend={laufend} invest={invest} mode={mode} context={data!.context} baseYear={y} height={300} />
+        {hasInvest && (
+          <p className="text-xs text-ink-muted mt-1">
+            Investitionen (Vermögenshaushalt) sind von Jahr zu Jahr unregelmäßig und nur als Balken
+            eingeblendet, wenn aktiviert — sie taugen nicht als Trend.
+          </p>
         )}
-        <EChart option={opt} style={{ height: 320 }} />
       </section>
 
       <section className="grid lg:grid-cols-2 gap-4">

@@ -26,14 +26,13 @@ export function Erkunden() {
       series: [
         {
           type: "sankey",
-          left: 8,
+          left: 210,
           right: 230,
           top: 10,
           bottom: 10,
           nodeWidth: 16,
           nodeGap: 10,
-          nodeAlign: "left",
-          layoutIterations: 0, // deterministic tree order → no crossings
+          layoutIterations: 32, // let ECharts minimise crossings at the central hub
           draggable: false,
           emphasis: { focus: "adjacency" },
           data: tree.nodes,
@@ -66,9 +65,9 @@ export function Erkunden() {
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-bold">Haushalt erkunden</h1>
         <p className="max-w-2xl text-ink-soft">
-          Der ganze Haushalt auf einen Blick: links woher das Geld kommt
-          (<b>Einnahmen</b>), rechts wohin es geht (<b>Ausgaben</b> nach Einzelplänen).
-          Klick auf einen Einzelplan oder auf „Einnahmen" führt eine Ebene tiefer.
+          Der ganze Haushalt auf einen Blick: <b>links</b> woher das Geld kommt (Einnahmen),
+          in der Mitte der Gesamthaushalt, <b>rechts</b> wohin es geht (Ausgaben nach
+          Einzelplänen). Klick auf eine Einnahmeart oder einen Einzelplan führt eine Ebene tiefer.
         </p>
       </header>
 

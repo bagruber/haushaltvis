@@ -1,30 +1,36 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useData, einzelplanName, einzelplanSections, latestYear, type Haushalt } from "@/lib/data";
+import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear } from "@/lib/data";
+import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
-
-type HaushaltFilter = "alle" | Haushalt;
 
 export function EinzelplanDetail() {
   const { ep = "" } = useParams();
   const { data, error } = useData();
-  const [hh, setHh] = useState<HaushaltFilter>("alle");
+  const [mode, setMode] = useState<TimelineMode>({});
 
   const view = useMemo(() => {
     if (!data) return null;
     const y = latestYear(data.budget);
-    const sections = einzelplanSections(data, ep, y, hh === "alle" ? undefined : hh);
+    const sections = einzelplanSections(data, ep, y).map((s) => ({
+      ...s,
+      laufend: bereichSeries(data, s.code, "A", "verwaltung"),
+      invest: bereichSeries(data, s.code, "A", "vermoegen"),
+    }));
     const total = sections.reduce((s, x) => s + x.total, 0);
+    const hasInvest = sections.some((s) => s.invest.ansatz.some((v) => v) || s.invest.ergebnis.some((v) => v));
     return {
       y,
       sections,
       total,
+      hasInvest,
+      hasContext: !!(data.context.cpi || data.context.population),
       name: einzelplanName(data, ep),
       intro: data.einleitungen[`ep:${ep}`],
       themes: data.themes.themes,
     };
-  }, [data, ep, hh]);
+  }, [data, ep]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
@@ -48,13 +54,9 @@ export function EinzelplanDetail() {
         {view.intro && <p className="max-w-3xl text-ink-soft">{view.intro}</p>}
       </header>
 
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <div className="inline-flex rounded-lg border border-ink-line bg-cream p-0.5">
-          {([["alle", "Gesamt"], ["verwaltung", "Laufender Betrieb"], ["vermoegen", "Investitionen"]] as [HaushaltFilter, string][]).map(([k, l]) => (
-            <button key={k} onClick={() => setHh(k)} className={"px-3 py-1 rounded-md transition-colors " + (hh === k ? "bg-red-600 text-cream" : "text-ink-soft hover:text-ink")}>{l}</button>
-          ))}
-        </div>
-        <span className="rounded-md bg-white border border-ink-line px-3 py-1.5">Ausgaben {view.y}: <b>{fmtEurShort(view.total)}</b></span>
+      <div className="flex flex-wrap items-center gap-4">
+        <span className="rounded-md bg-white border border-ink-line px-3 py-1.5 text-sm">Ausgaben {view.y}: <b>{fmtEurShort(view.total)}</b></span>
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={view.hasInvest} />
       </div>
 
       <div className="space-y-4">
@@ -64,7 +66,10 @@ export function EinzelplanDetail() {
               <h2 className="font-display text-lg font-bold">{s.label}</h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(s.total)}</span>
             </div>
-            <ul className="space-y-1.5 text-sm">
+
+            <Timeline laufend={s.laufend} invest={s.invest} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} />
+
+            <ul className="space-y-1.5 text-sm mt-3">
               {s.einrichtungen.map((e) => (
                 <li key={e.glz} className="border-b border-ink-line/50 pb-1.5 last:border-0">
                   <Link to={`/einrichtung/${e.glz}`} className="flex items-center justify-between gap-3 hover:text-red-600 transition-colors">
