@@ -1,7 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
-import { Geldfluss } from "./pages/Geldfluss";
+import { Erkunden } from "./pages/Erkunden";
+import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
 import { ThemeDetail } from "./pages/ThemeDetail";
 import { PostenDetail } from "./pages/PostenDetail";
@@ -14,7 +15,9 @@ export const router = createBrowserRouter(
       element: <Layout />,
       children: [
         { path: "/", element: <Home /> },
-        { path: "/geldfluss", element: <Geldfluss /> },
+        { path: "/erkunden", element: <Erkunden /> },
+        { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
+        { path: "/geldfluss", element: <Navigate to="/erkunden" replace /> },
         { path: "/themen", element: <Themen /> },
         { path: "/themen/:id", element: <ThemeDetail /> },
         { path: "/posten/:id", element: <PostenDetail /> },

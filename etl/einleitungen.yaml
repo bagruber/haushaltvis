@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Kurze Einleitungstexte für die explorative (kamerale) Sicht.
+#
+# Schlüssel:
+#   "ep:<N>"   Einzelplan (0–9)
+#   "ab:<NN>"  Bereich (2-stelliger Abschnitt) — optional, für Detailtexte
+#
+# Frei editierbar. Nach Änderung: python etl/build_web.py
+# ─────────────────────────────────────────────────────────────────────────────
+
+"ep:0": >
+  Die Allgemeine Verwaltung umfasst den inneren Betrieb der Stadt: Bürgermeister
+  und Stadtrat, Geschäftsleitung, Kämmerei und Finanzverwaltung, Standesamt,
+  EDV/IT sowie die Verwaltungsgebäude. Hier entstehen die Kosten, die den
+  Rathausbetrieb am Laufen halten.
+
+"ep:1": >
+  Öffentliche Sicherheit und Ordnung bündelt Ordnungsamt, Einwohnermelde- und
+  Zulassungswesen, Verkehrsüberwachung sowie die Feuerwehren Moosburg, Pfrombach/
+  Aich und Thonstetten und den Katastrophenschutz.
+
+"ep:2": >
+  Der Einzelplan Schulen trägt die Sachkosten der städtischen Schulen
+  (Grundschulen, Mittelschule, Schulzentrum) samt Gebäuden und Ausstattung sowie
+  die Schülerbeförderung. Personalkosten der Lehrkräfte trägt der Freistaat.
+
+"ep:3": >
+  Wissenschaft, Forschung und Kulturpflege enthält Museen, Heimat- und
+  Kulturpflege, Festspiele und Märkte, Volkshochschule und Stadtbücherei sowie
+  kirchliche Angelegenheiten und Städtepartnerschaften.
+
+"ep:4": >
+  Soziale Sicherung wird in Moosburg vor allem von den Kindertageseinrichtungen
+  und der Jugendarbeit geprägt — städtische wie kirchliche und freie Träger.
+  Dazu kommen Obdachlosenhilfe und sonstige soziale Aufgaben.
+
+"ep:5": >
+  Gesundheit, Sport und Erholung umfasst die Bäder (Frei- und Hallenbad), Sport-
+  anlagen und Sportförderung, Park- und Grünanlagen, Naturschutz sowie Friedhöfe.
+
+"ep:6": >
+  Bau- und Wohnungswesen, Verkehr ist einer der größten Bereiche: Bauverwaltung
+  und Städtebau, Gemeindestraßen und Brücken, Straßenbeleuchtung und -reinigung,
+  Parkeinrichtungen, Gewässer sowie der Bauhof.
+
+"ep:7": >
+  Öffentliche Einrichtungen und Wirtschaftsförderung enthält Abwasser (Kanal und
+  Kläranlage), Abfall und Wertstoffhof, öffentliche Einrichtungen wie die Stadt-
+  halle, Wirtschaftsförderung und Öffentlichkeitsarbeit.
+
+"ep:8": >
+  Wirtschaftliche Unternehmen und Grundvermögen bündelt die städtischen
+  Versorgungsbetriebe (Strom, Wasser), den Stadtwald sowie den bebauten und
+  unbebauten Grundbesitz der Stadt, einschließlich Gewerbe- und Wohngebiete.
+
+"ep:9": >
+  Allgemeine Finanzwirtschaft enthält die großen Geldströme ohne konkrete
+  Einrichtung: Steuern, Schlüsselzuweisungen und Umlagen, Kredite und
+  Schuldendienst, Zuführungen und Rücklagen.

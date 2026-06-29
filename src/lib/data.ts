@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { shades, GOLD_BASE, ZUSCHUSS_RED } from "./colors";
+import { shades, GOLD_BASE, ZUSCHUSS_RED, EINZELPLAN_COLORS } from "./colors";
 
 // ── Types mirroring the ETL output (see etl/*.py) ───────────────────────────
 export type Haushalt = "verwaltung" | "vermoegen";
@@ -74,6 +74,8 @@ export interface Data {
   events: BudgetEvent[];
   labels: Labels;
   context: Context;
+  /** editorial intro texts, keyed e.g. "ep:2" (Einzelplan) or "ab:21" (Bereich) */
+  einleitungen: Record<string, string>;
 }
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
@@ -94,12 +96,16 @@ export function loadData(): Promise<Data> {
       fetch(`${base}data/context.json`)
         .then((r) => (r.ok ? (r.json() as Promise<Context>) : {}))
         .catch(() => ({}) as Context),
-    ]).then(([budget, themes, ev, labels, context]) => ({
+      fetch(`${base}data/einleitungen.json`)
+        .then((r) => (r.ok ? (r.json() as Promise<Record<string, string>>) : {}))
+        .catch(() => ({}) as Record<string, string>),
+    ]).then(([budget, themes, ev, labels, context, einleitungen]) => ({
       budget,
       themes,
       events: ev.events ?? [],
       labels,
       context,
+      einleitungen,
     }));
   }
   return cache;
@@ -814,4 +820,139 @@ export function investmentNet(data: Data, themeId: string, year: number, limit =
     .filter((x) => x.invest > 0)
     .sort((a, b) => b.invest - a.invest)
     .slice(0, limit);
+}
+
+// ── Kameral exploratory tree (Schiene A) ────────────────────────────────────
+
+const EINZELPLAN_ORDER = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
+export function einzelplanName(data: Data, ep: string): string {
+  for (const p of Object.values(data.budget.posten)) if (p.einzelplan === ep) return p.einzelplan_name;
+  return `Einzelplan ${ep}`;
+}
+
+export interface KameralTree {
+  nodes: SankeyNode[];
+  links: SankeyLink[];
+  nav: Record<string, string>; // node name → Einzelplan id
+  total: number;
+}
+
+/**
+ * Pure expense tree for the exploratory view: Gesamtausgaben → Einzelplan →
+ * Bereich. A strict tree (every Bereich has exactly one Einzelplan parent), so
+ * the Sankey is planar — no crossing streams. Income is shown on its own pages.
+ */
+export function kameralExpenseTree(
+  data: Data,
+  year: number,
+  haushalt?: Haushalt,
+  capPerEp = 6,
+): KameralTree {
+  const eps = new Map<string, { total: number; name: string; bereiche: Map<string, number> }>();
+  let total = 0;
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "A") continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
+    const e = eps.get(p.einzelplan) ?? { total: 0, name: p.einzelplan_name, bereiche: new Map() };
+    e.total += f.ansatz;
+    e.bereiche.set(p.glz.slice(0, 2), (e.bereiche.get(p.glz.slice(0, 2)) ?? 0) + f.ansatz);
+    eps.set(p.einzelplan, e);
+    total += f.ansatz;
+  }
+
+  const ROOT = "Gesamtausgaben";
+  const nodes: SankeyNode[] = [];
+  const links: SankeyLink[] = [];
+  const nav: Record<string, string> = {};
+  const used = new Set<string>();
+  const addNode = (name: string, color: string, depth: number): string => {
+    let n = name;
+    while (used.has(n)) n += " ";
+    used.add(n);
+    nodes.push({ name: n, itemStyle: { color }, depth });
+    return n;
+  };
+
+  addNode(ROOT, "#a8a193", 0);
+  for (const ep of EINZELPLAN_ORDER) {
+    const e = eps.get(ep);
+    if (!e || e.total <= 0) continue;
+    const color = EINZELPLAN_COLORS[ep] ?? "#999";
+    const epName = addNode(`${ep} · ${e.name}`, color, 1);
+    nav[epName] = ep;
+    links.push({ source: ROOT, target: epName, value: Math.round(e.total) });
+
+    const sorted = [...e.bereiche.entries()].sort((a, b) => b[1] - a[1]);
+    const head = sorted.slice(0, capPerEp);
+    const tail = sorted.slice(capPerEp);
+    const bShades = shades(color, head.length + (tail.length ? 1 : 0), 0.08, 0.55);
+    head.forEach(([ab, v], i) => {
+      if (v <= 0) return;
+      links.push({ source: epName, target: addNode(abschnittName(data.labels, ab), bShades[i], 2), value: Math.round(v) });
+    });
+    const rest = tail.reduce((s, [, v]) => s + v, 0);
+    if (rest > 0) {
+      links.push({ source: epName, target: addNode(`Weitere Bereiche (${tail.length})`, bShades[head.length], 2), value: Math.round(rest) });
+    }
+  }
+  return { nodes, links, nav, total };
+}
+
+export interface EinrichtungAmount {
+  glz: string;
+  label: string;
+  value: number;
+  themes: string[];
+}
+
+export interface BereichSection {
+  code: string;
+  label: string;
+  total: number;
+  einrichtungen: EinrichtungAmount[];
+}
+
+/** For one Einzelplan: its Bereiche, each with Einrichtungen and theme hints. */
+export function einzelplanSections(
+  data: Data,
+  ep: string,
+  year: number,
+  haushalt?: Haushalt,
+): BereichSection[] {
+  const bereiche = new Map<string, Map<string, { label: string; value: number }>>();
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "A" || p.einzelplan !== ep) continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
+    const ab = p.glz.slice(0, 2);
+    if (!bereiche.has(ab)) bereiche.set(ab, new Map());
+    const inner = bereiche.get(ab)!;
+    const cur = inner.get(p.glz) ?? { label: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(), value: 0 };
+    cur.value += f.ansatz;
+    inner.set(p.glz, cur);
+  }
+  const themeOf = (glz: string): string[] => {
+    const hh = Object.values(data.budget.posten).find((p) => p.glz === glz);
+    if (!hh) return [];
+    return (data.themes.assignment[hh.hhst_id] ?? []).map((t) => t.theme);
+  };
+  return [...bereiche.entries()]
+    .map(([code, inner]) => {
+      const einrichtungen = [...inner.entries()]
+        .map(([glz, x]) => ({ glz, label: x.label, value: Math.round(x.value), themes: themeOf(glz) }))
+        .filter((x) => x.value > 0)
+        .sort((a, b) => b.value - a.value);
+      return {
+        code,
+        label: abschnittName(data.labels, code),
+        total: einrichtungen.reduce((s, e) => s + e.value, 0),
+        einrichtungen,
+      };
+    })
+    .filter((s) => s.total > 0)
+    .sort((a, b) => b.total - a.total);
 }
