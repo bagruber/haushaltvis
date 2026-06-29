@@ -9,6 +9,37 @@ interface Props {
   onThemeClick?: (id: string) => void;
 }
 
+/** Label on a soft cream chip, matching the Moosburg card style. */
+function ChipLabel({ x, y, text, bold }: { x: number; y: number; text: string; bold?: boolean }) {
+  const fs = bold ? 12 : 10;
+  const w = text.length * fs * 0.56 + 10;
+  const h = fs + 6;
+  return (
+    <g className="pointer-events-none">
+      <rect
+        x={x - w / 2}
+        y={y - h / 2}
+        width={w}
+        height={h}
+        rx={4}
+        fill="#faf7f2"
+        fillOpacity={0.9}
+        stroke="#e4e0d7"
+        strokeWidth={0.5}
+      />
+      <text
+        x={x}
+        y={y}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        style={{ fontSize: fs, fontWeight: bold ? 700 : 500, fill: "#1c1c1c" }}
+      >
+        {text}
+      </text>
+    </g>
+  );
+}
+
 /** Circle-packing view of the Theme → Abschnitt hierarchy (area = amount). */
 export function PackedCircles({ data, height = 560, onThemeClick }: Props) {
   const ref = useRef<HTMLDivElement>(null);
@@ -45,7 +76,7 @@ export function PackedCircles({ data, height = 560, onThemeClick }: Props) {
             const color = n.data.itemStyle?.color ?? "#ccc";
             const id = themeId(n);
             const key = `${n.data.name}-${i}`;
-            const showLabel = isTheme && n.r > 26;
+            const short = n.data.name.length > 18 ? n.data.name.split(/[ ,]/)[0] : n.data.name;
             return (
               <g
                 key={key}
@@ -65,28 +96,11 @@ export function PackedCircles({ data, height = 560, onThemeClick }: Props) {
                   strokeWidth={isTheme ? 1.5 : 0}
                   strokeOpacity={hover?.key === key ? 1 : 0.6}
                 />
-                {showLabel && (
-                  <text
-                    x={n.x}
-                    y={n.y - n.r + 14}
-                    textAnchor="middle"
-                    className="pointer-events-none"
-                    style={{ fontSize: 12, fontWeight: 700, fill: "#1c1c1c" }}
-                  >
-                    {n.data.name}
-                  </text>
+                {isTheme && n.r > 30 && (
+                  <ChipLabel x={n.x} y={n.y - n.r + 12} text={short} bold />
                 )}
-                {!isTheme && n.r > 18 && (
-                  <text
-                    x={n.x}
-                    y={n.y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className="pointer-events-none"
-                    style={{ fontSize: 10, fill: "#1c1c1c" }}
-                  >
-                    {n.r > 34 ? n.data.name.split(" ")[0] : ""}
-                  </text>
+                {!isTheme && n.r > 22 && (
+                  <ChipLabel x={n.x} y={n.y} text={n.r > 46 ? n.data.name : short} />
                 )}
               </g>
             );

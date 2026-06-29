@@ -185,7 +185,9 @@ export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): T
       .map(([ab, v]) => ({ name: abschnittName(data.labels, ab), value: Math.round(v) }))
       .filter((c) => c.value > 0)
       .sort((a, b) => b.value - a.value);
-    const childShades = shades(color, sorted.length, 0.0, 0.55);
+    // Child shades are all offset from the base (never identical to the parent):
+    // build n+1 shades starting lighter than the base and drop the base itself.
+    const childShades = shades(color, sorted.length + 1, 0.14, 0.6).slice(1);
     const children: TreeNode[] = sorted.map((c, i) => ({
       ...c,
       id: theme, // leaves carry their theme id so a click can navigate
@@ -567,17 +569,17 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
     return n;
   };
 
-  // Depths: Zuschuss starts one column further left (0), income at 1, hub 2,
-  // groups 3, leaves 4 — so the cross-subsidy reads as a distinct origin.
+  // Income and Zuschuss share the left column (depth 0) so the red cross-subsidy
+  // band doesn't cross the income column; it's set apart by colour + top position.
   const incomeEntries = [...income.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
   const goldShades = shades(GOLD_BASE, incomeEntries.length);
   if (zuschuss > 0) {
     links.push({ source: addNode(ZUSCHUSS, ZUSCHUSS_RED, 0), target: hub, value: Math.round(zuschuss) });
   }
   incomeEntries.forEach(([src, v], i) => {
-    links.push({ source: addNode(src, goldShades[i], 1), target: hub, value: Math.round(v) });
+    links.push({ source: addNode(src, goldShades[i], 0), target: hub, value: Math.round(v) });
   });
-  addNode(hub, themeColor, 2);
+  addNode(hub, themeColor, 1);
 
   // hub → group → (leaves, capped). Each group a shade of the theme colour,
   // its leaves lighter tints of that shade.
@@ -585,7 +587,7 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   const groupShades = shades(themeColor, groupEntries.length);
   groupEntries.forEach(([code, g], gi) => {
     const gColor = groupShades[gi];
-    const gName = addNode(groupName.get(code)!, gColor, 3);
+    const gName = addNode(groupName.get(code)!, gColor, 2);
     links.push({ source: hub, target: gName, value: Math.round(g.total) });
     if (g.leaves.size <= 1) return; // single item: group node already represents it
 
@@ -595,13 +597,13 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
     const leafShades = shades(gColor, head.length + (tail.length ? 1 : 0), 0.1, 0.55);
     head.forEach(([leaf, v], li) => {
       if (v <= 0) return;
-      links.push({ source: gName, target: addNode(leaf, leafShades[li], 4), value: Math.round(v) });
+      links.push({ source: gName, target: addNode(leaf, leafShades[li], 3), value: Math.round(v) });
     });
     const rest = tail.reduce((s, [, v]) => s + v, 0);
     if (rest > 0) {
       links.push({
         source: gName,
-        target: addNode(`Weitere (${tail.length})`, leafShades[head.length], 4),
+        target: addNode(`Weitere (${tail.length})`, leafShades[head.length], 3),
         value: Math.round(rest),
       });
     }

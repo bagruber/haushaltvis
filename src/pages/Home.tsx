@@ -76,22 +76,28 @@ export function Home() {
         }],
       };
     }
-    // sunburst
+    // sunburst — topic labels live in the legend beside the chart; rings stay
+    // clean, subtopic labels appear only on hover (emphasis).
     return {
       tooltip: { formatter: tooltipFmt },
       series: [{
-        type: "sunburst", radius: ["12%", "96%"], data: tree, nodeClick: "rootToNode",
-        sort: undefined,
-        emphasis: { focus: "ancestor" },
+        type: "sunburst", radius: ["10%", "98%"], data: tree, nodeClick: "rootToNode",
+        label: { show: false },
+        emphasis: { focus: "ancestor", label: { show: true, formatter: "{b}", color: "#1c1c1c" } },
         levels: [
           {},
-          { r0: "12%", r: "62%", label: { rotate: "tangential", overflow: "truncate", minAngle: 8 } },
-          { r0: "62%", r: "96%", label: { align: "right", overflow: "truncate", minAngle: 5 } },
+          { r0: "10%", r: "58%" },
+          { r0: "59%", r: "98%" },
         ],
         itemStyle: { borderColor: "#faf7f2", borderWidth: 1.5 },
       }],
     };
   }, [tree, viz]);
+
+  const legend = useMemo(
+    () => tree.map((n) => ({ id: n.id!, name: n.name, color: n.itemStyle?.color ?? "#999", value: n.value })),
+    [tree],
+  );
 
   const onEvents = useMemo(
     () => ({
@@ -150,6 +156,26 @@ export function Home() {
           <div className="h-[560px] grid place-items-center text-ink-muted">Lade Daten …</div>
         ) : viz === "circles" ? (
           <PackedCircles data={tree} height={560} onThemeClick={(id) => navigate(`/themen/${id}`)} />
+        ) : viz === "sunburst" ? (
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="lg:flex-1 min-w-0">
+              {option && <EChart option={option} onEvents={onEvents} style={{ height: 560 }} />}
+            </div>
+            <ul className="lg:w-56 shrink-0 grid grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-1.5 self-center text-sm">
+              {legend.map((l) => (
+                <li key={l.id}>
+                  <button
+                    onClick={() => navigate(`/themen/${l.id}`)}
+                    className="flex items-center gap-2 text-left hover:text-red-600 transition-colors w-full"
+                  >
+                    <span className="inline-block h-3 w-3 rounded-sm shrink-0" style={{ background: l.color }} />
+                    <span className="flex-1 min-w-0 truncate">{l.name}</span>
+                    <span className="text-ink-muted tabular-nums text-xs">{fmtEurShort(l.value)}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : (
           option && <EChart option={option} onEvents={onEvents} style={{ height: 560 }} />
         )}
