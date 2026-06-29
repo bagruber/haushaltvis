@@ -1,140 +1,155 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Themen-Taxonomie für die Moosburg-Haushaltsvisualisierung
+# Themen-Taxonomie (Schiene B) — 11 Themen, frei M:N.
 #
-# Das kamerale Rückgrat (Einzelplan > Gliederung > Gruppierung) bleibt unberührt.
-# Diese Datei legt EINE laienfreundliche Themen-Schicht DARÜBER (many-to-many).
+# Das kamerale Rückgrat bleibt unberührt (Schiene A). Hier wird die laienfreund-
+# liche Themen-Schicht DARÜBER gelegt. Ein Unterabschnitt/Posten kann MEHREREN
+# Themen zugeordnet sein und zählt dann VOLL in jedem (keine anteilige Aufteilung,
+# Themen-Summen müssen nicht zur kameralen Summe passen).
 #
-# Zuordnung passiert auf Abschnitts-Ebene (2-stellige GLZ) als Standard,
-# mit Overrides je Gliederung (4-stellig) für Ausnahmen. Ein Posten kann
-# mehreren Themen zugeordnet sein; die Gewichte je Posten werden vom
-# classify-Skript auf Summe 1.0 normalisiert (kein Doppelzählen in Summen).
-#
-# Bearbeiten: Themen umbenennen, Farben ändern, Abschnitte verschieben.
-# Danach `python etl/classify.py` ausführen -> erzeugt data/processed/themes.json
+# Zuordnung: Standard je Bereich (2-stellige GLZ), Ausnahmen je Gliederung
+# (4-/5-stellig) in gliederung_overrides. Danach: python etl/classify.py
 # ─────────────────────────────────────────────────────────────────────────────
 
 themes:
-  verwaltung:
-    label: "Verwaltung & Rathaus"
-    color: "#8a8170"
-    description: "Bürgermeister, Stadtrat, Kämmerei, Standesamt, EDV — der laufende Betrieb der Stadtverwaltung."
-  sicherheit:
-    label: "Sicherheit & Feuerwehr"
-    color: "#e5202e"
-    description: "Öffentliche Ordnung, Feuerwehr und Katastrophenschutz."
+  kinder_jugend_familie:
+    label: "Kinder, Jugend & Familie"
+    color: "#f4830a"
+    description: "Kindertageseinrichtungen, Krippen, Horte und die offene Jugendarbeit."
   bildung:
     label: "Bildung & Schulen"
     color: "#009ac7"
-    description: "Grundschule, Schülerbeförderung und Volkshochschule."
-  kinder_jugend:
-    label: "Kinder, Jugend & Familie"
-    color: "#f4830a"
-    description: "Kindertagesstätten, Krippen und Einrichtungen der Jugendarbeit."
+    description: "Grund- und Mittelschulen, Schülerbeförderung und Erwachsenenbildung (VHS)."
   soziales:
-    label: "Soziales & Wohnen"
+    label: "Soziales & Senioren"
     color: "#e91e8c"
-    description: "Soziale Sicherung, Obdachlosenhilfe und Wohnungsbauförderung."
-  kultur:
-    label: "Kultur & Heimat"
-    color: "#6b3e7a"
-    description: "Museum, Heimatpflege, Städtepartnerschaften, Kirchen und Ausstellungen."
-  sport_freizeit:
-    label: "Sport & Freizeit"
+    description: "Soziale Sicherung, Obdachlosenhilfe, sozialer Wohnungsbau, Stiftungen und Bestattung."
+  sport_gesundheit:
+    label: "Sport & Gesundheit"
     color: "#0a9e4c"
-    description: "Sportförderung, Sportanlagen, Freibad und Kleingärten."
-  gruen_umwelt:
-    label: "Grün, Natur & Umwelt"
-    color: "#78be1e"
-    description: "Naturschutz, Park- und Grünanlagen, Gewässer und Stadtwald."
-  strassen_verkehr:
-    label: "Straßen, Wege & Verkehr"
+    description: "Bäder, Sportanlagen und Sportförderung."
+  kultur_freizeit:
+    label: "Freizeit & Kultur"
+    color: "#6b3e7a"
+    description: "Museen, Heimat- und Kulturpflege, Feste, Bücherei, Stadthalle und Vereinsleben."
+  mobilitaet:
+    label: "Mobilität & Infrastruktur"
     color: "#3b3f9a"
-    description: "Gemeindestraßen, Brücken, Straßenbeleuchtung, Parkplätze und Bauhof."
-  ver_entsorgung:
-    label: "Ver- & Entsorgung"
-    color: "#18ada4"
-    description: "Städtische Daseinsvorsorge: Strom, Wasser, Abwasser und Abfall. (Untergliedert in eigene Bereiche.)"
-  stadtentwicklung:
-    label: "Stadtplanung & Bauen"
+    description: "Straßen, Brücken, Parken, Beleuchtung, Bauhof sowie Strom- und Wasserversorgung."
+  wohnen:
+    label: "Wohnen, Bauen & Stadtentwicklung"
     color: "#b8964e"
-    description: "Bauamt, Städtebauplanung und der bebaute Grundbesitz der Stadt."
+    description: "Bauverwaltung, Städtebau, Wohnungsbau und der städtische Grundbesitz."
+  umwelt:
+    label: "Umwelt, Klima & Natur"
+    color: "#78be1e"
+    description: "Naturschutz, Grünanlagen, Gewässer, Stadtwald, Abwasser und Abfall."
+  sicherheit:
+    label: "Sicherheit & Ordnung"
+    color: "#e5202e"
+    description: "Öffentliche Ordnung, Feuerwehr, Katastrophenschutz sowie Sauberkeit (Reinigung)."
   wirtschaft:
-    label: "Wirtschaft & Märkte"
+    label: "Wirtschaft & Tourismus"
     color: "#f5d400"
-    description: "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Vereinshaus."
-  finanzen:
-    label: "Finanzen, Steuern & Schulden"
-    color: "#1a1a1a"
-    description: "Steuern, allgemeine Zuweisungen/Umlagen, Kredite und Schuldendienst."
+    description: "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Innenstadt/Stadtleben."
+  verwaltung_finanzen:
+    label: "Verwaltung & Finanzen"
+    color: "#8a8170"
+    description: "Rathaus, Verwaltung und die allgemeine Finanzwirtschaft (Steuern, Umlagen, Kredite)."
 
-# Standard-Zuordnung je Abschnitt (2-stellige GLZ).
-# Liste = ein oder mehrere Themen (gleichgewichtet). Für gewichtete Mehrfach-
-# zuordnung: {theme: bildung, weight: 2} schreiben.
+# Standard-Zuordnung je Bereich (2-stellige GLZ). Liste = ein oder mehrere Themen.
 abschnitt_themes:
-  "00": [verwaltung]      # Bürgermeister und Stadträte
-  "02": [verwaltung]      # Geschäftsleitung
-  "03": [verwaltung, finanzen]   # Stadtkämmerei
-  "05": [verwaltung]      # Standesamt
-  "06": [verwaltung]      # EDV-Abteilung
-  "08": [verwaltung]      # Einrichtungen für Verwaltungsangehörige
-  "10": [sicherheit]      # Sicherheit/Ordnung – Verwaltung
-  "11": [sicherheit]      # Öffentliche Ordnung
-  "13": [sicherheit]      # Feuerwehr Moosburg
-  "14": [sicherheit]      # Katastrophenschutz
-  "21": [bildung]         # Anton-Vitzthum-Grundschule
-  "22": [bildung]         # (weitere Schule, falls vorhanden)
-  "29": [bildung, strassen_verkehr]   # Schülerbeförderung
-  "30": [kultur]          # Kult. Angelegenheiten / Städtepartnerschaft
-  "32": [kultur]          # Heimatmuseum im Kloster
-  "34": [kultur]          # Heimat- und Kulturpflege
-  "35": [bildung, kultur] # VHS - Haus der Bildung
-  "36": [gruen_umwelt]    # Naturschutz und Landschaftspflege
-  "37": [kultur]          # Kirchliche Angelegenheiten
-  "40": [soziales]        # Allgemeine Sozialverwaltung
-  "42": [soziales]        # (Soziales, falls vorhanden)
-  "43": [soziales]        # Obdachlosenunterkunft
-  "46": [kinder_jugend]   # Einrichtungen der Jugendarbeit / Kitas
-  "47": [soziales]        # Soziale Einrichtungen
-  "49": [soziales]        # Sonst. soziale Angelegenheiten
-  "55": [sport_freizeit]  # Förderung des Sports
-  "56": [sport_freizeit]  # Sportanlagen
-  "57": [sport_freizeit]  # Freibad
-  "58": [gruen_umwelt]    # Park-/Grünanlagen
-  "59": [sport_freizeit, gruen_umwelt]   # Kleingartenanlage
-  "60": [stadtentwicklung]   # Stadtbau- u. Tiefbauamt
-  "61": [stadtentwicklung]   # Städtebauliche Planung
-  "62": [soziales]        # Wohnungsbauförderung
-  "63": [strassen_verkehr]   # Gemeindestraßen
-  "64": [strassen_verkehr]   # Brücken
-  "66": [strassen_verkehr]   # Verkehrsanlagen (sonstige)
-  "67": [strassen_verkehr]   # Straßenbeleuchtung
-  "68": [strassen_verkehr]   # Parkplätze
-  "69": [gruen_umwelt]    # Wasserläufe, Wasserbau
-  "70": [ver_entsorgung]  # Kanalnetz u. Kläranlage (Abwasser)
-  "71": [ver_entsorgung]  # WC-Anlage
-  "72": [ver_entsorgung]  # Wertstoffhof (Abfall)
-  "73": [wirtschaft]      # Wochen- u. Jahrmärkte
-  "75": [soziales]   # Friedhöfe / Bestattung (kommunale Daseinsvorsorge)
-  "76": [wirtschaft, kultur]   # Haus der Vereine
-  "77": [strassen_verkehr]   # Bauhof
-  "78": [kultur]          # Ausstellungshalle
-  "79": [wirtschaft]      # Öffentlichkeitsarbeit / Wirtschaftsförderung
-  "81": [ver_entsorgung]  # Strom- & Wasserversorgung
-  "85": [gruen_umwelt]    # Stadtwald
-  "87": [wirtschaft]      # Sonstige wirtschaftliche Unternehmen
-  "88": [stadtentwicklung]   # Bebauter Grundbesitz
-  "89": [soziales]        # Wohltätigkeitsstiftung
-  "90": [finanzen]        # Steuern, Zuweisungen, Umlagen
-  "91": [finanzen]        # Kredite, Schuldendienst
-  "92": [finanzen]        # Abwicklung der Vorjahre
-  "96": [finanzen]        # Rücklagen
+  # Einzelplan 0 — Allgemeine Verwaltung
+  "00": [verwaltung_finanzen]
+  "02": [verwaltung_finanzen]
+  "03": [verwaltung_finanzen]
+  "05": [verwaltung_finanzen]
+  "06": [verwaltung_finanzen]
+  "08": [verwaltung_finanzen]
+  # Einzelplan 1 — Sicherheit & Ordnung
+  "10": [sicherheit]
+  "11": [sicherheit]
+  "13": [sicherheit]
+  "14": [sicherheit]
+  # Einzelplan 2 — Schulen
+  "21": [bildung]
+  "22": [bildung]
+  "29": [bildung, mobilitaet]   # Schülerbeförderung
+  # Einzelplan 3 — Kultur / Naturschutz
+  "30": [kultur_freizeit]
+  "32": [kultur_freizeit]
+  "34": [kultur_freizeit]       # Heimat-/Kulturpflege, Feste (Feste auch Wirtschaft -> override)
+  "35": [bildung, kultur_freizeit]   # VHS (Bildung) + Stadtbücherei (Kultur)
+  "36": [umwelt]                # Naturschutz & Landschaftspflege
+  "37": [kultur_freizeit]
+  # Einzelplan 4 — Soziale Sicherung
+  "40": [soziales]
+  "43": [soziales]
+  "46": [kinder_jugend_familie] # Kitas & Jugendarbeit
+  "47": [soziales]
+  "49": [soziales]
+  # Einzelplan 5 — Gesundheit, Sport, Erholung
+  "55": [sport_gesundheit]
+  "56": [sport_gesundheit]
+  "57": [sport_gesundheit]      # Bäder
+  "58": [umwelt, kultur_freizeit]   # Park- & Grünanlagen (Erholung)
+  "59": [kultur_freizeit, umwelt]   # Kleingärten & Erholung
+  # Einzelplan 6 — Bau & Verkehr
+  "60": [wohnen]
+  "61": [wohnen]
+  "62": [wohnen, soziales]      # Wohnungsbauförderung (sozialer Wohnungsbau)
+  "63": [mobilitaet]
+  "64": [mobilitaet]
+  "66": [mobilitaet]
+  "67": [mobilitaet]            # Beleuchtung (Reinigung/Winterdienst -> override sicherheit)
+  "68": [mobilitaet]
+  "69": [umwelt]                # Gewässer & Wasserbau
+  # Einzelplan 7 — Öffentliche Einrichtungen, Wirtschaft
+  "70": [umwelt]                # Abwasser (Kanal & Kläranlage)
+  "71": [sicherheit]            # WC-Anlagen (Sauberkeit)
+  "72": [umwelt]                # Abfall & Wertstoffhof
+  "73": [wirtschaft]            # Märkte
+  "75": [soziales]              # Bestattung & Friedhöfe
+  "76": [kultur_freizeit, wirtschaft]   # Stadthalle, Vereinshaus, WLAN (gemischt -> overrides)
+  "77": [mobilitaet]            # Bauhof
+  "78": [kultur_freizeit]       # Ausstellungshalle
+  "79": [wirtschaft]            # Wirtschaftsförderung & Öffentlichkeitsarbeit
+  # Einzelplan 8 — Wirtschaftliche Unternehmen, Grundbesitz
+  "81": [mobilitaet]            # Strom- & Wasserversorgung
+  "85": [umwelt]                # Stadtwald
+  "87": [wirtschaft]            # Sonstige wirtschaftliche Unternehmen
+  "88": [wohnen]                # Bebauter Grundbesitz (Gewerbegebiete -> override + wirtschaft)
+  "89": [soziales]              # Stiftungen
+  # Einzelplan 9 — Finanzwirtschaft
+  "90": [verwaltung_finanzen]
+  "91": [verwaltung_finanzen]
+  "92": [verwaltung_finanzen]
+  "96": [verwaltung_finanzen]
 
-# Overrides je Gliederung (4-/5-stellig). Gewinnen gegen den Abschnitts-Standard.
-# Für Posten, die im Abschnitt thematisch aus der Reihe tanzen.
+# Ausnahmen je Gliederung (gewinnen gegen den Bereichs-Standard).
 gliederung_overrides:
-  "8151": [ver_entsorgung]   # Wasserversorgung (eigene Einrichtung im Bereich 81)
-  "1141": [gruen_umwelt]        # Klimaschutzmanagement (liegt im Abschnitt 11 Öff. Ordnung)
-  "3650": [kultur]              # Denkmalschutz & -pflege (liegt im Abschnitt 36 Naturschutz)
+  # Sauberkeit -> Ordnung
+  "6751": [sicherheit]          # Straßenreinigung
+  "6752": [sicherheit]          # Winterdienst
+  # Klimaschutz raus aus Sicherheit
+  "1141": [umwelt]              # Klimaschutzmanagement
+  # Denkmalschutz ist Kultur, nicht Naturschutz
+  "3650": [kultur_freizeit]     # Denkmalschutz & -pflege
+  # Feste sind Kultur UND Innenstadt/Wirtschaft
+  "3430": [kultur_freizeit, wirtschaft]   # Frühlingsfest u. Herbstschau
+  "3402": [kultur_freizeit, wirtschaft]   # Festspiele Moosburg
+  # Abschnitt 76 auseinanderdividieren
+  "7610": [wirtschaft]          # Öffentliche WLAN-Hotspots (digital)
+  "7621": [kultur_freizeit]     # Stadthallengebäude
+  "7692": [kultur_freizeit, sport_gesundheit]   # Haus der Vereine (Vereinsförderung beidseitig)
+  # Versorgung: Wasser auch Umwelt
+  "8151": [mobilitaet, umwelt]  # Wasserversorgung
+  # Grundbesitz: Gewerbegebiete sind Wirtschaft
+  "8812": [wohnen, wirtschaft]  # Gewerbegebiet Degernpoint
+  # sozialer Wohnungsbau zusätzlich Soziales
+  "8850": [wohnen, soziales]
+  "8851": [wohnen, soziales]
+  "8852": [wohnen, soziales]
+  "8853": [wohnen, soziales]
+  "8854": [wohnen, soziales]
 
-# Fallback, wenn ein Abschnitt nirgends gemappt ist:
-default_theme: finanzen
+default_theme: verwaltung_finanzen
