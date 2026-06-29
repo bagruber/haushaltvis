@@ -10,6 +10,7 @@ import { fmtEur, fmtEurShort } from "@/lib/format";
 const STEUERN: [string, string][] = [
   ["Einkommensteuer-Anteil", "#c8102e"],
   ["Gewerbesteuer", "#b8964e"],
+  ["Schlüsselzuweisungen & Finanzausgleich", "#6b3e7a"],
   ["Grundsteuer", "#009ac7"],
   ["Umsatzsteuer-Anteil", "#0a9e4c"],
 ];
@@ -65,7 +66,7 @@ export function Einnahmen() {
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
         <div className="flex items-baseline justify-between gap-2 mb-1">
-          <h2 className="font-display text-lg font-bold">Steuern im Zeitverlauf</h2>
+          <h2 className="font-display text-lg font-bold">Steuern & Zuweisungen im Zeitverlauf</h2>
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <EChart option={view.steuerOpt} style={{ height: 300 }} />
