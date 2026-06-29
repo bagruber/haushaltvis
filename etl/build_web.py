@@ -22,6 +22,7 @@ EVENTS_YAML = ROOT / "etl/events.yaml"
 LABELS_YAML = ROOT / "etl/labels.yaml"
 CONTEXT_YAML = ROOT / "etl/context.yaml"
 EINLEITUNGEN_YAML = ROOT / "etl/einleitungen.yaml"
+GLOSSAR_YAML = ROOT / "etl/glossar.yaml"
 
 # Threshold for auto-derived "Posten neu/aufgegeben" events (in €, peak value).
 AUTO_EVENT_MIN = 200_000
@@ -143,6 +144,14 @@ def main():
         encoding="utf-8",
     )
     print(f"einleitungen.json -> {len(einl)} Texte")
+
+    glos = yaml.safe_load(GLOSSAR_YAML.read_text(encoding="utf-8")) if GLOSSAR_YAML.exists() else {}
+    glos = {k: " ".join(str(v).split()) for k, v in (glos or {}).items()}
+    (DST / "glossar.json").write_text(
+        json.dumps(glos, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    print(f"glossar.json   -> {len(glos)} Begriffe")
 
 
 if __name__ == "__main__":

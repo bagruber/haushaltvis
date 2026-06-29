@@ -76,6 +76,8 @@ export interface Data {
   context: Context;
   /** editorial intro texts, keyed e.g. "ep:2" (Einzelplan) or "ab:21" (Bereich) */
   einleitungen: Record<string, string>;
+  /** glossary term id → definition */
+  glossar: Record<string, string>;
 }
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
@@ -99,13 +101,17 @@ export function loadData(): Promise<Data> {
       fetch(`${base}data/einleitungen.json`)
         .then((r) => (r.ok ? (r.json() as Promise<Record<string, string>>) : {}))
         .catch(() => ({}) as Record<string, string>),
-    ]).then(([budget, themes, ev, labels, context, einleitungen]) => ({
+      fetch(`${base}data/glossar.json`)
+        .then((r) => (r.ok ? (r.json() as Promise<Record<string, string>>) : {}))
+        .catch(() => ({}) as Record<string, string>),
+    ]).then(([budget, themes, ev, labels, context, einleitungen, glossar]) => ({
       budget,
       themes,
       events: ev.events ?? [],
       labels,
       context,
       einleitungen,
+      glossar,
     }));
   }
   return cache;
@@ -1214,4 +1220,49 @@ export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
     }
   }
   return { years, series };
+}
+
+// ── Search index (real-name entities only) ──────────────────────────────────
+
+export interface SearchItem {
+  label: string;
+  sub: string;
+  route: string;
+}
+
+/** Searchable entities with everyday names: Themen, Einzelpläne, Einrichtungen. */
+export function searchIndex(data: Data): SearchItem[] {
+  const items: SearchItem[] = [];
+  for (const [id, t] of Object.entries(data.themes.themes)) {
+    items.push({ label: t.label, sub: "Thema", route: `/themen/${id}` });
+  }
+  const eps = new Map<string, string>();
+  for (const p of Object.values(data.budget.posten)) if (!eps.has(p.einzelplan)) eps.set(p.einzelplan, p.einzelplan_name);
+  for (const [ep, name] of [...eps].sort()) {
+    items.push({ label: `${ep} · ${name}`, sub: "Einzelplan", route: `/einzelplan/${ep}` });
+  }
+  const seen = new Set<string>();
+  for (const p of Object.values(data.budget.posten)) {
+    if (p.glz_text && !seen.has(p.glz)) {
+      seen.add(p.glz);
+      items.push({ label: p.glz_text.replace(/\s+/g, " ").trim(), sub: "Einrichtung", route: `/einrichtung/${p.glz}` });
+    }
+  }
+  return items;
+}
+
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+/** Rank search items for a query: prefix matches first, then substring, shortest first. */
+export function searchRank(items: SearchItem[], query: string, limit = 10): SearchItem[] {
+  const q = norm(query.trim());
+  if (!q) return [];
+  const scored: { it: SearchItem; score: number }[] = [];
+  for (const it of items) {
+    const l = norm(it.label);
+    const i = l.indexOf(q);
+    if (i < 0) continue;
+    scored.push({ it, score: (i === 0 ? 0 : 100) + i + l.length * 0.01 });
+  }
+  return scored.sort((a, b) => a.score - b.score).slice(0, limit).map((x) => x.it);
 }

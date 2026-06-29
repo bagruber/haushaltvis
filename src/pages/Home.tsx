@@ -4,6 +4,7 @@ import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { PackedCircles } from "@/components/PackedCircles";
 import { useData, expenseTreemap, totals, latestYear, topMovers, type Haushalt, type TreeNode } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 type Viz = "sunburst" | "circles" | "treemap";
@@ -44,14 +45,15 @@ function Toggle<T extends string>({ value, onChange, options }: {
 export function Home() {
   const { data, error } = useData();
   const navigate = useNavigate();
+  const { year: selYear } = useYearCtx();
   const [haushalt, setHaushalt] = useState<Haushalt>("verwaltung");
   const [viz, setViz] = useState<Viz>("sunburst");
 
   const { tree, year, t } = useMemo(() => {
     if (!data) return { tree: [] as TreeNode[], year: 0, t: { einnahmen: 0, ausgaben: 0 } };
-    const year = latestYear(data.budget);
+    const year = selYear ?? latestYear(data.budget);
     return { tree: expenseTreemap(data, year, haushalt), year, t: totals(data.budget, year) };
-  }, [data, haushalt]);
+  }, [data, haushalt, selYear]);
 
   const movers = useMemo(() => {
     if (!data) return [];

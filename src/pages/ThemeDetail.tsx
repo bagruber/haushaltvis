@@ -15,6 +15,7 @@ import {
   type BudgetEvent,
   type TimeMode,
 } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 function gatherEvents(data: Data, themeId: string): BudgetEvent[] {
@@ -46,7 +47,7 @@ export function ThemeDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
   const navigate = useNavigate();
-  const [year] = useState<number | null>(null);
+  const { year } = useYearCtx();
   const [mode, setMode] = useState<TimeMode>({});
 
   const view = useMemo(() => {

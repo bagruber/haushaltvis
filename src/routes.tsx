@@ -10,6 +10,7 @@ import { ThemeDetail } from "./pages/ThemeDetail";
 import { PostenDetail } from "./pages/PostenDetail";
 import { EinrichtungDetail } from "./pages/EinrichtungDetail";
 import { Info } from "./pages/Info";
+import { Methodik } from "./pages/Methodik";
 
 export const router = createBrowserRouter(
   [
@@ -27,6 +28,7 @@ export const router = createBrowserRouter(
         { path: "/posten/:id", element: <PostenDetail /> },
         { path: "/einrichtung/:glz", element: <EinrichtungDetail /> },
         { path: "/info", element: <Info /> },
+        { path: "/methodik", element: <Methodik /> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],
     },

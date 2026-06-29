@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Glossar — Kurzdefinitionen für Fachbegriffe (als Tooltips im Frontend).
+# Schlüssel = kebab-case-id, die im Code via <Term name="..."> referenziert wird.
+# Nach Änderung: python etl/build_web.py
+# ─────────────────────────────────────────────────────────────────────────────
+
+ansatz: >
+  Der für ein Jahr geplante Betrag (Soll). Wird vor Jahresbeginn im Haushaltsplan
+  beschlossen.
+ergebnis: >
+  Der tatsächlich verbuchte Betrag (Ist) eines Jahres. Steht erst ein bis zwei
+  Jahre später fest.
+verwaltungshaushalt: >
+  Das laufende Tagesgeschäft der Stadt — Personal, Betrieb, Zuschüsse. Wird über
+  laufende Einnahmen wie Steuern und Gebühren finanziert.
+vermoegenshaushalt: >
+  Die Investitionen — Bau, Grundstücke, Anschaffungen. Wird über Förderungen,
+  Verkäufe, Rücklagen und Kredite finanziert. Von Jahr zu Jahr sehr unterschiedlich.
+einzelplan: >
+  Oberste Gliederungsebene des Haushalts (0–9), z. B. „2 Schulen" oder
+  „6 Bau und Verkehr".
+unterabschnitt: >
+  Eine benannte Einheit innerhalb eines Einzelplans — eine konkrete Einrichtung
+  oder Aufgabe, z. B. „Freibad" oder „Stadtbücherei".
+haushaltsstelle: >
+  Der einzelne Buchungsposten (Gliederung + Gruppierung), z. B. „Beamtenbezüge"
+  einer bestimmten Schule.
+schluesselzuweisung: >
+  Allgemeine Geldzuweisung des Freistaats an finanzschwächere Gemeinden im
+  kommunalen Finanzausgleich.
+kreisumlage: >
+  Abgabe der Stadt an den Landkreis zur Finanzierung von dessen Aufgaben — eine
+  der größten Ausgaben im Verwaltungshaushalt.
+gewerbesteuerumlage: >
+  Teil der Gewerbesteuer, den die Stadt an Land und Bund weiterreicht.
+zuschuss-aus-allg-haushalt: >
+  Der Betrag, den ein Bereich mehr ausgibt als er an eigenen Einnahmen erzielt —
+  gedeckt aus allgemeinen Haushaltsmitteln (v. a. Steuern).
+interne-verrechnung: >
+  Buchungen zwischen städtischen Stellen (z. B. Leistungen des Bauhofs) oder
+  zwischen den beiden Haushalten. Sie sind ausgeblendet, da sie sonst doppelt zählen.
+kameralistik: >
+  Das traditionelle, einnahmen-/ausgabenorientierte Rechnungssystem bayerischer
+  Kommunen, nach dem dieser Haushalt aufgebaut ist.

@@ -3,15 +3,17 @@ import { useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, kameralBothSidesTree, totals, latestYear } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 export function Erkunden() {
   const { data, error } = useData();
   const navigate = useNavigate();
+  const { year: selYear } = useYearCtx();
 
   const view = useMemo(() => {
     if (!data) return null;
-    const y = latestYear(data.budget);
+    const y = selYear ?? latestYear(data.budget);
     const tree = kameralBothSidesTree(data, y);
     const t = totals(data.budget, y);
     const option: EChartsOption = {
@@ -43,7 +45,7 @@ export function Erkunden() {
       ],
     };
     return { option, tree, y, t };
-  }, [data]);
+  }, [data, selYear]);
 
   const onEvents = useMemo(
     () => ({

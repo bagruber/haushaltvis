@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, incomeByCategory, incomeCategorySeries, totals, latestYear } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { shades, GOLD_BASE } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -16,9 +17,10 @@ const STEUERN: [string, string][] = [
 export function Einnahmen() {
   const { data, error } = useData();
 
+  const { year: selYear } = useYearCtx();
   const view = useMemo(() => {
     if (!data) return null;
-    const y = latestYear(data.budget);
+    const y = selYear ?? latestYear(data.budget);
     const groups = incomeByCategory(data, y);
 
     const years = data.budget.meta.years;
@@ -43,7 +45,7 @@ export function Einnahmen() {
     };
 
     return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen, steuerOpt };
-  }, [data]);
+  }, [data, selYear]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;

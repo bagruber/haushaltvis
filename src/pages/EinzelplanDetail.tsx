@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
@@ -9,10 +10,11 @@ export function EinzelplanDetail() {
   const { ep = "" } = useParams();
   const { data, error } = useData();
   const [mode, setMode] = useState<TimelineMode>({});
+  const { year: selYear } = useYearCtx();
 
   const view = useMemo(() => {
     if (!data) return null;
-    const y = latestYear(data.budget);
+    const y = selYear ?? latestYear(data.budget);
     const sections = einzelplanSections(data, ep, y).map((s) => ({
       ...s,
       laufend: bereichSeries(data, s.code, "A", "verwaltung"),
@@ -30,7 +32,7 @@ export function EinzelplanDetail() {
       intro: data.einleitungen[`ep:${ep}`],
       themes: data.themes.themes,
     };
-  }, [data, ep]);
+  }, [data, ep, selYear]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;

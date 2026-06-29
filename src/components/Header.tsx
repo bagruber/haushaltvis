@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/cn";
+import { Search } from "./Search";
 
 const links = [
   { to: "/", label: "Überblick", end: true },
@@ -7,14 +8,13 @@ const links = [
   { to: "/einnahmen", label: "Einnahmen" },
   { to: "/investitionen", label: "Investitionen" },
   { to: "/themen", label: "Themen" },
-  { to: "/info", label: "Info" },
 ];
 
 export function Header() {
   return (
     <header className="border-b border-ink-line bg-cream/90 backdrop-blur sticky top-0 z-20">
       <div className="mx-auto max-w-6xl px-5 py-3 flex items-center justify-between gap-4">
-        <NavLink to="/" className="flex items-baseline gap-2">
+        <NavLink to="/" className="flex items-baseline gap-2 shrink-0">
           <span className="font-display text-xl font-bold text-red-600">Haushalt</span>
           <span className="font-display text-xl text-ink">Moosburg</span>
         </NavLink>
@@ -37,6 +37,7 @@ export function Header() {
             </NavLink>
           ))}
         </nav>
+        <Search />
       </div>
     </header>
   );

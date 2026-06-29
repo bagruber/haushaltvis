@@ -1,14 +1,21 @@
+import { Link } from "react-router-dom";
+
 export function Footer() {
   return (
     <footer className="border-t border-ink-line mt-16">
-      <div className="mx-auto max-w-6xl px-5 py-8 text-sm text-ink-muted space-y-1">
+      <div className="mx-auto max-w-6xl px-5 py-8 text-sm text-ink-muted space-y-2">
+        <nav className="flex flex-wrap gap-4">
+          <Link to="/info" className="hover:text-ink">Über das Projekt</Link>
+          <Link to="/methodik" className="hover:text-ink">Methodik & Daten</Link>
+        </nav>
         <p>
           Haushalt der Stadt Moosburg an der Isar — bürgerschaftliches Transparenzprojekt,
-          keine amtliche Veröffentlichung.
+          keine amtliche Veröffentlichung. Die Datenaufbereitung ist{" "}
+          <Link to="/methodik" className="underline hover:text-ink">KI-gestützt</Link> und kann
+          vereinzelt Fehler enthalten.
         </p>
         <p>
-          Datengrundlage: Haushaltspläne 2024 &amp; 2025 (Kameralistik), Jahre 2018–2024.
-          Werte 2024 vorläufig (Ist-Vollzug).
+          Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2018–2024. Werte 2024 vorläufig.
         </p>
       </div>
     </footer>

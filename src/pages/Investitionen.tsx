@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, investmentsAll, investmentStacked, latestYear } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -22,9 +23,10 @@ export function Investitionen() {
   const { data, error } = useData();
   const navigate = useNavigate();
 
+  const { year: selYear } = useYearCtx();
   const view = useMemo(() => {
     if (!data) return null;
-    const y = latestYear(data.budget);
+    const y = selYear ?? latestYear(data.budget);
     const inv = investmentsAll(data, y);
     const top = inv.items.slice(0, TOP);
     const cats = top.map((i) => i.label);
@@ -85,7 +87,7 @@ export function Investitionen() {
     };
 
     return { y, inv, top, option, stackedOpt };
-  }, [data]);
+  }, [data, selYear]);
 
   const onEvents = useMemo(
     () => ({
