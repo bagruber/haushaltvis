@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
 import { Erkunden } from "./pages/Erkunden";
 import { Einnahmen } from "./pages/Einnahmen";
+import { Investitionen } from "./pages/Investitionen";
 import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
 import { ThemeDetail } from "./pages/ThemeDetail";
@@ -18,6 +19,7 @@ export const router = createBrowserRouter(
         { path: "/", element: <Home /> },
         { path: "/erkunden", element: <Erkunden /> },
         { path: "/einnahmen", element: <Einnahmen /> },
+        { path: "/investitionen", element: <Investitionen /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
         { path: "/geldfluss", element: <Navigate to="/erkunden" replace /> },
         { path: "/themen", element: <Themen /> },

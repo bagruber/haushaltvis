@@ -1060,3 +1060,59 @@ export function incomeByCategory(data: Data, year: number, hideInternal = true):
     .filter((g) => g.value > 0)
     .sort((a, b) => b.value - a.value);
 }
+
+// ── Investitionen (Vermögenshaushalt), global ───────────────────────────────
+
+export interface InvestmentX extends Investment {
+  einzelplan: string;
+}
+
+export interface InvestmentsAll {
+  items: InvestmentX[];
+  totalInvest: number;
+  totalFoerder: number;
+}
+
+/**
+ * All real investments (Vermögenshaushalt, HG 9) per Einrichtung with their
+ * earmarked income/Förderung (HG 3, excluding general financing & internal
+ * transfers) and the net own contribution. Not theme-scoped.
+ */
+export function investmentsAll(data: Data, year: number): InvestmentsAll {
+  const invest = new Map<string, number>();
+  const foerder = new Map<string, number>();
+  const label = new Map<string, string>();
+  const ep = new Map<string, string>();
+
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.haushalt !== "vermoegen") continue;
+    if (isInternal(p) || isFinancing(p)) continue;
+    if (p.grz[0] === "9") invest.set(p.glz, (invest.get(p.glz) ?? 0) + f.ansatz);
+    else if (p.grz[0] === "3") foerder.set(p.glz, (foerder.get(p.glz) ?? 0) + f.ansatz);
+    if (p.glz_text && !label.has(p.glz)) label.set(p.glz, p.glz_text.replace(/\s+/g, " ").trim());
+    if (!ep.has(p.glz)) ep.set(p.glz, p.einzelplan);
+  }
+
+  const items = [...invest.entries()]
+    .map(([glz, a]) => {
+      const fo = foerder.get(glz) ?? 0;
+      return {
+        glz,
+        label: label.get(glz) ?? glz,
+        einzelplan: ep.get(glz) ?? glz[0],
+        invest: Math.round(a),
+        foerderung: Math.round(fo),
+        netto: Math.round(a - fo),
+      };
+    })
+    .filter((x) => x.invest > 0)
+    .sort((a, b) => b.invest - a.invest);
+
+  return {
+    items,
+    totalInvest: items.reduce((s, x) => s + x.invest, 0),
+    totalFoerder: items.reduce((s, x) => s + x.foerderung, 0),
+  };
+}

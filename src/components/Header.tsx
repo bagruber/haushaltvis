@@ -5,6 +5,7 @@ const links = [
   { to: "/", label: "Überblick", end: true },
   { to: "/erkunden", label: "Erkunden" },
   { to: "/einnahmen", label: "Einnahmen" },
+  { to: "/investitionen", label: "Investitionen" },
   { to: "/themen", label: "Themen" },
   { to: "/info", label: "Info" },
 ];
