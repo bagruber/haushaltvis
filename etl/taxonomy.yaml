@@ -118,7 +118,7 @@ abschnitt_themes:
   "71": [wasser_entsorgung]  # WC-Anlage
   "72": [wasser_entsorgung]  # Wertstoffhof
   "73": [wirtschaft]      # Wochen- u. Jahrmärkte
-  "75": [wasser_entsorgung]   # Friedhöfe / Bestattung (Pflege & Entsorgung; Themenzuordnung offen)
+  "75": [soziales]   # Friedhöfe / Bestattung (kommunale Daseinsvorsorge)
   "76": [wirtschaft, kultur]   # Haus der Vereine
   "77": [strassen_verkehr]   # Bauhof
   "78": [kultur]          # Ausstellungshalle
@@ -133,10 +133,12 @@ abschnitt_themes:
   "92": [finanzen]        # Abwicklung der Vorjahre
   "96": [finanzen]        # Rücklagen
 
-# Overrides je Gliederung (4-stellig). Gewinnen gegen den Abschnitts-Standard.
-# Beispiel:
-#   "5700": [sport_freizeit, gesundheit]
-gliederung_overrides: {}
+# Overrides je Gliederung (4-/5-stellig). Gewinnen gegen den Abschnitts-Standard.
+# Für Posten, die im Abschnitt thematisch aus der Reihe tanzen.
+gliederung_overrides:
+  "8151": [wasser_entsorgung]   # Wasserversorgung (liegt im Abschnitt 81 Elektrizität)
+  "1141": [gruen_umwelt]        # Klimaschutzmanagement (liegt im Abschnitt 11 Öff. Ordnung)
+  "3650": [kultur]              # Denkmalschutz & -pflege (liegt im Abschnitt 36 Naturschutz)
 
 # Fallback, wenn ein Abschnitt nirgends gemappt ist:
 default_theme: finanzen

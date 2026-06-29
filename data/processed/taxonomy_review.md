@@ -1,0 +1,293 @@
+# Taxonomie-Review — Ausgaben 2024
+
+Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte Posten erscheinen unter mehreren Themen (anteilig). Markiere alles, was im falschen Thema steht.
+
+## Finanzen, Steuern & Schulden — 21.641.269 €
+- **Steuern & allgemeine Finanzwirtschaft** [90] — 14.850.000 €
+    - Steuern,allgemeine Zuweisungen und allgemeine Umlagen [9000] — 14.850.000 €
+- **Schulden & Kredite** [91] — 6.161.469 €
+    - Zuführungen zwischen Verwaltungs- und Vermögens- haushalt [9161] — 3.829.334 €
+    - Kredite,innere Darl.,Kreditbe- schaff.-Kosten,Schuldendienst, Schuldendiensthilfe v. Dritt [9121] — 1.967.135 €
+    - Deckungsreserve [9141] — 200.000 €
+    - Darlehen Wasserwerk [9122] — 165.000 €
+    - Zinsen aus der Anlage des Kassenbestandes einschließ- lich Kontokorrentverkehr [9181] — 0 €
+    - Allgemeine Rücklage (einschließlich Zinserträge) [9101] — 0 €
+- **Stadtkämmerei & Finanzverwaltung** [03] — 629.800 €
+    - Stadtkämmerei [0301] — 247.000 € ⚠️anteilig
+    - Stadtkassenverwaltung [0331] — 119.350 € ⚠️anteilig
+    - Liegenschaftsamt [0351] — 111.250 € ⚠️anteilig
+    - Beitrags- u. Gebührenstelle [0332] — 101.775 € ⚠️anteilig
+    - Stadtsteueramt [0341] — 50.425 € ⚠️anteilig
+- **Abwicklung der Vorjahre** [92] — 0 €
+    - Abwicklung der Vorjahre [9200] — 0 €
+
+## Kinder, Jugend & Familie — 17.711.650 €
+- **Kindertageseinrichtungen & Jugend** [46] — 17.711.650 €
+    - KiGa Erzgebirgstr. [46418] — 2.450.000 €
+    - Kinderkrippe Sonnensiedlung bis 2022 - 4681 [46411] — 2.340.000 €
+    - Kinderhaus Amperauen bis 2022 - 4642 [46412] — 1.759.350 €
+    - Kindergarten Moosschlössl bis 2022 - 4647 [46417] — 1.186.450 €
+    - Kinderhort Sonnenschein bis 2022 - 4646 [46416] — 1.035.900 €
+    - Drei Rosen Kindergarten bis 2022 - 4645 [46415] — 1.012.700 €
+    - Kinderhaus St. Elisabeth bis 2022 - 4644 [46414] — 911.900 €
+    - Evang. KiGa Weltentdecker bis 2022 - 4641 [46431] — 792.300 €
+    - Kath. KiGa St. Pius bis 2022 - 4643 [46433] — 670.200 €
+    - Tageseinrichtungen für Kinder [4640] — 623.200 €
+    - Evang. KiGa Villa Kunterbunt bis 2022 - 4689 [46439] — 556.800 €
+    - Kinderkrippe Sonnenkäfer bis 2022 - 4648 [46448] — 547.100 €
+    - Lebenshilfe KiGa INKIMO bis 2022 - 4649 [46434] — 546.300 €
+    - Kindergarten In der Neustadt ; bis 2022 - 4680; bis 05/23 KiGa MoosBurg [46410] — 532.600 €
+    - Jugendhaus [4606] — 499.050 €
+    - Kath. KiGa St. Kastulus bis 2022 - 4643 [46432] — 473.600 €
+    - Kinderkrippe Schatzinsel bis 2022 - 4620 [46440] — 471.500 €
+    - Naturkindergarten Wind u. W. bis 2022 - 4682 [46413] — 391.000 €
+    - Waldkindergarten -neu ab 2024- [46419] — 322.200 €
+    - Einrichtungen der Jugendarbeit [4600] — 319.600 €
+    - Kinderspiel- u. Bolzplätze [4605] — 269.900 €
+    - Kinderkrippe Aich -neu ab 2025 [46420] — 0 €
+
+## Stadtplanung & Bauen — 15.077.500 €
+- **Bebauter Grundbesitz & Grundstücke** [88] — 13.702.600 €
+    - Sondergebiet Amperauen [8817] — 5.467.500 €
+    - Gewerbegebiet Degernpoint [8812] — 3.140.000 €
+    - Bebauter Grundbesitz [8801] — 1.623.400 €
+    - Sozialer Wohungsbau Sonnensiedlung [8854] — 1.440.000 €
+    - Allgem. Grundvermögen [8811] — 1.086.700 €
+    - Bahnhof [8807] — 302.800 €
+    - Sozialer Wohnungsbau Unterreiterweg [8850] — 190.000 €
+    - Sudetenlandstr. 46 u. 48 [8803] — 137.600 €
+    - Auf dem Plan 2 - Klostergeb. [8805] — 104.900 €
+    - Sozialer Wohungsbau Hopfenstr. 22 [8851] — 51.000 €
+    - Böhmerwaldstr. 25 und 25 A [8804] — 47.700 €
+    - Baugeb. In den Amperauen [8814] — 32.800 €
+    - Am Mühlbachb.Begegnungspl. [8813] — 25.000 €
+    - Oberes Gereuth (Wiesenstr.u.a) [8815] — 25.000 €
+    - Asylunterkunft - Fronängerstr. alte VHS [8852] — 15.900 €
+    - Bahnhofstr. 46 - TÜV [8806] — 6.600 €
+    - Wohnsiedlung Schlesierstr. [8802] — 4.900 €
+    - Bebauter Grundbesitz Nachlaß Reiter [8809] — 700 €
+    - Baugeb. Alte Thalbacher Str. I [8816] — 100 €
+    - Herrnstr. 1- 3 [8808] — 0 €
+    - Sozialer Wohnungsbau Amperauen [8853] — 0 €
+    - Grundstücksgleiche Rechte [8820] — 0 €
+- **Bauverwaltung (Hoch- & Tiefbau)** [60] — 1.111.500 €
+    - Stadtbau- u. Tiefbauamt [6001] — 557.000 €
+    - Hochbauverwaltung [6011] — 554.500 €
+- **Städtebauliche Planung** [61] — 263.400 €
+    - Städtebauliche Planung, Städtebauförderung, Bauleitplan. u. Grünordnung [6100] — 249.000 €
+    - Vermessung [6123] — 14.400 €
+
+## Straßen, Wege & Verkehr — 14.992.175 €
+- **Gemeindestraßen** [63] — 8.536.000 €
+    - Auf dem Plan [6324] — 3.680.000 €
+    - Gemeindestraßen [6300] — 3.381.000 €
+    - Leinbergerstraße [6303] — 880.000 €
+    - Breitbandausbau allgemein [6352] — 300.000 €
+    - Radweg Aich - Buch a. Erlbach ST 2082 [6311] — 150.000 €
+    - Fußgängerunterführung am Bahnhof [6312] — 100.000 €
+    - Umgestaltung der ehem. St.2085 [6345] — 25.000 €
+    - Stadtwaldstraße [6325] — 20.000 €
+    - Schleienstraße [6302] — 0 €
+    - Egerlandstraße [6304] — 0 €
+    - Blütenstraße [6305] — 0 €
+    - Siebenbürgen-Glatzer-Weg [6307] — 0 €
+    - Forellenstraße [6314] — 0 €
+    - Breitenbergstraße [6317] — 0 €
+    - Wiesenstraße [6321] — 0 €
+    - Jahnstraße [6326] — 0 €
+    - Auf dem Gries [6328] — 0 €
+- **Bauhof** [77] — 3.912.400 €
+    - Bauhof Böhmerwaldstr. 35 [7711] — 3.535.900 €
+    - Fuhrpark [7709] — 376.500 €
+- **Straßenbeleuchtung & -reinigung** [67] — 1.254.400 €
+    - Straßenbeleuchtung [6701] — 614.000 €
+    - Straßenreinigung [6751] — 461.400 €
+    - Winterdienst auf Straßen [6752] — 179.000 €
+- **Brücken** [64] — 609.800 €
+    - Brücke Pillhofen [6487] — 561.000 €
+    - Brücken in Moosburg [6481] — 48.800 €
+- **Schülerbeförderung** [29] — 360.775 €
+    - Schülerbeförderung [2901] — 290.025 € ⚠️anteilig
+    - Sonstige schulische Aufgaben [2950] — 70.750 € ⚠️anteilig
+- **Parkplätze** [68] — 318.800 €
+    - Parkhaus am Bahnhof [6890] — 182.100 €
+    - Parkplätze (selbstständig) [6815] — 56.600 €
+    - Tiefgarage Setz-Areal [6860] — 43.800 €
+    - Parkplätze (unselbstständig) [6800] — 27.300 €
+    - Tiefgarage Leinbergerstr. [6861] — 9.000 €
+
+## Bildung & Schulen — 12.332.275 €
+- **Schulen** [21] — 11.681.700 €
+    - Anton-Vitzthum-Grundschule [2110] — 5.183.300 €
+    - Theresia-Gerhardinger-Grunds. [2111] — 3.863.400 €
+    - Alle Schulen [2150] — 1.232.000 €
+    - Georg-Hummel-Mittelschule [2130] — 901.400 €
+    - Kombinierte Grund- und Mittelschule Schulzentrum Nord [2155] — 443.900 €
+    - Mensa auf Rockermeier-Grundstück [2165] — 57.700 €
+    - Kombinierte Grund- und Hauptschule -16- Neubau Mensa und Sportanlagen [2156] — 0 €
+- **Schülerbeförderung** [29] — 360.775 €
+    - Schülerbeförderung [2901] — 290.025 € ⚠️anteilig
+    - Sonstige schulische Aufgaben [2950] — 70.750 € ⚠️anteilig
+- **Volkshochschule & Stadtbücherei** [35] — 289.800 €
+    - VHS - Haus der Bildung [3503] — 142.800 € ⚠️anteilig
+    - Stadtbücherei [3521] — 142.350 € ⚠️anteilig
+    - Sonstige Volksbildung [3551] — 4.650 € ⚠️anteilig
+
+## Wasser, Abwasser & Entsorgung — 10.187.780 €
+- **Abwasser (Kanal & Kläranlage)** [70] — 5.117.330 €
+    - Kanalnetz u. Kläranlage [7000] — 5.116.480 €
+    - Abwasserbeseitigung in Aich [7005] — 850 €
+- **Elektrizitätsversorgung** [81] — 4.745.900 €
+    - Wasserversorgung [8151] — 4.745.900 €
+- **Abfall & Wertstoffhof** [72] — 285.150 €
+    - Wertstoffhof [7201] — 139.450 €
+    - Allgemeine Entsorgung [7200] — 130.400 €
+    - Containerplätze [7202] — 14.200 €
+    - Fundräderlager [7203] — 1.100 €
+- **Öffentliche WC-Anlagen** [71] — 39.400 €
+    - WC-Anlage Kirchgäßl/Bahnhof [7191] — 38.500 €
+    - Abwasserabgabe Kleineinleiter [7196] — 900 €
+
+## Sport & Freizeit — 8.630.900 €
+- **Bäder (Frei- & Hallenbad)** [57] — 7.263.500 €
+    - Hallenbad [5702] — 4.317.700 €
+    - Freibad [5701] — 2.758.100 €
+    - Kleinschwimmhalle [5703] — 187.700 €
+- **Sportanlagen** [56] — 1.133.650 €
+    - Eisstadion [5613] — 499.800 €
+    - Schäfflerhalle [5652] — 238.350 €
+    - Dreifachturnhalle Albinstraße [5651] — 194.500 €
+    - Sportanlagen Plätze SGM,TSV,FC Moosb.,Aich [5609] — 87.900 €
+    - Gymnastikhalle i.d.Stadthalle [5659] — 53.400 €
+    - Sport- und Begegnungsplatz [5612] — 30.000 €
+    - Skateboardanlage [5611] — 29.700 €
+- **Sportförderung** [55] — 228.800 €
+    - Förderung des Sports [5500] — 228.800 €
+- **Kleingärten & Erholung** [59] — 4.950 €
+    - Sonst. Erholungseinrichtungen [5900] — 2.750 € ⚠️anteilig
+    - Kleingartenanlage a.d.Lände [5901] — 2.200 € ⚠️anteilig
+
+## Verwaltung & Rathaus — 6.371.550 €
+- **EDV / IT** [06] — 3.642.200 €
+    - Rathaus - Herrnstr. 2 [0683] — 1.724.700 €
+    - EDV-Abteilung [0601] — 822.100 €
+    - Rathaus - Stadtplatz 13 [0681] — 785.900 €
+    - Feyerabendhaus - Stadtplatz 14 [0682] — 121.200 €
+    - Controlling [0671] — 109.500 €
+    - Archiv [0621] — 52.800 €
+    - Sicherheitstechnischer Dienst [0614] — 26.000 €
+- **Geschäftsleitung & Hauptverwaltung** [02] — 1.226.700 €
+    - Geschäftsleitung [0200] — 761.100 €
+    - Personalamt [0221] — 465.600 €
+- **Stadtkämmerei & Finanzverwaltung** [03] — 629.800 €
+    - Stadtkämmerei [0301] — 247.000 € ⚠️anteilig
+    - Stadtkassenverwaltung [0331] — 119.350 € ⚠️anteilig
+    - Liegenschaftsamt [0351] — 111.250 € ⚠️anteilig
+    - Beitrags- u. Gebührenstelle [0332] — 101.775 € ⚠️anteilig
+    - Stadtsteueramt [0341] — 50.425 € ⚠️anteilig
+- **Bürgermeister & Stadtrat** [00] — 536.700 €
+    - Bürgermeister und Stadträte [0000] — 536.700 €
+- **Personalnebeneinrichtungen** [08] — 179.200 €
+    - Einrichtungen und Maßnahmen für Verwaltungsangehörige [0800] — 97.700 €
+    - Personalrat [0801] — 58.500 €
+    - Arbeitsmedizinischer Dienst [0842] — 23.000 €
+- **Standesamt** [05] — 156.950 €
+    - Standesamt [0501] — 125.750 €
+    - Wahlen [0521] — 31.200 €
+
+## Sicherheit & Feuerwehr — 2.880.900 €
+- **Feuerwehr** [13] — 1.611.200 €
+    - Feuerwehr Moosburg [1311] — 1.149.250 €
+    - Feuerwehr Pfrombach/Aich [1313] — 280.100 €
+    - Feuerwehr Thonstetten [1312] — 177.850 €
+    - Feuerbeschau Vorbeugender Brandschutz [1351] — 4.000 €
+- **Öffentliche Ordnung** [11] — 1.244.500 €
+    - Zulassungsstelle [1111] — 470.200 €
+    - Einwohnermeldeamt [1161] — 433.400 €
+    - Verkehrsüberwachung [1122] — 203.600 €
+    - Öffentliche Ordnung [1100] — 133.500 €
+    - Gewerbeamt [1171] — 3.800 €
+- **Katastrophenschutz** [14] — 25.200 €
+    - Sonstige Katastrophenschutz- einrichtungen [1491] — 25.200 €
+
+## Kultur & Heimat — 1.447.000 €
+- **Heimat- & Kulturpflege** [34] — 438.600 €
+    - Frühlingsfest u. Herbstschau [3430] — 315.300 €
+    - Heimat- u. sonst. Kulturpflege [3400] — 99.700 €
+    - Festspiele Moosburg [3402] — 14.000 €
+    - STALAG VII a -Sabathiel- [3401] — 9.600 €
+- **Naturschutz & Landschaftspflege** [36] — 298.300 €
+    - Denkmalschutz und -pflege [3650] — 298.300 €
+- **Volkshochschule & Stadtbücherei** [35] — 289.800 €
+    - VHS - Haus der Bildung [3503] — 142.800 € ⚠️anteilig
+    - Stadtbücherei [3521] — 142.350 € ⚠️anteilig
+    - Sonstige Volksbildung [3551] — 4.650 € ⚠️anteilig
+- **Sonstige öffentliche Einrichtungen** [76] — 278.100 €
+    - Stadthallengebäude insgesamt [7621] — 196.550 € ⚠️anteilig
+    - Haus der Vereine [7692] — 61.650 € ⚠️anteilig
+    - Zehentstadel [7691] — 12.000 € ⚠️anteilig
+    - Öffentliche WLAN-Hotspots [7610] — 5.000 € ⚠️anteilig
+    - Uhren in Aich, Pfromb.,Thonst. [7631] — 2.900 € ⚠️anteilig
+- **Museen (Heimat- & STALAG-Museum)** [32] — 96.100 €
+    - Heimatmuseum im Kloster [3201] — 81.300 €
+    - Stalagmuseum, Hodschager Str. [3202] — 12.600 €
+    - STALAG, Dokumentationszentrum Schlesierstraße [3203] — 2.200 €
+- **Kulturpflege & Städtepartnerschaft** [30] — 27.400 €
+    - Allgemeine kulturelle Angelegenheiten Städtepartnerschaft [3000] — 27.400 €
+- **Kirchliche Angelegenheiten** [37] — 14.300 €
+    - Kirchliche Angelegenheiten [3700] — 14.300 €
+    - Kirchl. Angelegenheiten [3701] — 0 €
+- **Ausstellungshalle** [78] — 4.400 €
+    - Ausstell.Halle Stadtwaldstr. 8 [7800] — 4.400 €
+
+## Grün, Natur & Umwelt — 1.015.750 €
+- **Park- & Grünanlagen** [58] — 370.700 €
+    - Öffentl. Park-/Grünanlagen u.a [5800] — 367.800 €
+    - Baumschule Oberreith [5821] — 2.900 €
+- **Naturschutz & Landschaftspflege** [36] — 298.500 €
+    - Naturschutz und Landschaftspflege [3600] — 298.500 €
+- **Öffentliche Ordnung** [11] — 223.000 €
+    - Klimaschutzmanagement [1141] — 223.000 €
+- **Stadtwald & Forst** [85] — 84.400 €
+    - Stadtwald [8551] — 84.400 €
+- **Gewässer & Wasserbau** [69] — 34.200 €
+    - Wasserläufe, Wasserbau [6909] — 34.200 €
+- **Kleingärten & Erholung** [59] — 4.950 €
+    - Sonst. Erholungseinrichtungen [5900] — 2.750 € ⚠️anteilig
+    - Kleingartenanlage a.d.Lände [5901] — 2.200 € ⚠️anteilig
+
+## Wirtschaft & Märkte — 560.150 €
+- **Sonstige öffentliche Einrichtungen** [76] — 278.100 €
+    - Stadthallengebäude insgesamt [7621] — 196.550 € ⚠️anteilig
+    - Haus der Vereine [7692] — 61.650 € ⚠️anteilig
+    - Zehentstadel [7691] — 12.000 € ⚠️anteilig
+    - Öffentliche WLAN-Hotspots [7610] — 5.000 € ⚠️anteilig
+    - Uhren in Aich, Pfromb.,Thonst. [7631] — 2.900 € ⚠️anteilig
+- **Wirtschaftsförderung & Öffentlichkeitsarbeit** [79] — 234.850 €
+    - Öffentlichkeitsarbeit [7910] — 222.050 €
+    - Wirtschafts-/Verkehrsförderung [7900] — 12.800 €
+- **Märkte** [73] — 43.600 €
+    - Wochen- u. Jahrmärkte [7300] — 43.600 €
+- **Sonstige wirtschaftliche Unternehmen** [87] — 3.600 €
+    - Sonstige wirtschaftliche Unternehmen [8700] — 3.600 €
+
+## Energieversorgung — 319.800 €
+- **Elektrizitätsversorgung** [81] — 319.800 €
+    - Elektrizitätsversorgung [8100] — 319.800 €
+    - Elektrizitätsversorgung SWM u. Bayernwerk [8101] — 0 €
+    - Erdgas Südbayern [8131] — 0 €
+
+## Soziales & Wohnen — 258.100 €
+- **Sonstige soziale Angelegenheiten** [49] — 85.000 €
+    - Sonst. soziale Angelegenheiten -örtlicher Träger- [4900] — 85.000 €
+- **Allgemeine Sozialverwaltung** [40] — 83.000 €
+    - Allgemeine Sozialverwaltung [4001] — 83.000 €
+- **Obdachlosenhilfe** [43] — 45.000 €
+    - Obdachlosenunterkunft Landshuter Str. 52 [4351] — 45.000 €
+- **Bestattungswesen & Friedhöfe** [75] — 29.900 €
+    - Allgemeines Bestattungswesen [7501] — 17.000 €
+    - Friedhof Münchener Str. [7511] — 10.000 €
+    - Friedhöfe der Ortsteile Pfrombach, Aich, Thonstetten [7512] — 2.900 €
+- **Stiftungen** [89] — 15.200 €
+    - Otto u.Barbara Rothmayer Wohltätigkeitsstiftung [8901] — 11.700 €
+    - Irma Rieger Stiftung [8902] — 3.500 €

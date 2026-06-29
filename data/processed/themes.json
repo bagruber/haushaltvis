@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-06-29T17:57:32",
+  "generated": "2026-06-29T19:02:40",
   "n_posten": 3960,
   "n_themes": 14,
   "multi_tagged": 339
@@ -1262,25 +1262,25 @@
   ],
   "1141.5620": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
   "1141.5622": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
   "1141.6540": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
   "1141.6790": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -2392,37 +2392,37 @@
   ],
   "3650.1771": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
   "3650.4140": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
   "3650.4340": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
   "3650.4440": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
   "3650.5144": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
   "3650.6790": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -5800,31 +5800,31 @@
   ],
   "7512.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7512.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7512.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7512.5010": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7512.6790": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -6430,97 +6430,97 @@
   ],
   "8151.1174": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1540": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1550": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1600": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.1621": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.4590": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6329": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6421": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6530": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6540": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6560": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6720": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6790": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6792": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6800": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6850": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -7594,13 +7594,13 @@
   ],
   "1141.3600": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
   "1141.9350": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -7818,7 +7818,7 @@
   ],
   "3650.9871": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -8408,25 +8408,25 @@
   ],
   "8151.3569": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9350": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9412": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9500": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9086,7 +9086,7 @@
   ],
   "1141.6321": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -9156,7 +9156,7 @@
   ],
   "8151.6500": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9192,13 +9192,13 @@
   ],
   "3650.3610": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
   "3650.9870": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -9222,7 +9222,7 @@
   ],
   "8151.9504": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -9360,7 +9360,7 @@
   ],
   "7501.6329": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -10060,7 +10060,7 @@
   ],
   "1141.9341": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -10108,7 +10108,7 @@
   ],
   "1141.6329": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -10126,13 +10126,13 @@
   ],
   "8151.9352": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6320": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10190,7 +10190,7 @@
   ],
   "8151.5622": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10208,7 +10208,7 @@
   ],
   "1141.6620": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -10412,7 +10412,7 @@
   ],
   "3650.6329": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -10430,7 +10430,7 @@
   ],
   "8151.1555": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10848,7 +10848,7 @@
   ],
   "8151.6412": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10924,7 +10924,7 @@
   ],
   "8151.3561": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -10982,7 +10982,7 @@
   ],
   "8151.6325": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11106,7 +11106,7 @@
   ],
   "8151.5620": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11180,7 +11180,7 @@
   ],
   "8151.6510": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11328,7 +11328,7 @@
   ],
   "8151.6550": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11386,7 +11386,7 @@
   ],
   "7501.6365": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -11404,7 +11404,7 @@
   ],
   "8151.9502": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11540,7 +11540,7 @@
   ],
   "8151.5510": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11588,7 +11588,7 @@
   ],
   "8151.9501": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11630,7 +11630,7 @@
   ],
   "8151.5030": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11818,7 +11818,7 @@
   ],
   "8151.5041": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -11890,13 +11890,13 @@
   ],
   "8151.6322": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "1141.6320": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -12090,7 +12090,7 @@
   ],
   "8151.5450": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12114,7 +12114,7 @@
   ],
   "8151.5042": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12156,7 +12156,7 @@
   ],
   "8151.5100": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12324,13 +12324,13 @@
   ],
   "8151.6410": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.6369": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12432,7 +12432,7 @@
   ],
   "8151.5400": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12460,7 +12460,7 @@
   ],
   "8151.9509": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12496,7 +12496,7 @@
   ],
   "8151.6551": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -12808,7 +12808,7 @@
   ],
   "8151.5010": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13698,7 +13698,7 @@
   ],
   "1141.4340": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -13818,7 +13818,7 @@
   ],
   "1141.4140": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -13830,7 +13830,7 @@
   ],
   "8151.4140": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -13914,7 +13914,7 @@
   ],
   "8151.4440": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14038,7 +14038,7 @@
   ],
   "8151.4340": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14102,7 +14102,7 @@
   ],
   "8151.6580": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14144,7 +14144,7 @@
   ],
   "8151.6520": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14476,7 +14476,7 @@
   ],
   "8151.1173": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14504,7 +14504,7 @@
   ],
   "1141.4440": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -14556,7 +14556,7 @@
   ],
   "8151.5550": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14626,7 +14626,7 @@
   ],
   "8151.5560": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14866,7 +14866,7 @@
   ],
   "8151.6450": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -14992,7 +14992,7 @@
   ],
   "8151.5040": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15096,7 +15096,7 @@
   ],
   "8151.5220": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15318,7 +15318,7 @@
   ],
   "8151.6400": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15358,7 +15358,7 @@
   ],
   "8151.6610": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15482,7 +15482,7 @@
   ],
   "8151.1172": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15512,7 +15512,7 @@
   ],
   "8151.5601": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15880,7 +15880,7 @@
   ],
   "8151.5431": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -15898,7 +15898,7 @@
   ],
   "8151.1171": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16044,7 +16044,7 @@
   ],
   "8151.1198": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16226,7 +16226,7 @@
   ],
   "7501.1670": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -16402,7 +16402,7 @@
   ],
   "7511.5350": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -16418,7 +16418,7 @@
   ],
   "7512.1145": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -16436,7 +16436,7 @@
   ],
   "8151.3250": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16740,7 +16740,7 @@
   ],
   "8151.5250": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -16806,7 +16806,7 @@
   ],
   "8151.5200": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17202,7 +17202,7 @@
   ],
   "3650.7110": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -17396,7 +17396,7 @@
   ],
   "8151.1598": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17612,7 +17612,7 @@
   ],
   "8151.6351": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17696,7 +17696,7 @@
   ],
   "8151.9532": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -17794,7 +17794,7 @@
   ],
   "7501.1680": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -17910,7 +17910,7 @@
   ],
   "3650.5400": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -18218,7 +18218,7 @@
   ],
   "1141.1599": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -18476,7 +18476,7 @@
   ],
   "8151.9400": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18564,7 +18564,7 @@
   ],
   "8151.6342": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18628,7 +18628,7 @@
   ],
   "8151.6321": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18656,7 +18656,7 @@
   ],
   "8151.1599": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -18908,7 +18908,7 @@
   ],
   "1141.1710": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -19164,7 +19164,7 @@
   ],
   "3650.1710": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -19688,7 +19688,7 @@
   ],
   "8151.1411": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -20182,13 +20182,13 @@
   ],
   "1141.5441": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
   "1141.6610": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -21772,37 +21772,37 @@
   ],
   "7501.4140": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7501.4340": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7501.4440": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7501.6610": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7511.6329": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7512.5370": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -22534,7 +22534,7 @@
   ],
   "1141.3610": [
    {
-    "theme": "sicherheit",
+    "theme": "gruen_umwelt",
     "weight": 1.0
    }
   ],
@@ -23114,7 +23114,7 @@
   ],
   "8151.3454": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
@@ -23724,7 +23724,7 @@
   ],
   "3650.9881": [
    {
-    "theme": "gruen_umwelt",
+    "theme": "kultur",
     "weight": 1.0
    }
   ],
@@ -24420,13 +24420,13 @@
   ],
   "7512.9535": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
   "7512.9880": [
    {
-    "theme": "wasser_entsorgung",
+    "theme": "soziales",
     "weight": 1.0
    }
   ],
@@ -24530,13 +24530,13 @@
   ],
   "8151.9250": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
   "8151.9357": [
    {
-    "theme": "energie",
+    "theme": "wasser_entsorgung",
     "weight": 1.0
    }
   ],
