@@ -1134,3 +1134,84 @@ export function investmentsAll(data: Data, year: number): InvestmentsAll {
     totalFoerder: items.reduce((s, x) => s + x.foerderung, 0),
   };
 }
+
+// ── Income-category time series + stacked investments ───────────────────────
+
+/** Ansatz/Ergebnis per year for one income category (e.g. "Gewerbesteuer"). */
+export function incomeCategorySeries(data: Data, category: string): YearSeries {
+  return aggSeries(data, (p) => p.ea === "E" && !isInternal(p) && incomeCategory(p) === category);
+}
+
+export interface StackSeries {
+  name: string;
+  color: string;
+  data: number[];
+}
+export interface InvestmentStacked {
+  years: number[];
+  series: StackSeries[];
+}
+
+/**
+ * Investment (Vermögenshaushalt, HG 9) per year, stacked by Thema. The biggest
+ * single Vorhaben get their own shade of the theme colour; the rest of each
+ * theme is pooled into "Sonstige <Thema>". Multi-themed Vorhaben use their first
+ * (primary) theme so the stack stays a true partition of the total.
+ */
+export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
+  const years = data.budget.meta.years;
+  const themeOfGlz = new Map<string, string>();
+  const items = new Map<string, { label: string; theme: string; year: Map<number, number>; total: number }>();
+
+  for (const f of data.budget.facts) {
+    if (f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.haushalt !== "vermoegen" || isInternal(p) || isFinancing(p) || p.grz[0] !== "9") continue;
+    if (!themeOfGlz.has(p.glz)) themeOfGlz.set(p.glz, data.themes.assignment[p.hhst_id]?.[0]?.theme ?? "verwaltung_finanzen");
+    const it = items.get(p.glz) ?? { label: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(), theme: themeOfGlz.get(p.glz)!, year: new Map(), total: 0 };
+    it.year.set(f.year, (it.year.get(f.year) ?? 0) + f.ansatz);
+    it.total += f.ansatz;
+    items.set(p.glz, it);
+  }
+
+  const all = [...items.values()].filter((i) => i.total > 0).sort((a, b) => b.total - a.total);
+  const top = all.slice(0, topN);
+  const rest = all.slice(topN);
+
+  // group: theme → { tops, restYear, total }
+  type Item = (typeof all)[number];
+  interface ThemeGroup { tops: Item[]; restYear: Map<number, number>; total: number }
+  const byTheme = new Map<string, ThemeGroup>();
+  const group = (theme: string): ThemeGroup => {
+    let g = byTheme.get(theme);
+    if (!g) { g = { tops: [], restYear: new Map(), total: 0 }; byTheme.set(theme, g); }
+    return g;
+  };
+  for (const it of top) {
+    const g = group(it.theme);
+    g.tops.push(it);
+    g.total += it.total;
+  }
+  for (const it of rest) {
+    const g = group(it.theme);
+    for (const [y, v] of it.year) g.restYear.set(y, (g.restYear.get(y) ?? 0) + v);
+    g.total += it.total;
+  }
+
+  const series: StackSeries[] = [];
+  const themesSorted = [...byTheme.entries()].sort((a, b) => b[1].total - a[1].total);
+  for (const [theme, g] of themesSorted) {
+    const base = data.themes.themes[theme]?.color ?? "#999";
+    const label = data.themes.themes[theme]?.label ?? theme;
+    const n = g.tops.length + (g.restYear.size ? 1 : 0);
+    const sh = shades(base, n, -0.1, 0.55);
+    let i = 0;
+    for (const it of g.tops) {
+      series.push({ name: it.label, color: sh[i++], data: years.map((y) => Math.round(it.year.get(y) ?? 0)) });
+    }
+    if (g.restYear.size) {
+      series.push({ name: `Sonstige · ${label}`, color: sh[i], data: years.map((y) => Math.round(g.restYear.get(y) ?? 0)) });
+    }
+  }
+  return { years, series };
+}

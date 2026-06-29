@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { useData, investmentsAll, latestYear } from "@/lib/data";
+import { useData, investmentsAll, investmentStacked, latestYear } from "@/lib/data";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -60,7 +60,31 @@ export function Investitionen() {
         },
       ],
     };
-    return { y, inv, top, option };
+    const stacked = investmentStacked(data, 12);
+    const stackedOpt: EChartsOption = {
+      tooltip: {
+        trigger: "axis",
+        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
+        order: "valueDesc",
+      },
+      legend: { type: "scroll", bottom: 0 },
+      grid: { left: 64, right: 16, top: 12, bottom: 56 },
+      xAxis: { type: "category", boundaryGap: false, data: stacked.years.map(String) },
+      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+      series: stacked.series.map((s) => ({
+        name: s.name,
+        type: "line" as const,
+        stack: "inv",
+        areaStyle: { color: s.color, opacity: 0.85 },
+        lineStyle: { width: 0 },
+        showSymbol: false,
+        itemStyle: { color: s.color },
+        emphasis: { focus: "series" as const },
+        data: s.data,
+      })),
+    };
+
+    return { y, inv, top, option, stackedOpt };
   }, [data]);
 
   const onEvents = useMemo(
@@ -98,8 +122,20 @@ export function Investitionen() {
       </section>
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+        <div className="flex items-baseline justify-between gap-2 mb-1">
+          <h2 className="font-display text-lg font-bold">Investitionen über die Jahre</h2>
+          <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Thema; größte Vorhaben einzeln</span>
+        </div>
+        <EChart option={view.stackedOpt} style={{ height: 380 }} />
+        <p className="text-xs text-ink-muted mt-1">
+          Jede Fläche ist ein Vorhaben (große einzeln, kleinere als „Sonstige · Thema" gebündelt).
+          Mehrfach-Themen werden hier ihrem Hauptthema zugerechnet, damit die Summe stimmt.
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
         <div className="flex items-baseline justify-between gap-2 mb-2">
-          <h2 className="font-display text-lg font-bold">Größte Vorhaben</h2>
+          <h2 className="font-display text-lg font-bold">Größte Vorhaben {view.y}</h2>
           <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
         </div>
         <EChart option={view.option} onEvents={onEvents} style={{ height: TOP * 30 + 60 }} />

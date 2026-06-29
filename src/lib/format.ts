@@ -20,3 +20,10 @@ export function fmtEurShort(v: number): string {
 
 export const fmtPct = (v: number) =>
   new Intl.NumberFormat("de-DE", { style: "percent", maximumFractionDigits: 1 }).format(v);
+
+/** Euro for small (per-capita) values: more decimals when the number is tiny. */
+export function fmtEurFine(v: number): string {
+  const abs = Math.abs(v);
+  const d = abs < 10 ? 2 : abs < 100 ? 1 : 0;
+  return `${v.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d })} €`;
+}

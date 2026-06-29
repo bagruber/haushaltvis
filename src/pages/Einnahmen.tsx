@@ -1,8 +1,17 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useData, incomeByCategory, totals, latestYear } from "@/lib/data";
+import type { EChartsOption } from "echarts";
+import { EChart } from "@/components/EChart";
+import { useData, incomeByCategory, incomeCategorySeries, totals, latestYear } from "@/lib/data";
 import { shades, GOLD_BASE } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
+
+const STEUERN: [string, string][] = [
+  ["Einkommensteuer-Anteil", "#c8102e"],
+  ["Gewerbesteuer", "#b8964e"],
+  ["Grundsteuer", "#009ac7"],
+  ["Umsatzsteuer-Anteil", "#0a9e4c"],
+];
 
 export function Einnahmen() {
   const { data, error } = useData();
@@ -11,7 +20,29 @@ export function Einnahmen() {
     if (!data) return null;
     const y = latestYear(data.budget);
     const groups = incomeByCategory(data, y);
-    return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen };
+
+    const years = data.budget.meta.years;
+    const steuerOpt: EChartsOption = {
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : fmtEur(v as number)) },
+      legend: { bottom: 0, type: "scroll" },
+      grid: { left: 64, right: 16, top: 12, bottom: 56 },
+      xAxis: { type: "category", data: years.map(String) },
+      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+      series: STEUERN.map(([name, color]) => {
+        const s = incomeCategorySeries(data, name);
+        return {
+          name,
+          type: "line" as const,
+          data: years.map((_, i) => s.ergebnis[i] ?? s.ansatz[i]),
+          symbolSize: 6,
+          lineStyle: { width: 2.5 },
+          itemStyle: { color },
+          connectNulls: true,
+        };
+      }),
+    };
+
+    return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen, steuerOpt };
   }, [data]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
@@ -29,6 +60,14 @@ export function Einnahmen() {
           Einnahmen {view.y}: <b>{fmtEurShort(view.total)}</b>
         </span>
       </header>
+
+      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+        <div className="flex items-baseline justify-between gap-2 mb-1">
+          <h2 className="font-display text-lg font-bold">Steuern im Zeitverlauf</h2>
+          <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
+        </div>
+        <EChart option={view.steuerOpt} style={{ height: 300 }} />
+      </section>
 
       <div className="space-y-4">
         {view.groups.map((g, i) => (
