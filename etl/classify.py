@@ -77,14 +77,16 @@ def main():
         else:
             entries = [(default_theme, 1.0)]
             fallback.append(ab)
-        total = sum(w for _, w in entries) or 1.0
-        norm = [{"theme": t, "weight": round(w / total, 4)} for t, w in entries]
-        assignment[hhst] = norm
-        for e in norm:
+        # No fractional assignment: every theme tag carries the FULL amount.
+        # A Posten may belong to several Themen (counted fully in each); Theme
+        # totals therefore need not reconcile to the kameral sum.
+        tags = [{"theme": t, "weight": 1.0} for t, _w in entries]
+        assignment[hhst] = tags
+        for e in tags:
             used.add(e["theme"])
         amt = vol.get(hhst, (0, 0.0))[1]
-        for e in norm:
-            theme_vol[e["theme"]] += amt * e["weight"]
+        for e in tags:
+            theme_vol[e["theme"]] += amt
 
     # validate every used theme is defined
     unknown = used - set(themes)

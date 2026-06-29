@@ -62,8 +62,9 @@ def main():
 
     side_name = "Ausgaben" if args.side == "A" else "Einnahmen"
     lines = [f"# Taxonomie-Review — {side_name} {args.year}", ""]
-    lines.append("Thema → Bereich → Einrichtung mit gewichteten Beträgen. "
-                 "Mehrfach getaggte Posten erscheinen unter mehreren Themen (anteilig). "
+    lines.append("Thema → Bereich → Einrichtung mit vollen Beträgen (keine anteilige "
+                 "Zuordnung). Ein Posten kann voll in mehreren Themen stehen; Themen-"
+                 "Summen müssen daher nicht zur kameralen Gesamtsumme passen. "
                  "Markiere alles, was im falschen Thema steht.\n")
 
     for th in sorted(theme_total, key=lambda k: -theme_total[k]):
@@ -74,7 +75,7 @@ def main():
             sub = sum(n["value"] for n in bereiche[ab].values())
             lines.append(f"- **{ab_lbl.get(ab, ab)}** [{ab}] — {eur(sub)}")
             for glz, n in sorted(bereiche[ab].items(), key=lambda kv: -kv[1]["value"]):
-                flag = " ⚠️anteilig" if n["multi"] else ""
+                flag = " ⚠️auch in anderem Thema (voll gezählt)" if n["multi"] else ""
                 lines.append(f"    - {n['label']} [{glz}] — {eur(n['value'])}{flag}")
         lines.append("")
 

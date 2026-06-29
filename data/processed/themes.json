@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-06-29T19:10:46",
+  "generated": "2026-06-29T20:31:10",
   "n_posten": 3960,
   "n_themes": 13,
   "multi_tagged": 339
@@ -298,331 +298,331 @@
   "0301.1651": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.1692": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.4107": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.4307": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.4590": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.6329": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.6554": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.6589": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.6790": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.1651": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.1692": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.2612": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.2618": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.4307": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.4590": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.6588": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.6790": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.1010": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.1651": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.4590": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.5200": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.6540": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.6790": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0341.4590": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0341.5200": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0341.6790": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.4307": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.4590": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.5200": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.5620": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.6510": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.6589": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.6790": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0501.1198": [
@@ -1768,71 +1768,71 @@
   "2901.1621": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.4140": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.4340": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.4440": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.6790": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.6850": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2950.7180": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3000.1680": [
@@ -2228,131 +2228,131 @@
   "3503.1198": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.1559": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.5220": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.5421": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.5431": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.6410": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.6790": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.1681": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.4090": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.5441": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6589": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6790": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.7181": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3600.4140": [
@@ -4872,51 +4872,51 @@
   "5901.4140": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5901.4340": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5901.4440": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5901.5401": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5901.6790": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6001.1559": [
@@ -5600,41 +5600,41 @@
   "7692.1559": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.1430": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.1522": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1559": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.1760": [
@@ -5694,11 +5694,11 @@
   "7691.1410": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7202.4140": [
@@ -5758,11 +5758,11 @@
   "7621.1430": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7300.4340": [
@@ -5786,11 +5786,11 @@
   "7691.1430": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.4140": [
@@ -5826,11 +5826,11 @@
   "7610.6520": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.1544": [
@@ -5842,11 +5842,11 @@
   "7621.1411": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.1420": [
@@ -5870,81 +5870,81 @@
   "7621.4590": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.5045": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6400": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6410": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6412": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6589": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6790": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6792": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.1680": [
@@ -5962,71 +5962,71 @@
   "7691.4140": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.4340": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.4440": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.5200": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.6410": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.6412": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.6790": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7000.1460": [
@@ -6044,21 +6044,21 @@
   "7692.5441": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.6790": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7200.1198": [
@@ -6166,31 +6166,31 @@
   "7621.1198": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1555": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1600": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.4590": [
@@ -6298,21 +6298,21 @@
   "7691.1198": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.1555": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7910.4140": [
@@ -7746,11 +7746,11 @@
   "2901.9400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3201.3610": [
@@ -7798,11 +7798,11 @@
   "3521.3610": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3600.9321": [
@@ -8378,21 +8378,21 @@
   "7621.9352": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.9450": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.3600": [
@@ -8854,11 +8854,11 @@
   "0301.6550": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7900.3610": [
@@ -8894,21 +8894,21 @@
   "0351.6540": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6320": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3201.6329": [
@@ -8950,11 +8950,11 @@
   "0301.5200": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4606.6316": [
@@ -9014,11 +9014,11 @@
   "0332.6320": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6300.6300": [
@@ -9072,11 +9072,11 @@
   "7691.5441": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1141.6321": [
@@ -9136,11 +9136,11 @@
   "3521.6540": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1311.6500": [
@@ -9416,11 +9416,11 @@
   "0351.6500": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46413.5810": [
@@ -9444,11 +9444,11 @@
   "3521.5620": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0601.6500": [
@@ -9550,11 +9550,11 @@
   "7692.5200": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0221.5622": [
@@ -9662,11 +9662,11 @@
   "7691.5010": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2111.1683": [
@@ -9690,11 +9690,11 @@
   "7621.5040": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2110.5790": [
@@ -9760,11 +9760,11 @@
   "7692.5431": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8811.5350": [
@@ -9872,11 +9872,11 @@
   "7692.1600": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1313.5441": [
@@ -9888,21 +9888,21 @@
   "0331.6500": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.5010": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6751.6369": [
@@ -9956,11 +9956,11 @@
   "7621.5220": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5613.5421": [
@@ -10158,11 +10158,11 @@
   "0341.6500": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2110.5717": [
@@ -10438,11 +10438,11 @@
   "3521.9350": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46412.6510": [
@@ -10454,21 +10454,21 @@
   "0351.6322": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.5622": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5651.5010": [
@@ -10492,11 +10492,11 @@
   "0331.6540": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3430.5400": [
@@ -10652,11 +10652,11 @@
   "3521.5431": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3201.5431": [
@@ -10752,11 +10752,11 @@
   "3521.5622": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.1346": [
@@ -10810,11 +10810,11 @@
   "7621.5431": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.9350": [
@@ -10904,11 +10904,11 @@
   "3521.5423": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0681.5510": [
@@ -10944,11 +10944,11 @@
   "0341.5620": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6300.6329": [
@@ -11074,11 +11074,11 @@
   "3521.5010": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6752.5220": [
@@ -11114,11 +11114,11 @@
   "3503.7180": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0501.6500": [
@@ -11148,11 +11148,11 @@
   "0301.6500": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2110.1430": [
@@ -11302,11 +11302,11 @@
   "0332.6500": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.5421": [
@@ -11330,11 +11330,11 @@
   "7621.9350": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0682.5431": [
@@ -11442,11 +11442,11 @@
   "3521.1682": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4606.6325": [
@@ -11734,11 +11734,11 @@
   "7692.5422": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46410.6525": [
@@ -11786,11 +11786,11 @@
   "7692.5450": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4606.1414": [
@@ -11844,21 +11844,21 @@
   "7621.6520": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0341.5622": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0800.5560": [
@@ -11870,11 +11870,11 @@
   "0341.6510": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5613.5450": [
@@ -11898,11 +11898,11 @@
   "0332.6322": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0000.6316": [
@@ -12052,11 +12052,11 @@
   "3521.5450": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46410.1195": [
@@ -12194,11 +12194,11 @@
   "0351.4340": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.5200": [
@@ -12216,11 +12216,11 @@
   "0351.4140": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6011.6500": [
@@ -12256,11 +12256,11 @@
   "0351.4440": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7200.6498": [
@@ -12446,11 +12446,11 @@
   "3503.1430": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8151.9509": [
@@ -12534,21 +12534,21 @@
   "3521.4590": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6329": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4606.5425": [
@@ -12572,11 +12572,11 @@
   "0331.5620": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3430.6317": [
@@ -12588,11 +12588,11 @@
   "0341.4340": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.1198": [
@@ -12682,11 +12682,11 @@
   "0341.4140": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6890.4340": [
@@ -12704,11 +12704,11 @@
   "0341.4440": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.1555": [
@@ -13038,11 +13038,11 @@
   "0301.4140": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.4440": [
@@ -13090,11 +13090,11 @@
   "2950.4340": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3201.6525": [
@@ -13106,11 +13106,11 @@
   "3521.6525": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5652.6525": [
@@ -13128,11 +13128,11 @@
   "7621.6525": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1100.6610": [
@@ -13198,11 +13198,11 @@
   "7631.5190": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2130.6369": [
@@ -13310,11 +13310,11 @@
   "3503.5400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4600.4340": [
@@ -13344,11 +13344,11 @@
   "3521.2610": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7201.4140": [
@@ -13408,11 +13408,11 @@
   "7692.4340": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0682.4440": [
@@ -13424,11 +13424,11 @@
   "0332.4440": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7201.4340": [
@@ -13506,11 +13506,11 @@
   "7621.5450": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6100.6555": [
@@ -13558,11 +13558,11 @@
   "7621.5422": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4606.6520": [
@@ -13622,11 +13622,11 @@
   "0332.4140": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5613.5010": [
@@ -13650,11 +13650,11 @@
   "0331.6581": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1313.5430": [
@@ -13684,11 +13684,11 @@
   "0332.4340": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1141.4340": [
@@ -13724,21 +13724,21 @@
   "0331.1519": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2950.4140": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7191.4140": [
@@ -13780,11 +13780,11 @@
   "2950.4440": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2111.6387": [
@@ -13832,11 +13832,11 @@
   "7692.4440": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0621.4140": [
@@ -13872,11 +13872,11 @@
   "7621.4340": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0601.6322": [
@@ -13894,11 +13894,11 @@
   "0341.6322": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4600.6500": [
@@ -13946,11 +13946,11 @@
   "3503.5010": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4001.4340": [
@@ -14070,11 +14070,11 @@
   "3503.4440": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5651.4140": [
@@ -14164,11 +14164,11 @@
   "7692.4140": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0000.4140": [
@@ -14192,21 +14192,21 @@
   "3521.4440": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.4140": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8851.5400": [
@@ -14218,11 +14218,11 @@
   "3521.4340": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6890.4440": [
@@ -14300,11 +14300,11 @@
   "3521.5200": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8804.5425": [
@@ -14328,21 +14328,21 @@
   "7621.5010": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.4140": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46417.5810": [
@@ -14378,11 +14378,11 @@
   "0301.4340": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7910.1555": [
@@ -14430,11 +14430,11 @@
   "7621.1415": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.6520": [
@@ -14446,21 +14446,21 @@
   "7691.5431": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.5045": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0000.4098": [
@@ -14478,11 +14478,11 @@
   "0301.4440": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1311.6520": [
@@ -14512,11 +14512,11 @@
   "3503.4140": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1100.1191": [
@@ -14564,11 +14564,11 @@
   "3503.4340": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0601.9350": [
@@ -14706,11 +14706,11 @@
   "2901.6391": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46410.5400": [
@@ -14722,11 +14722,11 @@
   "3551.7180": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3700.4140": [
@@ -14792,11 +14792,11 @@
   "3521.1100": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0000.4090": [
@@ -14874,11 +14874,11 @@
   "0331.5622": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0621.4107": [
@@ -14902,11 +14902,11 @@
   "2901.6730": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2130.6540": [
@@ -14966,11 +14966,11 @@
   "7621.4440": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3400.6319": [
@@ -15006,11 +15006,11 @@
   "3521.6520": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3201.4140": [
@@ -15028,11 +15028,11 @@
   "7621.5600": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2130.9451": [
@@ -15104,11 +15104,11 @@
   "0331.4107": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3201.4440": [
@@ -15138,21 +15138,21 @@
   "7691.5450": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.5045": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8804.1432": [
@@ -15224,11 +15224,11 @@
   "7692.5010": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8804.5400": [
@@ -15294,21 +15294,21 @@
   "3521.1710": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6610": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8151.6400": [
@@ -15326,11 +15326,11 @@
   "3503.5450": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8807.6369": [
@@ -15426,11 +15426,11 @@
   "0301.6322": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1311.4090": [
@@ -15682,11 +15682,11 @@
   "3521.6070": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8101.2200": [
@@ -15716,21 +15716,21 @@
   "5900.6610": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6322": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46416.5430": [
@@ -15778,21 +15778,21 @@
   "7691.5421": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.5200": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46412.9350": [
@@ -15900,11 +15900,11 @@
   "3521.5400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8804.5430": [
@@ -16012,11 +16012,11 @@
   "7621.1599": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.5430": [
@@ -16046,11 +16046,11 @@
   "7692.5400": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "9122.9776": [
@@ -16146,11 +16146,11 @@
   "0301.6610": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46432.1195": [
@@ -16192,31 +16192,31 @@
   "3503.7094": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2950.5600": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6500": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7501.1670": [
@@ -16240,11 +16240,11 @@
   "0331.6440": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.1194": [
@@ -16328,11 +16328,11 @@
   "3521.1410": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4600.7099": [
@@ -16404,11 +16404,11 @@
   "7621.1432": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7512.1145": [
@@ -16450,11 +16450,11 @@
   "3503.1416": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0200.6610": [
@@ -16478,21 +16478,21 @@
   "7692.1411": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.1415": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46412.1541": [
@@ -16570,11 +16570,11 @@
   "5901.1451": [
    {
     "theme": "sport_freizeit",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "gruen_umwelt",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0200.1590": [
@@ -16652,21 +16652,21 @@
   "0331.1621": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0341.1621": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46417.6369": [
@@ -16684,11 +16684,11 @@
   "7691.5400": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8851.1430": [
@@ -16742,11 +16742,11 @@
   "7621.5400": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.5010": [
@@ -16782,21 +16782,21 @@
   "0331.5200": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.4440": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8151.5200": [
@@ -16808,11 +16808,11 @@
   "0331.4340": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8551.6329": [
@@ -16866,11 +16866,11 @@
   "0331.4140": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1122.6369": [
@@ -16960,11 +16960,11 @@
   "2901.1716": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5652.5010": [
@@ -17252,11 +17252,11 @@
   "2950.4169": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8802.1415": [
@@ -17304,11 +17304,11 @@
   "2950.6450": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7192.1119": [
@@ -17464,11 +17464,11 @@
   "0332.5620": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5800.5600": [
@@ -17516,11 +17516,11 @@
   "0301.6510": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3000.6314": [
@@ -17592,11 +17592,11 @@
   "0331.1010": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6890.1193": [
@@ -17704,11 +17704,11 @@
   "0332.6510": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46432.1714": [
@@ -17726,11 +17726,11 @@
   "3521.5045": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "6890.5400": [
@@ -17802,11 +17802,11 @@
   "7621.1414": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8805.1411": [
@@ -17860,11 +17860,11 @@
   "3503.1410": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.1699": [
@@ -18008,11 +18008,11 @@
   "0331.6550": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.5622": [
@@ -18204,11 +18204,11 @@
   "0301.5622": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1141.1599": [
@@ -18238,11 +18238,11 @@
   "0301.6540": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46410.1199": [
@@ -18260,11 +18260,11 @@
   "0331.8412": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46415.1541": [
@@ -18276,11 +18276,11 @@
   "3503.5441": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3430.6550": [
@@ -18322,11 +18322,11 @@
   "0331.1040": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1100.6510": [
@@ -18416,11 +18416,11 @@
   "0301.5620": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4600.5200": [
@@ -18456,11 +18456,11 @@
   "0341.2615": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0221.9340": [
@@ -18538,11 +18538,11 @@
   "0331.2610": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46417.5622": [
@@ -18596,11 +18596,11 @@
   "7621.5441": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "5613.9450": [
@@ -18630,11 +18630,11 @@
   "0332.6551": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8802.5441": [
@@ -18682,11 +18682,11 @@
   "7621.1699": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "1313.1710": [
@@ -18710,11 +18710,11 @@
   "0331.1000": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "46413.5441": [
@@ -18726,11 +18726,11 @@
   "0332.5622": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0200.5622": [
@@ -18742,11 +18742,11 @@
   "0331.2616": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8854.3610": [
@@ -18764,11 +18764,11 @@
   "3521.1599": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.3454": [
@@ -18804,41 +18804,41 @@
   "0301.1650": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.1599": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.1650": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0341.1519": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0511.1599": [
@@ -19072,71 +19072,71 @@
   "3501.1411": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.1430": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.1101": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.1199": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.1620": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.1781": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.1430": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3600.1100": [
@@ -19526,81 +19526,81 @@
   "7605.1459": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1100": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1416": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1620": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.1740": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.1559": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.1771": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.2050": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.1350": [
@@ -19942,51 +19942,51 @@
   "0301.4110": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.4210": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.6589": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0332.6525": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0351.4210": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0501.4210": [
@@ -20406,51 +20406,51 @@
   "2901.4590": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2901.6800": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2950.6329": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2950.6430": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "2950.6530": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "strassen_verkehr",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3000.6316": [
@@ -20666,251 +20666,251 @@
   "3501.4140": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.4340": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.4440": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.5010": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.5400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.5420": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.5431": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.5441": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.5450": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.5010": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.5400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.5420": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.5431": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.5441": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.5450": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.5420": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.6400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.5420": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.5600": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.6528": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.4140": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.4340": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.4440": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.6369": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3551.7091": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "4001.4090": [
@@ -21804,121 +21804,121 @@
   "7605.4140": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7605.4340": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7605.4440": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7605.6329": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.5442": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.6329": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.5420": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.6799": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.8690": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.5442": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.6329": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.6520": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7709.6400": [
@@ -22638,11 +22638,11 @@
   "3503.3610": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3600.3610": [
@@ -23074,31 +23074,31 @@
   "7621.3670": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.3090": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.3190": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "8100.3670": [
@@ -23302,31 +23302,31 @@
   "0301.9340": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0301.9350": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0331.9350": [
    {
     "theme": "verwaltung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "finanzen",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "0671.9350": [
@@ -23620,101 +23620,101 @@
   "3500.9400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3501.9400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3502.9400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.9322": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.9350": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.9352": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3503.9450": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.9400": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.9490": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3521.9590": [
    {
     "theme": "bildung",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "3650.9881": [
@@ -24428,81 +24428,81 @@
   "7610.9630": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.9490": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7621.9600": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.9190": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.9321": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.9450": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7691.9490": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7692.9450": [
    {
     "theme": "wirtschaft",
-    "weight": 0.5
+    "weight": 1.0
    },
    {
     "theme": "kultur",
-    "weight": 0.5
+    "weight": 1.0
    }
   ],
   "7711.9535": [

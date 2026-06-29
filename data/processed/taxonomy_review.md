@@ -1,8 +1,8 @@
 # Taxonomie-Review — Ausgaben 2024
 
-Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte Posten erscheinen unter mehreren Themen (anteilig). Markiere alles, was im falschen Thema steht.
+Thema → Bereich → Einrichtung mit vollen Beträgen (keine anteilige Zuordnung). Ein Posten kann voll in mehreren Themen stehen; Themen-Summen müssen daher nicht zur kameralen Gesamtsumme passen. Markiere alles, was im falschen Thema steht.
 
-## Finanzen, Steuern & Schulden — 21.641.269 €
+## Finanzen, Steuern & Schulden — 22.271.069 €
 - **Steuern & allgemeine Finanzwirtschaft** [90] — 14.850.000 €
     - Steuern,allgemeine Zuweisungen und allgemeine Umlagen [9000] — 14.850.000 €
 - **Schulden & Kredite** [91] — 6.161.469 €
@@ -12,12 +12,12 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Darlehen Wasserwerk [9122] — 165.000 €
     - Zinsen aus der Anlage des Kassenbestandes einschließ- lich Kontokorrentverkehr [9181] — 0 €
     - Allgemeine Rücklage (einschließlich Zinserträge) [9101] — 0 €
-- **Stadtkämmerei & Finanzverwaltung** [03] — 629.800 €
-    - Stadtkämmerei [0301] — 247.000 € ⚠️anteilig
-    - Stadtkassenverwaltung [0331] — 119.350 € ⚠️anteilig
-    - Liegenschaftsamt [0351] — 111.250 € ⚠️anteilig
-    - Beitrags- u. Gebührenstelle [0332] — 101.775 € ⚠️anteilig
-    - Stadtsteueramt [0341] — 50.425 € ⚠️anteilig
+- **Stadtkämmerei & Finanzverwaltung** [03] — 1.259.600 €
+    - Stadtkämmerei [0301] — 494.000 € ⚠️auch in anderem Thema (voll gezählt)
+    - Stadtkassenverwaltung [0331] — 238.700 € ⚠️auch in anderem Thema (voll gezählt)
+    - Liegenschaftsamt [0351] — 222.500 € ⚠️auch in anderem Thema (voll gezählt)
+    - Beitrags- u. Gebührenstelle [0332] — 203.550 € ⚠️auch in anderem Thema (voll gezählt)
+    - Stadtsteueramt [0341] — 100.850 € ⚠️auch in anderem Thema (voll gezählt)
 - **Abwicklung der Vorjahre** [92] — 0 €
     - Abwicklung der Vorjahre [9200] — 0 €
 
@@ -45,6 +45,45 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Einrichtungen der Jugendarbeit [4600] — 319.600 €
     - Kinderspiel- u. Bolzplätze [4605] — 269.900 €
     - Kinderkrippe Aich -neu ab 2025 [46420] — 0 €
+
+## Straßen, Wege & Verkehr — 15.352.950 €
+- **Gemeindestraßen** [63] — 8.536.000 €
+    - Auf dem Plan [6324] — 3.680.000 €
+    - Gemeindestraßen [6300] — 3.381.000 €
+    - Leinbergerstraße [6303] — 880.000 €
+    - Breitbandausbau allgemein [6352] — 300.000 €
+    - Radweg Aich - Buch a. Erlbach ST 2082 [6311] — 150.000 €
+    - Fußgängerunterführung am Bahnhof [6312] — 100.000 €
+    - Umgestaltung der ehem. St.2085 [6345] — 25.000 €
+    - Stadtwaldstraße [6325] — 20.000 €
+    - Schleienstraße [6302] — 0 €
+    - Egerlandstraße [6304] — 0 €
+    - Blütenstraße [6305] — 0 €
+    - Siebenbürgen-Glatzer-Weg [6307] — 0 €
+    - Forellenstraße [6314] — 0 €
+    - Breitenbergstraße [6317] — 0 €
+    - Wiesenstraße [6321] — 0 €
+    - Jahnstraße [6326] — 0 €
+    - Auf dem Gries [6328] — 0 €
+- **Bauhof** [77] — 3.912.400 €
+    - Bauhof Böhmerwaldstr. 35 [7711] — 3.535.900 €
+    - Fuhrpark [7709] — 376.500 €
+- **Straßenbeleuchtung & -reinigung** [67] — 1.254.400 €
+    - Straßenbeleuchtung [6701] — 614.000 €
+    - Straßenreinigung [6751] — 461.400 €
+    - Winterdienst auf Straßen [6752] — 179.000 €
+- **Schülerbeförderung** [29] — 721.550 €
+    - Schülerbeförderung [2901] — 580.050 € ⚠️auch in anderem Thema (voll gezählt)
+    - Sonstige schulische Aufgaben [2950] — 141.500 € ⚠️auch in anderem Thema (voll gezählt)
+- **Brücken** [64] — 609.800 €
+    - Brücke Pillhofen [6487] — 561.000 €
+    - Brücken in Moosburg [6481] — 48.800 €
+- **Parkplätze** [68] — 318.800 €
+    - Parkhaus am Bahnhof [6890] — 182.100 €
+    - Parkplätze (selbstständig) [6815] — 56.600 €
+    - Tiefgarage Setz-Areal [6860] — 43.800 €
+    - Parkplätze (unselbstständig) [6800] — 27.300 €
+    - Tiefgarage Leinbergerstr. [6861] — 9.000 €
 
 ## Stadtplanung & Bauen — 15.077.500 €
 - **Bebauter Grundbesitz & Grundstücke** [88] — 13.702.600 €
@@ -77,46 +116,7 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Städtebauliche Planung, Städtebauförderung, Bauleitplan. u. Grünordnung [6100] — 249.000 €
     - Vermessung [6123] — 14.400 €
 
-## Straßen, Wege & Verkehr — 14.992.175 €
-- **Gemeindestraßen** [63] — 8.536.000 €
-    - Auf dem Plan [6324] — 3.680.000 €
-    - Gemeindestraßen [6300] — 3.381.000 €
-    - Leinbergerstraße [6303] — 880.000 €
-    - Breitbandausbau allgemein [6352] — 300.000 €
-    - Radweg Aich - Buch a. Erlbach ST 2082 [6311] — 150.000 €
-    - Fußgängerunterführung am Bahnhof [6312] — 100.000 €
-    - Umgestaltung der ehem. St.2085 [6345] — 25.000 €
-    - Stadtwaldstraße [6325] — 20.000 €
-    - Schleienstraße [6302] — 0 €
-    - Egerlandstraße [6304] — 0 €
-    - Blütenstraße [6305] — 0 €
-    - Siebenbürgen-Glatzer-Weg [6307] — 0 €
-    - Forellenstraße [6314] — 0 €
-    - Breitenbergstraße [6317] — 0 €
-    - Wiesenstraße [6321] — 0 €
-    - Jahnstraße [6326] — 0 €
-    - Auf dem Gries [6328] — 0 €
-- **Bauhof** [77] — 3.912.400 €
-    - Bauhof Böhmerwaldstr. 35 [7711] — 3.535.900 €
-    - Fuhrpark [7709] — 376.500 €
-- **Straßenbeleuchtung & -reinigung** [67] — 1.254.400 €
-    - Straßenbeleuchtung [6701] — 614.000 €
-    - Straßenreinigung [6751] — 461.400 €
-    - Winterdienst auf Straßen [6752] — 179.000 €
-- **Brücken** [64] — 609.800 €
-    - Brücke Pillhofen [6487] — 561.000 €
-    - Brücken in Moosburg [6481] — 48.800 €
-- **Schülerbeförderung** [29] — 360.775 €
-    - Schülerbeförderung [2901] — 290.025 € ⚠️anteilig
-    - Sonstige schulische Aufgaben [2950] — 70.750 € ⚠️anteilig
-- **Parkplätze** [68] — 318.800 €
-    - Parkhaus am Bahnhof [6890] — 182.100 €
-    - Parkplätze (selbstständig) [6815] — 56.600 €
-    - Tiefgarage Setz-Areal [6860] — 43.800 €
-    - Parkplätze (unselbstständig) [6800] — 27.300 €
-    - Tiefgarage Leinbergerstr. [6861] — 9.000 €
-
-## Bildung & Schulen — 12.332.275 €
+## Bildung & Schulen — 12.982.850 €
 - **Schulen** [21] — 11.681.700 €
     - Anton-Vitzthum-Grundschule [2110] — 5.183.300 €
     - Theresia-Gerhardinger-Grunds. [2111] — 3.863.400 €
@@ -125,13 +125,13 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Kombinierte Grund- und Mittelschule Schulzentrum Nord [2155] — 443.900 €
     - Mensa auf Rockermeier-Grundstück [2165] — 57.700 €
     - Kombinierte Grund- und Hauptschule -16- Neubau Mensa und Sportanlagen [2156] — 0 €
-- **Schülerbeförderung** [29] — 360.775 €
-    - Schülerbeförderung [2901] — 290.025 € ⚠️anteilig
-    - Sonstige schulische Aufgaben [2950] — 70.750 € ⚠️anteilig
-- **Volkshochschule & Stadtbücherei** [35] — 289.800 €
-    - VHS - Haus der Bildung [3503] — 142.800 € ⚠️anteilig
-    - Stadtbücherei [3521] — 142.350 € ⚠️anteilig
-    - Sonstige Volksbildung [3551] — 4.650 € ⚠️anteilig
+- **Schülerbeförderung** [29] — 721.550 €
+    - Schülerbeförderung [2901] — 580.050 € ⚠️auch in anderem Thema (voll gezählt)
+    - Sonstige schulische Aufgaben [2950] — 141.500 € ⚠️auch in anderem Thema (voll gezählt)
+- **Volkshochschule & Stadtbücherei** [35] — 579.600 €
+    - VHS - Haus der Bildung [3503] — 285.600 € ⚠️auch in anderem Thema (voll gezählt)
+    - Stadtbücherei [3521] — 284.700 € ⚠️auch in anderem Thema (voll gezählt)
+    - Sonstige Volksbildung [3551] — 9.300 € ⚠️auch in anderem Thema (voll gezählt)
 
 ## Ver- & Entsorgung — 10.507.580 €
 - **Abwasser (Kanal & Kläranlage)** [70] — 5.117.330 €
@@ -151,7 +151,7 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - WC-Anlage Kirchgäßl/Bahnhof [7191] — 38.500 €
     - Abwasserabgabe Kleineinleiter [7196] — 900 €
 
-## Sport & Freizeit — 8.630.900 €
+## Sport & Freizeit — 8.635.850 €
 - **Bäder (Frei- & Hallenbad)** [57] — 7.263.500 €
     - Hallenbad [5702] — 4.317.700 €
     - Freibad [5701] — 2.758.100 €
@@ -166,11 +166,11 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Skateboardanlage [5611] — 29.700 €
 - **Sportförderung** [55] — 228.800 €
     - Förderung des Sports [5500] — 228.800 €
-- **Kleingärten & Erholung** [59] — 4.950 €
-    - Sonst. Erholungseinrichtungen [5900] — 2.750 € ⚠️anteilig
-    - Kleingartenanlage a.d.Lände [5901] — 2.200 € ⚠️anteilig
+- **Kleingärten & Erholung** [59] — 9.900 €
+    - Sonst. Erholungseinrichtungen [5900] — 5.500 € ⚠️auch in anderem Thema (voll gezählt)
+    - Kleingartenanlage a.d.Lände [5901] — 4.400 € ⚠️auch in anderem Thema (voll gezählt)
 
-## Verwaltung & Rathaus — 6.371.550 €
+## Verwaltung & Rathaus — 7.001.350 €
 - **EDV / IT** [06] — 3.642.200 €
     - Rathaus - Herrnstr. 2 [0683] — 1.724.700 €
     - EDV-Abteilung [0601] — 822.100 €
@@ -179,15 +179,15 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Controlling [0671] — 109.500 €
     - Archiv [0621] — 52.800 €
     - Sicherheitstechnischer Dienst [0614] — 26.000 €
+- **Stadtkämmerei & Finanzverwaltung** [03] — 1.259.600 €
+    - Stadtkämmerei [0301] — 494.000 € ⚠️auch in anderem Thema (voll gezählt)
+    - Stadtkassenverwaltung [0331] — 238.700 € ⚠️auch in anderem Thema (voll gezählt)
+    - Liegenschaftsamt [0351] — 222.500 € ⚠️auch in anderem Thema (voll gezählt)
+    - Beitrags- u. Gebührenstelle [0332] — 203.550 € ⚠️auch in anderem Thema (voll gezählt)
+    - Stadtsteueramt [0341] — 100.850 € ⚠️auch in anderem Thema (voll gezählt)
 - **Geschäftsleitung & Hauptverwaltung** [02] — 1.226.700 €
     - Geschäftsleitung [0200] — 761.100 €
     - Personalamt [0221] — 465.600 €
-- **Stadtkämmerei & Finanzverwaltung** [03] — 629.800 €
-    - Stadtkämmerei [0301] — 247.000 € ⚠️anteilig
-    - Stadtkassenverwaltung [0331] — 119.350 € ⚠️anteilig
-    - Liegenschaftsamt [0351] — 111.250 € ⚠️anteilig
-    - Beitrags- u. Gebührenstelle [0332] — 101.775 € ⚠️anteilig
-    - Stadtsteueramt [0341] — 50.425 € ⚠️anteilig
 - **Bürgermeister & Stadtrat** [00] — 536.700 €
     - Bürgermeister und Stadträte [0000] — 536.700 €
 - **Personalnebeneinrichtungen** [08] — 179.200 €
@@ -213,7 +213,17 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
 - **Katastrophenschutz** [14] — 25.200 €
     - Sonstige Katastrophenschutz- einrichtungen [1491] — 25.200 €
 
-## Kultur & Heimat — 1.447.000 €
+## Kultur & Heimat — 2.014.900 €
+- **Volkshochschule & Stadtbücherei** [35] — 579.600 €
+    - VHS - Haus der Bildung [3503] — 285.600 € ⚠️auch in anderem Thema (voll gezählt)
+    - Stadtbücherei [3521] — 284.700 € ⚠️auch in anderem Thema (voll gezählt)
+    - Sonstige Volksbildung [3551] — 9.300 € ⚠️auch in anderem Thema (voll gezählt)
+- **Sonstige öffentliche Einrichtungen** [76] — 556.200 €
+    - Stadthallengebäude insgesamt [7621] — 393.100 € ⚠️auch in anderem Thema (voll gezählt)
+    - Haus der Vereine [7692] — 123.300 € ⚠️auch in anderem Thema (voll gezählt)
+    - Zehentstadel [7691] — 24.000 € ⚠️auch in anderem Thema (voll gezählt)
+    - Öffentliche WLAN-Hotspots [7610] — 10.000 € ⚠️auch in anderem Thema (voll gezählt)
+    - Uhren in Aich, Pfromb.,Thonst. [7631] — 5.800 € ⚠️auch in anderem Thema (voll gezählt)
 - **Heimat- & Kulturpflege** [34] — 438.600 €
     - Frühlingsfest u. Herbstschau [3430] — 315.300 €
     - Heimat- u. sonst. Kulturpflege [3400] — 99.700 €
@@ -221,16 +231,6 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - STALAG VII a -Sabathiel- [3401] — 9.600 €
 - **Naturschutz & Landschaftspflege** [36] — 298.300 €
     - Denkmalschutz und -pflege [3650] — 298.300 €
-- **Volkshochschule & Stadtbücherei** [35] — 289.800 €
-    - VHS - Haus der Bildung [3503] — 142.800 € ⚠️anteilig
-    - Stadtbücherei [3521] — 142.350 € ⚠️anteilig
-    - Sonstige Volksbildung [3551] — 4.650 € ⚠️anteilig
-- **Sonstige öffentliche Einrichtungen** [76] — 278.100 €
-    - Stadthallengebäude insgesamt [7621] — 196.550 € ⚠️anteilig
-    - Haus der Vereine [7692] — 61.650 € ⚠️anteilig
-    - Zehentstadel [7691] — 12.000 € ⚠️anteilig
-    - Öffentliche WLAN-Hotspots [7610] — 5.000 € ⚠️anteilig
-    - Uhren in Aich, Pfromb.,Thonst. [7631] — 2.900 € ⚠️anteilig
 - **Museen (Heimat- & STALAG-Museum)** [32] — 96.100 €
     - Heimatmuseum im Kloster [3201] — 81.300 €
     - Stalagmuseum, Hodschager Str. [3202] — 12.600 €
@@ -243,7 +243,7 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
 - **Ausstellungshalle** [78] — 4.400 €
     - Ausstell.Halle Stadtwaldstr. 8 [7800] — 4.400 €
 
-## Grün, Natur & Umwelt — 1.015.750 €
+## Grün, Natur & Umwelt — 1.020.700 €
 - **Park- & Grünanlagen** [58] — 370.700 €
     - Öffentl. Park-/Grünanlagen u.a [5800] — 367.800 €
     - Baumschule Oberreith [5821] — 2.900 €
@@ -255,17 +255,17 @@ Thema → Bereich → Einrichtung mit gewichteten Beträgen. Mehrfach getaggte P
     - Stadtwald [8551] — 84.400 €
 - **Gewässer & Wasserbau** [69] — 34.200 €
     - Wasserläufe, Wasserbau [6909] — 34.200 €
-- **Kleingärten & Erholung** [59] — 4.950 €
-    - Sonst. Erholungseinrichtungen [5900] — 2.750 € ⚠️anteilig
-    - Kleingartenanlage a.d.Lände [5901] — 2.200 € ⚠️anteilig
+- **Kleingärten & Erholung** [59] — 9.900 €
+    - Sonst. Erholungseinrichtungen [5900] — 5.500 € ⚠️auch in anderem Thema (voll gezählt)
+    - Kleingartenanlage a.d.Lände [5901] — 4.400 € ⚠️auch in anderem Thema (voll gezählt)
 
-## Wirtschaft & Märkte — 560.150 €
-- **Sonstige öffentliche Einrichtungen** [76] — 278.100 €
-    - Stadthallengebäude insgesamt [7621] — 196.550 € ⚠️anteilig
-    - Haus der Vereine [7692] — 61.650 € ⚠️anteilig
-    - Zehentstadel [7691] — 12.000 € ⚠️anteilig
-    - Öffentliche WLAN-Hotspots [7610] — 5.000 € ⚠️anteilig
-    - Uhren in Aich, Pfromb.,Thonst. [7631] — 2.900 € ⚠️anteilig
+## Wirtschaft & Märkte — 838.250 €
+- **Sonstige öffentliche Einrichtungen** [76] — 556.200 €
+    - Stadthallengebäude insgesamt [7621] — 393.100 € ⚠️auch in anderem Thema (voll gezählt)
+    - Haus der Vereine [7692] — 123.300 € ⚠️auch in anderem Thema (voll gezählt)
+    - Zehentstadel [7691] — 24.000 € ⚠️auch in anderem Thema (voll gezählt)
+    - Öffentliche WLAN-Hotspots [7610] — 10.000 € ⚠️auch in anderem Thema (voll gezählt)
+    - Uhren in Aich, Pfromb.,Thonst. [7631] — 5.800 € ⚠️auch in anderem Thema (voll gezählt)
 - **Wirtschaftsförderung & Öffentlichkeitsarbeit** [79] — 234.850 €
     - Öffentlichkeitsarbeit [7910] — 222.050 €
     - Wirtschafts-/Verkehrsförderung [7900] — 12.800 €
