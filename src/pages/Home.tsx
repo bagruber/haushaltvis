@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { PackedCircles } from "@/components/PackedCircles";
-import { useData, expenseTreemap, totals, latestYear, type Haushalt, type TreeNode } from "@/lib/data";
+import { useData, expenseTreemap, totals, latestYear, topMovers, type Haushalt, type TreeNode } from "@/lib/data";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 type Viz = "sunburst" | "circles" | "treemap";
@@ -52,6 +52,12 @@ export function Home() {
     const year = latestYear(data.budget);
     return { tree: expenseTreemap(data, year, haushalt), year, t: totals(data.budget, year) };
   }, [data, haushalt]);
+
+  const movers = useMemo(() => {
+    if (!data) return [];
+    const y = latestYear(data.budget);
+    return topMovers(data, y - 1, y, 6);
+  }, [data]);
 
   const tooltipFmt = (info: unknown) => {
     const i = info as { name: string; value: number; treePathInfo?: { name: string }[] };
@@ -180,6 +186,36 @@ export function Home() {
           option && <EChart option={option} onEvents={onEvents} style={{ height: 560 }} />
         )}
       </section>
+
+      {movers.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold">Das fällt auf — größte Veränderungen {year - 1} → {year}</h2>
+          <ul className="grid sm:grid-cols-2 gap-2">
+            {movers.map((m) => {
+              const up = m.delta > 0;
+              return (
+                <li key={m.hhst_id}>
+                  <Link
+                    to={`/posten/${m.hhst_id}`}
+                    className="flex items-center gap-3 rounded-lg border border-ink-line bg-white px-4 py-3 shadow-soft hover:shadow-lift transition-shadow"
+                  >
+                    <span className="font-display text-lg font-bold tabular-nums shrink-0 text-ink">
+                      <span className="text-ink-muted">{up ? "▲" : "▼"}</span> {up ? "+" : "−"}
+                      {fmtEurShort(Math.abs(m.delta))}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium">{m.label}</span>
+                      <span className="block truncate text-xs text-ink-muted">
+                        {m.context} · {fmtEurShort(m.from)} → {fmtEurShort(m.to)}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

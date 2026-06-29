@@ -222,12 +222,14 @@ export function ThemeDetail() {
             )}
             <EChart option={timelineOpt} style={{ height: 300 }} />
           </Card>
-          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y}`}>
+          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y} — Klick öffnet den Posten`}>
             <ol className="space-y-1.5 text-sm">
               {vwTop.map((p) => (
-                <li key={p.key} className="flex justify-between gap-3 border-b border-ink-line/60 pb-1.5">
-                  <span className="text-ink-soft">{p.label}</span>
-                  <span className="tabular-nums shrink-0 font-medium">{fmtEur(p.value)}</span>
+                <li key={p.key} className="border-b border-ink-line/60 pb-1.5">
+                  <Link to={`/posten/${p.key}`} className="flex justify-between gap-3 hover:text-red-600 transition-colors">
+                    <span className="text-ink-soft">{p.label}</span>
+                    <span className="tabular-nums shrink-0 font-medium">{fmtEur(p.value)}</span>
+                  </Link>
                 </li>
               ))}
             </ol>

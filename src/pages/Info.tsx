@@ -13,7 +13,42 @@ export function Info() {
         Für jedes Jahr gibt es einen <b>Ansatz</b> (Plan) und — ein bis zwei Jahre später —
         ein <b>Ergebnis</b> (Ist). Die Werte für 2024 sind vorläufig.
       </p>
-      <p className="text-ink-muted text-sm">
+
+      <h2 className="font-display text-xl font-bold pt-2">Die Ebenen des Haushalts</h2>
+      <p className="text-ink-soft">Von grob nach fein gliedert sich der Haushalt so:</p>
+      <div className="overflow-hidden rounded-lg border border-ink-line">
+        <table className="w-full text-sm">
+          <thead className="bg-cream-dark text-left">
+            <tr>
+              <th className="px-3 py-2 font-semibold">Ebene</th>
+              <th className="px-3 py-2 font-semibold">Fachbegriff</th>
+              <th className="px-3 py-2 font-semibold">Beispiel</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-ink-line">
+            {[
+              ["Thema", "(eigene Einordnung)", "Bildung & Schulen"],
+              ["Aufgabenbereich", "Einzelplan", "2 – Schulen"],
+              ["Bereich", "Abschnitt", "Grundschulen"],
+              ["Untergruppe", "Unterabschnitt", "Grund- & Mittelschulen"],
+              ["Einrichtung", "Gliederung", "Anton-Vitzthum-Grundschule"],
+              ["Posten", "Haushaltsstelle", "Beamtenbezüge"],
+            ].map(([a, b, c]) => (
+              <tr key={a}>
+                <td className="px-3 py-2 font-medium">{a}</td>
+                <td className="px-3 py-2 text-ink-soft">{b}</td>
+                <td className="px-3 py-2 text-ink-soft">{c}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-ink-soft text-sm">
+        Ein <b>Thema</b> bündelt Posten aus beiden Haushalten über die kamerale Gliederung
+        hinweg. Jeder <b>Posten</b> lässt sich über die Jahre verfolgen (Ansatz gegen Ergebnis).
+      </p>
+
+      <p className="text-ink-muted text-sm pt-2">
         Bürgerschaftliches Transparenzprojekt, keine amtliche Veröffentlichung. Bei
         Abweichungen gilt der offizielle Haushaltsplan der Stadt.
       </p>

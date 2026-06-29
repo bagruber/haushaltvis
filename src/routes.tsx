@@ -4,6 +4,7 @@ import { Home } from "./pages/Home";
 import { Geldfluss } from "./pages/Geldfluss";
 import { Themen } from "./pages/Themen";
 import { ThemeDetail } from "./pages/ThemeDetail";
+import { PostenDetail } from "./pages/PostenDetail";
 import { Info } from "./pages/Info";
 
 export const router = createBrowserRouter(
@@ -15,6 +16,7 @@ export const router = createBrowserRouter(
         { path: "/geldfluss", element: <Geldfluss /> },
         { path: "/themen", element: <Themen /> },
         { path: "/themen/:id", element: <ThemeDetail /> },
+        { path: "/posten/:id", element: <PostenDetail /> },
         { path: "/info", element: <Info /> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],

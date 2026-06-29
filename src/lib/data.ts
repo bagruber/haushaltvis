@@ -479,6 +479,88 @@ export function eventsFor(data: Data, scope: EventScope, id: string): BudgetEven
     .sort((a, b) => a.year - b.year);
 }
 
+// ── Posten (Haushaltsstelle) selectors ──────────────────────────────────────
+
+/** Ansatz/Ergebnis per year for a single Posten (Haushaltsstelle). */
+export function postenSeries(data: Data, hhst: string): YearSeries {
+  const years = data.budget.meta.years;
+  const a = new Map<number, number>();
+  const e = new Map<number, number>();
+  const provisional = new Set<number>();
+  for (const f of data.budget.facts) {
+    if (f.hhst_id !== hhst) continue;
+    if (f.ansatz != null) a.set(f.year, f.ansatz);
+    if (f.ergebnis != null) {
+      e.set(f.year, f.ergebnis);
+      if (f.provisional) provisional.add(f.year);
+    }
+  }
+  return {
+    years,
+    ansatz: years.map((y) => (a.has(y) ? a.get(y)! : null)),
+    ergebnis: years.map((y) => (e.has(y) ? e.get(y)! : null)),
+    provisional,
+  };
+}
+
+export interface Crumb {
+  aufgabenbereich: string;
+  bereich: string;
+  untergruppe: string;
+  einrichtung: string;
+}
+
+/** Human-readable path (Aufgabenbereich → Bereich → Einrichtung) for a Posten. */
+export function postenCrumb(data: Data, p: Posten): Crumb {
+  return {
+    aufgabenbereich: `Einzelplan ${p.einzelplan} – ${p.einzelplan_name}`,
+    bereich: abschnittName(data.labels, p.glz.slice(0, 2)),
+    untergruppe: groupLabel(data.labels, p.glz),
+    einrichtung: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(),
+  };
+}
+
+export interface Mover {
+  hhst_id: string;
+  label: string;
+  context: string;
+  from: number;
+  to: number;
+  delta: number;
+}
+
+/**
+ * Biggest year-over-year Ansatz changes per Posten (highlights "Das fällt auf").
+ * Internal/technical lines are excluded.
+ */
+export function topMovers(data: Data, fromYear: number, toYear: number, limit = 8): Mover[] {
+  const prev = new Map<string, number>();
+  const cur = new Map<string, number>();
+  for (const f of data.budget.facts) {
+    if (f.ansatz == null) continue;
+    if (f.year === fromYear) prev.set(f.hhst_id, f.ansatz);
+    if (f.year === toYear) cur.set(f.hhst_id, f.ansatz);
+  }
+  const out: Mover[] = [];
+  for (const id of new Set([...prev.keys(), ...cur.keys()])) {
+    const p = data.budget.posten[id];
+    if (!p || isInternal(p)) continue;
+    const a = prev.get(id) ?? 0;
+    const c = cur.get(id) ?? 0;
+    const delta = c - a;
+    if (Math.abs(delta) < 50000) continue;
+    out.push({
+      hhst_id: id,
+      label: (p.grz_text ?? id).replace(/\s+/g, " ").trim(),
+      context: (p.glz_text ?? "").replace(/\s+/g, " ").trim(),
+      from: a,
+      to: c,
+      delta,
+    });
+  }
+  return out.sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta)).slice(0, limit);
+}
+
 // ── Theme-scoped Sankey (Verwaltungshaushalt) ───────────────────────────────
 
 export interface SankeyNode {
