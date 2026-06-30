@@ -4,7 +4,8 @@ import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, kameralBothSidesTree, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
-import { fmtEur, fmtEurShort } from "@/lib/format";
+import { sankeyTooltip } from "@/lib/charts";
+import { fmtEurShort } from "@/lib/format";
 
 export function Erkunden() {
   const { data, error } = useData();
@@ -17,14 +18,7 @@ export function Erkunden() {
     const tree = kameralBothSidesTree(data, y);
     const t = totals(data.budget, y);
     const option: EChartsOption = {
-      tooltip: {
-        trigger: "item",
-        formatter: (p: unknown) => {
-          const i = p as { dataType: string; name?: string; value?: number; data?: { source?: string; target?: string } };
-          if (i.dataType === "edge") return `${i.data?.source} → ${i.data?.target}<br/><b>${fmtEur(i.value!)}</b>`;
-          return `<b>${i.name}</b><br/>${fmtEur(i.value!)}`;
-        },
-      },
+      tooltip: { trigger: "item", formatter: sankeyTooltip },
       series: [
         {
           type: "sankey",

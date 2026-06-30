@@ -5,42 +5,10 @@ import { EChart } from "@/components/EChart";
 import { PackedCircles } from "@/components/PackedCircles";
 import { useData, expenseTreemap, totals, latestYear, topMovers, type Haushalt, type TreeNode } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { Stat, SegmentedToggle } from "@/components/ui";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 type Viz = "sunburst" | "circles" | "treemap";
-
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-lg border border-ink-line bg-white px-5 py-4 shadow-soft">
-      <div className="text-xs uppercase tracking-wide text-ink-muted">{label}</div>
-      <div className="mt-1 font-display text-2xl font-bold text-ink">{value}</div>
-      {hint && <div className="text-xs text-ink-muted mt-0.5">{hint}</div>}
-    </div>
-  );
-}
-
-function Toggle<T extends string>({ value, onChange, options }: {
-  value: T;
-  onChange: (v: T) => void;
-  options: [T, string][];
-}) {
-  return (
-    <div className="inline-flex rounded-lg border border-ink-line bg-cream p-0.5 text-sm">
-      {options.map(([k, lbl]) => (
-        <button
-          key={k}
-          onClick={() => onChange(k)}
-          className={
-            "px-3 py-1 rounded-md transition-colors " +
-            (value === k ? "bg-red-600 text-cream" : "text-ink-soft hover:text-ink")
-          }
-        >
-          {lbl}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function Home() {
   const { data, error } = useData();
@@ -143,12 +111,12 @@ export function Home() {
             {haushalt === "verwaltung" ? "Laufende Ausgaben" : "Investitionen"} nach Themen ({year})
           </h2>
           <div className="flex flex-wrap items-center gap-2">
-            <Toggle
+            <SegmentedToggle
               value={haushalt}
               onChange={setHaushalt}
               options={[["verwaltung", "Laufender Betrieb"], ["vermoegen", "Investitionen"]]}
             />
-            <Toggle
+            <SegmentedToggle
               value={viz}
               onChange={setViz}
               options={[["sunburst", "Ringe"], ["circles", "Kreise"], ["treemap", "Kacheln"]]}

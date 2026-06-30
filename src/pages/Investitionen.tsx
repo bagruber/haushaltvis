@@ -5,19 +5,10 @@ import { EChart } from "@/components/EChart";
 import { useData, investmentsAll, investmentStacked, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
+import { Stat } from "@/components/ui";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const TOP = 18;
-
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-lg border border-ink-line bg-white px-5 py-4 shadow-soft">
-      <div className="text-xs uppercase tracking-wide text-ink-muted">{label}</div>
-      <div className="mt-1 font-display text-2xl font-bold text-ink">{value}</div>
-      {hint && <div className="text-xs text-ink-muted mt-0.5">{hint}</div>}
-    </div>
-  );
-}
 
 export function Investitionen() {
   const { data, error } = useData();

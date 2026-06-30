@@ -168,9 +168,10 @@ export interface TreeNode {
 }
 
 /**
- * Weighted expense hierarchy: Theme → Abschnitt. Each Posten's Ansatz for `year`
- * is split across its themes by weight, so totals never double-count. Children
- * are coloured as shades of the theme colour. Shared by treemap/sunburst/circles.
+ * Expense hierarchy Theme → Abschnitt, as a true partition: each Posten counts
+ * to its PRIMARY theme only (first tag), so the proportions are honest and don't
+ * double-count multi-tagged Posten. Children are shades of the theme colour.
+ * Shared by treemap/sunburst/circles.
  */
 export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): TreeNode[] {
   const { budget, themes } = data;
@@ -181,13 +182,12 @@ export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): T
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== "A") continue;
     if (haushalt && p.haushalt !== haushalt) continue;
-    const tags = themes.assignment[f.hhst_id] ?? [];
+    const theme = themes.assignment[f.hhst_id]?.[0]?.theme;
+    if (!theme) continue;
     const ab = p.glz.slice(0, 2);
-    for (const { theme, weight } of tags) {
-      if (!acc.has(theme)) acc.set(theme, new Map());
-      const inner = acc.get(theme)!;
-      inner.set(ab, (inner.get(ab) ?? 0) + f.ansatz * weight);
-    }
+    if (!acc.has(theme)) acc.set(theme, new Map());
+    const inner = acc.get(theme)!;
+    inner.set(ab, (inner.get(ab) ?? 0) + f.ansatz);
   }
   const nodes: TreeNode[] = [];
   for (const [theme, inner] of acc) {

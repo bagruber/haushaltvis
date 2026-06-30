@@ -9,13 +9,14 @@ import {
   investmentNet,
   topPosten,
   breakdownByAbschnitt,
-  adjustSeries,
   latestYear,
   type Data,
   type BudgetEvent,
-  type TimeMode,
 } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { Card } from "@/components/ui";
+import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { sankeyTooltip } from "@/lib/charts";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 function gatherEvents(data: Data, themeId: string): BudgetEvent[] {
@@ -33,33 +34,22 @@ function gatherEvents(data: Data, themeId: string): BudgetEvent[] {
     .sort((a, b) => a.year - b.year);
 }
 
-function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
-      <h3 className="font-display text-lg font-bold">{title}</h3>
-      {hint && <p className="text-xs text-ink-muted mb-2">{hint}</p>}
-      <div className={hint ? "" : "mt-2"}>{children}</div>
-    </section>
-  );
-}
 
 export function ThemeDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
   const navigate = useNavigate();
   const { year } = useYearCtx();
-  const [mode, setMode] = useState<TimeMode>({});
+  const [mode, setMode] = useState<TimelineMode>({});
 
   const view = useMemo(() => {
     if (!data) return null;
     const def = data.themes.themes[id];
     if (!def) return { def: null } as const;
     const y = year ?? latestYear(data.budget);
-    const unit = mode.perCapita ? " €/Kopf" : "";
-    const fmt = (v: number) => (mode.perCapita ? `${fmtEur(v)}${unit}` : fmtEur(v));
 
     const sankey = themeSankey(data, id, y);
-    const vwSeries = adjustSeries(themeYearSeries(data, id, "A", "verwaltung"), data.context, mode, y);
+    const vwSeries = themeYearSeries(data, id, "A", "verwaltung");
     const vwTop = topPosten(data, id, "A", y, 8, "verwaltung");
     const invest = investmentNet(data, id, y);
     const vmTotal = invest.reduce((s, x) => s + x.invest, 0);
@@ -67,14 +57,7 @@ export function ThemeDetail() {
     const events = gatherEvents(data, id);
 
     const sankeyOpt: EChartsOption = {
-      tooltip: {
-        trigger: "item",
-        formatter: (p: unknown) => {
-          const i = p as { dataType: string; name?: string; value?: number; data?: { source?: string; target?: string } };
-          if (i.dataType === "edge") return `${i.data?.source} → ${i.data?.target}<br/><b>${fmtEur(i.value!)}</b>`;
-          return `<b>${i.name}</b><br/>${fmtEur(i.value!)}`;
-        },
-      },
+      tooltip: { trigger: "item", formatter: sankeyTooltip },
       series: [
         {
           type: "sankey",
@@ -93,19 +76,6 @@ export function ThemeDetail() {
           label: { color: "#1c1c1c", fontSize: 11 },
           lineStyle: { color: "gradient", opacity: 0.4, curveness: 0.5 },
         },
-      ],
-    };
-
-    const timelineOpt: EChartsOption = {
-      color: [def.color, "#967a40"],
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : fmt(v as number)) },
-      legend: { bottom: 0 },
-      grid: { left: 64, right: 20, top: 16, bottom: 48 },
-      xAxis: { type: "category", data: vwSeries.years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? `${fmtEur(v)}${unit}` : fmtEurShort(v)) } },
-      series: [
-        { name: "Ansatz (Plan)", type: "line", data: vwSeries.ansatz, symbolSize: 7, lineStyle: { width: 3 }, connectNulls: true },
-        { name: "Ergebnis (Ist)", type: "line", data: vwSeries.ergebnis, symbol: "emptyCircle", symbolSize: 7, lineStyle: { width: 2, type: "dashed" }, connectNulls: true },
       ],
     };
 
@@ -145,8 +115,8 @@ export function ThemeDetail() {
       : null;
 
     const hasContext = !!(data.context.cpi || data.context.population);
-    return { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext };
-  }, [data, id, year, mode]);
+    return { def, y, sankey, sankeyOpt, vwSeries, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext };
+  }, [data, id, year]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
@@ -157,7 +127,7 @@ export function ThemeDetail() {
       </p>
     );
 
-  const { def, y, sankey, sankeyOpt, timelineOpt, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext } = view;
+  const { def, y, sankey, sankeyOpt, vwSeries, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext } = view;
   const sankeyHeight = Math.max(360, sankey.nodes.length * 26);
   const sankeyEvents = {
     click: (p: unknown) => {
@@ -207,33 +177,10 @@ export function ThemeDetail() {
         <div className="grid lg:grid-cols-2 gap-4">
           <Card
             title="Entwicklung der Ausgaben"
-            hint={
-              `Plan (Ansatz) gegen Ergebnis (Ist), 2018–${y}. Wert ${y} vorläufig.` +
-              (mode.real ? ` Inflationsbereinigt in Preisen von ${y}.` : "") +
-              (mode.perCapita ? " Je Einwohner." : "")
-            }
+            hint={`Plan (Ansatz) gegen Ergebnis (Ist), 2018–${y}. Wert ${y} vorläufig.` + (mode.real ? ` Inflationsbereinigt in Preisen von ${y}.` : "") + (mode.perCapita ? " Je Einwohner." : "")}
           >
-            {hasContext && (
-              <div className="flex flex-wrap gap-4 text-xs mb-1">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!mode.real}
-                    onChange={(e) => setMode((m) => ({ ...m, real: e.target.checked }))}
-                  />
-                  <span>inflationsbereinigt</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!mode.perCapita}
-                    onChange={(e) => setMode((m) => ({ ...m, perCapita: e.target.checked }))}
-                  />
-                  <span>je Einwohner</span>
-                </label>
-              </div>
-            )}
-            <EChart option={timelineOpt} style={{ height: 300 }} />
+            <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
+            <Timeline laufend={vwSeries} mode={mode} context={data!.context} baseYear={y} color={def.color} height={300} />
           </Card>
           <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y} — Klick öffnet den Posten`}>
             <ol className="space-y-1.5 text-sm">

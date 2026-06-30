@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { Chip } from "@/components/ui";
 import {
   useData,
   einrichtungInfo,
@@ -59,9 +60,7 @@ export function EinrichtungDetail() {
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-bold">{info.label}</h1>
         <div className="flex flex-wrap gap-2 pt-1">
-          <span className="rounded-md border border-ink-line bg-cream px-2.5 py-1 text-xs text-ink-soft">
-            Gliederung {info.glz}
-          </span>
+          <Chip>Gliederung {info.glz}</Chip>
           {info.themes.map((t) => (
             <Link key={t.theme} to={`/themen/${t.theme}`}>
               <span className="rounded-md px-2.5 py-1 text-xs text-white" style={{ background: data!.themes.themes[t.theme]?.color ?? "#999" }}>

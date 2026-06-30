@@ -1,56 +1,26 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { EChartsOption } from "echarts";
-import { EChart } from "@/components/EChart";
-import {
-  useData,
-  postenSeries,
-  postenCrumb,
-  adjustSeries,
-  eventsFor,
-  type TimeMode,
-} from "@/lib/data";
-import { fmtEur, fmtEurShort } from "@/lib/format";
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-md border border-ink-line bg-cream px-2.5 py-1 text-xs text-ink-soft">
-      {children}
-    </span>
-  );
-}
+import { useData, postenSeries, postenCrumb, eventsFor } from "@/lib/data";
+import { Chip } from "@/components/ui";
+import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 
 export function PostenDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimeMode>({});
+  const [mode, setMode] = useState<TimelineMode>({});
 
   const view = useMemo(() => {
     if (!data) return null;
     const p = data.budget.posten[id];
     if (!p) return { p: null } as const;
     const baseYear = Math.max(...data.budget.meta.years);
-    const unit = mode.perCapita ? " €/Kopf" : "";
-    const series = adjustSeries(postenSeries(data, id), data.context, mode, baseYear);
+    const series = postenSeries(data, id);
     const crumb = postenCrumb(data, p);
     const tags = data.themes.assignment[id] ?? [];
     const events = eventsFor(data, "hhst", id);
     const hasContext = !!(data.context.cpi || data.context.population);
-
-    const opt: EChartsOption = {
-      color: ["#c8102e", "#967a40"],
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : `${fmtEur(v as number)}${unit}`) },
-      legend: { bottom: 0 },
-      grid: { left: 64, right: 20, top: 16, bottom: 48 },
-      xAxis: { type: "category", data: series.years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? `${fmtEur(v)}${unit}` : fmtEurShort(v)) } },
-      series: [
-        { name: "Ansatz (Plan)", type: "line", data: series.ansatz, symbolSize: 7, lineStyle: { width: 3 }, connectNulls: true },
-        { name: "Ergebnis (Ist)", type: "line", data: series.ergebnis, symbol: "emptyCircle", symbolSize: 7, lineStyle: { width: 2, type: "dashed" }, connectNulls: true },
-      ],
-    };
-    return { p, opt, crumb, tags, events, hasContext, baseYear };
-  }, [data, id, mode]);
+    return { p, series, crumb, tags, events, hasContext, baseYear };
+  }, [data, id]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
@@ -61,7 +31,7 @@ export function PostenDetail() {
       </p>
     );
 
-  const { p, opt, crumb, tags, events, hasContext, baseYear } = view;
+  const { p, series, crumb, tags, events, hasContext, baseYear } = view;
 
   return (
     <div className="space-y-6">
@@ -98,19 +68,8 @@ export function PostenDetail() {
           <h2 className="font-display text-lg font-bold">Entwicklung über die Jahre</h2>
           <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Wert {baseYear} vorläufig.</span>
         </div>
-        {hasContext && (
-          <div className="flex flex-wrap gap-4 text-xs mb-1">
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input type="checkbox" checked={!!mode.real} onChange={(e) => setMode((m) => ({ ...m, real: e.target.checked }))} />
-              <span>inflationsbereinigt</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input type="checkbox" checked={!!mode.perCapita} onChange={(e) => setMode((m) => ({ ...m, perCapita: e.target.checked }))} />
-              <span>je Einwohner</span>
-            </label>
-          </div>
-        )}
-        <EChart option={opt} style={{ height: 320 }} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
+        <Timeline laufend={series} mode={mode} context={data!.context} baseYear={baseYear} height={320} />
       </section>
 
       {events.length > 0 && (
