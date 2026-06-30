@@ -16,8 +16,8 @@ export function Info() {
 
       <h2 className="font-display text-xl font-bold pt-2">Die Ebenen des Haushalts</h2>
       <p className="text-ink-soft">Von grob nach fein gliedert sich der Haushalt so:</p>
-      <div className="overflow-hidden rounded-lg border border-ink-line">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-lg border border-ink-line">
+        <table className="w-full min-w-[26rem] text-sm">
           <thead className="bg-cream-dark text-left">
             <tr>
               <th className="px-3 py-2 font-semibold">Ebene</th>

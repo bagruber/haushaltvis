@@ -167,7 +167,11 @@ export function ThemeDetail() {
           {sankey.links.length ? (
             <>
               <p className="text-xs text-ink-muted mb-1">Klick auf eine Einrichtung öffnet ihre Detailseite.</p>
-              <EChart option={sankeyOpt} onEvents={sankeyEvents} style={{ height: sankeyHeight }} />
+              <div className="overflow-x-auto">
+                <div className="min-w-[560px]">
+                  <EChart option={sankeyOpt} onEvents={sankeyEvents} style={{ height: sankeyHeight }} />
+                </div>
+              </div>
             </>
           ) : (
             <p className="text-sm text-ink-muted">Kein laufender Aufwand in diesem Thema.</p>

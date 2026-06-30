@@ -79,9 +79,15 @@ export function Erkunden() {
       )}
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
-        <p className="text-xs text-ink-muted mb-1">Interne Verrechnungen sind ausgeblendet.</p>
+        <p className="text-xs text-ink-muted mb-1">
+          Interne Verrechnungen sind ausgeblendet. <span className="md:hidden">Auf kleinen Bildschirmen seitlich scrollen.</span>
+        </p>
         {view ? (
-          <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts`} style={{ height }} />
+          <div className="overflow-x-auto">
+            <div className="min-w-[680px]">
+              <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts`} style={{ height }} />
+            </div>
+          </div>
         ) : (
           <div className="h-[560px] grid place-items-center text-ink-muted">Lade Daten …</div>
         )}

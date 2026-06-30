@@ -136,7 +136,8 @@ export function Investitionen() {
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
         <h2 className="font-display text-lg font-bold mb-2">Alle Investitionen</h2>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[32rem] text-sm">
           <thead className="text-left text-ink-muted border-b border-ink-line">
             <tr>
               <th className="py-1.5 font-medium">Vorhaben</th>
@@ -161,6 +162,7 @@ export function Investitionen() {
             ))}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );
