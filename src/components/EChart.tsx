@@ -1,6 +1,16 @@
 import { useEffect, useRef } from "react";
-import * as echarts from "echarts";
+import * as echarts from "echarts/core";
+import { BarChart, LineChart, SankeyChart, SunburstChart, TreemapChart } from "echarts/charts";
+import { TooltipComponent, LegendComponent, GridComponent, AriaComponent } from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
 import type { EChartsOption } from "echarts";
+
+// Register only what we actually use — keeps the bundle small.
+echarts.use([
+  BarChart, LineChart, SankeyChart, SunburstChart, TreemapChart,
+  TooltipComponent, LegendComponent, GridComponent, AriaComponent,
+  CanvasRenderer,
+]);
 
 interface Props {
   option: EChartsOption;
@@ -14,7 +24,7 @@ interface Props {
 /** Thin React wrapper around an ECharts instance — no peer-dep baggage. */
 export function EChart({ option, className, style, onEvents, ariaLabel }: Props) {
   const el = useRef<HTMLDivElement>(null);
-  const inst = useRef<echarts.ECharts | null>(null);
+  const inst = useRef<ReturnType<typeof echarts.init> | null>(null);
 
   useEffect(() => {
     if (!el.current) return;
