@@ -87,7 +87,7 @@ export function Erkunden() {
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
         <p className="text-xs text-ink-muted mb-1">Interne Verrechnungen sind ausgeblendet.</p>
         {view ? (
-          <EChart option={view.option} onEvents={onEvents} style={{ height }} />
+          <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts`} style={{ height }} />
         ) : (
           <div className="h-[560px] grid place-items-center text-ink-muted">Lade Daten …</div>
         )}

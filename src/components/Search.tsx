@@ -24,6 +24,7 @@ export function Search() {
         type="search"
         value={q}
         placeholder="Suchen…"
+        aria-label="Suche nach Themen, Einzelplänen und Einrichtungen"
         onChange={(e) => { setQ(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
         onBlur={() => { blurTimer.current = window.setTimeout(() => setOpen(false), 120); }}

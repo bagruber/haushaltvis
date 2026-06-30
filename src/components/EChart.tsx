@@ -7,10 +7,12 @@ interface Props {
   className?: string;
   style?: React.CSSProperties;
   onEvents?: Record<string, (params: unknown) => void>;
+  /** Accessible description of the chart for screen readers. */
+  ariaLabel?: string;
 }
 
 /** Thin React wrapper around an ECharts instance — no peer-dep baggage. */
-export function EChart({ option, className, style, onEvents }: Props) {
+export function EChart({ option, className, style, onEvents, ariaLabel }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const inst = useRef<echarts.ECharts | null>(null);
 
@@ -28,7 +30,8 @@ export function EChart({ option, className, style, onEvents }: Props) {
   }, []);
 
   useEffect(() => {
-    inst.current?.setOption(option, true);
+    // aria.enabled lets ECharts emit a generated description on the canvas.
+    inst.current?.setOption({ aria: { enabled: true }, ...option }, true);
   }, [option]);
 
   useEffect(() => {
@@ -40,5 +43,13 @@ export function EChart({ option, className, style, onEvents }: Props) {
     };
   }, [onEvents]);
 
-  return <div ref={el} className={className} style={{ width: "100%", height: 480, ...style }} />;
+  return (
+    <div
+      ref={el}
+      className={className}
+      role="img"
+      aria-label={ariaLabel ?? "Diagramm"}
+      style={{ width: "100%", height: 480, ...style }}
+    />
+  );
 }

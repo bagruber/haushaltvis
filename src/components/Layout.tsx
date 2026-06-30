@@ -11,13 +11,14 @@ export function Layout() {
   const showYear = YEAR_ROUTES.some((r) => (r === "/" ? pathname === "/" : pathname.startsWith(r)));
   return (
     <div className="min-h-screen flex flex-col">
+      <a href="#inhalt" className="skip-link">Zum Inhalt springen</a>
       <Header />
       {showYear && (
         <div className="sticky top-[57px] z-10">
           <YearBar />
         </div>
       )}
-      <main className="flex-1 mx-auto w-full max-w-6xl px-5 py-8">
+      <main id="inhalt" className="flex-1 mx-auto w-full max-w-6xl px-5 py-8">
         <Outlet />
       </main>
       <Footer />
