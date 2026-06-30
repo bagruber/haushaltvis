@@ -4,6 +4,7 @@ import { Home } from "./pages/Home";
 import { Erkunden } from "./pages/Erkunden";
 import { Einnahmen } from "./pages/Einnahmen";
 import { Investitionen } from "./pages/Investitionen";
+import { WofuerZahleIch } from "./pages/WofuerZahleIch";
 import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
 import { ThemeDetail } from "./pages/ThemeDetail";
@@ -21,6 +22,7 @@ export const router = createBrowserRouter(
         { path: "/erkunden", element: <Erkunden /> },
         { path: "/einnahmen", element: <Einnahmen /> },
         { path: "/investitionen", element: <Investitionen /> },
+        { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
         { path: "/geldfluss", element: <Navigate to="/erkunden" replace /> },
         { path: "/themen", element: <Themen /> },

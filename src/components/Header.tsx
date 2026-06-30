@@ -8,6 +8,7 @@ const links = [
   { to: "/einnahmen", label: "Einnahmen" },
   { to: "/investitionen", label: "Investitionen" },
   { to: "/themen", label: "Themen" },
+  { to: "/wofuer-zahle-ich", label: "Wofür zahle ich?" },
 ];
 
 export function Header() {

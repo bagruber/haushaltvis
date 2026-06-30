@@ -1266,3 +1266,41 @@ export function searchRank(items: SearchItem[], query: string, limit = 10): Sear
   }
   return scored.sort((a, b) => a.score - b.score).slice(0, limit).map((x) => x.it);
 }
+
+// ── "Wofür zahle ich?" — expense share by primary theme ─────────────────────
+
+export interface ThemeShare {
+  theme: string;
+  label: string;
+  color: string;
+  amount: number;
+  share: number;
+}
+
+/**
+ * Expense split as a true partition (each Posten counts to its PRIMARY theme
+ * only), so the shares sum to 100%. Internal transfers excluded. Drives the
+ * "Wofür zahle ich?" calculator.
+ */
+export function expenseShareByPrimaryTheme(data: Data, year: number): ThemeShare[] {
+  const acc = new Map<string, number>();
+  let total = 0;
+  for (const f of data.budget.facts) {
+    if (f.year !== year || f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "A" || isInternal(p)) continue;
+    const primary = data.themes.assignment[f.hhst_id]?.[0]?.theme ?? "verwaltung_finanzen";
+    acc.set(primary, (acc.get(primary) ?? 0) + f.ansatz);
+    total += f.ansatz;
+  }
+  return [...acc.entries()]
+    .map(([theme, amount]) => ({
+      theme,
+      label: data.themes.themes[theme]?.label ?? theme,
+      color: data.themes.themes[theme]?.color ?? "#999",
+      amount: Math.round(amount),
+      share: total ? amount / total : 0,
+    }))
+    .filter((x) => x.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+}
