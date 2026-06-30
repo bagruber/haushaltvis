@@ -80,12 +80,15 @@ Ein neuer Jahrgang: Excel ablegen → `npm run data` → committen.
 
 ```
 etl/             Python-Daten-Pipeline + editierbare YAMLs
-haushaltsplaene/ AKDB-Quell-Exporte (Excel/PDF)
+haushaltsplaene/ AKDB-Quell-Exporte (Excel/PDF) — lokal, NICHT im Repo
 public/data/     fertige JSONs für die Web-App
 src/lib/         Daten-Laden, Typen, Selektoren, Farben
 src/components/  Charts, Layout, Suche, Timeline, Glossar
 src/pages/       die Seiten/Routen
 ```
+
+Die Roh-Exporte unter `haushaltsplaene/` sind bewusst nicht eingecheckt; die
+fertig aufbereiteten Daten liegen in `public/data/` bzw. `data/processed/`.
 
 Deployment automatisch via GitHub Actions (`.github/workflows/deploy.yml`) bei
 Push auf `main`.

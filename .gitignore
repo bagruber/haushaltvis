@@ -4,3 +4,6 @@ dist
 .DS_Store
 __pycache__
 .vite
+
+# Roh-Haushaltsexporte der Stadt — bleiben lokal, nicht im Repo
+haushaltsplaene/
