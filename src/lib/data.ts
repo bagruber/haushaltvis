@@ -1269,37 +1269,49 @@ export function searchRank(items: SearchItem[], query: string, limit = 10): Sear
 
 // ── "Wofür zahle ich?" — expense share by primary theme ─────────────────────
 
-export interface ThemeShare {
-  theme: string;
+export interface ShareNode {
   label: string;
-  color: string;
   amount: number;
   share: number;
+}
+export interface ThemeShare extends ShareNode {
+  theme: string;
+  color: string;
+  /** one level deeper: Bereiche contributing to this theme (primary) */
+  children: ShareNode[];
 }
 
 /**
  * Expense split as a true partition (each Posten counts to its PRIMARY theme
- * only), so the shares sum to 100%. Internal transfers excluded. Drives the
- * "Wofür zahle ich?" calculator.
+ * only), so the shares sum to 100%. Each theme carries its Bereiche one level
+ * deeper. Internal transfers excluded. Drives the "Wofür zahle ich?" calculator.
  */
 export function expenseShareByPrimaryTheme(data: Data, year: number): ThemeShare[] {
-  const acc = new Map<string, number>();
+  const acc = new Map<string, { amount: number; bereiche: Map<string, number> }>();
   let total = 0;
   for (const f of data.budget.facts) {
     if (f.year !== year || f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "A" || isInternal(p)) continue;
     const primary = data.themes.assignment[f.hhst_id]?.[0]?.theme ?? "verwaltung_finanzen";
-    acc.set(primary, (acc.get(primary) ?? 0) + f.ansatz);
+    const t = acc.get(primary) ?? { amount: 0, bereiche: new Map() };
+    t.amount += f.ansatz;
+    const ab = p.glz.slice(0, 2);
+    t.bereiche.set(ab, (t.bereiche.get(ab) ?? 0) + f.ansatz);
+    acc.set(primary, t);
     total += f.ansatz;
   }
   return [...acc.entries()]
-    .map(([theme, amount]) => ({
+    .map(([theme, t]) => ({
       theme,
       label: data.themes.themes[theme]?.label ?? theme,
       color: data.themes.themes[theme]?.color ?? "#999",
-      amount: Math.round(amount),
-      share: total ? amount / total : 0,
+      amount: Math.round(t.amount),
+      share: total ? t.amount / total : 0,
+      children: [...t.bereiche.entries()]
+        .map(([ab, v]) => ({ label: abschnittName(data.labels, ab), amount: Math.round(v), share: total ? v / total : 0 }))
+        .filter((c) => c.amount > 0)
+        .sort((a, b) => b.amount - a.amount),
     }))
     .filter((x) => x.amount > 0)
     .sort((a, b) => b.amount - a.amount);
