@@ -28,27 +28,60 @@ export function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Segmented control: one of a small set of mutually exclusive options. */
-export function SegmentedToggle<T extends string>({ value, onChange, options }: {
+/**
+ * Segmented control: one of a small set of mutually exclusive options.
+ * Semantically a radiogroup (roving tabindex, arrow keys move the selection).
+ * Selected state is ink, not red — red stays reserved for brand + deficit cues.
+ */
+export function SegmentedToggle<T extends string>({ value, onChange, options, label }: {
   value: T;
   onChange: (v: T) => void;
   options: [T, string][];
+  label?: string;
 }) {
+  const move = (delta: number) => {
+    const i = options.findIndex(([k]) => k === value);
+    const next = options[(i + delta + options.length) % options.length];
+    if (next) onChange(next[0]);
+  };
   return (
-    <div className="inline-flex rounded-lg border border-ink-line bg-cream p-0.5 text-sm">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="inline-flex rounded-lg border border-ink-line bg-cream p-0.5 text-sm"
+    >
       {options.map(([k, lbl]) => (
         <button
           key={k}
+          role="radio"
+          aria-checked={value === k}
+          tabIndex={value === k ? 0 : -1}
           onClick={() => onChange(k)}
-          aria-pressed={value === k}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); move(1); }
+            if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+          }}
           className={
             "px-3 py-1 rounded-md transition-colors " +
-            (value === k ? "bg-red-600 text-cream" : "text-ink-soft hover:text-ink")
+            (value === k ? "bg-ink text-cream" : "text-ink-soft hover:text-ink")
           }
         >
           {lbl}
         </button>
       ))}
+    </div>
+  );
+}
+
+/** Loading placeholder: announced to screen readers, pulsing blocks for everyone else. */
+export function Loading({ height = 320 }: { height?: number }) {
+  return (
+    <div role="status" className="space-y-3" style={{ minHeight: height }}>
+      <span className="sr-only">Lade Daten …</span>
+      <div aria-hidden className="animate-pulse space-y-3">
+        <div className="h-6 w-1/3 rounded-md bg-cream-dark" />
+        <div className="rounded-xl bg-cream-dark" style={{ height: Math.max(120, height - 60) }} />
+      </div>
     </div>
   );
 }

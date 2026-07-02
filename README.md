@@ -54,6 +54,7 @@ npm install
 npm run dev        # Dev-Server auf http://localhost:5173
 npm run build      # Produktions-Build nach dist/
 npm run typecheck  # nur tsc, kein Build
+npm run test       # Konsistenz-Tests der Selektoren gegen die echten Daten
 npm run data       # Daten neu erzeugen (Python, siehe unten)
 ```
 
@@ -92,6 +93,19 @@ fertig aufbereiteten Daten liegen in `public/data/` bzw. `data/processed/`.
 
 Deployment automatisch via GitHub Actions (`.github/workflows/deploy.yml`) bei
 Push auf `main`.
+
+## Hosting-Portabilität & Doppik
+
+Die App ist ein rein statischer Build: `npm run build` erzeugt einen Ordner
+(`dist/`), der auf **jedem beliebigen Webspace** läuft — GitHub Pages ist nur
+der Prototyp-Standort. Für einen Umzug (z. B. auf städtisches Hosting) genügt
+es, in `vite.config.ts` das `base` anzupassen; Router und Datenpfade folgen
+automatisch. Es gibt keinen Server, keine Datenbank und keine externen Dienste
+(auch die Schriften sind eingebettet).
+
+Die Pipeline trennt Rohdaten → Klassifikation → Darstellung strikt. Eine
+spätere Umstellung der Stadt auf **Doppik** ersetzt nur die unterste Schicht
+(`etl/ingest.py`); Themen-Taxonomie und Frontend sind buchungslogik-agnostisch.
 
 ## Geschwister-Apps
 

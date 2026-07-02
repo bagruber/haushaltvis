@@ -25,7 +25,9 @@ themes:
     description: "Soziale Sicherung, Obdachlosenhilfe, sozialer Wohnungsbau, Stiftungen und Bestattung."
   sport_gesundheit:
     label: "Sport & Gesundheit"
-    color: "#0a9e4c"
+    # dunkler als das Umwelt-Lindgrün, damit die beiden Grüntöne auch bei
+    # Rot-Grün-Schwäche über die Helligkeit unterscheidbar bleiben
+    color: "#077a3c"
     description: "Bäder, Sportanlagen und Sportförderung."
   kultur_freizeit:
     label: "Freizeit & Kultur"
@@ -49,7 +51,8 @@ themes:
     description: "Öffentliche Ordnung, Feuerwehr, Katastrophenschutz sowie Sauberkeit (Reinigung)."
   wirtschaft:
     label: "Wirtschaft & Tourismus"
-    color: "#f5d400"
+    # abgedunkeltes Gelb: das frühere #f5d400 war auf weißem Grund kaum sichtbar
+    color: "#dfa801"
     description: "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Innenstadt/Stadtleben."
   verwaltung_finanzen:
     label: "Verwaltung & Finanzen"

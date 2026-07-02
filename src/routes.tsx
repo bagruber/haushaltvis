@@ -12,6 +12,7 @@ import { PostenDetail } from "./pages/PostenDetail";
 import { EinrichtungDetail } from "./pages/EinrichtungDetail";
 import { Info } from "./pages/Info";
 import { Methodik } from "./pages/Methodik";
+import { Impressum, Datenschutz, Barrierefreiheit } from "./pages/Rechtliches";
 
 export const router = createBrowserRouter(
   [
@@ -31,9 +32,14 @@ export const router = createBrowserRouter(
         { path: "/einrichtung/:glz", element: <EinrichtungDetail /> },
         { path: "/info", element: <Info /> },
         { path: "/methodik", element: <Methodik /> },
+        { path: "/impressum", element: <Impressum /> },
+        { path: "/datenschutz", element: <Datenschutz /> },
+        { path: "/barrierefreiheit", element: <Barrierefreiheit /> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],
     },
   ],
-  { basename: "/haushaltvis" },
+  // Follows Vite's `base`, so the app runs unchanged under any mount path
+  // (GitHub Pages today, städtisches Hosting später).
+  { basename: import.meta.env.BASE_URL.replace(/\/$/, "") },
 );

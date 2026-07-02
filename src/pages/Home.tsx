@@ -1,21 +1,39 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { PackedCircles } from "@/components/PackedCircles";
+import { ChartTable } from "@/components/ChartTable";
 import { useData, expenseTreemap, totals, latestYear, topMovers, type Haushalt, type TreeNode } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
-import { Stat, SegmentedToggle } from "@/components/ui";
+import { Stat, SegmentedToggle, Loading } from "@/components/ui";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 type Viz = "sunburst" | "circles" | "treemap";
+const VIZ_VALUES: Viz[] = ["sunburst", "circles", "treemap"];
 
 export function Home() {
   const { data, error } = useData();
   const navigate = useNavigate();
   const { year: selYear } = useYearCtx();
-  const [haushalt, setHaushalt] = useState<Haushalt>("verwaltung");
-  const [viz, setViz] = useState<Viz>("sunburst");
+
+  // View choices live in the URL so any state of the page is shareable.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const haushalt: Haushalt = searchParams.get("haushalt") === "vermoegen" ? "vermoegen" : "verwaltung";
+  const vizParam = searchParams.get("ansicht") as Viz | null;
+  const viz: Viz = vizParam && VIZ_VALUES.includes(vizParam) ? vizParam : "sunburst";
+  const setParam = (key: string, value: string, defaultValue: string) =>
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value === defaultValue) next.delete(key);
+        else next.set(key, value);
+        return next;
+      },
+      { replace: true, preventScrollReset: true },
+    );
+  const setHaushalt = (v: Haushalt) => setParam("haushalt", v, "verwaltung");
+  const setViz = (v: Viz) => setParam("ansicht", v, "sunburst");
 
   const { tree, year, t } = useMemo(() => {
     if (!data) return { tree: [] as TreeNode[], year: 0, t: { einnahmen: 0, ausgaben: 0 } };
@@ -112,11 +130,13 @@ export function Home() {
           </h2>
           <div className="flex flex-wrap items-center gap-2">
             <SegmentedToggle
+              label="Haushalt wählen"
               value={haushalt}
               onChange={setHaushalt}
               options={[["verwaltung", "Laufender Betrieb"], ["vermoegen", "Investitionen"]]}
             />
             <SegmentedToggle
+              label="Darstellung wählen"
               value={viz}
               onChange={setViz}
               options={[["sunburst", "Ringe"], ["circles", "Kreise"], ["treemap", "Kacheln"]]}
@@ -129,13 +149,20 @@ export function Home() {
             : "Klick auf eine Untergruppe öffnet die Themenseite; Klick auf ein Thema zoomt hinein."}
         </p>
         {!tree.length ? (
-          <div className="h-[560px] grid place-items-center text-ink-muted">Lade Daten …</div>
+          <Loading height={560} />
         ) : viz === "circles" ? (
           <PackedCircles data={tree} height={560} onThemeClick={(id) => navigate(`/themen/${id}`)} />
         ) : viz === "sunburst" ? (
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="lg:flex-1 min-w-0">
-              {option && <EChart option={option} onEvents={onEvents} style={{ height: 560 }} />}
+              {option && (
+                <EChart
+                  option={option}
+                  onEvents={onEvents}
+                  ariaLabel={`Ausgaben ${year} nach Themen — Zahlen in der Tabelle darunter`}
+                  style={{ height: 560 }}
+                />
+              )}
             </div>
             <ul className="lg:w-56 shrink-0 grid grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-1.5 self-center text-sm">
               {legend.map((l) => (
@@ -153,7 +180,23 @@ export function Home() {
             </ul>
           </div>
         ) : (
-          option && <EChart option={option} onEvents={onEvents} style={{ height: 560 }} />
+          option && (
+            <EChart
+              option={option}
+              onEvents={onEvents}
+              ariaLabel={`Ausgaben ${year} nach Themen — Zahlen in der Tabelle darunter`}
+              style={{ height: 560 }}
+            />
+          )
+        )}
+        {tree.length > 0 && (
+          <ChartTable
+            columns={["Thema", "Bereich", "Betrag"]}
+            rows={tree.flatMap((n) => [
+              [n.name, "gesamt", fmtEur(n.value)],
+              ...(n.children ?? []).map((c) => ["", c.name, fmtEur(c.value)]),
+            ])}
+          />
         )}
       </section>
 
@@ -170,7 +213,8 @@ export function Home() {
                     className="flex items-center gap-3 rounded-lg border border-ink-line bg-white px-4 py-3 shadow-soft hover:shadow-lift transition-shadow"
                   >
                     <span className="font-display text-lg font-bold tabular-nums shrink-0 text-ink">
-                      <span className="text-ink-muted">{up ? "▲" : "▼"}</span> {up ? "+" : "−"}
+                      <span className="text-ink-muted" aria-hidden>{up ? "▲" : "▼"}</span>
+                      <span className="sr-only">{up ? "gestiegen um" : "gesunken um"}</span> {up ? "+" : "−"}
                       {fmtEurShort(Math.abs(m.delta))}
                     </span>
                     <span className="min-w-0">

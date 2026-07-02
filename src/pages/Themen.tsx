@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { useData } from "@/lib/data";
+import { usePageTitle } from "@/lib/title";
 
 export function Themen() {
+  usePageTitle("Themen");
   const { data } = useData();
   return (
     <div className="space-y-6">

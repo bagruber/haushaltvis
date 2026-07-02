@@ -4,13 +4,16 @@ import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, investmentsAll, investmentStacked, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { usePageTitle } from "@/lib/title";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
-import { Stat } from "@/components/ui";
+import { Stat, Loading } from "@/components/ui";
+import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const TOP = 18;
 
 export function Investitionen() {
+  usePageTitle("Investitionen");
   const { data, error } = useData();
   const navigate = useNavigate();
 
@@ -77,7 +80,8 @@ export function Investitionen() {
       })),
     };
 
-    return { y, inv, top, option, stackedOpt };
+    const stackedTotals = stacked.years.map((_, i) => stacked.series.reduce((s, x) => s + (x.data[i] ?? 0), 0));
+    return { y, inv, top, option, stackedOpt, stackedYears: stacked.years, stackedTotals };
   }, [data, selYear]);
 
   const onEvents = useMemo(
@@ -92,7 +96,7 @@ export function Investitionen() {
   );
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
 
   const { y, inv } = view;
   const foerderquote = inv.totalInvest ? inv.totalFoerder / inv.totalInvest : 0;
@@ -119,11 +123,20 @@ export function Investitionen() {
           <h2 className="font-display text-lg font-bold">Investitionen über die Jahre</h2>
           <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Thema; größte Vorhaben einzeln</span>
         </div>
-        <EChart option={view.stackedOpt} style={{ height: 380 }} />
+        <EChart
+          option={view.stackedOpt}
+          ariaLabel="Investitionen über die Jahre, gestapelt nach Thema — Jahressummen in der Tabelle darunter"
+          style={{ height: 380 }}
+        />
         <p className="text-xs text-ink-muted mt-1">
           Jede Fläche ist ein Vorhaben (große einzeln, kleinere als „Sonstige · Thema" gebündelt).
           Mehrfach-Themen werden hier ihrem Hauptthema zugerechnet, damit die Summe stimmt.
         </p>
+        <ChartTable
+          summary="Jahressummen als Tabelle"
+          columns={["Jahr", "Summe Investitionen (Ansatz)"]}
+          rows={view.stackedYears.map((yy, i) => [String(yy), fmtEur(view.stackedTotals[i])])}
+        />
       </section>
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
@@ -131,7 +144,12 @@ export function Investitionen() {
           <h2 className="font-display text-lg font-bold">Größte Vorhaben {view.y}</h2>
           <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
         </div>
-        <EChart option={view.option} onEvents={onEvents} style={{ height: TOP * 30 + 60 }} />
+        <EChart
+          option={view.option}
+          onEvents={onEvents}
+          ariaLabel={`Größte Vorhaben ${view.y} mit Förderung und Netto-Eigenanteil — alle Zahlen in der Tabelle „Alle Investitionen" weiter unten`}
+          style={{ height: TOP * 30 + 60 }}
+        />
       </section>
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">

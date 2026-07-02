@@ -5,7 +5,10 @@ import { EChart } from "@/components/EChart";
 import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { useData, incomeByCategory, incomeCategorySeries, adjustSeries, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { usePageTitle } from "@/lib/title";
 import { shades, GOLD_BASE } from "@/lib/colors";
+import { ChartTable } from "@/components/ChartTable";
+import { Loading } from "@/components/ui";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
 const STEUERN: [string, string][] = [
@@ -17,6 +20,7 @@ const STEUERN: [string, string][] = [
 ];
 
 export function Einnahmen() {
+  usePageTitle("Einnahmen");
   const { data, error } = useData();
 
   const { year: selYear } = useYearCtx();
@@ -28,32 +32,35 @@ export function Einnahmen() {
 
     const years = data.budget.meta.years;
     const fmtY = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
+    const steuerSeries = STEUERN.map(([name]) => {
+      const s = adjustSeries(incomeCategorySeries(data, name), data.context, mode, y);
+      return { name, values: years.map((_, i) => s.ergebnis[i] ?? s.ansatz[i]) };
+    });
+    const fmtCell = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
+    const steuerRows = years.map((yy, i) => [String(yy), ...steuerSeries.map((s) => fmtCell(s.values[i]))]);
     const steuerOpt: EChartsOption = {
       tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
       legend: { bottom: 0, type: "scroll" },
       grid: { left: 66, right: 16, top: 12, bottom: 56 },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
-      series: STEUERN.map(([name, color]) => {
-        const s = adjustSeries(incomeCategorySeries(data, name), data.context, mode, y);
-        return {
-          name,
-          type: "line" as const,
-          data: years.map((_, i) => s.ergebnis[i] ?? s.ansatz[i]),
-          symbolSize: 6,
-          lineStyle: { width: 2.5 },
-          itemStyle: { color },
-          connectNulls: true,
-        };
-      }),
+      series: STEUERN.map(([name, color], si) => ({
+        name,
+        type: "line" as const,
+        data: steuerSeries[si].values,
+        symbolSize: 6,
+        lineStyle: { width: 2.5 },
+        itemStyle: { color },
+        connectNulls: true,
+      })),
     };
 
     const hasContext = !!(data.context.cpi || data.context.population);
-    return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen, steuerOpt, hasContext };
+    return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext };
   }, [data, selYear, mode]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
 
   return (
     <div className="space-y-6">
@@ -74,7 +81,8 @@ export function Einnahmen() {
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
-        <EChart option={view.steuerOpt} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen" style={{ height: 300 }} />
+        <EChart option={view.steuerOpt} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen — Zahlen in der Tabelle darunter" style={{ height: 300 }} />
+        <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>
 
       <div className="space-y-4">

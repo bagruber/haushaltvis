@@ -14,7 +14,9 @@ import {
   type BudgetEvent,
 } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
-import { Card } from "@/components/ui";
+import { usePageTitle } from "@/lib/title";
+import { Card, Loading } from "@/components/ui";
+import { ChartTable } from "@/components/ChartTable";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { sankeyTooltip } from "@/lib/charts";
 import { fmtEur, fmtEurShort } from "@/lib/format";
@@ -118,8 +120,10 @@ export function ThemeDetail() {
     return { def, y, sankey, sankeyOpt, vwSeries, vwTop, invest, investOpt, vmTotal, vmFoerder, events, hasContext };
   }, [data, id, year]);
 
+  usePageTitle(view && view.def ? view.def.label : undefined);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
   if (!view.def)
     return (
       <p className="text-ink-muted">
@@ -169,9 +173,19 @@ export function ThemeDetail() {
               <p className="text-xs text-ink-muted mb-1">Klick auf eine Einrichtung öffnet ihre Detailseite.</p>
               <div className="overflow-x-auto">
                 <div className="min-w-[560px]">
-                  <EChart option={sankeyOpt} onEvents={sankeyEvents} style={{ height: sankeyHeight }} />
+                  <EChart
+                    option={sankeyOpt}
+                    onEvents={sankeyEvents}
+                    ariaLabel={`Geldfluss ${def.label} ${y}: Einnahmequellen, Bereiche und Einrichtungen — Zahlen in der Tabelle darunter`}
+                    style={{ height: sankeyHeight }}
+                  />
                 </div>
               </div>
+              <ChartTable
+                summary="Geldfluss als Tabelle"
+                columns={["Von", "Nach", "Betrag"]}
+                rows={sankey.links.map((l) => [l.source.trim(), l.target.trim(), fmtEur(l.value)])}
+              />
             </>
           ) : (
             <p className="text-sm text-ink-muted">Kein laufender Aufwand in diesem Thema.</p>
@@ -213,7 +227,17 @@ export function ThemeDetail() {
             title="Was Investitionen netto kosten"
             hint={`Brutto-Investitionen ${fmtEurShort(vmTotal)}, davon durch Förderungen/Einnahmen gedeckt ${fmtEurShort(vmFoerder)}. Der farbige Teil bleibt an der Stadt hängen.`}
           >
-            {investOpt && <EChart option={investOpt} style={{ height: Math.max(280, invest.length * 36 + 80) }} />}
+            {investOpt && (
+              <EChart
+                option={investOpt}
+                ariaLabel={`Investitionen ${def.label} ${y} mit Förderung und Netto-Eigenanteil — Zahlen in der Tabelle darunter`}
+                style={{ height: Math.max(280, invest.length * 36 + 80) }}
+              />
+            )}
+            <ChartTable
+              columns={["Vorhaben", "Brutto", "Förderung", "Netto"]}
+              rows={invest.map((i) => [i.label, fmtEur(i.invest), fmtEur(i.foerderung), fmtEur(i.netto)])}
+            />
           </Card>
         </div>
       )}

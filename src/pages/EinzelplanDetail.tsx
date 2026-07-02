@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { usePageTitle } from "@/lib/title";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { Loading } from "@/components/ui";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -34,8 +36,10 @@ export function EinzelplanDetail() {
     };
   }, [data, ep, selYear]);
 
+  usePageTitle(view ? `Einzelplan ${ep} · ${view.name}` : undefined);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
   if (!/^[0-9]$/.test(ep))
     return <p className="text-ink-muted">Unbekannter Einzelplan. <Link className="text-red-600 underline" to="/erkunden">Zur Übersicht</Link></p>;
 

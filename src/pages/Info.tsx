@@ -1,4 +1,7 @@
+import { usePageTitle } from "@/lib/title";
+
 export function Info() {
+  usePageTitle("Über das Projekt");
   return (
     <div className="space-y-4 max-w-2xl">
       <h1 className="font-display text-3xl font-bold">Über dieses Projekt</h1>

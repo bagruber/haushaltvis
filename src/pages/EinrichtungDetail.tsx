@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
-import { Chip } from "@/components/ui";
+import { usePageTitle } from "@/lib/title";
+import { Chip, Loading } from "@/components/ui";
 import {
   useData,
   einrichtungInfo,
   einrichtungPosten,
   einrichtungSeries,
+  factsOfYear,
   latestYear,
 } from "@/lib/data";
 import { fmtEur } from "@/lib/format";
@@ -28,16 +30,18 @@ export function EinrichtungDetail() {
 
     // latest Ansatz per Posten for the list
     const latest = new Map<string, number>();
-    for (const f of data.budget.facts) {
-      if (f.year === y && f.ansatz != null) latest.set(f.hhst_id, f.ansatz);
+    for (const f of factsOfYear(data.budget, y)) {
+      if (f.ansatz != null) latest.set(f.hhst_id, f.ansatz);
     }
 
     const hasContext = !!(data.context.cpi || data.context.population);
     return { info, laufend, invest, hasInvest, posten, latest, y, hasContext };
-  }, [data, glz, mode]);
+  }, [data, glz]);
+
+  usePageTitle(view && view.info ? view.info.label : undefined);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
   if (!view.info)
     return (
       <p className="text-ink-muted">
@@ -53,7 +57,7 @@ export function EinrichtungDetail() {
     <div className="space-y-6">
       <nav className="text-sm text-ink-muted flex flex-wrap items-center gap-1.5">
         <Link to={`/einzelplan/${info.glz[0]}`} className="hover:text-ink underline-offset-2 hover:underline">{info.crumb.aufgabenbereich}</Link>
-        <span>›</span>
+        <span aria-hidden>›</span>
         <span className="text-ink-soft">{info.crumb.bereich}</span>
       </nav>
 

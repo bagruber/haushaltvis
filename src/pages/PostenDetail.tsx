@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, postenSeries, postenCrumb, eventsFor } from "@/lib/data";
-import { Chip } from "@/components/ui";
+import { usePageTitle } from "@/lib/title";
+import { Chip, Loading } from "@/components/ui";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 
 export function PostenDetail() {
@@ -22,8 +23,10 @@ export function PostenDetail() {
     return { p, series, crumb, tags, events, hasContext, baseYear };
   }, [data, id]);
 
+  usePageTitle(view && view.p ? view.p.grz_text ?? view.p.hhst_id : undefined);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
   if (!view.p)
     return (
       <p className="text-ink-muted">
@@ -37,9 +40,9 @@ export function PostenDetail() {
     <div className="space-y-6">
       <nav className="text-sm text-ink-muted flex flex-wrap items-center gap-1.5">
         <Link to={`/einzelplan/${p.einzelplan}`} className="hover:text-ink underline-offset-2 hover:underline">{crumb.aufgabenbereich}</Link>
-        <span>›</span>
+        <span aria-hidden>›</span>
         <span>{crumb.bereich}</span>
-        <span>›</span>
+        <span aria-hidden>›</span>
         <Link to={`/einrichtung/${p.glz}`} className="text-ink-soft hover:text-ink underline-offset-2 hover:underline">{crumb.einrichtung}</Link>
       </nav>
 

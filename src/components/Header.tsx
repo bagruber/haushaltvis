@@ -12,10 +12,12 @@ const links = [
   { to: "/wofuer-zahle-ich", label: "Wofür zahle ich?" },
 ];
 
+// Active state is ink, not red: in a finance UI red reads as "deficit",
+// so it stays reserved for the brand wordmark and true warning cues.
 function navClass({ isActive }: { isActive: boolean }) {
   return cn(
     "px-3 py-1.5 rounded-md transition-colors",
-    isActive ? "bg-red-600 text-cream" : "text-ink-soft hover:bg-cream-dark hover:text-ink",
+    isActive ? "bg-ink text-cream" : "text-ink-soft hover:bg-cream-dark hover:text-ink",
   );
 }
 

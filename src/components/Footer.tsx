@@ -7,6 +7,9 @@ export function Footer() {
         <nav className="flex flex-wrap gap-4">
           <Link to="/info" className="hover:text-ink">Über das Projekt</Link>
           <Link to="/methodik" className="hover:text-ink">Methodik & Daten</Link>
+          <Link to="/barrierefreiheit" className="hover:text-ink">Barrierefreiheit</Link>
+          <Link to="/impressum" className="hover:text-ink">Impressum</Link>
+          <Link to="/datenschutz" className="hover:text-ink">Datenschutz</Link>
         </nav>
         <p>
           Haushalt der Stadt Moosburg an der Isar — bürgerschaftliches Transparenzprojekt,

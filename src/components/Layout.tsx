@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { YearBar } from "./YearBar";
+import { YearUrlSync } from "@/lib/year";
 
 // Routes whose main content reacts to the global Stichjahr.
 const YEAR_ROUTES = ["/", "/erkunden", "/einnahmen", "/investitionen", "/themen/", "/einzelplan/", "/wofuer-zahle-ich"];
@@ -12,6 +13,7 @@ export function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <a href="#inhalt" className="skip-link">Zum Inhalt springen</a>
+      <YearUrlSync />
       <Header />
       {showYear && (
         <div className="sticky top-[57px] z-10">

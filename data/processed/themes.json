@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-06-30T00:27:54",
+  "generated": "2026-07-02T01:02:34",
   "n_posten": 3960,
   "n_themes": 11,
   "multi_tagged": 495
@@ -23,7 +23,7 @@
   },
   "sport_gesundheit": {
    "label": "Sport & Gesundheit",
-   "color": "#0a9e4c",
+   "color": "#077a3c",
    "description": "Bäder, Sportanlagen und Sportförderung."
   },
   "kultur_freizeit": {
@@ -53,7 +53,7 @@
   },
   "wirtschaft": {
    "label": "Wirtschaft & Tourismus",
-   "color": "#f5d400",
+   "color": "#dfa801",
    "description": "Wirtschaftsförderung, Öffentlichkeitsarbeit, Märkte und Innenstadt/Stadtleben."
   },
   "verwaltung_finanzen": {

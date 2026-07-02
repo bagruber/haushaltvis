@@ -4,10 +4,14 @@ import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, kameralBothSidesTree, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { usePageTitle } from "@/lib/title";
 import { sankeyTooltip } from "@/lib/charts";
-import { fmtEurShort } from "@/lib/format";
+import { ChartTable } from "@/components/ChartTable";
+import { Loading } from "@/components/ui";
+import { fmtEur, fmtEurShort } from "@/lib/format";
 
 export function Erkunden() {
+  usePageTitle("Haushalt erkunden");
   const { data, error } = useData();
   const navigate = useNavigate();
   const { year: selYear } = useYearCtx();
@@ -83,13 +87,22 @@ export function Erkunden() {
           Interne Verrechnungen sind ausgeblendet. <span className="md:hidden">Auf kleinen Bildschirmen seitlich scrollen.</span>
         </p>
         {view ? (
-          <div className="overflow-x-auto">
-            <div className="min-w-[680px]">
-              <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts`} style={{ height }} />
+          <>
+            <div className="overflow-x-auto">
+              <div className="min-w-[680px]">
+                <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts — Zahlen in der Tabelle darunter`} style={{ height }} />
+              </div>
             </div>
-          </div>
+            <ChartTable
+              columns={["Seite", "Kategorie", "Betrag"]}
+              rows={view.tree.links.map((l) => {
+                const isIncome = l.target.startsWith("Haushalt ");
+                return [isIncome ? "Einnahmen" : "Ausgaben", (isIncome ? l.source : l.target).trim(), fmtEur(l.value)];
+              })}
+            />
+          </>
         ) : (
-          <div className="h-[560px] grid place-items-center text-ink-muted">Lade Daten …</div>
+          <Loading height={560} />
         )}
       </section>
     </div>

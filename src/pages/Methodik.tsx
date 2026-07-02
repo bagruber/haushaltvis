@@ -1,6 +1,8 @@
 import { Term } from "@/components/Term";
+import { usePageTitle } from "@/lib/title";
 
 export function Methodik() {
+  usePageTitle("Methodik & Datengrundlage");
   return (
     <div className="space-y-6 max-w-2xl">
       <h1 className="font-display text-3xl font-bold">Methodik & Datengrundlage</h1>

@@ -1,5 +1,5 @@
 import type { Budget, Data, Posten, EA, Haushalt, ThemeTag, BudgetEvent, EventScope, Context } from "./types";
-import { abschnittName, groupLabel } from "./core";
+import { abschnittName, groupLabel, factsOfYear, factsOfHhst, postenOfGlz } from "./core";
 import { shades, GOLD_BASE, ZUSCHUSS_RED, EINZELPLAN_COLORS } from "../colors";
 
 
@@ -22,8 +22,8 @@ export function expenseTreemap(data: Data, year: number, haushalt?: Haushalt): T
   const { budget, themes } = data;
   // theme -> abschnitt -> amount
   const acc = new Map<string, Map<string, number>>();
-  for (const f of budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(budget, year)) {
+    if (f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== "A") continue;
     if (haushalt && p.haushalt !== haushalt) continue;
@@ -72,8 +72,8 @@ export interface Totals {
 export function totals(b: Budget, year: number): Totals {
   let einnahmen = 0;
   let ausgaben = 0;
-  for (const f of b.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(b, year)) {
+    if (f.ansatz == null) continue;
     const p = b.posten[f.hhst_id];
     if (!p) continue;
     if (p.ea === "E") einnahmen += f.ansatz;
@@ -186,8 +186,8 @@ export function breakdownByAbschnitt(
 ): NamedAmount[] {
   const { budget, themes } = data;
   const acc = new Map<string, number>();
-  for (const f of budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(budget, year)) {
+    if (f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== ea) continue;
     const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
@@ -212,8 +212,8 @@ export function topPosten(
 ): NamedAmount[] {
   const { budget, themes } = data;
   const out: NamedAmount[] = [];
-  for (const f of budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(budget, year)) {
+    if (f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.ea !== ea) continue;
     if (haushalt && p.haushalt !== haushalt) continue;
@@ -291,8 +291,8 @@ export function incomeSources(
   haushalt?: Haushalt,
 ): NamedAmount[] {
   const acc = new Map<string, number>();
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "E") continue;
     if (haushalt && p.haushalt !== haushalt) continue;
@@ -314,8 +314,8 @@ export function expenseThemes(
   haushalt?: Haushalt,
 ): NamedAmount[] {
   const acc = new Map<string, number>();
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "A") continue;
     if (haushalt && p.haushalt !== haushalt) continue;
@@ -344,8 +344,7 @@ export function postenSeries(data: Data, hhst: string): YearSeries {
   const a = new Map<number, number>();
   const e = new Map<number, number>();
   const provisional = new Set<number>();
-  for (const f of data.budget.facts) {
-    if (f.hhst_id !== hhst) continue;
+  for (const f of factsOfHhst(data.budget, hhst)) {
     if (f.ansatz != null) a.set(f.year, f.ansatz);
     if (f.ergebnis != null) {
       e.set(f.year, f.ergebnis);
@@ -393,11 +392,8 @@ export interface Mover {
 export function topMovers(data: Data, fromYear: number, toYear: number, limit = 8): Mover[] {
   const prev = new Map<string, number>();
   const cur = new Map<string, number>();
-  for (const f of data.budget.facts) {
-    if (f.ansatz == null) continue;
-    if (f.year === fromYear) prev.set(f.hhst_id, f.ansatz);
-    if (f.year === toYear) cur.set(f.hhst_id, f.ansatz);
-  }
+  for (const f of factsOfYear(data.budget, fromYear)) if (f.ansatz != null) prev.set(f.hhst_id, f.ansatz);
+  for (const f of factsOfYear(data.budget, toYear)) if (f.ansatz != null) cur.set(f.hhst_id, f.ansatz);
   const out: Mover[] = [];
   for (const id of new Set([...prev.keys(), ...cur.keys()])) {
     const p = data.budget.posten[id];
@@ -422,8 +418,7 @@ export function topMovers(data: Data, fromYear: number, toYear: number, limit = 
 
 /** All Posten (Haushaltsstellen) belonging to one Gliederung (Einrichtung). */
 export function einrichtungPosten(data: Data, glz: string): Posten[] {
-  return Object.values(data.budget.posten)
-    .filter((p) => p.glz === glz)
+  return [...postenOfGlz(data.budget, glz)]
     .sort((a, b) => (a.ea === b.ea ? a.grz.localeCompare(b.grz) : a.ea === "A" ? -1 : 1));
 }
 
@@ -509,6 +504,23 @@ const ZUSCHUSS = "Zuschuss aus allg. Haushalt";
 const MAX_LEAVES = 7; // per Bereich, before collapsing the tail into "Weitere"
 
 /**
+ * Node collector shared by the Sankey builders: ECharts identifies nodes by
+ * name, so duplicate display names get invisibly padded to stay unique.
+ */
+function sankeyNodeSet() {
+  const nodes: SankeyNode[] = [];
+  const used = new Set<string>();
+  const add = (name: string, color: string, depth: number, labelPos?: "left" | "right"): string => {
+    let n = name;
+    while (used.has(n)) n += " ";
+    used.add(n);
+    nodes.push({ name: n, itemStyle: { color }, depth, ...(labelPos ? { label: { position: labelPos } } : {}) });
+    return n;
+  };
+  return { nodes, add };
+}
+
+/**
  * Verwaltungshaushalt money flow for one theme, one year:
  *   [income sources + Zuschuss] → [theme hub] → [Bereich] → [Einrichtung].
  * Income can't be attributed to individual Posten, so it pools at the hub; the
@@ -527,8 +539,8 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   const bereiche = new Map<string, { total: number; leaves: Map<string, { label: string; value: number }> }>();
   let totalEx = 0;
 
-  for (const f of budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(budget, year)) {
+    if (f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.haushalt !== "verwaltung") continue;
     const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
@@ -566,18 +578,10 @@ export function themeSankey(data: Data, themeId: string, year: number): SankeyDa
   const totalIn = [...income.values()].reduce((s, v) => s + v, 0);
   const zuschuss = Math.max(0, totalEx - totalIn);
 
-  const nodes: SankeyNode[] = [];
+  const { nodes, add: addNode } = sankeyNodeSet();
   const links: SankeyLink[] = [];
   const nav: Record<string, string> = {};
-  const used = new Set<string>();
   const themeColor = def?.color ?? "#999";
-  const addNode = (name: string, color: string, depth: number): string => {
-    let n = name;
-    while (used.has(n)) n += " ";
-    used.add(n);
-    nodes.push({ name: n, itemStyle: { color }, depth });
-    return n;
-  };
 
   // Income and Zuschuss share the left column (depth 0) so the red cross-subsidy
   // band doesn't cross the income column; it's set apart by colour + top position.
@@ -655,8 +659,8 @@ export function investmentNet(data: Data, themeId: string, year: number, limit =
   const foerder = new Map<string, number>();
   const label = new Map<string, string>();
 
-  for (const f of budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(budget, year)) {
+    if (f.ansatz == null) continue;
     const p = budget.posten[f.hhst_id];
     if (!p || p.haushalt !== "vermoegen") continue;
     if (isInternal(p) || isFinancing(p)) continue;
@@ -713,8 +717,8 @@ export function kameralExpenseTree(
 ): KameralTree {
   const eps = new Map<string, { total: number; name: string; bereiche: Map<string, number> }>();
   let total = 0;
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "A") continue;
     if (haushalt && p.haushalt !== haushalt) continue;
@@ -726,17 +730,9 @@ export function kameralExpenseTree(
   }
 
   const ROOT = "Gesamtausgaben";
-  const nodes: SankeyNode[] = [];
+  const { nodes, add: addNode } = sankeyNodeSet();
   const links: SankeyLink[] = [];
   const nav: Record<string, string> = {};
-  const used = new Set<string>();
-  const addNode = (name: string, color: string, depth: number): string => {
-    let n = name;
-    while (used.has(n)) n += " ";
-    used.add(n);
-    nodes.push({ name: n, itemStyle: { color }, depth });
-    return n;
-  };
 
   addNode(ROOT, "#a8a193", 0);
   for (const ep of EINZELPLAN_ORDER) {
@@ -785,8 +781,8 @@ export function einzelplanSections(
   haushalt?: Haushalt,
 ): BereichSection[] {
   const bereiche = new Map<string, Map<string, { label: string; value: number }>>();
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "A" || p.einzelplan !== ep) continue;
     if (haushalt && p.haushalt !== haushalt) continue;
@@ -798,7 +794,7 @@ export function einzelplanSections(
     inner.set(p.glz, cur);
   }
   const themeOf = (glz: string): string[] => {
-    const hh = Object.values(data.budget.posten).find((p) => p.glz === glz);
+    const hh = postenOfGlz(data.budget, glz)[0];
     if (!hh) return [];
     return (data.themes.assignment[hh.hhst_id] ?? []).map((t) => t.theme);
   };
@@ -831,8 +827,8 @@ export function kameralBothSidesTree(data: Data, year: number): KameralTree {
   const inc = new Map<string, number>();
   let totEx = 0;
   let totIn = 0;
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || isInternal(p)) continue;
     if (p.ea === "A") {
@@ -847,17 +843,9 @@ export function kameralBothSidesTree(data: Data, year: number): KameralTree {
     }
   }
 
-  const nodes: SankeyNode[] = [];
+  const { nodes, add } = sankeyNodeSet();
   const links: SankeyLink[] = [];
   const nav: Record<string, string> = {};
-  const used = new Set<string>();
-  const add = (name: string, color: string, depth: number, labelPos?: "left" | "right"): string => {
-    let n = name;
-    while (used.has(n)) n += " ";
-    used.add(n);
-    nodes.push({ name: n, itemStyle: { color }, depth, ...(labelPos ? { label: { position: labelPos } } : {}) });
-    return n;
-  };
 
   // Bidirectional: Einnahmearten (left, depth 0) → Haushalt (center, depth 1)
   // → Einzelpläne (right, depth 2). A residual balances the two sides so the
@@ -902,8 +890,8 @@ export interface IncomeGroup {
 /** Einnahmen grouped into laien categories, each with its biggest Posten. */
 export function incomeByCategory(data: Data, year: number, hideInternal = true): IncomeGroup[] {
   const groups = new Map<string, { value: number; posten: Map<string, { label: string; value: number }> }>();
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "E") continue;
     if (hideInternal && isInternal(p)) continue;
@@ -953,8 +941,8 @@ export function investmentsAll(data: Data, year: number): InvestmentsAll {
   const label = new Map<string, string>();
   const ep = new Map<string, string>();
 
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.haushalt !== "vermoegen") continue;
     if (isInternal(p) || isFinancing(p)) continue;
@@ -1134,8 +1122,8 @@ export interface ThemeShare extends ShareNode {
 export function expenseShareByPrimaryTheme(data: Data, year: number): ThemeShare[] {
   const acc = new Map<string, { amount: number; bereiche: Map<string, number> }>();
   let total = 0;
-  for (const f of data.budget.facts) {
-    if (f.year !== year || f.ansatz == null) continue;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.ea !== "A" || isInternal(p)) continue;
     const primary = data.themes.assignment[f.hhst_id]?.[0]?.theme ?? "verwaltung_finanzen";

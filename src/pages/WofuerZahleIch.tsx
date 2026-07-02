@@ -1,13 +1,22 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useData, expenseShareByPrimaryTheme, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { usePageTitle } from "@/lib/title";
 import { Term } from "@/components/Term";
+import { Loading } from "@/components/ui";
 import { fmtEur, fmtEurFine } from "@/lib/format";
 
 // Kommunaler Anteil je Steuerart (vereinfacht).
 const ANTEIL_EST = 0.15; // Gemeindeanteil an der Einkommensteuer
 const ANTEIL_GRUNDSTEUER = 1.0; // Grundsteuer B: vollständig kommunal
+
+// Grobe Beispielwerte zum Einstieg — wer seine Zahlen kennt, tippt sie ein.
+const PRESETS: { label: string; est: number; grund: number }[] = [
+  { label: "Single, zur Miete", est: 5000, grund: 0 },
+  { label: "Familie im Eigenheim", est: 7500, grund: 450 },
+  { label: "Rente, Eigentumswohnung", est: 800, grund: 300 },
+];
 
 function NumberField({ id, label, hint, value, onChange }: {
   id: string; label: React.ReactNode; hint: string; value: number; onChange: (v: number) => void;
@@ -34,11 +43,33 @@ function NumberField({ id, label, hint, value, onChange }: {
 }
 
 export function WofuerZahleIch() {
+  usePageTitle("Wofür zahle ich?");
   const { data, error } = useData();
   const { year: selYear } = useYearCtx();
-  const [est, setEst] = useState(4000);
-  const [grund, setGrund] = useState(400);
   const [open, setOpen] = useState<Set<string>>(new Set());
+
+  // Inputs live in the URL, so a filled-in calculator can be shared as a link.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const readAmount = (key: string, fallback: number) => {
+    const raw = searchParams.get(key);
+    if (raw == null) return fallback;
+    const v = Number(raw);
+    return Number.isFinite(v) && v >= 0 ? v : fallback;
+  };
+  const est = readAmount("est", 4000);
+  const grund = readAmount("grundsteuer", 400);
+  const setAmounts = (nextEst: number, nextGrund: number) =>
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("est", String(nextEst));
+        next.set("grundsteuer", String(nextGrund));
+        return next;
+      },
+      { replace: true, preventScrollReset: true },
+    );
+  const setEst = (v: number) => setAmounts(v, grund);
+  const setGrund = (v: number) => setAmounts(est, v);
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -49,7 +80,7 @@ export function WofuerZahleIch() {
   }, [data, selYear, est, grund]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
-  if (!view) return <p className="text-ink-muted">Lade Daten …</p>;
+  if (!view) return <Loading />;
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -63,6 +94,18 @@ export function WofuerZahleIch() {
       </header>
 
       <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-ink-muted">Beispiele:</span>
+          {PRESETS.map((p) => (
+            <button
+              key={p.label}
+              onClick={() => setAmounts(p.est, p.grund)}
+              className="rounded-md border border-ink-line bg-cream px-2.5 py-1 text-xs text-ink-soft hover:bg-cream-dark hover:text-ink transition-colors"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-5">
           <NumberField
             id="est"
@@ -99,7 +142,7 @@ export function WofuerZahleIch() {
                   className="w-full grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-left"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-ink-muted text-xs w-3 shrink-0">{isOpen ? "▾" : "▸"}</span>
+                    <span className="text-ink-muted text-xs w-3 shrink-0" aria-hidden>{isOpen ? "▾" : "▸"}</span>
                     <span className="inline-block h-3 w-3 rounded-sm shrink-0" style={{ background: s.color }} />
                     <span className="truncate font-medium">{s.label}</span>
                   </div>
