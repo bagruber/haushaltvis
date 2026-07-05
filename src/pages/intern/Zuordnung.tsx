@@ -17,7 +17,7 @@ interface PostenNode { hhst: string; grz: string; label: string; amount: number 
 interface GlzNode { glz: string; label: string; amount: number; posten: PostenNode[] }
 interface EpNode { ep: string; name: string; amount: number; glzs: GlzNode[] }
 
-interface Meta { chip: string; amount: number; isPosten: boolean; postenCount: number }
+interface Meta { code: string; name: string; amount: number; isPosten: boolean; postenCount: number }
 
 function build(data: Data) {
   const y = latestYear(data.budget);
@@ -41,7 +41,7 @@ function build(data: Data) {
     const grz = p.grz;
     const label = (p.grz_text ?? grz).replace(/\s+/g, " ").trim();
     g.posten.push({ hhst: p.hhst_id, grz, label, amount: a });
-    meta.set(p.hhst_id, { chip: `${grz} ${label}`, amount: a, isPosten: true, postenCount: 0 });
+    meta.set(p.hhst_id, { code: p.hhst_id, name: label, amount: a, isPosten: true, postenCount: 0 });
     g.amount += a;
     ep.amount += a;
   }
@@ -51,7 +51,7 @@ function build(data: Data) {
     ep.glzs.sort((a, b) => a.glz.localeCompare(b.glz));
     for (const g of ep.glzs) {
       g.posten.sort((a, b) => a.grz.localeCompare(b.grz));
-      meta.set(g.glz, { chip: `${g.glz} ${g.label}`, amount: g.amount, isPosten: false, postenCount: g.posten.length });
+      meta.set(g.glz, { code: g.glz, name: g.label, amount: g.amount, isPosten: false, postenCount: g.posten.length });
     }
   }
   return { tree, meta };
@@ -106,7 +106,8 @@ export default function Zuordnung() {
     e.dataTransfer.setData("text/plain", id);
     e.dataTransfer.effectAllowed = "copy";
     const ghost = document.createElement("div");
-    ghost.textContent = meta.get(id)?.chip ?? id;
+    const gm = meta.get(id);
+    ghost.textContent = gm ? `${gm.code} ${gm.name}` : id;
     ghost.style.cssText = "position:absolute;top:-1000px;left:-1000px;max-width:280px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:4px 10px;border-radius:9999px;background:#1c1c1c;color:#faf7f2;font:600 12px Inter,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25)";
     document.body.appendChild(ghost);
     e.dataTransfer.setDragImage(ghost, 12, 12);
@@ -130,7 +131,7 @@ export default function Zuordnung() {
         style={{ paddingLeft: depth * 14 + 6 }}
         title="Ziehen auf ein Thema — oder anklicken und dann Thema wählen">
         <span className="shrink-0 tabular-nums text-xs text-ink-muted w-14">{code}</span>
-        <span className="flex-1 min-w-0 truncate text-sm">{label}</span>
+        <span className="flex-1 min-w-0 truncate text-sm" title={label}>{label}</span>
         <span className="flex gap-0.5 shrink-0">{own.map((t) => dot(t))}{inh.map((t) => dot(t, true))}</span>
         <span className="w-16 shrink-0 text-right tabular-nums text-xs text-ink-muted">{amount ? fmtEurShort(amount) : ""}</span>
       </div>
@@ -184,8 +185,13 @@ export default function Zuordnung() {
                   if (view === "ua") {
                     return show(g.glz, g.label) ? <Row key={g.glz} id={g.glz} code={g.glz} label={g.label} amount={g.amount} depth={1} /> : null;
                   }
-                  // posten view: Unterabschnitt as header, posten draggable with inheritance
-                  const visiblePosten = g.posten.filter((p) => show(p.hhst, p.label));
+                  // posten view: Unterabschnitt as header, posten draggable with inheritance.
+                  // "nur unzugeordnete" also hides posten that inherit from the Unterabschnitt.
+                  const visiblePosten = g.posten.filter((p) => {
+                    if (q && !hit(p.hhst, p.label)) return false;
+                    if (onlyOpen && ((assign[p.hhst]?.length ?? 0) + gAssigned.length > 0)) return false;
+                    return true;
+                  });
                   if (!visiblePosten.length && !(q && hit(g.glz, g.label))) return null;
                   const gOpen = expanded.has(g.glz) || !!q;
                   return (
@@ -229,10 +235,12 @@ export default function Zuordnung() {
                 {(byTheme[tid] ?? []).map((id) => {
                   const m = meta.get(id);
                   return (
-                    <span key={id} className={"inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs " + (m?.isPosten ? "bg-cream-dark" : "bg-gold-200/60 font-medium")}>
-                      <span className="max-w-[16rem] truncate">{m?.chip ?? id}</span>
-                      {!m?.isPosten && m?.postenCount ? <span className="text-ink-muted">·{m.postenCount}P</span> : null}
-                      <button onClick={(e) => { e.stopPropagation(); remove(id, tid); }} className="text-ink-muted hover:text-red-600" aria-label="Entfernen">✕</button>
+                    <span key={id} title={m ? `${m.code} · ${m.name}` : id}
+                      className={"inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs " + (m?.isPosten ? "bg-cream-dark" : "bg-gold-200/60 font-medium")}>
+                      <span className="tabular-nums shrink-0">{m?.code ?? id}</span>
+                      <span className="max-w-[9rem] truncate text-ink-soft">{m?.name}</span>
+                      {!m?.isPosten && m?.postenCount ? <span className="text-ink-muted shrink-0">·{m.postenCount}P</span> : null}
+                      <button onClick={(e) => { e.stopPropagation(); remove(id, tid); }} className="text-ink-muted hover:text-red-600 shrink-0" aria-label="Entfernen">✕</button>
                     </span>
                   );
                 })}
