@@ -1,5 +1,10 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { Loading } from "./components/ui";
+
+// Temporäres internes Werkzeug — lazy, damit es die Bürger-App nicht aufbläht.
+const Zuordnung = lazy(() => import("./pages/intern/Zuordnung"));
 import { Home } from "./pages/Home";
 import { Erkunden } from "./pages/Erkunden";
 import { Einnahmen } from "./pages/Einnahmen";
@@ -35,6 +40,7 @@ export const router = createBrowserRouter(
         { path: "/impressum", element: <Impressum /> },
         { path: "/datenschutz", element: <Datenschutz /> },
         { path: "/barrierefreiheit", element: <Barrierefreiheit /> },
+        { path: "/intern/zuordnung", element: <Suspense fallback={<Loading />}><Zuordnung /></Suspense> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],
     },
