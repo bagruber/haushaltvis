@@ -77,6 +77,15 @@ Von Hand pflegbar (kein Code nötig): `etl/taxonomy.yaml` (Themen + Zuordnung),
 `etl/einleitungen.yaml` (Einzelplan-Texte), `etl/glossar.yaml`, `etl/events.yaml`.
 Ein neuer Jahrgang: Excel ablegen → `npm run data` → committen.
 
+## Einmal bauen, dann Dateien tauschen
+
+Die App lädt ihre Daten zur Laufzeit aus `data/*.json` — nichts ist ins
+JavaScript eingebacken. Ein einmal gebauter Ordner (`dist/`) kann daher
+**ohne neuen Build aktualisiert** werden, indem man die Dateien in `data/`
+ersetzt: die Rohdaten (`budget.json`) und die thematische Zuordnung
+(`zuordnung.json`, Export des Werkzeugs `/intern/zuordnung`, gewinnt über die
+Standard-Zuordnung). Schema und Ablauf: **[DATENFORMAT.md](DATENFORMAT.md)**.
+
 ## Projektstruktur
 
 ```

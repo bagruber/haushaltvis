@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Budget, Data, Fact, Labels, Posten, Themes, BudgetEvent, Context } from "./types";
+import type { Budget, Data, Fact, Labels, Posten, Themes, ThemeTag, BudgetEvent, Context } from "./types";
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
 const base = import.meta.env.BASE_URL;
@@ -13,35 +13,60 @@ function required<T>(path: string): Promise<T> {
   });
 }
 
+/** Optional file: missing/broken → the provided empty default (never an error). */
+function optional<T>(path: string, empty: T): Promise<T> {
+  return fetch(`${base}${path}`).then((r) => (r.ok ? (r.json() as Promise<T>) : empty)).catch(() => empty);
+}
+
+/**
+ * Export shape of the classification tool (/intern/zuordnung). Drop this file in
+ * as data/zuordnung.json and the app adopts it at runtime — no build needed.
+ */
+export interface Zuordnung {
+  unterabschnitt?: { verwaltung?: Record<string, string[]>; vermoegen?: Record<string, string[]> };
+  posten?: Record<string, string[]>;
+}
+
+function zuordnungHasContent(z: Zuordnung): boolean {
+  const ua = z.unterabschnitt ?? {};
+  return Object.keys(ua.verwaltung ?? {}).length > 0 || Object.keys(ua.vermoegen ?? {}).length > 0 || Object.keys(z.posten ?? {}).length > 0;
+}
+
+/**
+ * Resolve per-Posten themes from a swapped-in Zuordnung: each Posten gets the
+ * union of its own (hhst) tags and its Unterabschnitt (glz) tags for its Haushalt.
+ */
+function resolveAssignment(budget: Budget, z: Zuordnung): Record<string, ThemeTag[]> {
+  const ua = z.unterabschnitt ?? {};
+  const posten = z.posten ?? {};
+  const out: Record<string, ThemeTag[]> = {};
+  for (const p of Object.values(budget.posten)) {
+    const level = p.haushalt === "vermoegen" ? ua.vermoegen : ua.verwaltung;
+    const set = new Set<string>([...(level?.[p.glz] ?? []), ...(posten[p.hhst_id] ?? [])]);
+    if (set.size) out[p.hhst_id] = [...set].map((theme) => ({ theme, weight: 1 }));
+  }
+  return out;
+}
+
 export function loadData(): Promise<Data> {
   if (!cache) {
     cache = Promise.all([
       required<Budget>("data/budget.json"),
       required<Themes>("data/themes.json"),
-      fetch(`${base}data/events.json`)
-        .then((r) => (r.ok ? (r.json() as Promise<{ events: BudgetEvent[] }>) : { events: [] }))
-        .catch(() => ({ events: [] })),
-      fetch(`${base}data/labels.json`)
-        .then((r) => (r.ok ? (r.json() as Promise<Labels>) : {}))
-        .catch(() => ({}) as Labels),
-      fetch(`${base}data/context.json`)
-        .then((r) => (r.ok ? (r.json() as Promise<Context>) : {}))
-        .catch(() => ({}) as Context),
-      fetch(`${base}data/einleitungen.json`)
-        .then((r) => (r.ok ? (r.json() as Promise<Record<string, string>>) : {}))
-        .catch(() => ({}) as Record<string, string>),
-      fetch(`${base}data/glossar.json`)
-        .then((r) => (r.ok ? (r.json() as Promise<Record<string, string>>) : {}))
-        .catch(() => ({}) as Record<string, string>),
-    ]).then(([budget, themes, ev, labels, context, einleitungen, glossar]) => ({
-      budget,
-      themes,
-      events: ev.events ?? [],
-      labels,
-      context,
-      einleitungen,
-      glossar,
-    }));
+      optional<{ events: BudgetEvent[] }>("data/events.json", { events: [] }),
+      optional<Labels>("data/labels.json", {}),
+      optional<Context>("data/context.json", {}),
+      optional<Record<string, string>>("data/einleitungen.json", {}),
+      optional<Record<string, string>>("data/glossar.json", {}),
+      optional<Zuordnung>("data/zuordnung.json", {}),
+    ]).then(([budget, themes, ev, labels, context, einleitungen, glossar, zuordnung]) => {
+      // A dropped-in Zuordnung (from the tool) wins over the baked assignment.
+      const merged: Themes =
+        zuordnungHasContent(zuordnung)
+          ? { ...themes, assignment: resolveAssignment(budget, zuordnung) }
+          : themes;
+      return { budget, themes: merged, events: ev.events ?? [], labels, context, einleitungen, glossar };
+    });
   }
   return cache;
 }

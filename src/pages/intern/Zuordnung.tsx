@@ -145,6 +145,11 @@ export default function Zuordnung() {
           Ein zugeordneter Unterabschnitt gilt implizit für seine Posten <i>im gewählten Haushalt</i> (○ = geerbt).
           Mehrfachzuordnung möglich. Änderungen bleiben nur in <b>diesem Browser</b> — mit <b>Export</b> sichern.
         </p>
+        <p className="text-xs text-ink-muted max-w-3xl">
+          Übernahme ohne Neubau: <b>Export JSON</b> → Datei als <code>zuordnung.json</code> in den
+          Ordner <code>data/</code> der veröffentlichten App legen → beim nächsten Laden übernimmt die
+          App die Zuordnung automatisch.
+        </p>
       </header>
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -284,7 +289,7 @@ function splitAssign(assign: Assign) {
 function exportJson(assign: Assign) {
   const { ua, posten } = splitAssign(assign);
   const out = { generated: new Date().toISOString(), unterabschnitt: { verwaltung: ua.vw, vermoegen: ua.vm }, posten };
-  download("themen-zuordnung.json", JSON.stringify(out, null, 2), "application/json");
+  download("zuordnung.json", JSON.stringify(out, null, 2), "application/json");
 }
 function exportYaml(assign: Assign) {
   const { ua, posten } = splitAssign(assign);
