@@ -3,7 +3,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useData, expenseShareByPrimaryTheme, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Term } from "@/components/Term";
 import { Loading } from "@/components/ui";
 import { fmtEur, fmtEurFine } from "@/lib/format";
 
@@ -87,7 +86,7 @@ export function WofuerZahleIch() {
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-bold">Wofür zahle ich?</h1>
         <p className="text-ink-soft">
-          Gib deine jährliche <Term name="ansatz">Einkommensteuer</Term> und Grundsteuer ein —
+          Gib deine jährliche Einkommensteuer und Grundsteuer ein —
           der Rechner schätzt deinen <b>kommunalen Beitrag</b> und zeigt, wie die Stadt ihn
           (anteilig zu ihren Gesamtausgaben {view.y}) auf die Themen verteilt.
         </p>

@@ -145,8 +145,14 @@ def main():
     )
     print(f"einleitungen.json -> {len(einl)} Texte")
 
-    glos = yaml.safe_load(GLOSSAR_YAML.read_text(encoding="utf-8")) if GLOSSAR_YAML.exists() else {}
-    glos = {k: " ".join(str(v).split()) for k, v in (glos or {}).items()}
+    raw = yaml.safe_load(GLOSSAR_YAML.read_text(encoding="utf-8")) if GLOSSAR_YAML.exists() else {}
+    glos = {}
+    for k, v in (raw or {}).items():
+        if isinstance(v, dict):
+            glos[k] = {"title": " ".join(str(v.get("title", k)).split()),
+                       "text": " ".join(str(v.get("text", "")).split())}
+        else:  # legacy: plain string
+            glos[k] = {"title": k, "text": " ".join(str(v).split())}
     (DST / "glossar.json").write_text(
         json.dumps(glos, ensure_ascii=False, separators=(",", ":")),
         encoding="utf-8",

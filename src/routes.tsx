@@ -17,6 +17,7 @@ import { PostenDetail } from "./pages/PostenDetail";
 import { EinrichtungDetail } from "./pages/EinrichtungDetail";
 import { Info } from "./pages/Info";
 import { Methodik } from "./pages/Methodik";
+import { Glossar } from "./pages/Glossar";
 import { Impressum, Datenschutz, Barrierefreiheit } from "./pages/Rechtliches";
 
 const routes = [
@@ -36,6 +37,7 @@ const routes = [
         { path: "/einrichtung/:glz", element: <EinrichtungDetail /> },
         { path: "/info", element: <Info /> },
         { path: "/methodik", element: <Methodik /> },
+        { path: "/glossar", element: <Glossar /> },
         { path: "/impressum", element: <Impressum /> },
         { path: "/datenschutz", element: <Datenschutz /> },
         { path: "/barrierefreiheit", element: <Barrierefreiheit /> },

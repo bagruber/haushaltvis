@@ -7,6 +7,7 @@ export function Footer() {
         <nav className="flex flex-wrap gap-4">
           <Link to="/info" className="hover:text-ink">Über das Projekt</Link>
           <Link to="/methodik" className="hover:text-ink">Methodik & Daten</Link>
+          <Link to="/glossar" className="hover:text-ink">Glossar</Link>
           <Link to="/barrierefreiheit" className="hover:text-ink">Barrierefreiheit</Link>
           <Link to="/impressum" className="hover:text-ink">Impressum</Link>
           <Link to="/datenschutz" className="hover:text-ink">Datenschutz</Link>
@@ -18,7 +19,7 @@ export function Footer() {
           vereinzelt Fehler enthalten.
         </p>
         <p>
-          Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2018–2024. Werte 2024 vorläufig.
+          Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2016–2026. Werte des laufenden Jahres vorläufig.
         </p>
       </div>
     </footer>

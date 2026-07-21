@@ -22,9 +22,9 @@ export function Methodik() {
         <h2 className="font-display text-xl font-bold">Woher die Daten stammen</h2>
         <p className="text-ink-soft">
           Grundlage sind die <Term name="kameralistik">kameralen</Term> Haushaltspläne der
-          Stadt Moosburg. Erfasst sind die Jahre 2018–2024, jeweils mit{" "}
+          Stadt Moosburg. Erfasst sind die Jahre 2016–2026, jeweils mit{" "}
           <Term name="ansatz">Ansatz</Term> (Plan) und — soweit vorhanden —{" "}
-          <Term name="ergebnis">Ergebnis</Term> (Ist). Die Werte für 2024 sind vorläufig.
+          <Term name="ergebnis">Ergebnis</Term> (Ist). Die Werte des laufenden Jahres sind vorläufig.
         </p>
       </section>
 

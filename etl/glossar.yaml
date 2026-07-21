@@ -1,44 +1,133 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Glossar — Kurzdefinitionen für Fachbegriffe (als Tooltips im Frontend).
-# Schlüssel = kebab-case-id, die im Code via <Term name="..."> referenziert wird.
-# Nach Änderung: python etl/build_web.py
+# Glossar — Fachbegriffe der Kameralistik & kommunaler Haushalte.
+# Jeder Eintrag: title (Anzeige) + text (Kurzerklärung, auch als Tooltip).
+# Schlüssel = kebab-case-id, im Code via <Term name="…"> referenziert und als
+# Anker auf der Glossar-Seite (/glossar#id). Nach Änderung: python etl/build_web.py
 # ─────────────────────────────────────────────────────────────────────────────
 
-ansatz: >
-  Der für ein Jahr geplante Betrag (Soll). Wird vor Jahresbeginn im Haushaltsplan
-  beschlossen.
-ergebnis: >
-  Der tatsächlich verbuchte Betrag (Ist) eines Jahres. Steht erst ein bis zwei
-  Jahre später fest.
-verwaltungshaushalt: >
-  Das laufende Tagesgeschäft der Stadt — Personal, Betrieb, Zuschüsse. Wird über
-  laufende Einnahmen wie Steuern und Gebühren finanziert.
-vermoegenshaushalt: >
-  Die Investitionen — Bau, Grundstücke, Anschaffungen. Wird über Förderungen,
-  Verkäufe, Rücklagen und Kredite finanziert. Von Jahr zu Jahr sehr unterschiedlich.
-einzelplan: >
-  Oberste Gliederungsebene des Haushalts (0–9), z. B. „2 Schulen" oder
-  „6 Bau und Verkehr".
-unterabschnitt: >
-  Eine benannte Einheit innerhalb eines Einzelplans — eine konkrete Einrichtung
-  oder Aufgabe, z. B. „Freibad" oder „Stadtbücherei".
-haushaltsstelle: >
-  Der einzelne Buchungsposten (Gliederung + Gruppierung), z. B. „Beamtenbezüge"
-  einer bestimmten Schule.
-schluesselzuweisung: >
-  Allgemeine Geldzuweisung des Freistaats an finanzschwächere Gemeinden im
-  kommunalen Finanzausgleich.
-kreisumlage: >
-  Abgabe der Stadt an den Landkreis zur Finanzierung von dessen Aufgaben — eine
-  der größten Ausgaben im Verwaltungshaushalt.
-gewerbesteuerumlage: >
-  Teil der Gewerbesteuer, den die Stadt an Land und Bund weiterreicht.
-zuschuss-aus-allg-haushalt: >
-  Der Betrag, den ein Bereich mehr ausgibt als er an eigenen Einnahmen erzielt —
-  gedeckt aus allgemeinen Haushaltsmitteln (v. a. Steuern).
-interne-verrechnung: >
-  Buchungen zwischen städtischen Stellen (z. B. Leistungen des Bauhofs) oder
-  zwischen den beiden Haushalten. Sie sind ausgeblendet, da sie sonst doppelt zählen.
-kameralistik: >
-  Das traditionelle, einnahmen-/ausgabenorientierte Rechnungssystem bayerischer
-  Kommunen, nach dem dieser Haushalt aufgebaut ist.
+ansatz:
+  title: "Ansatz"
+  text: >
+    Der für ein Jahr geplante Betrag (das „Soll"), der vor Jahresbeginn im
+    Haushaltsplan beschlossen wird.
+ergebnis:
+  title: "Ergebnis (Ist)"
+  text: >
+    Der tatsächlich verbuchte Betrag eines Jahres (das „Ist"). Steht endgültig
+    erst mit dem Jahresabschluss fest; das laufende Jahr ist daher vorläufig.
+verwaltungshaushalt:
+  title: "Verwaltungshaushalt"
+  text: >
+    Das laufende Tagesgeschäft der Stadt — Personal, Betrieb, Zuschüsse —,
+    finanziert aus laufenden Einnahmen wie Steuern und Gebühren.
+vermoegenshaushalt:
+  title: "Vermögenshaushalt"
+  text: >
+    Die Investitionen — Bau, Grundstücke, Anschaffungen —, finanziert aus
+    Förderungen, Verkäufen, Rücklagen und Krediten. Von Jahr zu Jahr sehr
+    unterschiedlich.
+einzelplan:
+  title: "Einzelplan"
+  text: >
+    Oberste Gliederungsebene des Haushalts (0–9), grob nach Aufgabenbereich —
+    z. B. „2 Schulen" oder „6 Bau und Verkehr".
+abschnitt:
+  title: "Abschnitt"
+  text: >
+    Zweite Gliederungsebene innerhalb eines Einzelplans (zweistellig), z. B.
+    „21 Grundschulen".
+unterabschnitt:
+  title: "Unterabschnitt"
+  text: >
+    Feinere kamerale Gliederungsebene. In dieser App steht der Begriff für die
+    benannte Einheit bzw. Einrichtung, z. B. „Freibad" oder „Stadtbücherei".
+gliederung:
+  title: "Gliederung (GLZ)"
+  text: >
+    Die Nummer, die angibt, WOFÜR Geld ausgegeben oder eingenommen wird
+    (Aufgabe/Einrichtung). Zusammen mit der Gruppierung ergibt sie die
+    Haushaltsstelle.
+gruppierung:
+  title: "Gruppierung (GRZ)"
+  text: >
+    Die Nummer, die die ART der Einnahme oder Ausgabe angibt — z. B.
+    Personalausgaben, Sachkosten, Steuereinnahmen.
+haushaltsstelle:
+  title: "Haushaltsstelle"
+  text: >
+    Der einzelne Buchungsposten = Gliederung + Gruppierung, z. B. die
+    Beamtenbezüge einer bestimmten Schule.
+hauptgruppe:
+  title: "Hauptgruppe"
+  text: >
+    Die erste Ziffer der Gruppierung. Sie bestimmt, ob es sich um eine Einnahme
+    oder Ausgabe handelt und ob sie zum Verwaltungs- oder Vermögenshaushalt gehört.
+schluesselzuweisung:
+  title: "Schlüsselzuweisung"
+  text: >
+    Allgemeine Zuweisung des Freistaats an finanzschwächere Gemeinden im
+    kommunalen Finanzausgleich.
+finanzausgleich:
+  title: "Kommunaler Finanzausgleich"
+  text: >
+    Das Ausgleichssystem zwischen Land und Kommunen — u. a. über
+    Schlüsselzuweisungen und Umlagen.
+kreisumlage:
+  title: "Kreisumlage"
+  text: >
+    Abgabe der Stadt an den Landkreis zur Finanzierung von dessen Aufgaben — eine
+    der größten Ausgaben im Verwaltungshaushalt.
+gewerbesteuerumlage:
+  title: "Gewerbesteuerumlage"
+  text: >
+    Der Teil der Gewerbesteuer, den die Stadt an Land und Bund abführt.
+zufuehrung:
+  title: "Zuführung"
+  text: >
+    Übertrag vom Verwaltungs- an den Vermögenshaushalt: Überschüsse aus dem
+    laufenden Betrieb finanzieren Investitionen.
+ruecklage:
+  title: "Rücklage"
+  text: >
+    Angesparte Mittel der Stadt. Eine Entnahme finanziert Investitionen, eine
+    Zuführung spart an.
+schuldendienst:
+  title: "Schuldendienst"
+  text: >
+    Zinsen und Tilgung für aufgenommene Kredite.
+zuschuss-aus-allg-haushalt:
+  title: "Zuschuss aus allgemeinem Haushalt"
+  text: >
+    Der Betrag, den ein Bereich mehr ausgibt, als er an eigenen Einnahmen erzielt
+    — gedeckt aus allgemeinen Haushaltsmitteln, vor allem Steuern.
+interne-verrechnung:
+  title: "Interne Verrechnung"
+  text: >
+    Buchung zwischen städtischen Stellen (z. B. Leistungen des Bauhofs) oder
+    zwischen den beiden Haushalten. In Übersichten ausgeblendet, da sie sonst
+    doppelt zählt.
+freiwillige-leistung:
+  title: "Freiwillige Leistung"
+  text: >
+    Eine Ausgabe, zu der die Stadt gesetzlich nicht verpflichtet ist (z. B.
+    Kultur- oder Sportförderung) — im Gegensatz zur Pflichtaufgabe.
+pflichtaufgabe:
+  title: "Pflichtaufgabe"
+  text: >
+    Eine Aufgabe, die die Stadt von Gesetzes wegen erfüllen muss (z. B. Schulen,
+    Feuerwehr, Kinderbetreuung).
+kameralistik:
+  title: "Kameralistik"
+  text: >
+    Das traditionelle, an Einnahmen und Ausgaben orientierte Rechnungssystem
+    bayerischer Kommunen, nach dem dieser Haushalt aufgebaut ist.
+doppik:
+  title: "Doppik"
+  text: >
+    Die kaufmännische doppelte Buchführung, die die Kameralistik in vielen
+    Kommunen ablöst.
+haushaltsausgleich:
+  title: "Haushaltsausgleich"
+  text: >
+    Der Grundsatz, dass Einnahmen und Ausgaben je Haushalt gleich hoch sein
+    müssen — der Haushalt geht also immer „auf".

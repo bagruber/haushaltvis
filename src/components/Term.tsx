@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useData } from "@/lib/data";
 
 /**
- * Inline glossary term: dotted-underlined text that reveals its definition on
- * hover/focus. Unknown ids just render their children plainly.
+ * Inline glossary term: dotted-underlined text that reveals a short definition
+ * on hover/focus, plus a link to the full glossary entry. Unknown ids render
+ * their children plainly.
  */
 export function Term({ name, children }: { name: string; children: React.ReactNode }) {
   const { data } = useData();
   const [open, setOpen] = useState(false);
-  const def = data?.glossar?.[name];
-  if (!def) return <>{children}</>;
+  const entry = data?.glossar?.[name];
+  if (!entry) return <>{children}</>;
   return (
     <span
       className="relative cursor-help underline decoration-dotted decoration-ink-muted underline-offset-2"
@@ -25,7 +27,10 @@ export function Term({ name, children }: { name: string; children: React.ReactNo
           role="tooltip"
           className="absolute left-0 bottom-full z-30 mb-1 w-64 rounded-lg border border-ink-line bg-white p-3 text-xs font-normal leading-snug text-ink-soft shadow-lift"
         >
-          {def}
+          {entry.text}
+          <Link to={`/glossar#${name}`} className="mt-1.5 block text-red-600 hover:underline">
+            Im Glossar nachschlagen →
+          </Link>
         </span>
       )}
     </span>

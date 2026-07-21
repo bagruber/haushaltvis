@@ -57,7 +57,7 @@ export function loadData(): Promise<Data> {
       optional<Labels>("data/labels.json", {}),
       optional<Context>("data/context.json", {}),
       optional<Record<string, string>>("data/einleitungen.json", {}),
-      optional<Record<string, string>>("data/glossar.json", {}),
+      optional<Record<string, import("./types").GlossarEntry>>("data/glossar.json", {}),
       optional<Zuordnung>("data/zuordnung.json", {}),
     ]).then(([budget, themes, ev, labels, context, einleitungen, glossar, zuordnung]) => {
       // A dropped-in Zuordnung (from the tool) wins over the baked assignment.

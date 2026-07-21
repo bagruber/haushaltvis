@@ -65,6 +65,11 @@ export interface Context {
   cpi?: Record<string, number>;
 }
 
+export interface GlossarEntry {
+  title: string;
+  text: string;
+}
+
 export interface Data {
   budget: Budget;
   themes: Themes;
@@ -73,6 +78,6 @@ export interface Data {
   context: Context;
   /** editorial intro texts, keyed e.g. "ep:2" (Einzelplan) or "ab:21" (Bereich) */
   einleitungen: Record<string, string>;
-  /** glossary term id → definition */
-  glossar: Record<string, string>;
+  /** glossary term id → { title, text } */
+  glossar: Record<string, GlossarEntry>;
 }
