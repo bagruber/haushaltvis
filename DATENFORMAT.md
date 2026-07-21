@@ -104,7 +104,12 @@ nach `data/` legen → fertig (kein Build).
 - **`data/labels.json`** — `{ abschnitt: { "21": "Schulen" }, unterabschnitt: { … } }`
   saubere Namen für Bereiche.
 - **`data/einleitungen.json`** — `{ "ep:2": "Einleitungstext …" }` je Einzelplan.
-- **`data/glossar.json`** — `{ "ansatz": "Definition …" }`.
+- **`data/glossar.json`** — `{ "ansatz": { "title": "Ansatz", "text": "Definition …" } }`
+  (Fachbegriffe für Tooltips und die Glossar-Seite).
+- **`data/aggregatoren.json`** — Querschnitts-Kostenblöcke (Personal, Bauen, Strom,
+  Wasser), je `{ title, art, kriterium, beschreibung, hhst: [...], reihe: { "2024":
+  {ansatz, ergebnis, prov} } }`. Wird von `build_web.py` aus `etl/aggregatoren.yaml`
+  berechnet — dort lassen sich Kriterien und Stichwortlisten pflegen.
 - **`data/events.json`** — `{ "events": [ { scope, id, year, title, text } ] }`.
 
 Alle diese Dateien lassen sich einzeln austauschen; die App lädt sie tolerant

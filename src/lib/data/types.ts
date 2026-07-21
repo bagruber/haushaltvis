@@ -70,6 +70,19 @@ export interface GlossarEntry {
   text: string;
 }
 
+/** A cross-cutting cost block (etl/aggregatoren.yaml → aggregatoren.json). */
+export interface Aggregator {
+  title: string;
+  /** "struktur" = exact from Gruppierungsplan, "stichwort" = keyword heuristic */
+  art: "struktur" | "stichwort" | string;
+  kriterium: string;
+  beschreibung: string;
+  /** member Haushaltsstellen (for the auditable drilldown) */
+  hhst: string[];
+  /** per-year sums, keyed by year string */
+  reihe: Record<string, { ansatz: number; ergebnis: number; prov: boolean }>;
+}
+
 export interface Data {
   budget: Budget;
   themes: Themes;
@@ -80,4 +93,6 @@ export interface Data {
   einleitungen: Record<string, string>;
   /** glossary term id → { title, text } */
   glossar: Record<string, GlossarEntry>;
+  /** cross-cutting cost blocks, keyed by aggregator id */
+  aggregatoren: Record<string, Aggregator>;
 }

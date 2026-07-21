@@ -23,6 +23,7 @@ LABELS_YAML = ROOT / "etl/labels.yaml"
 CONTEXT_YAML = ROOT / "etl/context.yaml"
 EINLEITUNGEN_YAML = ROOT / "etl/einleitungen.yaml"
 GLOSSAR_YAML = ROOT / "etl/glossar.yaml"
+AGGREGATOREN_YAML = ROOT / "etl/aggregatoren.yaml"
 
 # Threshold for auto-derived "Posten neu/aufgegeben" events (in €, peak value).
 AUTO_EVENT_MIN = 200_000
@@ -87,6 +88,62 @@ def derive_events(budget: dict) -> list[dict]:
             continue
         kept_count[(ab, direction)] += 1
         out.append(ev)
+    return out
+
+
+def _agg_match(p: dict, rule: dict) -> bool:
+    """True if posten p satisfies every rule field (AND-combined)."""
+    if "ea" in rule and p["ea"] != rule["ea"]:
+        return False
+    if "haushalt" in rule and p["haushalt"] != rule["haushalt"]:
+        return False
+    if "grz_hauptgruppe" in rule and p["grz"][:1] != rule["grz_hauptgruppe"]:
+        return False
+    if "grz_prefix" in rule and p["grz"][:2] not in rule["grz_prefix"]:
+        return False
+    if "stichworte" in rule:
+        # Match on the cost nature (Gruppierungs-/Kontotext), not the facility
+        # (Gliederungstext) — otherwise a "Wasserversorgung" Einrichtung would
+        # pull in its personnel etc.
+        text = " ".join(filter(None, [p.get("grz_text"), p.get("kontotext")])).lower()
+        if not any(s.lower() in text for s in rule["stichworte"]):
+            return False
+    return True
+
+
+def build_aggregatoren(budget: dict) -> dict:
+    """Cross-cutting cost blocks: members + per-year Ansatz/Ergebnis sums."""
+    if not AGGREGATOREN_YAML.exists():
+        return {}
+    spec = yaml.safe_load(AGGREGATOREN_YAML.read_text(encoding="utf-8")) or {}
+    posten = budget["posten"]
+    facts_by_hhst: dict[str, list[dict]] = defaultdict(list)
+    for f in budget["facts"]:
+        facts_by_hhst[f["hhst_id"]].append(f)
+
+    out = {}
+    meta_keys = ("title", "art", "kriterium", "beschreibung")
+    for key, rule in spec.items():
+        members = sorted(h for h, p in posten.items() if _agg_match(p, rule))
+        reihe: dict[str, dict] = {}
+        for h in members:
+            for f in facts_by_hhst.get(h, []):
+                y = str(f["year"])
+                r = reihe.setdefault(y, {"ansatz": 0.0, "ergebnis": 0.0, "prov": False})
+                if f.get("ansatz") is not None:
+                    r["ansatz"] += f["ansatz"]
+                if f.get("ergebnis") is not None:
+                    r["ergebnis"] += f["ergebnis"]
+                if f.get("provisional"):
+                    r["prov"] = True
+        out[key] = {
+            **{k: (" ".join(str(rule[k]).split()) if k in rule else "") for k in meta_keys},
+            "hhst": members,
+            "reihe": {y: {"ansatz": round(v["ansatz"], 2),
+                          "ergebnis": round(v["ergebnis"], 2),
+                          "prov": v["prov"]}
+                      for y, v in sorted(reihe.items())},
+        }
     return out
 
 
@@ -158,6 +215,14 @@ def main():
         encoding="utf-8",
     )
     print(f"glossar.json   -> {len(glos)} Begriffe")
+
+    agg = build_aggregatoren(budget)
+    (DST / "aggregatoren.json").write_text(
+        json.dumps(agg, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    print("aggregatoren.json -> " + ", ".join(
+        f"{k}={len(v['hhst'])}" for k, v in agg.items()))
 
 
 if __name__ == "__main__":

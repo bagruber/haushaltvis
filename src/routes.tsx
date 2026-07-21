@@ -6,9 +6,11 @@ import { Loading } from "./components/ui";
 // Temporäres internes Werkzeug — lazy, damit es die Bürger-App nicht aufbläht.
 const Zuordnung = lazy(() => import("./pages/intern/Zuordnung"));
 import { Home } from "./pages/Home";
+import { ErkundenLayout } from "./pages/ErkundenLayout";
 import { Erkunden } from "./pages/Erkunden";
 import { Einnahmen } from "./pages/Einnahmen";
 import { Investitionen } from "./pages/Investitionen";
+import { Querschnitte } from "./pages/Querschnitte";
 import { WofuerZahleIch } from "./pages/WofuerZahleIch";
 import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
@@ -25,12 +27,21 @@ const routes = [
       element: <Layout />,
       children: [
         { path: "/", element: <Home /> },
-        { path: "/erkunden", element: <Erkunden /> },
-        { path: "/einnahmen", element: <Einnahmen /> },
-        { path: "/investitionen", element: <Investitionen /> },
+        {
+          path: "/erkunden",
+          element: <ErkundenLayout />,
+          children: [
+            { index: true, element: <Erkunden /> },
+            { path: "einnahmen", element: <Einnahmen /> },
+            { path: "investitionen", element: <Investitionen /> },
+            { path: "querschnitte", element: <Querschnitte /> },
+          ],
+        },
         { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
         { path: "/geldfluss", element: <Navigate to="/erkunden" replace /> },
+        { path: "/einnahmen", element: <Navigate to="/erkunden/einnahmen" replace /> },
+        { path: "/investitionen", element: <Navigate to="/erkunden/investitionen" replace /> },
         { path: "/themen", element: <Themen /> },
         { path: "/themen/:id", element: <ThemeDetail /> },
         { path: "/posten/:id", element: <PostenDetail /> },

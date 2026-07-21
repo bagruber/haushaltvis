@@ -1,0 +1,61 @@
+# Querschnitts-Aggregatoren — Kostenblöcke quer zur kameralen Gliederung.
+#
+# Jeder Eintrag sammelt Haushaltsstellen nach Regeln und summiert sie je Jahr.
+# build_web.py schreibt daraus public/data/aggregatoren.json (inkl. Mitglieder-
+# liste, damit die Zuordnung nachprüfbar ist).
+#
+# Regel-Felder (alle optional, UND-verknüpft):
+#   ea: "A" | "E"                 Ausgabe / Einnahme
+#   haushalt: verwaltung | vermoegen
+#   grz_hauptgruppe: "4"          erste Ziffer der Gruppierung
+#   grz_prefix: ["94","95"]       erste zwei Ziffern der Gruppierung
+#   stichworte: [strom, energie]  Teilstring-Treffer (klein) in Gruppierungs-
+#                                 text ODER Kontotext. Nur Kostenart, nicht die
+#                                 Einrichtung — daher NICHT im Gliederungstext.
+#
+# "art" ist nur ein Hinweis für die Anzeige: struktur = exakt aus dem
+# Gruppierungsplan, stichwort = Stichwort-Heuristik (überprüfbar gelistet).
+
+personal:
+  title: Personalkosten
+  art: struktur
+  kriterium: "Gruppierung 4… (Personalausgaben)"
+  beschreibung: >-
+    Bezüge und Gehälter der Beamten und tariflich Beschäftigten, Sozial-
+    versicherungsbeiträge, Versorgungskassen und Beihilfen — der gesamte
+    Personalaufwand des Verwaltungshaushalts.
+  ea: A
+  grz_hauptgruppe: "4"
+
+bauen:
+  title: Bauen (Investitionen)
+  art: struktur
+  kriterium: "Vermögenshaushalt, Gruppierung 94/95/96 (Hoch- & Tiefbau)"
+  beschreibung: >-
+    Hoch- und Tiefbaumaßnahmen sowie Betriebsanlagen im Vermögenshaushalt —
+    also die investiven Baukosten. Reiner Erwerb (Grundstücke, Fahrzeuge,
+    IT, Software; Gruppierung 93) zählt hier bewusst nicht mit.
+  haushalt: vermoegen
+  grz_prefix: ["94", "95", "96"]
+
+strom:
+  title: Strom & Energie
+  art: stichwort
+  kriterium: "Verwaltungshaushalt, Kostenart mit Energiebezug"
+  beschreibung: >-
+    Laufende Energiekosten des Verwaltungshaushalts — Stromverbrauch,
+    Heizung/Nahwärme, Brennstoffe und Straßenbeleuchtung.
+  ea: A
+  haushalt: verwaltung
+  stichworte: [strom, energie, heizung, heizkosten, beleuchtung, brennstoff, nahwärme, fernwärme, gas]
+
+wasser:
+  title: Wasser & Abwasser
+  art: stichwort
+  kriterium: "Verwaltungshaushalt, Kostenart mit Wasserbezug"
+  beschreibung: >-
+    Laufende Kosten der Wasserver- und -entsorgung im Verwaltungshaushalt —
+    Frischwasserbezug, Abwasser- und Kanalgebühren sowie Entwässerung.
+  ea: A
+  haushalt: verwaltung
+  stichworte: [wasser, abwasser, kanal, entwässer, kläranlage, entwässerung]

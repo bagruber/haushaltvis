@@ -33,6 +33,7 @@ const data: Data = {
   context: read("context.json"),
   einleitungen: {},
   glossar: {},
+  aggregatoren: {},
 };
 const year = latestYear(budget);
 
