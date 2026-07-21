@@ -1,16 +1,18 @@
 """
-Ingest Moosburg kameral budget data from the AKDB Excel exports into one
-canonical, tidy JSON (the "Kameral-Rückgrat").
+Ingest Moosburg kameral budget data into one canonical, tidy JSON (the
+"Kameral-Rückgrat").
 
-Sources (see memory/data-sources.md):
-  A) HHStellen Ansatz Ergebnis 2018-2022.xlsx / Sheet1  -> Ansatz + Ergebnis 2018..2023
-  B) Haushalt 2024 - 15.11.2024.xlsx                    -> Ansatz 2024 + provisional Ist 2024
+Quelle (ein Export genügt): die AKDB-Auswertung „Haushaltstellen" — eine
+Langformat-Tabelle mit einer Zeile je Haushaltsstelle UND Jahr, die Ansatz,
+Rechnungsergebnis, Texte, E/A und die Kennung „freiwillige Leistung" enthält.
+Spalten werden über die Kopfzeile erkannt (nicht über feste Positionen), damit
+ein neuer Export derselben Form ohne Anpassung funktioniert.
 
 Output: data/processed/budget.json
   {
-    meta:   { generated, years, sources, counts },
-    posten: { <hhst_id>: { hhst_id, einzelplan, glz, grz, glz_text, grz_text,
-                           kontotext, ea, haushalt } },
+    meta:   { generated, years, source, counts },
+    posten: { <hhst_id>: { hhst_id, einzelplan, einzelplan_name, glz, grz,
+                           glz_text, grz_text, kontotext, ea, haushalt, freiwillig } },
     facts:  [ { hhst_id, year, ansatz, ergebnis, provisional } ]
   }
 
@@ -19,14 +21,14 @@ Run:  python etl/ingest.py
 from __future__ import annotations
 
 import json
+import re
 import datetime as dt
 from pathlib import Path
 
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC_A = ROOT / "haushaltsplaene/Haushaltsplanentwurf 2024/HHStellen Ansatz Ergebnis 2018-2022.xlsx"
-SRC_B = ROOT / "haushaltsplaene/Haushaltsentwurf 2025/Haushalt 2024 - 15.11.2024.xlsx"
+SRC = ROOT / "haushaltsplaene/Official Data/Auswertung 2016 - 2026 Haushaltstellen.xlsx"
 OUT = ROOT / "data/processed/budget.json"
 
 EINZELPLAN_NAME = {
@@ -84,7 +86,7 @@ def register(posten: dict, glz: str, grz: str, glz_text=None, grz_text=None, kon
         p = {
             "hhst_id": hhst,
             "einzelplan": glz[0],
-            "einzelplan_name": EINZELPLAN_NAME[glz[0]],
+            "einzelplan_name": EINZELPLAN_NAME.get(glz[0], glz[0]),
             "glz": glz,
             "grz": grz,
             "glz_text": None,
@@ -92,95 +94,92 @@ def register(posten: dict, glz: str, grz: str, glz_text=None, grz_text=None, kon
             "kontotext": None,
             "ea": ea_of(grz),
             "haushalt": haushalt_of(grz),
+            "freiwillig": False,
         }
         posten[hhst] = p
-    # Prefer first non-empty text we see (Source B is processed first -> authoritative)
     if glz_text and not p["glz_text"]:
         p["glz_text"] = str(glz_text).strip()
     if grz_text and not p["grz_text"]:
         p["grz_text"] = str(grz_text).strip()
-    if kontotext and not p["kontotext"]:
+    if kontotext and str(kontotext).strip() and not p["kontotext"]:
         p["kontotext"] = str(kontotext).strip()
     return hhst
 
 
-def ingest_b(posten: dict, facts: list):
-    """2024 file: Ansatz 2024 + provisional Ist 2024. Authoritative for texts."""
-    wb = openpyxl.load_workbook(SRC_B, read_only=True, data_only=True)
+def header_map(row) -> dict:
+    """Normalised header name -> column index."""
+    idx = {}
+    for ci, v in enumerate(row):
+        if v is None:
+            continue
+        idx[" ".join(str(v).split()).lower()] = ci
+    return idx
+
+
+def find(idx: dict, *names: str) -> int:
+    for n in names:
+        if n in idx:
+            return idx[n]
+    raise KeyError(f"Spalte nicht gefunden (eine von {names}). Vorhanden: {sorted(idx)[:12]}…")
+
+
+def ingest(posten: dict, facts: list):
+    wb = openpyxl.load_workbook(SRC, read_only=True, data_only=True)
     ws = wb.active
-    glz_text_map, grz_text_map = {}, {}
+    it = ws.iter_rows(values_only=True)
+    idx = header_map(next(it))
+    c_hj = find(idx, "hj", "haushaltsjahr")
+    c_glz = find(idx, "glz")
+    c_grz = find(idx, "grz")
+    c_glzt = find(idx, "glz-text")
+    c_grzt = find(idx, "grz-text")
+    c_konto = find(idx, "kontotext")
+    c_ans = find(idx, "ansatz (ges.)", "ansatz(ges.)", "ansatz")
+    c_erg = find(idx, "recherg")
+    c_freiw = idx.get("freiw.leistung")
+
+    years: set[int] = set()
+    freiw_latest: dict[str, tuple[int, bool]] = {}
     n = 0
-    for i, r in enumerate(ws.iter_rows(values_only=True)):
-        if i < 2:  # row 0 = junk totals, row 1 = header
-            continue
-        _, ea, _ep, glz_c, grz_c, glz_t, grz_t, konto, ansatz, recherg = r[:10]
-        glz, grz = code(glz_c), code(grz_c)
-        if not glz or not grz:
-            continue
-        hhst = register(posten, glz, grz, glz_t, grz_t, konto)
-        if glz_t:
-            glz_text_map[glz] = str(glz_t).strip()
-        if grz_t:
-            grz_text_map[grz] = str(grz_t).strip()
-        a, e = num(ansatz), num(recherg)
-        if a is not None or e is not None:
-            facts.append({"hhst_id": hhst, "year": 2024, "ansatz": a,
-                          "ergebnis": e, "provisional": True})
-            n += 1
-    wb.close()
-    return glz_text_map, grz_text_map, n
-
-
-def ingest_a(posten: dict, facts: list, glz_text_map: dict, grz_text_map: dict):
-    """2018-2022 file Sheet1: Ansatz + RechErg per year, GLZ is sparse (forward-fill)."""
-    wb = openpyxl.load_workbook(SRC_A, read_only=True, data_only=True)
-    ws = wb["Sheet1"]
-    rows = list(ws.iter_rows(values_only=True))
-    wb.close()
-
-    # Detect year columns from row 0: a cell that is a 4-digit year; Ansatz=col, RechErg=col+1.
-    year_cols = {}
-    for ci, v in enumerate(rows[0]):
+    for r in it:
         try:
-            y = int(v)
+            year = int(r[c_hj])
         except (TypeError, ValueError):
             continue
-        if 2000 <= y <= 2100:
-            year_cols[y] = ci
-
-    n = 0
-    cur_glz = None
-    for r in rows[2:]:
-        glz_c, grz_c = r[0], r[1]
-        if code(glz_c):
-            cur_glz = code(glz_c)
-        grz = code(grz_c)
-        if not grz or not cur_glz:
+        glz, grz = code(r[c_glz]), code(r[c_grz])
+        if not glz or not grz:
             continue
-        hhst = register(posten, cur_glz, grz,
-                        glz_text_map.get(cur_glz), grz_text_map.get(grz))
-        for year, ci in year_cols.items():
-            a = num(r[ci]) if ci < len(r) else None
-            e = num(r[ci + 1]) if ci + 1 < len(r) else None
-            if a is not None or e is not None:
-                facts.append({"hhst_id": hhst, "year": year, "ansatz": a,
-                              "ergebnis": e, "provisional": False})
-                n += 1
-    return n
+        hhst = register(posten, glz, grz, r[c_glzt], r[c_grzt], r[c_konto])
+        if c_freiw is not None:
+            fv = str(r[c_freiw]).strip() in ("1", "1.0", "J", "j", "Ja", "ja")
+            cur = freiw_latest.get(hhst)
+            if cur is None or year > cur[0]:
+                freiw_latest[hhst] = (year, fv)
+        a, e = num(r[c_ans]), num(r[c_erg])
+        if a is not None or e is not None:
+            facts.append({"hhst_id": hhst, "year": year, "ansatz": a, "ergebnis": e, "provisional": False})
+            years.add(year)
+            n += 1
+    wb.close()
 
+    # Ergebnis des laufenden (jüngsten) Jahres ist vorläufig.
+    maxy = max(years) if years else None
+    for f in facts:
+        if f["year"] == maxy and f["ergebnis"] is not None:
+            f["provisional"] = True
+    for hhst, (_, fv) in freiw_latest.items():
+        if hhst in posten:
+            posten[hhst]["freiwillig"] = fv
+    return n, sorted(years), maxy
 
-import re
 
 RE_OLD = re.compile(r"bis\s*2022\s*-?\s*(\d{4,6})", re.I)   # text on NEW code names the OLD code
 RE_NEW = re.compile(r"ab\s*202[23]\s*-?\s*(\d{4,6})", re.I)  # text on OLD code names the NEW code
 
 
 def build_crosswalk(posten: dict) -> dict:
-    """
-    Map renumbered Gliederungen (recoding ~2022/2023) old->new, parsed from the
-    'bis 2022 - XXXX' / 'ab 2023 XXXX' annotations in the GLZ texts. Ambiguous
-    splits (one old code -> several new codes) are left unmapped.
-    """
+    """Map renumbered Gliederungen (recoding ~2022/2023) old->new from the
+    'bis 2022 - XXXX' annotations. Ambiguous splits are left unmapped."""
     edges: dict[str, set] = {}
     for p in posten.values():
         new_glz = p["glz"]
@@ -190,7 +189,6 @@ def build_crosswalk(posten: dict) -> dict:
             edges.setdefault(m.group(1).zfill(4), set()).add(new_glz)
         for m2 in RE_NEW.finditer(tx):
             edges.setdefault(new_glz, set()).add(m2.group(1).zfill(4))
-
     direct = {old: next(iter(news)) for old, news in edges.items()
               if len(news) == 1 and next(iter(news)) != old}
 
@@ -204,17 +202,15 @@ def build_crosswalk(posten: dict) -> dict:
     return {old: resolve(old) for old in direct}
 
 
-def apply_crosswalk(posten: dict, facts: list, cw: dict,
-                    glz_text_map: dict, grz_text_map: dict) -> int:
-    """Remap facts on old GLZ codes to their current code; merge and tidy posten."""
+def apply_crosswalk(posten: dict, facts: list, cw: dict) -> int:
+    glz_text = {p["glz"]: p["glz_text"] for p in posten.values() if p["glz_text"]}
+    grz_text = {p["grz"]: p["grz_text"] for p in posten.values() if p["grz_text"]}
     remapped = 0
     for f in facts:
         glz, grz = f["hhst_id"].split(".")
         if glz in cw:
             f["hhst_id"] = f"{cw[glz]}.{grz}"
             remapped += 1
-
-    # merge facts that now share (hhst_id, year)
     merged: dict[tuple, dict] = {}
     for f in facts:
         key = (f["hhst_id"], f["year"])
@@ -223,10 +219,10 @@ def apply_crosswalk(posten: dict, facts: list, cw: dict,
             for col in ("ansatz", "ergebnis"):
                 if f[col] is not None:
                     cur[col] = (cur[col] or 0) + f[col]
+            cur["provisional"] = cur["provisional"] or f["provisional"]
         else:
             merged[key] = f
     facts[:] = list(merged.values())
-
     used = {f["hhst_id"] for f in facts}
     for hh in list(posten):
         if hh not in used:
@@ -234,30 +230,26 @@ def apply_crosswalk(posten: dict, facts: list, cw: dict,
     for hh in used:
         if hh not in posten:
             glz, grz = hh.split(".")
-            register(posten, glz, grz, glz_text_map.get(glz), grz_text_map.get(grz))
+            register(posten, glz, grz, glz_text.get(glz), grz_text.get(grz))
     return remapped
 
 
 def main():
     posten: dict = {}
     facts: list = []
-
-    glz_text_map, grz_text_map, nb = ingest_b(posten, facts)
-    na = ingest_a(posten, facts, glz_text_map, grz_text_map)
-
+    n, years, maxy = ingest(posten, facts)
     crosswalk = build_crosswalk(posten)
-    n_remap = apply_crosswalk(posten, facts, crosswalk, glz_text_map, grz_text_map)
+    n_remap = apply_crosswalk(posten, facts, crosswalk)
 
-    years = sorted({f["year"] for f in facts})
     out = {
         "meta": {
             "generated": dt.datetime.now().isoformat(timespec="seconds"),
-            "years": years,
-            "sources": {"2018-2023": SRC_A.name, "2024": SRC_B.name},
+            "years": sorted({f["year"] for f in facts}),
+            "source": SRC.name,
             "counts": {"posten": len(posten), "facts": len(facts),
-                       "facts_2024": nb, "facts_hist": na,
-                       "crosswalk_codes": len(crosswalk), "facts_remapped": n_remap},
-            "note": "2024 ergebnis is provisional Ist-Vollzug, not final RechErg.",
+                       "crosswalk_codes": len(crosswalk), "facts_remapped": n_remap,
+                       "freiwillig": sum(1 for p in posten.values() if p["freiwillig"])},
+            "note": f"Ergebnis {maxy} ist vorläufiger Ist-Vollzug, nicht endgültige RechErg.",
         },
         "crosswalk": crosswalk,
         "posten": posten,
@@ -266,23 +258,18 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
 
-    # Stats for verification
-    print(f"posten={len(posten)} facts={len(facts)} years={years}")
+    # Verification
+    print(f"posten={len(posten)} facts={len(facts)} years={years} (provisorisch: {maxy})")
     print(f"crosswalk: {len(crosswalk)} alte Codes -> neu, {n_remap} Fakten umgehängt")
-    for old, new in sorted(crosswalk.items()):
-        print(f"    {old} -> {new}")
-    missing_glz = sum(1 for p in posten.values() if not p["glz_text"])
-    missing_grz = sum(1 for p in posten.values() if not p["grz_text"])
-    print(f"posten without glz_text={missing_glz}, without grz_text={missing_grz}")
+    print(f"freiwillige Leistungen: {sum(1 for p in posten.values() if p['freiwillig'])} Posten")
     from collections import defaultdict
-    by = defaultdict(float)
-    for f in facts:
-        if f["year"] == 2023 and f["ansatz"]:
-            p = posten[f["hhst_id"]]
-            by[(p["haushalt"], p["ea"])] += f["ansatz"]
-    print("Ansatz 2023 by (haushalt, E/A):")
-    for k in sorted(by):
-        print(f"  {k[0]:11} {k[1]}  {by[k]:16,.0f}")
+    for probe in (2020, 2024):
+        by = defaultdict(float)
+        for f in facts:
+            if f["year"] == probe and f["ansatz"]:
+                p = posten[f["hhst_id"]]
+                by[(p["haushalt"], p["ea"])] += f["ansatz"]
+        print(f"Ansatz {probe} je (Haushalt, E/A):", {f"{k[0]}/{k[1]}": round(v) for k, v in sorted(by.items())})
     print(f"-> {OUT.relative_to(ROOT)}")
 
 

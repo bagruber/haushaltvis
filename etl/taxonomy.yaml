@@ -73,6 +73,7 @@ abschnitt_themes:
   "11": [sicherheit]
   "13": [sicherheit]
   "14": [sicherheit]
+  "16": [sicherheit]            # Rettungsdienst
   # Einzelplan 2 — Schulen
   "21": [bildung]
   "22": [bildung]
