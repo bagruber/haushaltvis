@@ -10,10 +10,12 @@ import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 // Fixed display order + colour per aggregator (keys from etl/aggregatoren.yaml).
-const ORDER = ["personal", "bauen", "strom", "wasser"] as const;
+const ORDER = ["personal", "zuschuesse", "gebaeude", "it", "strom", "wasser"] as const;
 const COLOR: Record<string, string> = {
   personal: "#2f6f8f",
-  bauen: "#c26a2c",
+  zuschuesse: "#6b3e7a",
+  gebaeude: "#c26a2c",
+  it: "#0a9e4c",
   strom: "#d4a017",
   wasser: "#3a8fb7",
 };
@@ -111,7 +113,7 @@ export function Querschnitte() {
         </div>
         <EChart
           option={view.overview}
-          ariaLabel="Entwicklung der Kostenblöcke Personal, Bauen, Strom und Wasser über die Jahre — Zahlen in der Tabelle darunter"
+          ariaLabel="Entwicklung der Kostenblöcke über die Jahre — Zahlen in der Tabelle darunter"
           style={{ height: 360 }}
         />
         <ChartTable
@@ -188,9 +190,9 @@ export function Querschnitte() {
 
       <p className="text-xs text-ink-muted max-w-2xl">
         „Gruppierungsplan" heißt: exakt aus der kameralen Systematik abgeleitet.
-        „Stichwort-Auswahl" fasst Posten anhand ihrer Bezeichnung zusammen (Energie- bzw.
-        Wasserbezug) — die enthaltenen Kostenarten sind oben aufklappbar. Werte des laufenden
-        Jahres sind vorläufig.
+        „Stichwort-Auswahl" fasst Posten anhand ihrer Bezeichnung zusammen — die enthaltenen
+        Kostenarten sind oben aufklappbar. Für das laufende Jahr steht nur der Plan; das
+        Ergebnis stammt daher aus {view.finalYear}.
       </p>
     </div>
   );

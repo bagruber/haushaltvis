@@ -26,7 +26,7 @@ export function YearBar() {
           aria-label="Stichjahr wählen"
         />
         <span className="font-display font-bold text-ink tabular-nums w-12">{current}</span>
-        {current === max && <span className="text-xs text-ink-muted">(vorläufig)</span>}
+        {current === max && <span className="text-xs text-ink-muted">(nur Plan)</span>}
         {year !== null && year !== max && (
           <button onClick={() => setYear(null)} className="text-xs text-red-600 hover:underline">
             aktuellstes

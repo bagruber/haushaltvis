@@ -14,7 +14,7 @@ export function Info() {
       </p>
       <p className="text-ink-soft">
         Für jedes Jahr gibt es einen <b>Ansatz</b> (Plan) und — ein bis zwei Jahre später —
-        ein <b>Ergebnis</b> (Ist). Die Werte des laufenden Jahres sind vorläufig.
+        ein <b>Ergebnis</b> (Ist). Für das laufende Jahr steht nur der Plan — das Ergebnis wird erst im Lauf des Jahres gebucht.
       </p>
 
       <h2 className="font-display text-xl font-bold pt-2">Die Ebenen des Haushalts</h2>

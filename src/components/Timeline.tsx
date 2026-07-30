@@ -78,7 +78,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       ...(iv ? ["Investitionen (Ansatz)"] : []),
     ];
     const rows = lf.years.map((y, i) => [
-      `${y}${lf.provisional.has(y) ? " (vorläufig)" : ""}`,
+      `${y}${lf.provisional.has(y) ? " (nur Plan)" : ""}`,
       fmt(lf.ansatz[i]),
       fmt(lf.ergebnis[i]),
       ...(brutto ? [fmt(brutto.ansatz[i])] : []),

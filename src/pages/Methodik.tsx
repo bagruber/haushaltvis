@@ -24,7 +24,7 @@ export function Methodik() {
           Grundlage sind die <Term name="kameralistik">kameralen</Term> Haushaltspläne der
           Stadt Moosburg. Erfasst sind die Jahre 2016–2026, jeweils mit{" "}
           <Term name="ansatz">Ansatz</Term> (Plan) und — soweit vorhanden —{" "}
-          <Term name="ergebnis">Ergebnis</Term> (Ist). Die Werte des laufenden Jahres sind vorläufig.
+          <Term name="ergebnis">Ergebnis</Term> (Ist). Für das laufende Jahr steht nur der Plan; sein Ergebnis wird erst im Jahresverlauf gebucht und daher nicht ausgewiesen.
         </p>
       </section>
 

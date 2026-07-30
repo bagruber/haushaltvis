@@ -60,7 +60,7 @@ export function PostenDetail() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
           <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Wert {baseYear} vorläufig.</span>
+          <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Für {baseYear} nur der Plan.</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
         <Timeline laufend={series} mode={mode} context={data!.context} baseYear={baseYear} height={320} />

@@ -19,7 +19,7 @@ export function Footer() {
           vereinzelt Fehler enthalten.
         </p>
         <p>
-          Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2016–2026. Werte des laufenden Jahres vorläufig.
+          Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2016–2026. Für das laufende Jahr nur der Plan.
         </p>
       </div>
     </footer>

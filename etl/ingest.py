@@ -162,11 +162,16 @@ def ingest(posten: dict, facts: list):
             n += 1
     wb.close()
 
-    # Ergebnis des laufenden (jüngsten) Jahres ist vorläufig.
+    # Das Ist des laufenden (jüngsten) Jahres füllt sich erst über das Jahr und
+    # ist daher mit keinem abgeschlossenen Jahr vergleichbar — es wird gar nicht
+    # ausgewiesen. Der Plan bleibt. Das Kennzeichen bleibt gesetzt, damit die
+    # Auswertungen das laufende Jahr weiterhin als unfertig erkennen.
     maxy = max(years) if years else None
     for f in facts:
-        if f["year"] == maxy and f["ergebnis"] is not None:
+        if f["year"] == maxy:
+            f["ergebnis"] = None
             f["provisional"] = True
+    facts[:] = [f for f in facts if f["ansatz"] is not None or f["ergebnis"] is not None]
     for hhst, (_, fv) in freiw_latest.items():
         if hhst in posten:
             posten[hhst]["freiwillig"] = fv

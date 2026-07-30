@@ -195,7 +195,7 @@ export function ThemeDetail() {
         <div className="grid lg:grid-cols-2 gap-4">
           <Card
             title="Entwicklung der Ausgaben"
-            hint={`Plan (Ansatz) gegen Ergebnis (Ist), 2018–${y}. Wert ${y} vorläufig.` + (mode.real ? ` Inflationsbereinigt in Preisen von ${y}.` : "") + (mode.perCapita ? " Je Einwohner." : "")}
+            hint={`Plan (Ansatz) gegen Ergebnis (Ist). Für ${y} nur der Plan.` + (mode.real ? ` Inflationsbereinigt in Preisen von ${y}.` : "") + (mode.perCapita ? " Je Einwohner." : "")}
           >
             <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
             <Timeline laufend={vwSeries} mode={mode} context={data!.context} baseYear={y} color={def.color} height={300} />

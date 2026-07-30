@@ -27,16 +27,40 @@ personal:
   ea: A
   grz_hauptgruppe: "4"
 
-bauen:
-  title: Bauen (Investitionen)
+zuschuesse:
+  title: Zuschüsse an Dritte
   art: struktur
-  kriterium: "Vermögenshaushalt, Gruppierung 94/95/96 (Hoch- & Tiefbau)"
+  kriterium: "Gruppierung 70/71 (Zuweisungen und Zuschüsse für laufende Zwecke)"
   beschreibung: >-
-    Hoch- und Tiefbaumaßnahmen sowie Betriebsanlagen im Vermögenshaushalt —
-    also die investiven Baukosten. Reiner Erwerb (Grundstücke, Fahrzeuge,
-    IT, Software; Gruppierung 93) zählt hier bewusst nicht mit.
-  haushalt: vermoegen
-  grz_prefix: ["94", "95", "96"]
+    Geld, das die Stadt weitergibt, statt es selbst auszugeben: Betriebskosten
+    der Kindertagesstätten nach BayKiBiG, Zuschüsse an Vereine, Verbände und
+    freie Träger. Rund ein Zehntel des laufenden Haushalts.
+  ea: A
+  haushalt: verwaltung
+  grz_prefix: ["70", "71"]
+
+gebaeude:
+  title: Gebäudeunterhalt
+  art: struktur
+  kriterium: "Gruppierung 50/51 (Unterhaltung von Grundstücken und Anlagen)"
+  beschreibung: >-
+    Was der Erhalt des Bestands kostet — Unterhalt eigener Gebäude,
+    Wartungsverträge, Spiel- und Sportanlagen. Das laufende Gegenstück zu den
+    Baumaßnahmen im Vermögenshaushalt.
+  ea: A
+  haushalt: verwaltung
+  grz_prefix: ["50", "51"]
+
+it:
+  title: EDV & Digitalisierung
+  art: stichwort
+  kriterium: "Kostenart mit IT-Bezug, beide Haushalte"
+  beschreibung: >-
+    Laufende EDV-Kosten und IT-Investitionen zusammen betrachtet — Software,
+    Lizenzen, Hardware, DigitalPakt und Breitbandausbau. Der laufende Aufwand
+    wächst stetig, die Beschaffungen kommen in Schüben.
+  ea: A
+  stichworte: [edv, datenverarb, software, hardware, it-ausstattung, informationstechn, lizenz, digital, breitband, glasfaser]
 
 strom:
   title: Strom & Energie

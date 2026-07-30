@@ -101,7 +101,7 @@ export function EinrichtungDetail() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
           <h2 className="font-display text-xl font-bold">Laufende Ausgaben über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. Wert {y} vorläufig.</span>
+          <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. Für {y} nur der Plan.</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={hasInvest} hasEinnahmen={hasEinnahmen} />
         <Timeline laufend={laufend} invest={invest} einnahmen={einnahmen} mode={mode} context={data!.context} baseYear={y} height={300} />
