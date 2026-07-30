@@ -5,6 +5,10 @@ import { ChartTable } from "./ChartTable";
 import { adjustSeries, netSeries, type Context, type TimeMode, type YearSeries } from "@/lib/data";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
+/** Plan is drawn in a neutral tone so it never competes with the Ist colour. */
+export const PLAN_COLOR = "#8a7a5c";
+const REFERENZ_COLOR = "#c4bcac";
+
 export interface TimelineMode extends TimeMode {
   showInvest?: boolean;
   /** show Zuschussbedarf (Ausgaben − Einnahmen) instead of gross expenses */
@@ -41,18 +45,40 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     // exactly what fees and charges cover, and that is the point of the view.
     const brutto = netto ? adjustSeries(laufend, context, mode, baseYear) : null;
 
+    // Ist is the fact and carries the colour as a solid line; Plan is an
+    // intention and is dashed in a muted tone. Dashing the Ist would signal
+    // uncertainty about the one figure that is actually certain.
     const series: NonNullable<EChartsOption["series"]> = [
-      { name: netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)", type: "line", data: lf.ansatz, symbolSize: 7, lineStyle: { width: 3 }, itemStyle: { color }, connectNulls: true },
-      { name: netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)", type: "line", data: lf.ergebnis, symbol: "emptyCircle", symbolSize: 7, lineStyle: { width: 2, type: "dashed", color }, itemStyle: { color }, connectNulls: true },
+      {
+        name: netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)",
+        type: "line",
+        data: lf.ergebnis,
+        symbolSize: 7,
+        lineStyle: { width: 3, color },
+        itemStyle: { color },
+        connectNulls: true,
+        z: 3,
+      },
+      {
+        name: netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
+        type: "line",
+        data: lf.ansatz,
+        symbol: "emptyCircle",
+        symbolSize: 6,
+        lineStyle: { width: 2, type: "dashed", color: PLAN_COLOR },
+        itemStyle: { color: PLAN_COLOR },
+        connectNulls: true,
+        z: 2,
+      },
     ];
     if (brutto) {
       series.push({
-        name: "Ausgaben brutto (Plan)",
+        name: "Ausgaben brutto",
         type: "line",
         data: brutto.ansatz,
         symbol: "none",
-        lineStyle: { width: 1.5, color: "#b0a894" },
-        itemStyle: { color: "#b0a894" },
+        lineStyle: { width: 1.5, color: REFERENZ_COLOR },
+        itemStyle: { color: REFERENZ_COLOR },
         connectNulls: true,
         z: 1,
       });
@@ -72,15 +98,15 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
 
     const columns = [
       "Jahr",
-      netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
       netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)",
-      ...(brutto ? ["Ausgaben brutto (Plan)"] : []),
+      netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
+      ...(brutto ? ["Ausgaben brutto"] : []),
       ...(iv ? ["Investitionen (Ansatz)"] : []),
     ];
     const rows = lf.years.map((y, i) => [
       `${y}${lf.provisional.has(y) ? " (nur Plan)" : ""}`,
-      fmt(lf.ansatz[i]),
       fmt(lf.ergebnis[i]),
+      fmt(lf.ansatz[i]),
       ...(brutto ? [fmt(brutto.ansatz[i])] : []),
       ...(iv ? [fmt(iv.ansatz[i])] : []),
     ]);

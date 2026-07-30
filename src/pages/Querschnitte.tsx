@@ -20,18 +20,51 @@ const COLOR: Record<string, string> = {
   wasser: "#3a8fb7",
 };
 
-/** Members grouped by Gruppierungsart (grz_text) with count + latest final sum. */
-function groupsOf(agg: Aggregator, posten: Record<string, { grz_text: string | null }>,
-                  factSum: (h: string) => number) {
-  const by = new Map<string, { count: number; sum: number }>();
+/** How many single Posten to name inside each Gruppierung before summarising. */
+const POSTEN_JE_GRUPPE = 6;
+
+interface PostenRow {
+  hhst: string;
+  label: string;
+  sum: number;
+}
+
+/**
+ * Members grouped by Gruppierungsart (grz_text). Within a group every Posten
+ * carries the same Gruppierungstext, so the telling label is the Einrichtung
+ * (glz_text) — that is what makes a Zuschuss traceable to a recipient.
+ */
+function groupsOf(
+  agg: Aggregator,
+  posten: Record<string, { grz_text: string | null; glz_text: string | null; kontotext: string | null }>,
+  factSum: (h: string) => number,
+) {
+  const clean = (s: string | null | undefined) => s?.replace(/\s+/g, " ").trim() || "";
+  const by = new Map<string, { count: number; sum: number; rows: PostenRow[] }>();
   for (const h of agg.hhst) {
-    const t = posten[h]?.grz_text?.replace(/\s+/g, " ").trim() || "(ohne Bezeichnung)";
-    const g = by.get(t) ?? { count: 0, sum: 0 };
+    const p = posten[h];
+    const t = clean(p?.grz_text) || "(ohne Bezeichnung)";
+    const g = by.get(t) ?? { count: 0, sum: 0, rows: [] };
+    const sum = factSum(h);
     g.count += 1;
-    g.sum += factSum(h);
+    g.sum += sum;
+    g.rows.push({ hhst: h, label: clean(p?.kontotext) || clean(p?.glz_text) || h, sum });
     by.set(t, g);
   }
-  return [...by.entries()].map(([text, g]) => ({ text, ...g })).sort((a, b) => b.sum - a.sum);
+  return [...by.entries()]
+    .map(([text, g]) => {
+      const rows = g.rows.sort((a, b) => b.sum - a.sum);
+      const top = rows.slice(0, POSTEN_JE_GRUPPE).filter((r) => r.sum > 0);
+      return {
+        text,
+        count: g.count,
+        sum: g.sum,
+        top,
+        restCount: g.count - top.length,
+        restSum: g.sum - top.reduce((s, r) => s + r.sum, 0),
+      };
+    })
+    .sort((a, b) => b.sum - a.sum);
 }
 
 export function Querschnitte() {
@@ -159,29 +192,42 @@ export function Querschnitte() {
             <summary className="cursor-pointer text-sm text-ink-soft hover:text-ink w-fit">
               Enthaltene Kostenarten &amp; Posten ({c.agg.hhst.length} Haushaltsstellen)
             </summary>
-            <div className="mt-2 overflow-x-auto">
-              <table className="w-full min-w-[28rem] text-sm">
-                <thead className="text-left text-ink-muted border-b border-ink-line">
-                  <tr>
-                    <th className="py-1.5 font-medium">Kostenart (Gruppierung)</th>
-                    <th className="py-1.5 font-medium text-right">Posten</th>
-                    <th className="py-1.5 font-medium text-right">{view.finalYear}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {c.groups.map((g) => (
-                    <tr key={g.text} className="border-b border-ink-line/50">
-                      <td className="py-1.5">{g.text}</td>
-                      <td className="py-1.5 text-right tabular-nums">{g.count}</td>
-                      <td className="py-1.5 text-right tabular-nums">{g.sum ? fmtEur(g.sum) : "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="text-xs text-ink-muted mt-2">
-                Einzelne Haushaltsstellen lassen sich über{" "}
-                <Link to="/erkunden" className="underline hover:text-ink">Erkunden</Link> und die Suche
-                im Detail verfolgen.
+            <div className="mt-3 space-y-4">
+              {c.groups.map((g) => (
+                <div key={g.text}>
+                  <div className="flex items-baseline justify-between gap-3 border-b border-ink-line pb-1">
+                    <span className="font-medium">{g.text}</span>
+                    <span className="shrink-0 tabular-nums text-ink-soft">
+                      {g.sum ? fmtEur(g.sum) : "—"}
+                      <span className="ml-2 text-xs text-ink-muted">
+                        {g.count} {g.count === 1 ? "Posten" : "Posten"}
+                      </span>
+                    </span>
+                  </div>
+                  <ul className="text-sm">
+                    {g.top.map((r) => (
+                      <li key={r.hhst}>
+                        <Link
+                          to={`/posten/${r.hhst}`}
+                          className="flex items-baseline justify-between gap-3 border-b border-ink-line/40 py-1 hover:text-red-600 transition-colors"
+                        >
+                          <span className="min-w-0 truncate text-ink-soft">{r.label}</span>
+                          <span className="shrink-0 tabular-nums">{fmtEur(r.sum)}</span>
+                        </Link>
+                      </li>
+                    ))}
+                    {g.restCount > 0 && (
+                      <li className="flex items-baseline justify-between gap-3 py-1 text-xs text-ink-muted">
+                        <span>+ {g.restCount} weitere</span>
+                        <span className="tabular-nums">{g.restSum > 0 ? fmtEur(g.restSum) : "—"}</span>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              ))}
+              <p className="text-xs text-ink-muted">
+                Beträge sind das Ergebnis {view.finalYear}. Ein Klick öffnet die Haushaltsstelle mit
+                ihrem Zeitverlauf.
               </p>
             </div>
           </details>

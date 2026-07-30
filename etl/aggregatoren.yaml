@@ -54,13 +54,14 @@ gebaeude:
 it:
   title: EDV & Digitalisierung
   art: stichwort
-  kriterium: "Kostenart mit IT-Bezug, beide Haushalte"
+  kriterium: "Verwaltungshaushalt, Kostenart mit IT-Bezug"
   beschreibung: >-
-    Laufende EDV-Kosten und IT-Investitionen zusammen betrachtet — Software,
-    Lizenzen, Hardware, DigitalPakt und Breitbandausbau. Der laufende Aufwand
-    wächst stetig, die Beschaffungen kommen in Schüben.
+    Der laufende IT-Aufwand: EDV-Kosten an Dritte, Software, Lizenzen,
+    Sachbedarf für EDV-Anlagen. Seit 2016 mehr als verdreifacht. Beschaffungen
+    von Hardware zählen als Investition und stehen im Vermögenshaushalt.
   ea: A
-  stichworte: [edv, datenverarb, software, hardware, it-ausstattung, informationstechn, lizenz, digital, breitband, glasfaser]
+  haushalt: verwaltung
+  stichworte: [edv, datenverarb, software, informationstechn, lizenz, digital]
 
 strom:
   title: Strom & Energie

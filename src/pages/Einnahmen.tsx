@@ -32,27 +32,54 @@ export function Einnahmen() {
 
     const years = data.budget.meta.years;
     const fmtY = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
+    // Solid where an Ist exists, dashed for the trailing years that only carry
+    // a Plan. Same colour, so the line reads as one series that turns uncertain
+    // at the point where reality stops. The dashed part starts at the last Ist
+    // so the two segments join without a gap.
     const steuerSeries = STEUERN.map(([name]) => {
       const s = adjustSeries(incomeCategorySeries(data, name), data.context, mode, y);
-      return { name, values: years.map((_, i) => s.ergebnis[i] ?? s.ansatz[i]) };
+      const values = years.map((_, i) => s.ergebnis[i] ?? s.ansatz[i]);
+      const ist = years.map((_, i) => s.ergebnis[i] ?? null);
+      let lastIst = -1;
+      for (let i = 0; i < years.length; i++) if (ist[i] != null) lastIst = i;
+      const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst ? values[i] : null));
+      return { name, values, ist, plan, lastIst };
     });
     const fmtCell = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
-    const steuerRows = years.map((yy, i) => [String(yy), ...steuerSeries.map((s) => fmtCell(s.values[i]))]);
+    const steuerRows = years.map((yy, i) => [
+      `${yy}${steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
+      ...steuerSeries.map((s) => fmtCell(s.values[i])),
+    ]);
     const steuerOpt: EChartsOption = {
       tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
-      legend: { bottom: 0, type: "scroll" },
       grid: { left: 66, right: 16, top: 12, bottom: 56 },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
-      series: STEUERN.map(([name, color], si) => ({
-        name,
-        type: "line" as const,
-        data: steuerSeries[si].values,
-        symbolSize: 6,
-        lineStyle: { width: 2.5 },
-        itemStyle: { color },
-        connectNulls: true,
-      })),
+      legend: { bottom: 0, type: "scroll", data: STEUERN.map(([n]) => n) },
+      series: [
+        ...STEUERN.map(([name, color], si) => ({
+          name,
+          type: "line" as const,
+          data: steuerSeries[si].ist,
+          symbolSize: 6,
+          lineStyle: { width: 2.5, color },
+          itemStyle: { color },
+          connectNulls: true,
+        })),
+        // Plan tail: same colour, dashed, kept out of the legend and the
+        // tooltip so it reads as a continuation rather than a second series.
+        ...STEUERN.map(([name, color], si) => ({
+          name: `${name} (Plan)`,
+          type: "line" as const,
+          data: steuerSeries[si].plan,
+          symbol: "emptyCircle",
+          symbolSize: 6,
+          lineStyle: { width: 2.5, color, type: "dashed" as const },
+          itemStyle: { color },
+          connectNulls: true,
+          tooltip: { show: false },
+        })),
+      ],
     };
 
     const hasContext = !!(data.context.cpi || data.context.population);

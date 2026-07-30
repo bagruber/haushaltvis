@@ -135,11 +135,13 @@ export function Home() {
           data: idxPk,
         },
         {
+          // All three are Ansatz figures, so none of them is dashed: the dash
+          // is reserved app-wide for "Plan, no Ist yet".
           name: "je Einwohner, inflationsbereinigt",
           type: "line",
           smooth: true,
           showSymbol: false,
-          lineStyle: { width: 2.5, color: REAL_LINE, type: "dashed" },
+          lineStyle: { width: 2.5, color: REAL_LINE },
           itemStyle: { color: REAL_LINE },
           data: idxReal,
         },
