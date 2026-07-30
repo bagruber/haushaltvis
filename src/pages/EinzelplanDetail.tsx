@@ -32,7 +32,6 @@ export function EinzelplanDetail() {
       hasContext: !!(data.context.cpi || data.context.population),
       name: einzelplanName(data, ep),
       intro: data.einleitungen[`ep:${ep}`],
-      themes: data.themes.themes,
     };
   }, [data, ep, selYear]);
 
@@ -67,7 +66,7 @@ export function EinzelplanDetail() {
 
       <div className="space-y-4">
         {view.sections.map((s) => (
-          <section key={s.code} className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+          <section key={s.code} className="rounded-lg border border-ink-line bg-white p-4">
             <div className="flex items-baseline justify-between gap-3 mb-2 border-b border-ink-line pb-1.5">
               <h2 className="font-display text-lg font-bold">{s.label}</h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(s.total)}</span>
@@ -79,14 +78,7 @@ export function EinzelplanDetail() {
               {s.einrichtungen.map((e) => (
                 <li key={e.glz} className="border-b border-ink-line/50 pb-1.5 last:border-0">
                   <Link to={`/einrichtung/${e.glz}`} className="flex items-center justify-between gap-3 hover:text-red-600 transition-colors">
-                    <span className="flex items-center gap-2 min-w-0">
-                      <span className="truncate">{e.label}</span>
-                      <span className="flex gap-1 shrink-0">
-                        {e.themes.map((t) => (
-                          <span key={t} title={view.themes[t]?.label} className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: view.themes[t]?.color ?? "#ccc" }} />
-                        ))}
-                      </span>
-                    </span>
+                    <span className="min-w-0 truncate">{e.label}</span>
                     <span className="tabular-nums shrink-0 font-medium">{fmtEur(e.value)}</span>
                   </Link>
                 </li>

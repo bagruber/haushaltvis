@@ -2,8 +2,8 @@
 
 export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-ink-line bg-white px-5 py-4 shadow-soft">
-      <div className="text-xs uppercase tracking-wide text-ink-muted">{label}</div>
+    <div className="rounded-lg border border-ink-line bg-white px-5 py-4">
+      <div className="eyebrow text-ink-muted">{label}</div>
       <div className="mt-1 font-display text-2xl font-bold text-ink">{value}</div>
       {hint && <div className="text-xs text-ink-muted mt-0.5">{hint}</div>}
     </div>
@@ -12,7 +12,7 @@ export function Stat({ label, value, hint }: { label: string; value: string; hin
 
 export function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+    <section className="rounded-lg border border-ink-line bg-white p-4">
       <h3 className="font-display text-lg font-bold">{title}</h3>
       {hint && <p className="text-xs text-ink-muted mb-2">{hint}</p>}
       <div className={hint ? "" : "mt-2"}>{children}</div>

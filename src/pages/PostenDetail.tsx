@@ -30,11 +30,11 @@ export function PostenDetail() {
   if (!view.p)
     return (
       <p className="text-ink-muted">
-        Unbekannter Posten. <Link className="text-red-600 underline" to="/themen">Zur Übersicht</Link>
+        Unbekannter Posten. <Link className="text-red-600 underline" to="/erkunden">Zur Übersicht</Link>
       </p>
     );
 
-  const { p, series, crumb, tags, events, hasContext, baseYear } = view;
+  const { p, series, crumb, events, hasContext, baseYear } = view;
 
   return (
     <div className="space-y-6">
@@ -53,20 +53,10 @@ export function PostenDetail() {
           <Chip>{p.ea === "E" ? "Einnahme" : "Ausgabe"}</Chip>
           <Chip>{p.haushalt === "verwaltung" ? "Verwaltungshaushalt" : "Vermögenshaushalt"}</Chip>
           <Chip>Haushaltsstelle {p.glz}.{p.grz}</Chip>
-          {tags.map((t) => (
-            <Link key={t.theme} to={`/themen/${t.theme}`}>
-              <span
-                className="rounded-md px-2.5 py-1 text-xs text-white"
-                style={{ background: data!.themes.themes[t.theme]?.color ?? "#999" }}
-              >
-                {data!.themes.themes[t.theme]?.label ?? t.theme}
-              </span>
-            </Link>
-          ))}
         </div>
       </header>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
           <h2 className="font-display text-lg font-bold">Entwicklung über die Jahre</h2>
           <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Wert {baseYear} vorläufig.</span>
@@ -76,7 +66,7 @@ export function PostenDetail() {
       </section>
 
       {events.length > 0 && (
-        <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+        <section className="rounded-lg border border-ink-line bg-white p-4">
           <h2 className="font-display text-lg font-bold mb-2">Ereignisse</h2>
           <ul className="space-y-2">
             {events.map((e, i) => (

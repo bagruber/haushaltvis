@@ -127,7 +127,7 @@ export function ThemeDetail() {
   if (!view.def)
     return (
       <p className="text-ink-muted">
-        Unbekanntes Thema. <Link className="text-red-600 underline" to="/themen">Zur Übersicht</Link>
+        Unbekanntes Thema. <Link className="text-red-600 underline" to="/intern/themen">Zur Übersicht</Link>
       </p>
     );
 
@@ -145,7 +145,7 @@ export function ThemeDetail() {
   return (
     <div className="space-y-10">
       <nav className="text-sm text-ink-muted">
-        <Link to="/themen" className="hover:text-ink">Themen</Link> ›{" "}
+        <Link to="/intern/themen" className="hover:text-ink">Themen</Link> ›{" "}
         <span className="text-ink">{def.label}</span>
       </nav>
 

@@ -42,7 +42,7 @@ export function Glossar() {
           <div
             key={id}
             id={id}
-            className="scroll-mt-28 rounded-lg border border-ink-line bg-white p-4 shadow-soft transition-shadow"
+            className="scroll-mt-28 rounded-lg border border-ink-line bg-white p-4"
           >
             <dt className="font-display text-lg font-bold">{e.title}</dt>
             <dd className="mt-1 text-ink-soft">{e.text}</dd>

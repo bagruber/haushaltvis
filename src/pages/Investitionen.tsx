@@ -118,10 +118,10 @@ export function Investitionen() {
         <Stat label="Netto-Eigenanteil" value={fmtEurShort(inv.totalInvest - inv.totalFoerder)} hint="aus allg. Haushalt/Krediten" />
       </section>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="flex items-baseline justify-between gap-2 mb-1">
           <h2 className="font-display text-lg font-bold">Investitionen über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Thema; größte Vorhaben einzeln</span>
+          <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Einzelplan; größte Vorhaben einzeln</span>
         </div>
         <EChart
           option={view.stackedOpt}
@@ -129,8 +129,7 @@ export function Investitionen() {
           style={{ height: 380 }}
         />
         <p className="text-xs text-ink-muted mt-1">
-          Jede Fläche ist ein Vorhaben (große einzeln, kleinere als „Sonstige · Thema" gebündelt).
-          Mehrfach-Themen werden hier ihrem Hauptthema zugerechnet, damit die Summe stimmt.
+          Jede Fläche ist ein Vorhaben (große einzeln, kleinere je Einzelplan gebündelt).
         </p>
         <ChartTable
           summary="Jahressummen als Tabelle"
@@ -139,7 +138,7 @@ export function Investitionen() {
         />
       </section>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="flex items-baseline justify-between gap-2 mb-2">
           <h2 className="font-display text-lg font-bold">Größte Vorhaben {view.y}</h2>
           <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
@@ -152,7 +151,7 @@ export function Investitionen() {
         />
       </section>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <h2 className="font-display text-lg font-bold mb-2">Alle Investitionen</h2>
         <div className="overflow-x-auto">
         <table className="w-full min-w-[32rem] text-sm">

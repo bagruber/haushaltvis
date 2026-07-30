@@ -3,8 +3,11 @@ import { createBrowserRouter, createHashRouter, Navigate } from "react-router-do
 import { Layout } from "./components/Layout";
 import { Loading } from "./components/ui";
 
-// Temporäres internes Werkzeug — lazy, damit es die Bürger-App nicht aufbläht.
+// Temporäre interne Seiten — lazy, damit sie die Bürger-App nicht aufblähen.
 const Zuordnung = lazy(() => import("./pages/intern/Zuordnung"));
+// Themen-Feature: nicht freigegebene Zuordnung, daher unverlinkt und nur intern.
+const ThemenVorschau = lazy(() => import("./pages/intern/ThemenVorschau"));
+const ThemeDetail = lazy(() => import("./pages/ThemeDetail").then((m) => ({ default: m.ThemeDetail })));
 import { Home } from "./pages/Home";
 import { ErkundenLayout } from "./pages/ErkundenLayout";
 import { Erkunden } from "./pages/Erkunden";
@@ -14,7 +17,6 @@ import { Querschnitte } from "./pages/Querschnitte";
 import { WofuerZahleIch } from "./pages/WofuerZahleIch";
 import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
-import { ThemeDetail } from "./pages/ThemeDetail";
 import { PostenDetail } from "./pages/PostenDetail";
 import { EinrichtungDetail } from "./pages/EinrichtungDetail";
 import { Info } from "./pages/Info";
@@ -43,7 +45,8 @@ const routes = [
         { path: "/einnahmen", element: <Navigate to="/erkunden/einnahmen" replace /> },
         { path: "/investitionen", element: <Navigate to="/erkunden/investitionen" replace /> },
         { path: "/themen", element: <Themen /> },
-        { path: "/themen/:id", element: <ThemeDetail /> },
+        // Themen-Detail bleibt gesperrt, solange die Zuordnung nicht freigegeben ist.
+        { path: "/themen/:id", element: <Navigate to="/themen" replace /> },
         { path: "/posten/:id", element: <PostenDetail /> },
         { path: "/einrichtung/:glz", element: <EinrichtungDetail /> },
         { path: "/info", element: <Info /> },
@@ -53,6 +56,8 @@ const routes = [
         { path: "/datenschutz", element: <Datenschutz /> },
         { path: "/barrierefreiheit", element: <Barrierefreiheit /> },
         { path: "/intern/zuordnung", element: <Suspense fallback={<Loading />}><Zuordnung /></Suspense> },
+        { path: "/intern/themen", element: <Suspense fallback={<Loading />}><ThemenVorschau /></Suspense> },
+        { path: "/intern/themen/:id", element: <Suspense fallback={<Loading />}><ThemeDetail /></Suspense> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],
     },

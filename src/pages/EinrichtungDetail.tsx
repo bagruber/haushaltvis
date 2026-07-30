@@ -45,7 +45,7 @@ export function EinrichtungDetail() {
   if (!view.info)
     return (
       <p className="text-ink-muted">
-        Unbekannte Einrichtung. <Link className="text-red-600 underline" to="/themen">Zur Übersicht</Link>
+        Unbekannte Einrichtung. <Link className="text-red-600 underline" to="/erkunden">Zur Übersicht</Link>
       </p>
     );
 
@@ -65,17 +65,10 @@ export function EinrichtungDetail() {
         <h1 className="font-display text-3xl font-bold">{info.label}</h1>
         <div className="flex flex-wrap gap-2 pt-1">
           <Chip>Gliederung {info.glz}</Chip>
-          {info.themes.map((t) => (
-            <Link key={t.theme} to={`/themen/${t.theme}`}>
-              <span className="rounded-md px-2.5 py-1 text-xs text-white" style={{ background: data!.themes.themes[t.theme]?.color ?? "#999" }}>
-                {data!.themes.themes[t.theme]?.label ?? t.theme}
-              </span>
-            </Link>
-          ))}
         </div>
       </header>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
           <h2 className="font-display text-lg font-bold">Laufende Ausgaben über die Jahre</h2>
           <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. Wert {y} vorläufig.</span>
@@ -113,7 +106,7 @@ function PostenList({
     .map((p) => ({ p, v: latest.get(p.hhst_id) ?? 0 }))
     .sort((a, b) => b.v - a.v);
   return (
-    <div className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+    <div className="rounded-lg border border-ink-line bg-white p-4">
       <h2 className="font-display text-lg font-bold mb-2">{title}</h2>
       <ol className="space-y-1.5 text-sm">
         {rows.map(({ p, v }) => (

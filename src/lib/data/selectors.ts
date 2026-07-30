@@ -166,6 +166,34 @@ export function adjustSeries(
   };
 }
 
+/**
+ * Whole-budget Ansatz/Ergebnis per year — purely kameral, no theme assignment.
+ * Interne Verrechnungen are excluded so the totals don't double-count.
+ */
+export function budgetYearSeries(data: Data, ea: EA, haushalt?: Haushalt): YearSeries {
+  const { budget } = data;
+  const years = budget.meta.years;
+  const aMap = new Map<number, number>();
+  const eMap = new Map<number, number>();
+  const provisional = new Set<number>();
+  for (const f of budget.facts) {
+    const p = budget.posten[f.hhst_id];
+    if (!p || p.ea !== ea || isInternal(p)) continue;
+    if (haushalt && p.haushalt !== haushalt) continue;
+    if (f.ansatz != null) aMap.set(f.year, (aMap.get(f.year) ?? 0) + f.ansatz);
+    if (f.ergebnis != null) {
+      eMap.set(f.year, (eMap.get(f.year) ?? 0) + f.ergebnis);
+      if (f.provisional) provisional.add(f.year);
+    }
+  }
+  return {
+    years,
+    ansatz: years.map((y) => (aMap.has(y) ? Math.round(aMap.get(y)!) : null)),
+    ergebnis: years.map((y) => (eMap.has(y) ? Math.round(eMap.get(y)!) : null)),
+    provisional,
+  };
+}
+
 export interface NamedAmount {
   key: string;
   label: string;
@@ -992,22 +1020,20 @@ export interface InvestmentStacked {
 }
 
 /**
- * Investment (Vermögenshaushalt, HG 9) per year, stacked by Thema. The biggest
- * single Vorhaben get their own shade of the theme colour; the rest of each
- * theme is pooled into "Sonstige <Thema>". Multi-themed Vorhaben use their first
- * (primary) theme so the stack stays a true partition of the total.
+ * Investment (Vermögenshaushalt, HG 9) per year, stacked by Einzelplan. The
+ * biggest single Vorhaben get their own shade of the Einzelplan colour; the rest
+ * of each Einzelplan is pooled into "Sonstige · <Einzelplan>". Grouping stays
+ * kameral (not thematic) so the stack is a true partition of the total.
  */
 export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
   const years = data.budget.meta.years;
-  const themeOfGlz = new Map<string, string>();
-  const items = new Map<string, { label: string; theme: string; year: Map<number, number>; total: number }>();
+  const items = new Map<string, { label: string; ep: string; year: Map<number, number>; total: number }>();
 
   for (const f of data.budget.facts) {
     if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || p.haushalt !== "vermoegen" || isInternal(p) || isFinancing(p) || p.grz[0] !== "9") continue;
-    if (!themeOfGlz.has(p.glz)) themeOfGlz.set(p.glz, data.themes.assignment[p.hhst_id]?.[0]?.theme ?? "verwaltung_finanzen");
-    const it = items.get(p.glz) ?? { label: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(), theme: themeOfGlz.get(p.glz)!, year: new Map(), total: 0 };
+    const it = items.get(p.glz) ?? { label: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(), ep: p.einzelplan, year: new Map(), total: 0 };
     it.year.set(f.year, (it.year.get(f.year) ?? 0) + f.ansatz);
     it.total += f.ansatz;
     items.set(p.glz, it);
@@ -1017,31 +1043,31 @@ export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
   const top = all.slice(0, topN);
   const rest = all.slice(topN);
 
-  // group: theme → { tops, restYear, total }
+  // group: Einzelplan → { tops, restYear, total }
   type Item = (typeof all)[number];
-  interface ThemeGroup { tops: Item[]; restYear: Map<number, number>; total: number }
-  const byTheme = new Map<string, ThemeGroup>();
-  const group = (theme: string): ThemeGroup => {
-    let g = byTheme.get(theme);
-    if (!g) { g = { tops: [], restYear: new Map(), total: 0 }; byTheme.set(theme, g); }
+  interface EpGroup { tops: Item[]; restYear: Map<number, number>; total: number }
+  const byEp = new Map<string, EpGroup>();
+  const group = (ep: string): EpGroup => {
+    let g = byEp.get(ep);
+    if (!g) { g = { tops: [], restYear: new Map(), total: 0 }; byEp.set(ep, g); }
     return g;
   };
   for (const it of top) {
-    const g = group(it.theme);
+    const g = group(it.ep);
     g.tops.push(it);
     g.total += it.total;
   }
   for (const it of rest) {
-    const g = group(it.theme);
+    const g = group(it.ep);
     for (const [y, v] of it.year) g.restYear.set(y, (g.restYear.get(y) ?? 0) + v);
     g.total += it.total;
   }
 
   const series: StackSeries[] = [];
-  const themesSorted = [...byTheme.entries()].sort((a, b) => b[1].total - a[1].total);
-  for (const [theme, g] of themesSorted) {
-    const base = data.themes.themes[theme]?.color ?? "#999";
-    const label = data.themes.themes[theme]?.label ?? theme;
+  const epsSorted = [...byEp.entries()].sort((a, b) => b[1].total - a[1].total);
+  for (const [ep, g] of epsSorted) {
+    const base = EINZELPLAN_COLORS[ep] ?? "#999";
+    const label = einzelplanName(data, ep);
     const n = g.tops.length + (g.restYear.size ? 1 : 0);
     const sh = shades(base, n, -0.1, 0.55);
     let i = 0;
@@ -1112,6 +1138,48 @@ export interface ThemeShare extends ShareNode {
   color: string;
   /** one level deeper: Bereiche contributing to this theme (primary) */
   children: ShareNode[];
+}
+
+export interface EinzelplanShare extends ShareNode {
+  ep: string;
+  color: string;
+  /** one level deeper: Bereiche (Abschnitte) inside the Einzelplan */
+  children: ShareNode[];
+}
+
+/**
+ * Expense split by Einzelplan — a true partition (each Posten belongs to exactly
+ * one), so the shares sum to 100%. Purely kameral, no theme assignment involved.
+ * Internal transfers excluded. Drives the "Wofür zahle ich?" calculator.
+ */
+export function expenseShareByEinzelplan(data: Data, year: number): EinzelplanShare[] {
+  const acc = new Map<string, { amount: number; bereiche: Map<string, number> }>();
+  let total = 0;
+  for (const f of factsOfYear(data.budget, year)) {
+    if (f.ansatz == null) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.ea !== "A" || isInternal(p)) continue;
+    const t = acc.get(p.einzelplan) ?? { amount: 0, bereiche: new Map() };
+    t.amount += f.ansatz;
+    const ab = p.glz.slice(0, 2);
+    t.bereiche.set(ab, (t.bereiche.get(ab) ?? 0) + f.ansatz);
+    acc.set(p.einzelplan, t);
+    total += f.ansatz;
+  }
+  return [...acc.entries()]
+    .map(([ep, t]) => ({
+      ep,
+      label: einzelplanName(data, ep),
+      color: EINZELPLAN_COLORS[ep] ?? "#999",
+      amount: Math.round(t.amount),
+      share: total ? t.amount / total : 0,
+      children: [...t.bereiche.entries()]
+        .map(([ab, v]) => ({ label: abschnittName(data.labels, ab), amount: Math.round(v), share: total ? v / total : 0 }))
+        .filter((c) => c.amount > 0)
+        .sort((a, b) => b.amount - a.amount),
+    }))
+    .filter((x) => x.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
 }
 
 /**

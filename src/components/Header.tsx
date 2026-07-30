@@ -53,6 +53,12 @@ export function Header() {
         </button>
       </div>
 
+      {/* Brand signature of the Moosburg design system — the only place in the
+          app where the full palette appears, so it stays a mark, not decoration. */}
+      <div className="rainbow-stripe" aria-hidden>
+        {Array.from({ length: 9 }, (_, i) => <span key={i} />)}
+      </div>
+
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden border-t border-ink-line bg-cream px-5 py-3 space-y-2">

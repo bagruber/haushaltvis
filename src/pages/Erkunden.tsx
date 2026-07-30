@@ -82,7 +82,7 @@ export function Erkunden() {
         </div>
       )}
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <p className="text-xs text-ink-muted mb-1">
           Interne Verrechnungen sind ausgeblendet. <span className="md:hidden">Auf kleinen Bildschirmen seitlich scrollen.</span>
         </p>

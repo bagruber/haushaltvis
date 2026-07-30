@@ -12,6 +12,7 @@
   --color-red-700: #a50d24;
   --color-red-900: #6d0818;
 
+  --color-gold-100: #f6ecd5;
   --color-gold-200: #e8d5a3;
   --color-gold-500: #b8964e;
   --color-gold-600: #967a40;
@@ -27,6 +28,25 @@
 
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Rainbow stripe — fixed order, only ever as a stripe, never a gradient */
+  --color-rb-1: #e91e8c;
+  --color-rb-2: #e5202e;
+  --color-rb-3: #f4830a;
+  --color-rb-4: #f5d400;
+  --color-rb-5: #0a9e4c;
+  --color-rb-6: #009ac7;
+  --color-rb-7: #3b3f9a;
+  --color-rb-8: #8b4a2a;
+  --color-rb-9: #1a1a1a;
+
+  /* Flatter than the Tailwind default, matching the Moosburg design system.
+     Sharp-ish corners read as deliberate; soft ones read as a default. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
 
   --shadow-soft: 0 2px 12px rgb(0 0 0 / 0.07);
   --shadow-lift: 0 4px 24px rgb(0 0 0 / 0.1);
@@ -46,6 +66,32 @@ body {
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
+
+/* Small caps kicker — labels a section without competing with its heading.
+   Same role as in the Moosburg design system. */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 0.6875rem;
+}
+
+/* Rainbow stripe — 9 fixed segments, 4px, per Moosburg brand guideline */
+.rainbow-stripe {
+  display: flex;
+  height: 3px;
+  width: 100%;
+}
+.rainbow-stripe > span { flex: 1; }
+.rainbow-stripe > span:nth-child(1) { background: var(--color-rb-1); }
+.rainbow-stripe > span:nth-child(2) { background: var(--color-rb-2); }
+.rainbow-stripe > span:nth-child(3) { background: var(--color-rb-3); }
+.rainbow-stripe > span:nth-child(4) { background: var(--color-rb-4); }
+.rainbow-stripe > span:nth-child(5) { background: var(--color-rb-5); }
+.rainbow-stripe > span:nth-child(6) { background: var(--color-rb-6); }
+.rainbow-stripe > span:nth-child(7) { background: var(--color-rb-7); }
+.rainbow-stripe > span:nth-child(8) { background: var(--color-rb-8); }
+.rainbow-stripe > span:nth-child(9) { background: var(--color-rb-9); }
 
 /* Visible keyboard focus on all interactive elements */
 :focus-visible {

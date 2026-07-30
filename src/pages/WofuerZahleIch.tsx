@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useData, expenseShareByPrimaryTheme, latestYear } from "@/lib/data";
+import { useData, expenseShareByEinzelplan, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Loading } from "@/components/ui";
+import { Term } from "@/components/Term";
 import { fmtEur, fmtEurFine } from "@/lib/format";
 
 // Kommunaler Anteil je Steuerart (vereinfacht).
@@ -74,7 +75,7 @@ export function WofuerZahleIch() {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
     const beitrag = est * ANTEIL_EST + grund * ANTEIL_GRUNDSTEUER;
-    const shares = expenseShareByPrimaryTheme(data, y);
+    const shares = expenseShareByEinzelplan(data, y);
     return { y, beitrag, shares, max: shares[0]?.share ?? 1 };
   }, [data, selYear, est, grund]);
 
@@ -88,11 +89,11 @@ export function WofuerZahleIch() {
         <p className="text-ink-soft">
           Gib deine jährliche Einkommensteuer und Grundsteuer ein —
           der Rechner schätzt deinen <b>kommunalen Beitrag</b> und zeigt, wie die Stadt ihn
-          (anteilig zu ihren Gesamtausgaben {view.y}) auf die Themen verteilt.
+          (anteilig zu ihren Gesamtausgaben {view.y}) auf ihre Aufgabenbereiche verteilt.
         </p>
       </header>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="text-xs text-ink-muted">Beispiele:</span>
           {PRESETS.map((p) => (
@@ -132,11 +133,11 @@ export function WofuerZahleIch() {
         <p className="text-xs text-ink-muted">Auf einen Bereich tippen, um ihn aufzuklappen.</p>
         <ul className="space-y-2">
           {view.shares.map((s) => {
-            const isOpen = open.has(s.theme);
+            const isOpen = open.has(s.ep);
             return (
-              <li key={s.theme}>
+              <li key={s.ep}>
                 <button
-                  onClick={() => setOpen((o) => { const n = new Set(o); n.has(s.theme) ? n.delete(s.theme) : n.add(s.theme); return n; })}
+                  onClick={() => setOpen((o) => { const n = new Set(o); n.has(s.ep) ? n.delete(s.ep) : n.add(s.ep); return n; })}
                   aria-expanded={isOpen}
                   className="w-full grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-left"
                 >
@@ -163,7 +164,7 @@ export function WofuerZahleIch() {
                       </li>
                     ))}
                     <li className="pt-0.5">
-                      <Link to={`/themen/${s.theme}`} className="text-xs text-red-600 hover:underline">Thema öffnen →</Link>
+                      <Link to={`/einzelplan/${s.ep}`} className="text-xs text-red-600 hover:underline">Aufgabenbereich öffnen →</Link>
                     </li>
                   </ul>
                 )}
@@ -178,7 +179,7 @@ export function WofuerZahleIch() {
         Grundsteuer B (100 %). Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich nicht
         sinnvoll einzelnen Personen zuordnen und sind nicht enthalten. Die Stadt finanziert sich
         zudem aus Zuweisungen, Gebühren und weiteren Quellen. Die Verteilung entspricht den
-        Anteilen der Gesamtausgaben (Hauptthema je Posten). Siehe{" "}
+        Anteilen der Gesamtausgaben je <Term name="einzelplan">Einzelplan</Term>. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
     </div>

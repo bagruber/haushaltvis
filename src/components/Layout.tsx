@@ -5,7 +5,7 @@ import { YearBar } from "./YearBar";
 import { YearUrlSync } from "@/lib/year";
 
 // Routes whose main content reacts to the global Stichjahr.
-const YEAR_ROUTES = ["/", "/erkunden", "/themen/", "/einzelplan/", "/wofuer-zahle-ich"];
+const YEAR_ROUTES = ["/", "/erkunden", "/einzelplan/", "/wofuer-zahle-ich"];
 
 export function Layout() {
   const { pathname } = useLocation();
@@ -16,7 +16,7 @@ export function Layout() {
       <YearUrlSync />
       <Header />
       {showYear && (
-        <div className="sticky top-[57px] z-10">
+        <div className="sticky top-[60px] z-10">
           <YearBar />
         </div>
       )}

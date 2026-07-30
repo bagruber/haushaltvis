@@ -75,7 +75,7 @@ export function Einnahmen() {
         </span>
       </header>
 
-      <section className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+      <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="flex items-baseline justify-between gap-2 mb-1">
           <h2 className="font-display text-lg font-bold">Steuern & Zuweisungen im Zeitverlauf</h2>
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
@@ -87,7 +87,7 @@ export function Einnahmen() {
 
       <div className="space-y-4">
         {view.groups.map((g, i) => (
-          <section key={g.key} className="rounded-xl border border-ink-line bg-white p-4 shadow-soft">
+          <section key={g.key} className="rounded-lg border border-ink-line bg-white p-4">
             <div className="flex items-baseline justify-between gap-3 mb-2 border-b border-ink-line pb-1.5">
               <h2 className="flex items-center gap-2 font-display text-lg font-bold">
                 <span className="inline-block h-3.5 w-3.5 rounded-sm" style={{ background: view.colors[i] }} />
