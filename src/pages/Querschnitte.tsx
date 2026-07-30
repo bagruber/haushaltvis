@@ -1,13 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { useData, latestYear } from "@/lib/data";
-import type { Aggregator } from "@/lib/data";
+import { useData, latestYear, adjustSeries } from "@/lib/data";
+import type { Aggregator, YearSeries } from "@/lib/data";
+import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
 import { Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
-import { fmtEur, fmtEurShort } from "@/lib/format";
+import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
 // Fixed display order + colour per aggregator (keys from etl/aggregatoren.yaml).
 const ORDER = ["personal", "zuschuesse", "gebaeude", "it", "strom", "wasser"] as const;
@@ -70,6 +71,7 @@ function groupsOf(
 export function Querschnitte() {
   usePageTitle("Querschnitte");
   const { data, error } = useData();
+  const [mode, setMode] = useState<TimelineMode>({});
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -77,25 +79,56 @@ export function Querschnitte() {
     const keys = ORDER.filter((k) => aggs[k]);
     const years = [...data.budget.meta.years].sort((a, b) => a - b);
     const latest = latestYear(data.budget);
+    const ctx = data.context;
 
     // latest final (non-provisional) Ergebnis year, shared across aggregators
     const finalYear = Math.max(
       ...years.filter((y) => keys.some((k) => aggs[k].reihe[String(y)] && !aggs[k].reihe[String(y)].prov)),
     );
 
+    /** The stored reihe as a YearSeries, so it can go through adjustSeries. */
+    const toSeries = (a: Aggregator): YearSeries => ({
+      years,
+      ansatz: years.map((y) => a.reihe[String(y)]?.ansatz ?? null),
+      ergebnis: years.map((y) => a.reihe[String(y)]?.ergebnis || null),
+      provisional: new Set(years.filter((y) => a.reihe[String(y)]?.prov)),
+    });
+    const adjusted = Object.fromEntries(
+      keys.map((k) => [k, adjustSeries(toSeries(aggs[k]), ctx, mode, latest)]),
+    ) as Record<string, YearSeries>;
+
+    // Single-year amounts in the drilldown follow the same transformation:
+    // deflate to the base year's prices, then divide by that year's population.
+    const factorFor = (y: number) => {
+      let f = 1;
+      if (mode.real && ctx.cpi?.[String(y)] && ctx.cpi?.[String(latest)]) {
+        f *= ctx.cpi[String(latest)] / ctx.cpi[String(y)];
+      }
+      if (mode.perCapita && ctx.population?.[String(y)]) f /= ctx.population[String(y)];
+      return f;
+    };
+    const detailFactor = factorFor(finalYear);
+
     // per-hhst value at the latest final year (for the group breakdown)
     const factByHhstYear = new Map<string, number>();
     for (const f of data.budget.facts) {
       if (f.year === finalYear) factByHhstYear.set(f.hhst_id, f.ergebnis ?? f.ansatz ?? 0);
     }
-    const factSum = (h: string) => factByHhstYear.get(h) ?? 0;
+    const factSum = (h: string) => (factByHhstYear.get(h) ?? 0) * detailFactor;
+
+    const fmtV = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
+    const fmtAxis = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
 
     const overview: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "—"), order: "valueDesc" },
+      tooltip: {
+        trigger: "axis",
+        valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)),
+        order: "valueDesc",
+      },
       legend: { bottom: 0 },
-      grid: { left: 64, right: 16, top: 12, bottom: 44 },
+      grid: { left: 66, right: 16, top: 12, bottom: 44 },
       xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+      yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({
         name: aggs[k].title,
         type: "line" as const,
@@ -104,26 +137,25 @@ export function Querschnitte() {
         emphasis: { focus: "series" as const },
         lineStyle: { width: 2.5, color: COLOR[k] },
         itemStyle: { color: COLOR[k] },
-        data: years.map((y) => aggs[k].reihe[String(y)]?.ansatz ?? null),
+        data: adjusted[k].ansatz,
       })),
     };
 
     const cards = keys.map((k) => {
-      const a = aggs[k];
-      const rL = a.reihe[String(latest)];
-      const rF = a.reihe[String(finalYear)];
+      const s = adjusted[k];
       return {
         key: k,
-        agg: a,
+        agg: aggs[k],
         color: COLOR[k],
-        ansatzLatest: rL?.ansatz ?? 0,
-        ergebnisFinal: rF?.ergebnis ?? 0,
-        groups: groupsOf(a, data.budget.posten, factSum),
+        ansatzLatest: s.ansatz[years.indexOf(latest)],
+        ergebnisFinal: s.ergebnis[years.indexOf(finalYear)],
+        groups: groupsOf(aggs[k], data.budget.posten, factSum),
       };
     });
 
-    return { keys, years, latest, finalYear, overview, cards, aggs };
-  }, [data]);
+    const hasContext = !!(ctx.cpi || ctx.population);
+    return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext };
+  }, [data, mode]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
@@ -142,8 +174,13 @@ export function Querschnitte() {
       <section className="space-y-2">
         <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
           <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Ansätze (Plan) je Kostenblock</span>
+          <span className="text-xs text-ink-muted">
+            Ansätze (Plan) je Kostenblock
+            {mode.real && `, in Preisen von ${view.latest}`}
+            {mode.perCapita && ", je Einwohner"}
+          </span>
         </div>
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
         <EChart
           option={view.overview}
           ariaLabel="Entwicklung der Kostenblöcke über die Jahre — Zahlen in der Tabelle darunter"
@@ -152,12 +189,9 @@ export function Querschnitte() {
         <ChartTable
           summary="Jahreswerte (Ansatz) als Tabelle"
           columns={["Jahr", ...view.keys.map((k) => view.aggs[k].title)]}
-          rows={view.years.map((y) => [
+          rows={view.years.map((y, i) => [
             String(y),
-            ...view.keys.map((k) => {
-              const v = view.aggs[k].reihe[String(y)]?.ansatz;
-              return v ? fmtEur(v) : "—";
-            }),
+            ...view.keys.map((k) => view.fmtV(view.adjusted[k].ansatz[i])),
           ])}
         />
       </section>
@@ -177,8 +211,8 @@ export function Querschnitte() {
 
           <div className="flex flex-wrap gap-x-10 gap-y-3">
             {[
-              [`Ansatz ${view.latest}`, fmtEurShort(c.ansatzLatest)],
-              [`Ergebnis ${view.finalYear}`, fmtEurShort(c.ergebnisFinal)],
+              [`Ansatz ${view.latest}`, view.fmtV(c.ansatzLatest)],
+              [`Ergebnis ${view.finalYear}`, view.fmtV(c.ergebnisFinal)],
               ["Haushaltsstellen", String(c.agg.hhst.length)],
             ].map(([label, value]) => (
               <div key={label}>
@@ -198,7 +232,7 @@ export function Querschnitte() {
                   <div className="flex items-baseline justify-between gap-3 border-b border-ink-line pb-1">
                     <span className="font-medium">{g.text}</span>
                     <span className="shrink-0 tabular-nums text-ink-soft">
-                      {g.sum ? fmtEur(g.sum) : "—"}
+                      {g.sum ? view.fmtV(g.sum) : "—"}
                       <span className="ml-2 text-xs text-ink-muted">
                         {g.count} {g.count === 1 ? "Posten" : "Posten"}
                       </span>
@@ -212,14 +246,14 @@ export function Querschnitte() {
                           className="flex items-baseline justify-between gap-3 border-b border-ink-line/40 py-1 hover:text-red-600 transition-colors"
                         >
                           <span className="min-w-0 truncate text-ink-soft">{r.label}</span>
-                          <span className="shrink-0 tabular-nums">{fmtEur(r.sum)}</span>
+                          <span className="shrink-0 tabular-nums">{view.fmtV(r.sum)}</span>
                         </Link>
                       </li>
                     ))}
                     {g.restCount > 0 && (
                       <li className="flex items-baseline justify-between gap-3 py-1 text-xs text-ink-muted">
                         <span>+ {g.restCount} weitere</span>
-                        <span className="tabular-nums">{g.restSum > 0 ? fmtEur(g.restSum) : "—"}</span>
+                        <span className="tabular-nums">{g.restSum > 0 ? view.fmtV(g.restSum) : "—"}</span>
                       </li>
                     )}
                   </ul>
