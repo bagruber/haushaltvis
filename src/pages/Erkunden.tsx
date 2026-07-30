@@ -63,7 +63,7 @@ export function Erkunden() {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="font-display text-3xl font-bold">Haushalt erkunden</h1>
+        <h1 className="headline text-3xl">Haushalt erkunden</h1>
         <p className="max-w-2xl text-ink-soft">
           Der ganze Haushalt auf einen Blick: <b>links</b> woher das Geld kommt (Einnahmen),
           in der Mitte der Gesamthaushalt, <b>rechts</b> wohin es geht (Ausgaben nach
@@ -82,8 +82,8 @@ export function Erkunden() {
         </div>
       )}
 
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <p className="text-xs text-ink-muted mb-1">
+      <section className="space-y-2 border-t border-ink-line pt-4">
+        <p className="text-xs text-ink-muted">
           Interne Verrechnungen sind ausgeblendet. <span className="md:hidden">Auf kleinen Bildschirmen seitlich scrollen.</span>
         </p>
         {view ? (

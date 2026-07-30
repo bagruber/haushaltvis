@@ -194,6 +194,18 @@ export function budgetYearSeries(data: Data, ea: EA, haushalt?: Haushalt): YearS
   };
 }
 
+/** Ausgaben minus Einnahmen — the share the general budget has to carry. */
+export function netSeries(ausgaben: YearSeries, einnahmen: YearSeries): YearSeries {
+  const sub = (a: (number | null)[], e: (number | null)[]) =>
+    ausgaben.years.map((_, i) => (a[i] == null && e[i] == null ? null : (a[i] ?? 0) - (e[i] ?? 0)));
+  return {
+    years: ausgaben.years,
+    ansatz: sub(ausgaben.ansatz, einnahmen.ansatz),
+    ergebnis: sub(ausgaben.ergebnis, einnahmen.ergebnis),
+    provisional: ausgaben.provisional,
+  };
+}
+
 export interface NamedAmount {
   key: string;
   label: string;
@@ -1002,6 +1014,141 @@ export function investmentsAll(data: Data, year: number): InvestmentsAll {
   };
 }
 
+// ── Investment projects (multi-year view) ───────────────────────────────────
+
+/**
+ * How an investment is counter-financed. Kept apart on purpose: lumping land
+ * sales in with grants produced "funding quotas" above 300% for Baugebiete,
+ * where the city develops land and sells it on.
+ */
+export type FundingKind = "foerderung" | "beitraege" | "verkauf" | "sonstige";
+
+export const FUNDING_LABEL: Record<FundingKind, string> = {
+  foerderung: "Förderung & Zuschüsse",
+  beitraege: "Anliegerbeiträge",
+  verkauf: "Verkaufserlöse",
+  sonstige: "Sonstige Einnahmen",
+};
+
+export const FUNDING_COLOR: Record<FundingKind, string> = {
+  foerderung: "#0a9e4c",
+  beitraege: "#b8964e",
+  verkauf: "#009ac7",
+  sonstige: "#8a7a5c",
+};
+
+function fundingKind(grz: string): FundingKind {
+  if (grz.startsWith("36")) return "foerderung";
+  if (grz.startsWith("35")) return "beitraege";
+  if (grz.startsWith("34") || grz.startsWith("33")) return "verkauf";
+  return "sonstige";
+}
+
+export type Funding = Record<FundingKind, number>;
+const emptyFunding = (): Funding => ({ foerderung: 0, beitraege: 0, verkauf: 0, sonstige: 0 });
+
+export interface InvestProject {
+  glz: string;
+  label: string;
+  einzelplan: string;
+  /** years carrying an Ansatz, ascending */
+  years: number[];
+  first: number;
+  last: number;
+  /** already running when the data starts / still running when it ends */
+  offenAnfang: boolean;
+  offenEnde: boolean;
+  /** budgeted in nearly every year — a standing line, not a single project */
+  daueransatz: boolean;
+  /** gross investment over all years, and in the selected year */
+  total: number;
+  imJahr: number;
+  funding: Funding;
+  fundingImJahr: Funding;
+  /** total minus all counter-financing */
+  eigenanteil: number;
+  eigenanteilImJahr: number;
+}
+
+/**
+ * Investments grouped as projects (one Gliederung = one Vorhaben), summed over
+ * their whole runtime. The runtime is derived from the data: a project exists
+ * in the years it carries an Ansatz. Since the data starts in the first and
+ * ends in the last available year, projects touching either edge are flagged as
+ * open-ended rather than silently truncated.
+ */
+export function investmentProjects(data: Data, year: number): InvestProject[] {
+  const years = data.budget.meta.years;
+  const firstYear = years[0];
+  const lastYear = years[years.length - 1];
+
+  interface Acc {
+    label: string;
+    einzelplan: string;
+    byYear: Map<number, number>;
+    funding: Funding;
+    fundingImJahr: Funding;
+  }
+  const acc = new Map<string, Acc>();
+  const get = (p: Posten): Acc => {
+    let a = acc.get(p.glz);
+    if (!a) {
+      a = {
+        label: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(),
+        einzelplan: p.einzelplan,
+        byYear: new Map(),
+        funding: emptyFunding(),
+        fundingImJahr: emptyFunding(),
+      };
+      acc.set(p.glz, a);
+    }
+    return a;
+  };
+
+  for (const f of data.budget.facts) {
+    if (f.ansatz == null || f.ansatz === 0) continue;
+    const p = data.budget.posten[f.hhst_id];
+    if (!p || p.haushalt !== "vermoegen" || isInternal(p) || isFinancing(p)) continue;
+    if (p.ea === "A" && p.grz[0] === "9") {
+      const a = get(p);
+      a.byYear.set(f.year, (a.byYear.get(f.year) ?? 0) + f.ansatz);
+    } else if (p.ea === "E" && p.grz[0] === "3") {
+      const a = get(p);
+      const kind = fundingKind(p.grz);
+      a.funding[kind] += f.ansatz;
+      if (f.year === year) a.fundingImJahr[kind] += f.ansatz;
+    }
+  }
+
+  const out: InvestProject[] = [];
+  for (const [glz, a] of acc) {
+    const ys = [...a.byYear.keys()].sort((x, y) => x - y);
+    if (!ys.length) continue;
+    const total = [...a.byYear.values()].reduce((s, v) => s + v, 0);
+    if (total <= 0) continue;
+    const sum = (f: Funding) => f.foerderung + f.beitraege + f.verkauf + f.sonstige;
+    const imJahr = a.byYear.get(year) ?? 0;
+    out.push({
+      glz,
+      label: a.label,
+      einzelplan: a.einzelplan,
+      years: ys,
+      first: ys[0],
+      last: ys[ys.length - 1],
+      offenAnfang: ys[0] === firstYear,
+      offenEnde: ys[ys.length - 1] === lastYear,
+      daueransatz: ys.length >= years.length - 1,
+      total: Math.round(total),
+      imJahr: Math.round(imJahr),
+      funding: a.funding,
+      fundingImJahr: a.fundingImJahr,
+      eigenanteil: Math.round(total - sum(a.funding)),
+      eigenanteilImJahr: Math.round(imJahr - sum(a.fundingImJahr)),
+    });
+  }
+  return out.sort((a, b) => b.total - a.total);
+}
+
 // ── Income-category time series + stacked investments ───────────────────────
 
 /** Ansatz/Ergebnis per year for one income category (e.g. "Gewerbesteuer"). */
@@ -1143,42 +1290,54 @@ export interface ThemeShare extends ShareNode {
 export interface EinzelplanShare extends ShareNode {
   ep: string;
   color: string;
-  /** one level deeper: Bereiche (Abschnitte) inside the Einzelplan */
+  /** gross expenses and the income that offsets them */
+  ausgaben: number;
+  einnahmen: number;
+  /** one level deeper: Bereiche (Abschnitte) inside the Einzelplan, also net */
   children: ShareNode[];
 }
 
 /**
- * Expense split by Einzelplan — a true partition (each Posten belongs to exactly
- * one), so the shares sum to 100%. Purely kameral, no theme assignment involved.
- * Internal transfers excluded. Drives the "Wofür zahle ich?" calculator.
+ * Net burden (Zuschussbedarf = Ausgaben − Einnahmen) per Einzelplan, as a share
+ * of the total net burden. Areas that cover their own cost through fees drop
+ * out; Einzelplan 9 (taxes, Schlüsselzuweisungen) is strongly negative — it is
+ * the source that funds the rest, not a use of money — and is therefore not
+ * listed. Purely kameral. Drives the "Wofür zahle ich?" calculator.
  */
-export function expenseShareByEinzelplan(data: Data, year: number): EinzelplanShare[] {
-  const acc = new Map<string, { amount: number; bereiche: Map<string, number> }>();
-  let total = 0;
+export function netBurdenByEinzelplan(data: Data, year: number): EinzelplanShare[] {
+  const acc = new Map<string, { a: number; e: number; bereiche: Map<string, number> }>();
   for (const f of factsOfYear(data.budget, year)) {
     if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
-    if (!p || p.ea !== "A" || isInternal(p)) continue;
-    const t = acc.get(p.einzelplan) ?? { amount: 0, bereiche: new Map() };
-    t.amount += f.ansatz;
+    if (!p || isInternal(p)) continue;
+    const t = acc.get(p.einzelplan) ?? { a: 0, e: 0, bereiche: new Map() };
+    const signed = p.ea === "A" ? f.ansatz : -f.ansatz;
+    if (p.ea === "A") t.a += f.ansatz;
+    else t.e += f.ansatz;
     const ab = p.glz.slice(0, 2);
-    t.bereiche.set(ab, (t.bereiche.get(ab) ?? 0) + f.ansatz);
+    t.bereiche.set(ab, (t.bereiche.get(ab) ?? 0) + signed);
     acc.set(p.einzelplan, t);
-    total += f.ansatz;
   }
-  return [...acc.entries()]
-    .map(([ep, t]) => ({
+
+  const nets = [...acc.entries()]
+    .map(([ep, t]) => ({ ep, t, net: t.a - t.e }))
+    .filter((x) => x.net > 0);
+  const total = nets.reduce((s, x) => s + x.net, 0);
+
+  return nets
+    .map(({ ep, t, net }) => ({
       ep,
       label: einzelplanName(data, ep),
       color: EINZELPLAN_COLORS[ep] ?? "#999",
-      amount: Math.round(t.amount),
-      share: total ? t.amount / total : 0,
+      amount: Math.round(net),
+      share: total ? net / total : 0,
+      ausgaben: Math.round(t.a),
+      einnahmen: Math.round(t.e),
       children: [...t.bereiche.entries()]
         .map(([ab, v]) => ({ label: abschnittName(data.labels, ab), amount: Math.round(v), share: total ? v / total : 0 }))
         .filter((c) => c.amount > 0)
         .sort((a, b) => b.amount - a.amount),
     }))
-    .filter((x) => x.amount > 0)
     .sort((a, b) => b.amount - a.amount);
 }
 

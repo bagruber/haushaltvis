@@ -9,7 +9,7 @@ export function Impressum() {
   usePageTitle("Impressum");
   return (
     <div className="space-y-4 max-w-2xl">
-      <h1 className="font-display text-3xl font-bold">Impressum</h1>
+      <h1 className="headline text-3xl">Impressum</h1>
       <section className="space-y-1 text-ink-soft">
         <h2 className="font-display text-xl font-bold text-ink">Angaben gemäß § 5 DDG</h2>
         <p>
@@ -48,7 +48,7 @@ export function Datenschutz() {
   usePageTitle("Datenschutz");
   return (
     <div className="space-y-4 max-w-2xl">
-      <h1 className="font-display text-3xl font-bold">Datenschutzerklärung</h1>
+      <h1 className="headline text-3xl">Datenschutzerklärung</h1>
       <section className="space-y-2 text-ink-soft">
         <h2 className="font-display text-xl font-bold text-ink">Kurzfassung</h2>
         <p>
@@ -93,7 +93,7 @@ export function Barrierefreiheit() {
   usePageTitle("Barrierefreiheit");
   return (
     <div className="space-y-4 max-w-2xl">
-      <h1 className="font-display text-3xl font-bold">Erklärung zur Barrierefreiheit</h1>
+      <h1 className="headline text-3xl">Erklärung zur Barrierefreiheit</h1>
       <p className="text-ink-soft">
         Diese Erklärung erfolgt freiwillig: Als privates Projekt unterliegt die Seite nicht der
         BayBITV — sie orientiert sich aber bewusst an deren Anforderungen (WCAG 2.1 AA /

@@ -5,7 +5,7 @@ export function Methodik() {
   usePageTitle("Methodik & Datengrundlage");
   return (
     <div className="space-y-6 max-w-2xl">
-      <h1 className="font-display text-3xl font-bold">Methodik & Datengrundlage</h1>
+      <h1 className="headline text-3xl">Methodik & Datengrundlage</h1>
 
       <div className="rounded-xl border border-gold-500/50 bg-gold-100/60 p-4 text-sm">
         <p className="font-semibold text-ink">Wichtiger Hinweis: KI-gestützte Aufbereitung</p>

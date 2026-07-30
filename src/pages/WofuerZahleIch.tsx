@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useData, expenseShareByEinzelplan, latestYear } from "@/lib/data";
+import { useData, netBurdenByEinzelplan, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Loading } from "@/components/ui";
@@ -75,7 +75,7 @@ export function WofuerZahleIch() {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
     const beitrag = est * ANTEIL_EST + grund * ANTEIL_GRUNDSTEUER;
-    const shares = expenseShareByEinzelplan(data, y);
+    const shares = netBurdenByEinzelplan(data, y);
     return { y, beitrag, shares, max: shares[0]?.share ?? 1 };
   }, [data, selYear, est, grund]);
 
@@ -85,11 +85,12 @@ export function WofuerZahleIch() {
   return (
     <div className="space-y-6 max-w-2xl">
       <header className="space-y-2">
-        <h1 className="font-display text-3xl font-bold">Wofür zahle ich?</h1>
+        <h1 className="headline text-3xl">Wofür zahle ich?</h1>
         <p className="text-ink-soft">
-          Gib deine jährliche Einkommensteuer und Grundsteuer ein —
-          der Rechner schätzt deinen <b>kommunalen Beitrag</b> und zeigt, wie die Stadt ihn
-          (anteilig zu ihren Gesamtausgaben {view.y}) auf ihre Aufgabenbereiche verteilt.
+          Gib deine jährliche Einkommensteuer und Grundsteuer ein — der Rechner schätzt deinen{" "}
+          <b>kommunalen Beitrag</b> und zeigt, wohin er {view.y} fließt. Verteilt wird nach{" "}
+          <b>Zuschussbedarf</b>: Bereiche, die sich über Gebühren selbst tragen, kosten dich fast
+          nichts — Steuergeld deckt vor allem das, was übrig bleibt.
         </p>
       </header>
 
@@ -157,6 +158,12 @@ export function WofuerZahleIch() {
 
                 {isOpen && (
                   <ul className="mt-1.5 ml-6 space-y-1 border-l border-ink-line pl-3">
+                    {s.einnahmen > 0 && (
+                      <li className="pb-1 text-xs text-ink-muted">
+                        {fmtEur(s.ausgaben)} Ausgaben, davon {fmtEur(s.einnahmen)} über eigene
+                        Einnahmen gedeckt ({Math.round((s.einnahmen / s.ausgaben) * 100)} %).
+                      </li>
+                    )}
                     {s.children.map((c) => (
                       <li key={c.label} className="flex items-center justify-between gap-3 text-sm">
                         <span className="truncate text-ink-soft">{c.label}</span>
@@ -178,8 +185,10 @@ export function WofuerZahleIch() {
         Vereinfachtes Modell: Berücksichtigt sind nur Einkommensteuer (15 % Gemeindeanteil) und
         Grundsteuer B (100 %). Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich nicht
         sinnvoll einzelnen Personen zuordnen und sind nicht enthalten. Die Stadt finanziert sich
-        zudem aus Zuweisungen, Gebühren und weiteren Quellen. Die Verteilung entspricht den
-        Anteilen der Gesamtausgaben je <Term name="einzelplan">Einzelplan</Term>. Siehe{" "}
+        zudem aus Zuweisungen, Gebühren und weiteren Quellen. Verteilt wird nach dem
+        Zuschussbedarf je <Term name="einzelplan">Einzelplan</Term> (Ausgaben abzüglich eigener
+        Einnahmen); die Finanzwirtschaft, aus der die Steuern selbst stammen, ist keine Ausgabe
+        und daher nicht aufgeführt. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
     </div>

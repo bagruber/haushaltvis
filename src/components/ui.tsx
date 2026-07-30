@@ -1,4 +1,5 @@
 // Small shared UI primitives, previously duplicated across pages.
+import { Link } from "react-router-dom";
 
 export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -12,8 +13,8 @@ export function Stat({ label, value, hint }: { label: string; value: string; hin
 
 export function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-ink-line bg-white p-4">
-      <h3 className="font-display text-lg font-bold">{title}</h3>
+    <section className="space-y-1">
+      <h3 className="font-display text-lg font-bold border-b border-ink-line pb-2">{title}</h3>
       {hint && <p className="text-xs text-ink-muted mb-2">{hint}</p>}
       <div className={hint ? "" : "mt-2"}>{children}</div>
     </section>
@@ -25,6 +26,22 @@ export function Chip({ children }: { children: React.ReactNode }) {
     <span className="rounded-md border border-ink-line bg-cream px-2.5 py-1 text-xs text-ink-soft">
       {children}
     </span>
+  );
+}
+
+/**
+ * Holds the place of the (unreleased) thematic tags. Deliberately colourless
+ * and dashed: it marks a gap without implying a classification exists.
+ */
+export function ThemaPlatzhalter() {
+  return (
+    <Link
+      to="/themen"
+      title="Die thematische Zuordnung ist noch nicht freigegeben"
+      className="rounded-md border border-dashed border-ink-line px-2.5 py-1 text-xs text-ink-muted hover:border-ink-soft hover:text-ink-soft transition-colors"
+    >
+      Thema folgt
+    </Link>
   );
 }
 

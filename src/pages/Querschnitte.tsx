@@ -96,7 +96,7 @@ export function Querschnitte() {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="font-display text-3xl font-bold">Querschnitte</h1>
+        <h1 className="headline text-3xl">Querschnitte</h1>
         <p className="max-w-2xl text-ink-soft">
           Manche Kosten verteilen sich über den ganzen Haushalt — Personal steckt in fast
           jeder Einrichtung, Strom in jedem Gebäude. Diese <b>Kostenblöcke</b> bündeln solche
@@ -104,9 +104,9 @@ export function Querschnitte() {
         </p>
       </header>
 
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <div className="flex items-baseline justify-between gap-2 mb-1">
-          <h2 className="font-display text-lg font-bold">Entwicklung über die Jahre</h2>
+      <section className="space-y-2">
+        <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+          <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
           <span className="text-xs text-ink-muted">Ansätze (Plan) je Kostenblock</span>
         </div>
         <EChart

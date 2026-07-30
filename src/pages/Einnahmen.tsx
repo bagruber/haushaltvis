@@ -65,7 +65,7 @@ export function Einnahmen() {
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="font-display text-3xl font-bold">Woher das Geld kommt</h1>
+        <h1 className="headline text-3xl">Woher das Geld kommt</h1>
         <p className="max-w-2xl text-ink-soft">
           Die Einnahmen der Stadt nach Art geordnet — Steuern, Zuweisungen, Gebühren und mehr.
           Interne Verrechnungen sind ausgeblendet.
@@ -75,9 +75,9 @@ export function Einnahmen() {
         </span>
       </header>
 
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <div className="flex items-baseline justify-between gap-2 mb-1">
-          <h2 className="font-display text-lg font-bold">Steuern & Zuweisungen im Zeitverlauf</h2>
+      <section className="space-y-2">
+        <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+          <h2 className="font-display text-xl font-bold">Steuern & Zuweisungen im Zeitverlauf</h2>
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
@@ -85,14 +85,11 @@ export function Einnahmen() {
         <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {view.groups.map((g, i) => (
-          <section key={g.key} className="rounded-lg border border-ink-line bg-white p-4">
-            <div className="flex items-baseline justify-between gap-3 mb-2 border-b border-ink-line pb-1.5">
-              <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-                <span className="inline-block h-3.5 w-3.5 rounded-sm" style={{ background: view.colors[i] }} />
-                {g.label}
-              </h2>
+          <section key={g.key} className="border-t-2 pt-3" style={{ borderColor: view.colors[i] }}>
+            <div className="flex items-baseline justify-between gap-3 mb-2">
+              <h2 className="font-display text-lg font-bold">{g.label}</h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(g.value)}</span>
             </div>
             <ul className="space-y-1.5 text-sm">

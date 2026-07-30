@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, postenSeries, postenCrumb, eventsFor } from "@/lib/data";
 import { usePageTitle } from "@/lib/title";
-import { Chip, Loading } from "@/components/ui";
+import { Chip, Loading, ThemaPlatzhalter } from "@/components/ui";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 
 export function PostenDetail() {
@@ -53,12 +53,13 @@ export function PostenDetail() {
           <Chip>{p.ea === "E" ? "Einnahme" : "Ausgabe"}</Chip>
           <Chip>{p.haushalt === "verwaltung" ? "Verwaltungshaushalt" : "Vermögenshaushalt"}</Chip>
           <Chip>Haushaltsstelle {p.glz}.{p.grz}</Chip>
+          <ThemaPlatzhalter />
         </div>
       </header>
 
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
-          <h2 className="font-display text-lg font-bold">Entwicklung über die Jahre</h2>
+      <section className="space-y-2">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+          <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
           <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Wert {baseYear} vorläufig.</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
@@ -66,8 +67,8 @@ export function PostenDetail() {
       </section>
 
       {events.length > 0 && (
-        <section className="rounded-lg border border-ink-line bg-white p-4">
-          <h2 className="font-display text-lg font-bold mb-2">Ereignisse</h2>
+        <section>
+          <h2 className="font-display text-xl font-bold mb-2 border-b border-ink-line pb-2">Ereignisse</h2>
           <ul className="space-y-2">
             {events.map((e, i) => (
               <li key={i} className="flex gap-3 text-sm">

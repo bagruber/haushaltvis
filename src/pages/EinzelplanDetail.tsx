@@ -17,18 +17,25 @@ export function EinzelplanDetail() {
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
-    const sections = einzelplanSections(data, ep, y).map((s) => ({
-      ...s,
-      laufend: bereichSeries(data, s.code, "A", "verwaltung"),
-      invest: bereichSeries(data, s.code, "A", "vermoegen"),
-    }));
+    const sections = einzelplanSections(data, ep, y).map((s) => {
+      const einnahmen = bereichSeries(data, s.code, "E", "verwaltung");
+      return {
+        ...s,
+        laufend: bereichSeries(data, s.code, "A", "verwaltung"),
+        invest: bereichSeries(data, s.code, "A", "vermoegen"),
+        einnahmen,
+        hasEinnahmen: einnahmen.ansatz.some((v) => v) || einnahmen.ergebnis.some((v) => v),
+      };
+    });
     const total = sections.reduce((s, x) => s + x.total, 0);
     const hasInvest = sections.some((s) => s.invest.ansatz.some((v) => v) || s.invest.ergebnis.some((v) => v));
+    const hasEinnahmen = sections.some((s) => s.hasEinnahmen);
     return {
       y,
       sections,
       total,
       hasInvest,
+      hasEinnahmen,
       hasContext: !!(data.context.cpi || data.context.population),
       name: einzelplanName(data, ep),
       intro: data.einleitungen[`ep:${ep}`],
@@ -61,18 +68,18 @@ export function EinzelplanDetail() {
 
       <div className="flex flex-wrap items-center gap-4">
         <span className="rounded-md bg-white border border-ink-line px-3 py-1.5 text-sm">Ausgaben {view.y}: <b>{fmtEurShort(view.total)}</b></span>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={view.hasInvest} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={view.hasInvest} hasEinnahmen={view.hasEinnahmen} />
       </div>
 
       <div className="space-y-4">
         {view.sections.map((s) => (
-          <section key={s.code} className="rounded-lg border border-ink-line bg-white p-4">
-            <div className="flex items-baseline justify-between gap-3 mb-2 border-b border-ink-line pb-1.5">
+          <section key={s.code} className="border-t-2 pt-3" style={{ borderColor: color }}>
+            <div className="flex items-baseline justify-between gap-3 mb-2">
               <h2 className="font-display text-lg font-bold">{s.label}</h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(s.total)}</span>
             </div>
 
-            <Timeline laufend={s.laufend} invest={s.invest} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} />
+            <Timeline laufend={s.laufend} invest={s.invest} einnahmen={s.einnahmen} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} />
 
             <ul className="space-y-1.5 text-sm mt-3">
               {s.einrichtungen.map((e) => (

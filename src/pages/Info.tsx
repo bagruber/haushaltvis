@@ -4,7 +4,7 @@ export function Info() {
   usePageTitle("Über das Projekt");
   return (
     <div className="space-y-4 max-w-2xl">
-      <h1 className="font-display text-3xl font-bold">Über dieses Projekt</h1>
+      <h1 className="headline text-3xl">Über dieses Projekt</h1>
       <p className="text-ink-soft">
         Diese Seite macht den Haushalt der Stadt Moosburg an der Isar sichtbar. Grundlage sind
         die kameralen Haushaltspläne. Buchhalterisch ist der Haushalt in zwei Teile getrennt:

@@ -12,10 +12,8 @@ import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const VERWALTUNG = "#8a7a5c";
 const VERMOEGEN = "#c8102e";
+const PROKOPF_LINE = "#b8964e";
 const REAL_LINE = "#2f6f8f";
-
-/** Prices are expressed in this year's euros in the real-terms series. */
-const PREISBASIS = 2020;
 
 export function Home() {
   usePageTitle();
@@ -34,8 +32,18 @@ export function Home() {
     const einnahmen = budgetYearSeries(data, "E");
 
     const ctx = data.context;
-    const proKopf = adjustSeries(ausgaben, ctx, { perCapita: true }, PREISBASIS);
-    const proKopfReal = adjustSeries(ausgaben, ctx, { perCapita: true, real: true }, PREISBASIS);
+    // Basis = erstes Datenjahr: alle drei Reihen starten dort bei 100, sodass
+    // sich die beiden Effekte (Einwohner, Teuerung) nacheinander ablesen lassen.
+    const basis = years[0];
+    const proKopf = adjustSeries(ausgaben, ctx, { perCapita: true }, basis);
+    const proKopfReal = adjustSeries(ausgaben, ctx, { perCapita: true, real: true }, basis);
+
+    /** Index a series to 100 in the base year; null stays null. */
+    const index = (vals: (number | null)[]) => {
+      const ref = vals[0];
+      if (!ref) return vals.map(() => null);
+      return vals.map((v) => (v == null ? null : Math.round((v / ref) * 1000) / 10));
+    };
 
     const pop = ctx.population?.[String(y)];
     const popFirst = ctx.population?.[String(years[0])];
@@ -69,34 +77,71 @@ export function Home() {
       ],
     };
 
-    // Chart 2 — the same money per inhabitant, nominal against real.
+    // Chart 2 — one effect peeled off at a time, all indexed to the base year:
+    // absolute → per inhabitant (removes population growth) → real (removes
+    // inflation on top). Euro levels differ by ~4 orders of magnitude, so an
+    // index is the only way to read the three against each other.
+    const idxAbs = index(ausgaben.ansatz);
+    const idxPk = index(proKopf.ansatz);
+    const idxReal = index(proKopfReal.ansatz);
+    const euroOf = { abs: ausgaben.ansatz, pk: proKopf.ansatz, real: proKopfReal.ansatz };
+
     const proKopfOpt: EChartsOption = {
       tooltip: {
         trigger: "axis",
-        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
+        formatter: (params) => {
+          const rows = params as { dataIndex: number; seriesName: string; value: number; color: string }[];
+          if (!rows.length) return "";
+          const i = rows[0].dataIndex;
+          const euro = [euroOf.abs[i], euroOf.pk[i], euroOf.real[i]];
+          const body = rows
+            .map((r, k) => {
+              const e = euro[k];
+              const shown = k === 0 ? (e == null ? "—" : fmtEurShort(e)) : e == null ? "—" : fmtEur(Math.round(e));
+              return `<div style="display:flex;gap:8px;justify-content:space-between">
+                <span><span style="display:inline-block;width:8px;height:8px;background:${r.color};margin-right:6px"></span>${r.seriesName}</span>
+                <b>${r.value ?? "—"}</b> <span style="color:#888">${shown}</span></div>`;
+            })
+            .join("");
+          return `<b>${years[i]}</b>${body}`;
+        },
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
-      grid: { left: 64, right: 16, top: 16, bottom: 48 },
+      grid: { left: 48, right: 16, top: 16, bottom: 64 },
       xAxis: { type: "category", data: years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
+      yAxis: {
+        type: "value",
+        name: `Index ${basis} = 100`,
+        nameTextStyle: { color: "#6f6b63", fontSize: 11 },
+        axisLabel: { formatter: (v: number) => String(v) },
+      },
       series: [
         {
-          name: "je Einwohner (jeweilige Preise)",
+          name: "Ausgaben insgesamt",
           type: "line",
           smooth: true,
           showSymbol: false,
           lineStyle: { width: 2.5, color: VERMOEGEN },
           itemStyle: { color: VERMOEGEN },
-          data: proKopf.ansatz.map((v) => (v == null ? null : Math.round(v))),
+          data: idxAbs,
         },
         {
-          name: `je Einwohner, inflationsbereinigt (Preise ${PREISBASIS})`,
+          name: "je Einwohner",
+          type: "line",
+          smooth: true,
+          showSymbol: false,
+          lineStyle: { width: 2.5, color: PROKOPF_LINE },
+          itemStyle: { color: PROKOPF_LINE },
+          data: idxPk,
+        },
+        {
+          name: "je Einwohner, inflationsbereinigt",
           type: "line",
           smooth: true,
           showSymbol: false,
           lineStyle: { width: 2.5, color: REAL_LINE, type: "dashed" },
           itemStyle: { color: REAL_LINE },
-          data: proKopfReal.ansatz.map((v) => (v == null ? null : Math.round(v))),
+          data: idxReal,
         },
       ],
     };
@@ -108,13 +153,13 @@ export function Home() {
       einnahmen: einnahmen.ansatz[i] ?? 0,
       investAnteil: (vmh.ansatz[i] ?? 0) / ((vwh.ansatz[i] ?? 0) + (vmh.ansatz[i] ?? 1)),
       pop,
+      basis,
       popGrowth: pop && popFirst ? pop / popFirst - 1 : null,
       proKopfNominal: proKopf.ansatz[i],
-      proKopfReal: proKopfReal.ansatz[i],
-      proKopfRealFirst: proKopfReal.ansatz[0],
+      idx: { abs: idxAbs[i], pk: idxPk[i], real: idxReal[i] },
       haushalte,
       proKopfOpt,
-      series: { vwh, vmh, proKopf, proKopfReal },
+      series: { vwh, vmh, ausgaben, proKopf, proKopfReal },
     };
   }, [data, selYear]);
 
@@ -127,15 +172,15 @@ export function Home() {
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
-  const realDelta =
-    view.proKopfReal && view.proKopfRealFirst ? view.proKopfReal / view.proKopfRealFirst - 1 : null;
   const pct = (x: number) => `${x > 0 ? "+" : "−"}${Math.abs(Math.round(x * 100))} %`;
+  /** Index value 128.4 → "+28 %" against the base year. */
+  const fromIndex = (v: number | null) => (v == null ? null : v / 100 - 1);
 
   return (
     <div className="space-y-12">
       <section className="max-w-2xl space-y-4">
         <p className="eyebrow text-ink-muted">Stadt Moosburg an der Isar</p>
-        <h1 className="font-display text-4xl font-bold text-ink">Der Haushalt, öffentlich lesbar</h1>
+        <h1 className="headline text-4xl text-ink">Der Haushalt, öffentlich lesbar</h1>
         <p className="text-lg text-ink-soft">
           Jedes Jahr beschließt der Stadtrat, wofür Moosburg Geld ausgibt und woher es kommt.
           Dieser Beschluss ist der <b>Haushalt</b> — {fmtEurShort(view.ausgaben)} im Jahr {view.y}.
@@ -206,44 +251,53 @@ export function Home() {
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Was davon Wachstum ist</h2>
-          <span className="text-xs text-ink-muted">Ausgaben je Einwohner</span>
+          <h2 className="font-display text-2xl font-bold">Was davon echtes Wachstum ist</h2>
+          <span className="text-xs text-ink-muted">{view.basis} = 100</span>
         </div>
-        <div className="max-w-2xl space-y-3">
-          <p className="text-ink-soft">
-            Ein größerer Haushalt bedeutet nicht automatisch mehr Leistung. Moosburg ist seit{" "}
-            {view.years[0]} um{" "}
-            {view.popGrowth != null ? pct(view.popGrowth) : "einige Prozent"} gewachsen, und das
-            Geld selbst hat an Wert verloren. Rechnet man beides heraus, bleibt die durchgezogene
-            Linie als nominale Entwicklung und die gestrichelte als reale.
-          </p>
-        </div>
+        <p className="max-w-2xl text-ink-soft">
+          Ein größerer Haushalt heißt nicht automatisch mehr Leistung. Zwei Effekte blähen ihn
+          auf, ohne dass eine Straße breiter wird: Moosburg hat <b>mehr Einwohner</b>, und das
+          Geld ist <b>weniger wert</b>. Die drei Linien ziehen beide nacheinander ab.
+        </p>
         <EChart
           option={view.proKopfOpt}
-          ariaLabel={`Ausgaben je Einwohner, nominal und inflationsbereinigt in Preisen von ${PREISBASIS} — Zahlen in der Tabelle darunter`}
-          style={{ height: 340 }}
+          ariaLabel={`Ausgabenentwicklung als Index, ${view.basis} gleich 100: insgesamt, je Einwohner und zusätzlich inflationsbereinigt — Zahlen in der Tabelle darunter`}
+          style={{ height: 360 }}
         />
-        <p className="max-w-2xl text-sm text-ink-soft">
-          {realDelta != null && (
-            <>
-              Real, also nach Abzug der Inflation und je Einwohner, liegen die Ausgaben{" "}
-              {view.y} um <b>{pct(realDelta)}</b> über dem Stand von {view.years[0]}.{" "}
-            </>
-          )}
-          Der Abstand zwischen beiden Linien ist die Teuerung.
-        </p>
+        <ol className="max-w-2xl space-y-2 text-sm">
+          {[
+            [VERMOEGEN, "Ausgaben insgesamt", fromIndex(view.idx.abs),
+              "So viel mehr gibt die Stadt nominal aus als " + view.basis + "."],
+            [PROKOPF_LINE, "je Einwohner", fromIndex(view.idx.pk),
+              `Bevölkerung ${view.popGrowth != null ? pct(view.popGrowth) : "gewachsen"} — pro Kopf bleibt weniger Zuwachs übrig.`],
+            [REAL_LINE, "je Einwohner, inflationsbereinigt", fromIndex(view.idx.real),
+              "Nach Abzug der Teuerung: der tatsächliche Zuwachs an Leistung."],
+          ].map(([color, label, delta, text]) => (
+            <li key={label as string} className="flex gap-3">
+              <span className="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: color as string }} />
+              <span>
+                <b>{label as string}</b>
+                {delta != null && (
+                  <span className="ml-2 font-display font-bold tabular-nums">{pct(delta as number)}</span>
+                )}
+                <span className="block text-ink-muted">{text as string}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
         <ChartTable
           summary="Jahreswerte als Tabelle"
-          columns={["Jahr", "je Einwohner", `je Einwohner (Preise ${PREISBASIS})`]}
+          columns={["Jahr", "Ausgaben insgesamt", "je Einwohner", "je Einwohner, real"]}
           rows={view.years.map((y, i) => [
             String(y),
+            view.series.ausgaben.ansatz[i] ? fmtEur(view.series.ausgaben.ansatz[i]!) : "—",
             view.series.proKopf.ansatz[i] ? fmtEur(Math.round(view.series.proKopf.ansatz[i]!)) : "—",
             view.series.proKopfReal.ansatz[i] ? fmtEur(Math.round(view.series.proKopfReal.ansatz[i]!)) : "—",
           ])}
         />
         <p className="text-xs text-ink-muted">
           Einwohnerzahlen: Bayerisches Landesamt für Statistik (Zwischenjahre interpoliert).
-          Preisentwicklung: Verbraucherpreisindex Deutschland, {PREISBASIS} = 100.
+          Preisentwicklung: Verbraucherpreisindex Deutschland, umbasiert auf {view.basis}.
         </p>
       </section>
 

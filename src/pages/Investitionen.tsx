@@ -2,67 +2,119 @@ import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { useData, investmentsAll, investmentStacked, latestYear } from "@/lib/data";
+import {
+  useData,
+  investmentProjects,
+  investmentStacked,
+  latestYear,
+  FUNDING_LABEL,
+  FUNDING_COLOR,
+  type FundingKind,
+  type InvestProject,
+} from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { EINZELPLAN_COLORS } from "@/lib/colors";
-import { Stat, Loading } from "@/components/ui";
+import { Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
-const TOP = 18;
+const KINDS: FundingKind[] = ["foerderung", "beitraege", "verkauf"];
+const EIGEN_COLOR = "#c8102e";
+const TOP_JAHR = 14;
+
+const sumFunding = (f: Record<FundingKind, number>) =>
+  KINDS.reduce((s, k) => s + f[k], 0) + f.sonstige;
+
+/**
+ * How a given cost is covered, capped at the cost itself. Baugebiete can earn
+ * more than they cost (land sales); the surplus is reported in words rather
+ * than drawn as a negative stack, which would only garble the bar.
+ */
+function coverage(cost: number, funding: Record<FundingKind, number>) {
+  const total = sumFunding(funding);
+  const scale = total > cost && total > 0 ? cost / total : 1;
+  const parts = Object.fromEntries(
+    KINDS.map((k) => [k, funding[k] * scale]),
+  ) as Record<FundingKind, number>;
+  parts.sonstige = funding.sonstige * scale;
+  return { parts, eigen: Math.max(0, cost - total), ueberschuss: Math.max(0, total - cost) };
+}
+
+/** "2018–2024", "seit spätestens 2016", "läuft weiter", "Daueransatz". */
+function spanLabel(p: InvestProject): string {
+  if (p.daueransatz) return "laufender Ansatz";
+  if (p.first === p.last) return String(p.first);
+  const from = p.offenAnfang ? `vor ${p.first}` : String(p.first);
+  const to = p.offenEnde ? "offen" : String(p.last);
+  return `${from}–${to}`;
+}
 
 export function Investitionen() {
   usePageTitle("Investitionen");
   const { data, error } = useData();
   const navigate = useNavigate();
-
   const { year: selYear } = useYearCtx();
+
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
-    const inv = investmentsAll(data, y);
-    const top = inv.items.slice(0, TOP);
-    const cats = top.map((i) => i.label);
-    const option: EChartsOption = {
+    const projects = investmentProjects(data, y);
+
+    const imJahr = projects.filter((p) => p.imJahr > 0).sort((a, b) => b.imJahr - a.imJahr);
+    const top = imJahr.slice(0, TOP_JAHR);
+    const cov = top.map((p) => coverage(p.imJahr, p.fundingImJahr));
+
+    // Current year, stacked by how each project is paid for.
+    const jahrOpt: EChartsOption = {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        valueFormatter: (v) => fmtEur(v as number),
+        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
       },
-      legend: { bottom: 0 },
-      grid: { left: 8, right: 24, top: 8, bottom: 40, containLabel: true },
+      legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
+      grid: { left: 8, right: 24, top: 8, bottom: 56, containLabel: true },
       xAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
       yAxis: {
         type: "category",
         inverse: true,
-        data: cats,
-        axisLabel: { width: 200, overflow: "truncate", fontSize: 11 },
+        data: top.map((p) => p.label),
+        axisLabel: { width: 190, overflow: "truncate", fontSize: 11 },
       },
       series: [
-        {
-          // capped at gross so a fully/over-funded item doesn't overshoot the bar
-          name: "Förderung / Einnahmen",
-          type: "bar",
+        ...KINDS.map((k) => ({
+          name: FUNDING_LABEL[k],
+          type: "bar" as const,
           stack: "x",
-          data: top.map((i) => Math.min(i.foerderung, i.invest)),
-          itemStyle: { color: "#0a9e4c" },
-        },
+          data: cov.map((c) => Math.round(c.parts[k])),
+          itemStyle: { color: FUNDING_COLOR[k] },
+        })),
         {
-          name: "Netto-Eigenanteil der Stadt",
-          type: "bar",
+          name: "Eigenanteil der Stadt",
+          type: "bar" as const,
           stack: "x",
-          data: top.map((i) => ({ value: Math.max(0, i.invest - i.foerderung), itemStyle: { color: EINZELPLAN_COLORS[i.einzelplan] ?? "#999" } })),
+          data: cov.map((c) => Math.round(c.eigen)),
+          itemStyle: { color: EIGEN_COLOR },
         },
       ],
     };
+
+    // Summed per project, not on the aggregate: a Baugebiet that earns more
+    // than it costs cannot pay for a school, so its surplus must not shrink the
+    // city's own share elsewhere.
+    const covJahr = imJahr.reduce(
+      (acc, p) => {
+        const c = coverage(p.imJahr, p.fundingImJahr);
+        for (const k of [...KINDS, "sonstige" as const]) acc.parts[k] += c.parts[k];
+        acc.eigen += c.eigen;
+        return acc;
+      },
+      { parts: { foerderung: 0, beitraege: 0, verkauf: 0, sonstige: 0 } as Record<FundingKind, number>, eigen: 0 },
+    );
+    const totalJahr = imJahr.reduce((s, p) => s + p.imJahr, 0);
+
     const stacked = investmentStacked(data, 12);
     const stackedOpt: EChartsOption = {
-      tooltip: {
-        trigger: "axis",
-        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
-        order: "valueDesc",
-      },
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "—"), order: "valueDesc" },
       legend: { type: "scroll", bottom: 0 },
       grid: { left: 64, right: 16, top: 12, bottom: 56 },
       xAxis: { type: "category", boundaryGap: false, data: stacked.years.map(String) },
@@ -79,9 +131,12 @@ export function Investitionen() {
         data: s.data,
       })),
     };
-
     const stackedTotals = stacked.years.map((_, i) => stacked.series.reduce((s, x) => s + (x.data[i] ?? 0), 0));
-    return { y, inv, top, option, stackedOpt, stackedYears: stacked.years, stackedTotals };
+
+    const vorhaben = projects.filter((p) => !p.daueransatz).slice(0, 20);
+    const dauer = projects.filter((p) => p.daueransatz);
+
+    return { y, projects, imJahr, top, cov, jahrOpt, totalJahr, covJahr, stackedOpt, stackedYears: stacked.years, stackedTotals, vorhaben, dauer };
   }, [data, selYear]);
 
   const onEvents = useMemo(
@@ -98,88 +153,160 @@ export function Investitionen() {
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
-  const { y, inv } = view;
-  const foerderquote = inv.totalInvest ? inv.totalFoerder / inv.totalInvest : 0;
+  const { y, covJahr, totalJahr } = view;
+  const gegenfinanziert = totalJahr - covJahr.eigen;
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="font-display text-3xl font-bold">Investitionen {y}</h1>
-        <p className="max-w-2xl text-ink-soft">
-          Der Vermögenshaushalt: Bauten, Grundstücke und Anschaffungen. Grün zeigt, wie viel
-          durch Förderungen, Zuschüsse und Verkäufe wieder hereinkommt — der farbige Rest ist
-          der Netto-Eigenanteil der Stadt.
+    <div className="space-y-10">
+      <header className="max-w-2xl space-y-3">
+        <h1 className="headline text-3xl">Investitionen</h1>
+        <p className="text-ink-soft">
+          Der Vermögenshaushalt: Bauten, Grundstücke und Anschaffungen. Ein Vorhaben läuft meist
+          über mehrere Jahre — hier steht es als Ganzes, mit seiner Laufzeit und dem, was am Ende
+          die Stadt selbst trägt.
         </p>
       </header>
 
-      <section className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <Stat label="Brutto-Investitionen" value={fmtEurShort(inv.totalInvest)} hint={`${inv.items.length} Vorhaben`} />
-        <Stat label="Förderung / Einnahmen" value={fmtEurShort(inv.totalFoerder)} hint={`${Math.round(foerderquote * 100)}% refinanziert`} />
-        <Stat label="Netto-Eigenanteil" value={fmtEurShort(inv.totalInvest - inv.totalFoerder)} hint="aus allg. Haushalt/Krediten" />
+      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4 border-y border-ink-line py-6">
+        {[
+          [`Investitionen ${y}`, fmtEurShort(totalJahr), `${view.imJahr.length} Vorhaben`],
+          ["Gegenfinanziert", fmtEurShort(gegenfinanziert), `${Math.round((gegenfinanziert / (totalJahr || 1)) * 100)} % der Kosten`],
+          ["Eigenanteil der Stadt", fmtEurShort(covJahr.eigen), "aus Steuern und Krediten"],
+          ["Davon Förderung", fmtEurShort(covJahr.parts.foerderung), "Zuweisungen und Zuschüsse"],
+        ].map(([label, value, hint]) => (
+          <div key={label}>
+            <div className="eyebrow text-ink-muted">{label}</div>
+            <div className="mt-1.5 font-display text-2xl font-bold tabular-nums">{value}</div>
+            <div className="mt-0.5 text-xs text-ink-muted">{hint}</div>
+          </div>
+        ))}
       </section>
 
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <div className="flex items-baseline justify-between gap-2 mb-1">
-          <h2 className="font-display text-lg font-bold">Investitionen über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Einzelplan; größte Vorhaben einzeln</span>
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+          <h2 className="font-display text-2xl font-bold">Wer {y} bezahlt</h2>
+          <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
+        </div>
+        <p className="max-w-2xl text-ink-soft">
+          Jeder Balken ist ein Vorhaben im laufenden Jahr, aufgeteilt nach Herkunft des Geldes.
+          Getrennt ausgewiesen, weil es etwas anderes ist: <b>Förderung</b> kommt von Bund und
+          Land, <b>Anliegerbeiträge</b> von Grundstückseigentümern, <b>Verkaufserlöse</b> aus
+          veräußerten Grundstücken. Nur der rote Teil stammt aus Steuern und Krediten.
+        </p>
+        <EChart
+          option={view.jahrOpt}
+          onEvents={onEvents}
+          ariaLabel={`Investitionsvorhaben ${y}, aufgeteilt nach Finanzierungsquelle — Zahlen in der Tabelle darunter`}
+          style={{ height: TOP_JAHR * 32 + 80 }}
+        />
+        <ChartTable
+          summary="Vorhaben des Jahres als Tabelle"
+          columns={["Vorhaben", "Kosten", "Förderung", "Beiträge", "Verkauf", "Eigenanteil"]}
+          rows={view.top.map((p, i) => [
+            p.label,
+            fmtEur(p.imJahr),
+            fmtEur(Math.round(view.cov[i].parts.foerderung)),
+            fmtEur(Math.round(view.cov[i].parts.beitraege)),
+            fmtEur(Math.round(view.cov[i].parts.verkauf)),
+            fmtEur(Math.round(view.cov[i].eigen)),
+          ])}
+        />
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+          <h2 className="font-display text-2xl font-bold">Vorhaben über ihre ganze Laufzeit</h2>
+          <span className="text-xs text-ink-muted">Summe aller Jahre, größte zuerst</span>
+        </div>
+        <p className="max-w-2xl text-ink-soft">
+          Die Laufzeit ist aus den Daten abgeleitet: Ein Vorhaben existiert in den Jahren, in
+          denen es einen Ansatz trägt. Weil die Datenreihe {view.stackedYears[0]} beginnt und{" "}
+          {view.stackedYears[view.stackedYears.length - 1]} endet, sind Vorhaben an diesen Rändern
+          als offen gekennzeichnet — sie liefen schon vorher oder laufen weiter.
+        </p>
+        <ul>
+          {view.vorhaben.map((p) => {
+            const c = coverage(p.total, p.funding);
+            return (
+              <li key={p.glz}>
+                <Link
+                  to={`/einrichtung/${p.glz}`}
+                  className="group block border-b border-ink-line py-3 hover:border-ink-soft transition-colors"
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <span className="font-medium group-hover:text-red-600 transition-colors">{p.label}</span>
+                    <span className="font-display font-bold tabular-nums">{fmtEur(p.total)}</span>
+                  </div>
+                  <div className="mt-1.5 flex h-1.5 w-full overflow-hidden rounded-sm bg-cream-dark">
+                    {KINDS.map((k) =>
+                      c.parts[k] > 0 ? (
+                        <span key={k} style={{ width: `${(c.parts[k] / p.total) * 100}%`, background: FUNDING_COLOR[k] }} />
+                      ) : null,
+                    )}
+                    {c.eigen > 0 && <span style={{ width: `${(c.eigen / p.total) * 100}%`, background: EIGEN_COLOR }} />}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-x-4 text-xs text-ink-muted">
+                    <span>{spanLabel(p)}</span>
+                    <span>{p.years.length} {p.years.length === 1 ? "Jahr" : "Jahre"} mit Ansatz</span>
+                    {c.eigen > 0 && <span>Eigenanteil {fmtEur(Math.round(c.eigen))}</span>}
+                    {c.ueberschuss > 0 && (
+                      <span className="text-ink-soft">
+                        trägt sich selbst — Einnahmen übersteigen die Kosten um{" "}
+                        {fmtEur(Math.round(c.ueberschuss))}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {view.dauer.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+            <h2 className="font-display text-2xl font-bold">Laufende Ansätze</h2>
+            <span className="text-xs text-ink-muted">kein einzelnes Vorhaben</span>
+          </div>
+          <p className="max-w-2xl text-ink-soft">
+            Diese Positionen tragen in fast jedem Jahr einen Ansatz — Grunderwerb,
+            Straßenunterhalt, Fahrzeugbeschaffung. Sie sind Daueraufgaben, keine Projekte mit
+            Anfang und Ende.
+          </p>
+          <ul>
+            {view.dauer.map((p) => (
+              <li key={p.glz}>
+                <Link
+                  to={`/einrichtung/${p.glz}`}
+                  className="group flex flex-wrap items-baseline justify-between gap-x-4 border-b border-ink-line py-2.5 hover:border-ink-soft transition-colors"
+                >
+                  <span className="group-hover:text-red-600 transition-colors">{p.label}</span>
+                  <span className="tabular-nums text-ink-soft">
+                    {fmtEur(p.total)} <span className="text-xs text-ink-muted">seit {p.first}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
+          <h2 className="font-display text-2xl font-bold">Investitionen über die Jahre</h2>
+          <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Einzelplan</span>
         </div>
         <EChart
           option={view.stackedOpt}
-          ariaLabel="Investitionen über die Jahre, gestapelt nach Thema — Jahressummen in der Tabelle darunter"
+          ariaLabel="Investitionen über die Jahre, gestapelt nach Einzelplan — Jahressummen in der Tabelle darunter"
           style={{ height: 380 }}
         />
-        <p className="text-xs text-ink-muted mt-1">
-          Jede Fläche ist ein Vorhaben (große einzeln, kleinere je Einzelplan gebündelt).
-        </p>
         <ChartTable
           summary="Jahressummen als Tabelle"
           columns={["Jahr", "Summe Investitionen (Ansatz)"]}
           rows={view.stackedYears.map((yy, i) => [String(yy), fmtEur(view.stackedTotals[i])])}
         />
-      </section>
-
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <div className="flex items-baseline justify-between gap-2 mb-2">
-          <h2 className="font-display text-lg font-bold">Größte Vorhaben {view.y}</h2>
-          <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
-        </div>
-        <EChart
-          option={view.option}
-          onEvents={onEvents}
-          ariaLabel={`Größte Vorhaben ${view.y} mit Förderung und Netto-Eigenanteil — alle Zahlen in der Tabelle „Alle Investitionen" weiter unten`}
-          style={{ height: TOP * 30 + 60 }}
-        />
-      </section>
-
-      <section className="rounded-lg border border-ink-line bg-white p-4">
-        <h2 className="font-display text-lg font-bold mb-2">Alle Investitionen</h2>
-        <div className="overflow-x-auto">
-        <table className="w-full min-w-[32rem] text-sm">
-          <thead className="text-left text-ink-muted border-b border-ink-line">
-            <tr>
-              <th className="py-1.5 font-medium">Vorhaben</th>
-              <th className="py-1.5 font-medium text-right">Brutto</th>
-              <th className="py-1.5 font-medium text-right">Förderung</th>
-              <th className="py-1.5 font-medium text-right">Netto</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inv.items.map((i) => (
-              <tr key={i.glz} className="border-b border-ink-line/50">
-                <td className="py-1.5">
-                  <Link to={`/einrichtung/${i.glz}`} className="hover:text-red-600 transition-colors flex items-center gap-2">
-                    <span className="inline-block h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: EINZELPLAN_COLORS[i.einzelplan] ?? "#999" }} />
-                    {i.label}
-                  </Link>
-                </td>
-                <td className="py-1.5 text-right tabular-nums">{fmtEur(i.invest)}</td>
-                <td className="py-1.5 text-right tabular-nums text-[#0a9e4c]">{i.foerderung ? fmtEur(i.foerderung) : "—"}</td>
-                <td className="py-1.5 text-right tabular-nums font-medium">{fmtEur(i.netto)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        </div>
       </section>
     </div>
   );

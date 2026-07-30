@@ -12,7 +12,7 @@ export function Themen() {
     <div className="max-w-2xl space-y-8">
       <header className="space-y-3">
         <p className="eyebrow text-ink-muted">In Vorbereitung</p>
-        <h1 className="font-display text-3xl font-bold">Themen</h1>
+        <h1 className="headline text-3xl">Themen</h1>
       </header>
 
       <div className="border-l-2 border-gold-500 pl-5 space-y-3">

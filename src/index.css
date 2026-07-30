@@ -67,6 +67,18 @@ h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
 
+/* Page title in caps, per the Moosburg brand brief. Deliberately reserved for
+   the H1 of a top-level page — never for headings that carry data (a Posten or
+   Einrichtung name), where caps hurt legibility and inflate a value into a
+   label. Slight positive tracking keeps Playfair's caps from clotting. */
+.headline {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.015em;
+  font-weight: 700;
+  line-height: 1.08;
+}
+
 /* Small caps kicker — labels a section without competing with its heading.
    Same role as in the Moosburg design system. */
 .eyebrow {
