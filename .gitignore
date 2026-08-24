@@ -7,3 +7,4 @@ __pycache__
 
 # Roh-Haushaltsexporte der Stadt — bleiben lokal, nicht im Repo
 haushaltsplaene/
+*.stackdump
