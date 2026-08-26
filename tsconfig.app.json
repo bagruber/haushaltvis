@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "baseUrl": ".",
+    "types": ["node"],
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"]
