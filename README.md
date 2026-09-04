@@ -100,7 +100,7 @@ src/pages/       die Seiten/Routen
 Die Roh-Exporte unter `haushaltsplaene/` sind bewusst nicht eingecheckt; die
 fertig aufbereiteten Daten liegen in `public/data/` bzw. `data/processed/`.
 
-Deployment automatisch via GitHub Actions (`.github/workflows/deploy.yml`) bei
+Deployment automatisch via GitHub Actions (`.github/workflows/pages.yml`) bei
 Push auf `main`.
 
 ## Hosting-Portabilität & Doppik
