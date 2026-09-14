@@ -8,13 +8,21 @@ export function Methodik() {
       <h1 className="headline text-3xl">Methodik & Datengrundlage</h1>
 
       <div className="rounded-xl border border-gold-500/50 bg-gold-100/60 p-4 text-sm">
-        <p className="font-semibold text-ink">Wichtiger Hinweis: KI-gestützte Aufbereitung</p>
+        <p className="font-semibold text-ink">Hinweis: teilweise KI-unterstützt</p>
         <p className="mt-1 text-ink-soft">
-          Die Zusammenfassung und thematische Zuordnung der Haushaltsdaten wurde
-          <b> KI-gestützt </b> erstellt. Trotz sorgfältiger Prüfung können vereinzelt
-          Fehler in der Aggregation oder Zuordnung enthalten sein. Diese Seite ist ein
-          bürgerschaftliches Transparenzprojekt und <b>keine amtliche Veröffentlichung</b>.
-          Maßgeblich ist allein der offizielle Haushaltsplan der Stadt Moosburg a. d. Isar.
+          KI hat <b>teilweise unterstützt</b>, und zwar bei den Erklärungstexten, der
+          thematischen Zuordnung und dem Glossar. Trotz sorgfältiger Prüfung können dort
+          vereinzelt Fehler enthalten sein.
+        </p>
+        <p className="mt-2 text-ink-soft">
+          Die Haushaltsdaten selbst hat keine KI bearbeitet. Python-Skripte lesen den Export
+          der Stadt ein und bringen ihn in die Form, die diese Seite anzeigt; die Beträge der
+          einzelnen Haushaltsstellen übernehmen sie dabei unverändert.
+        </p>
+        <p className="mt-2 text-ink-soft">
+          Diese Seite ist ein bürgerschaftliches Transparenzprojekt und{" "}
+          <b>keine amtliche Veröffentlichung</b>. Maßgeblich ist allein der offizielle
+          Haushaltsplan der Stadt Moosburg a. d. Isar.
         </p>
       </div>
 
@@ -25,6 +33,12 @@ export function Methodik() {
           Stadt Moosburg. Erfasst sind die Jahre 2016–2026, jeweils mit{" "}
           <Term name="ansatz">Ansatz</Term> (Plan) und — soweit vorhanden —{" "}
           <Term name="ergebnis">Ergebnis</Term> (Ist). Für das laufende Jahr steht nur der Plan; sein Ergebnis wird erst im Jahresverlauf gebucht und daher nicht ausgewiesen.
+        </p>
+        <p className="text-ink-soft">
+          Bei der Aufbereitung ändert sich an den Beträgen nichts. Eine Ausnahme betrifft nur die
+          Zuordnung: Einrichtungen, die bei der Umstellung 2022/23 eine neue Gliederungsnummer
+          bekamen, stehen unter der neuen Nummer. Liegen für ein Jahr beide Nummern vor, werden
+          ihre Beträge dort zusammengezählt.
         </p>
       </section>
 

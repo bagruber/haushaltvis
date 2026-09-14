@@ -13,10 +13,10 @@ export function Footer() {
           <Link to="/datenschutz" className="hover:text-ink">Datenschutz</Link>
         </nav>
         <p>
-          Haushalt der Stadt Moosburg an der Isar — bürgerschaftliches Transparenzprojekt,
-          keine amtliche Veröffentlichung. Die Datenaufbereitung ist{" "}
-          <Link to="/methodik" className="underline hover:text-ink">KI-gestützt</Link> und kann
-          vereinzelt Fehler enthalten.
+          Haushalt der Stadt Moosburg an der Isar: bürgerschaftliches Transparenzprojekt,
+          keine amtliche Veröffentlichung. Bei Erklärungstexten, Themenzuordnung und Glossar hat{" "}
+          <Link to="/methodik" className="underline hover:text-ink">teilweise KI unterstützt</Link>; die
+          Beträge stammen unverändert aus den Haushaltsdaten der Stadt.
         </p>
         <p>
           Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2016–2026. Für das laufende Jahr nur der Plan.

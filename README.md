@@ -8,9 +8,11 @@ Diagramme und ein „Wofür zahle ich?"-Rechner.
 🔗 **Live:** [bagruber.github.io/haushaltvis](https://bagruber.github.io/haushaltvis/)
 
 > ⚠️ **Hinweis:** Dieses Projekt ist eine **private Eigenentwicklung**, nicht
-> offiziell durch die Stadt Moosburg beauftragt oder freigegeben. Die
-> Zusammenfassung und thematische Zuordnung der Daten ist **KI-gestützt** und
-> kann vereinzelt Fehler enthalten — im Zweifel ist der offizielle
+> offiziell durch die Stadt Moosburg beauftragt oder freigegeben. Bei den
+> Erklärungstexten, der thematischen Zuordnung und dem Glossar hat **teilweise
+> KI unterstützt**; dort können vereinzelt Fehler enthalten sein. Die
+> Haushaltsdaten selbst bringen Python-Skripte (`etl/`) in Form, die Beträge der
+> Haushaltsstellen bleiben dabei unverändert. Im Zweifel ist der offizielle
 > Haushaltsplan der Stadt verbindlich. Wünsche, Bug-Reports und Datenanfragen
 > gerne als [GitHub-Issue](https://github.com/bagruber/haushaltvis/issues).
 > Keine Datenerfassung, kein Tracking, keine Cookies.
