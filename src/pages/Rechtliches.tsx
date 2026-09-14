@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import { usePageTitle } from "@/lib/title";
 
-// Rechtsseiten. Platzhalter in [eckigen Klammern] vor Veröffentlichung als
-// "offizielles" Angebot ausfüllen; bis dahin gilt das Projekt als privates,
-// nicht-kommerzielles Transparenzprojekt.
+// Rechtsseiten. Das Projekt gilt als privates, nicht-kommerzielles
+// Transparenzprojekt.
 
 export function Impressum() {
   usePageTitle("Impressum");
@@ -15,20 +14,21 @@ export function Impressum() {
         <p>
           Benedict Gruber
           <br />
-          [Straße und Hausnummer]
-          <br />
-          [PLZ] Moosburg a. d. Isar
+          Moosburg a. d. Isar
         </p>
         <p>
-          Kontakt: über{" "}
+          Kontakt:{" "}
+          <a href="mailto:info@gruber.am" className="underline hover:text-ink">
+            info@gruber.am
+          </a>{" "}
+          oder über{" "}
           <a
             href="https://github.com/bagruber/haushaltvis/issues"
             className="underline hover:text-ink"
             rel="noreferrer"
           >
             GitHub-Issues
-          </a>{" "}
-          oder [E-Mail-Adresse]
+          </a>
         </p>
       </section>
       <section className="space-y-1 text-ink-soft">
