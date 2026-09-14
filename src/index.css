@@ -88,6 +88,11 @@ h1, h2, h3, .font-display {
 .rainbow-stripe > span:nth-child(8) { background: var(--color-rb-8); }
 .rainbow-stripe > span:nth-child(9) { background: var(--color-rb-9); }
 
+/* Checkboxes in the brand red, like the Stichjahr slider. */
+input[type="checkbox"] {
+  accent-color: var(--color-red-600);
+}
+
 /* Visible keyboard focus on all interactive elements */
 :focus-visible {
   outline: 2px solid var(--color-red-600);

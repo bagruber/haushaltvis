@@ -52,7 +52,25 @@ export function Einnahmen() {
       ...steuerSeries.map((s) => fmtCell(s.values[i])),
     ]);
     const steuerOpt: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "-" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
+      // One line per tax: the Ist where there is one, otherwise the Plan, marked as such.
+      // Built by hand because the dashed tail is a second series per tax.
+      tooltip: {
+        trigger: "axis",
+        formatter: (params) => {
+          const rows = params as { dataIndex: number }[];
+          if (!rows.length) return "";
+          const i = rows[0].dataIndex;
+          const body = STEUERN.map(([name, color], si) => {
+            const s = steuerSeries[si];
+            const v = s.values[i];
+            const wert = v == null ? "-" : `${fmtCell(v)}${mode.perCapita ? "/Kopf" : ""}`;
+            return `<div style="display:flex;gap:12px;justify-content:space-between">
+              <span><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background:${color};margin-right:6px"></span>${name}${s.ist[i] == null && v != null ? " (Plan)" : ""}</span>
+              <b>${wert}</b></div>`;
+          }).join("");
+          return `<b>${years[i]}</b>${body}`;
+        },
+      },
       grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
@@ -67,8 +85,8 @@ export function Einnahmen() {
           itemStyle: { color },
           connectNulls: true,
         })),
-        // Plan tail: same colour, dashed, kept out of the legend and the
-        // tooltip so it reads as a continuation rather than a second series.
+        // Plan tail: same colour, dashed, kept out of the legend so it reads as a
+        // continuation rather than a second series. The tooltip above covers it.
         ...STEUERN.map(([name, color], si) => ({
           name: `${name} (Plan)`,
           type: "line" as const,
@@ -78,7 +96,6 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color, type: "dashed" as const },
           itemStyle: { color },
           connectNulls: true,
-          tooltip: { show: false },
         })),
       ],
     };
