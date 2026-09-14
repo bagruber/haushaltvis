@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
 import { CaretRight } from "@phosphor-icons/react";
-import { Chip, Kennzahl, Loading, ThemaPlatzhalter } from "@/components/ui";
+import { Chip, Kennzahl, Loading, Teilen, ThemaPlatzhalter } from "@/components/ui";
+import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
 import {
   useData,
   einrichtungInfo,
@@ -12,7 +13,7 @@ import {
   factsOfYear,
   latestYear,
 } from "@/lib/data";
-import { fmtEur } from "@/lib/format";
+import { fmtEur, fmtEurFine } from "@/lib/format";
 
 export function EinrichtungDetail() {
   const { glz = "" } = useParams();
@@ -44,7 +45,8 @@ export function EinrichtungDetail() {
     const aus = laufend.ansatz[i] ?? 0;
     const ein = einnahmen.ansatz[i] ?? 0;
     const deckung = aus > 0 ? ein / aus : null;
-    return { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, hasContext, aus, ein, deckung };
+    const pop = data.context.population?.[String(y)];
+    return { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, hasContext, aus, ein, deckung, pop };
   }, [data, glz]);
 
   usePageTitle(view && view.info ? view.info.label : undefined);
@@ -58,7 +60,8 @@ export function EinrichtungDetail() {
       </p>
     );
 
-  const { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, hasContext, aus, ein, deckung } = view;
+  const { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, hasContext, aus, ein, deckung, pop } = view;
+  const jeKopf = (v: number) => (pop ? `, ${fmtEurFine(v / pop)} je Einwohner` : "");
   const ausgabenPosten = posten.filter((p) => p.ea === "A");
   const einnahmenPosten = posten.filter((p) => p.ea === "E");
 
@@ -72,18 +75,19 @@ export function EinrichtungDetail() {
 
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-bold">{info.label}</h1>
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap items-center gap-2 pt-1">
           <Chip>Gliederung {info.glz}</Chip>
           <ThemaPlatzhalter />
+          <Teilen className="ml-auto" />
         </div>
       </header>
 
       {hasEinnahmen && deckung != null && (
         <div className="flex flex-wrap gap-x-10 gap-y-3 border-y border-ink-line py-4">
-          <Kennzahl wert={fmtEur(aus)} label={`Ausgaben ${y}`} className="text-2xl" />
+          <Kennzahl wert={fmtEur(aus)} label={`Ausgaben ${y}${jeKopf(aus)}`} className="text-2xl" />
           <Kennzahl wert={fmtEur(ein)} label="Eigene Einnahmen" className="text-2xl" />
           {/* Red is right here: this figure is the shortfall the general budget covers. */}
-          <Kennzahl wert={fmtEur(aus - ein)} label="Zuschussbedarf" className="text-2xl text-red-600" />
+          <Kennzahl wert={fmtEur(aus - ein)} label={`Zuschussbedarf${jeKopf(aus - ein)}`} className="text-2xl text-red-600" />
           <Kennzahl wert={`${Math.round(deckung * 100)} %`} label="Kostendeckung" className="text-2xl" />
         </div>
       )}
@@ -97,7 +101,7 @@ export function EinrichtungDetail() {
         <Timeline laufend={laufend} invest={invest} einnahmen={einnahmen} mode={mode} context={data!.context} baseYear={y} height={300} />
         {hasEinnahmen && (
           <p className="text-xs text-ink-muted">
-            „Bilanziert" zieht die eigenen Einnahmen (Gebühren, Mieten, Entgelte) ab — es bleibt der
+            „Mit eigenen Einnahmen verrechnet" zieht die eigenen Einnahmen (Gebühren, Mieten, Entgelte) ab — es bleibt der
             Betrag, den der allgemeine Haushalt trägt. Die graue Linie zeigt weiter die Bruttoausgaben.
           </p>
         )}
@@ -109,6 +113,7 @@ export function EinrichtungDetail() {
         )}
       </section>
 
+      <NummernSchalter />
       <section className="grid lg:grid-cols-2 gap-4">
         <PostenList title={`Ausgaben-Posten ${y}`} posten={ausgabenPosten} latest={latest} />
         {einnahmenPosten.length > 0 && (
@@ -128,9 +133,12 @@ function PostenList({
   posten: { hhst_id: string; grz_text: string | null; grz: string }[];
   latest: Map<string, number>;
 }) {
+  const { zeigen } = useNummern();
   const rows = posten
     .map((p) => ({ p, v: latest.get(p.hhst_id) ?? 0 }))
     .sort((a, b) => b.v - a.v);
+  // The same Gruppierung can appear twice in one Einrichtung (both Haushalte).
+  const dup = doppelte(rows.map(({ p }) => p.grz_text ?? p.grz));
   return (
     <div className="rounded-lg border border-ink-line bg-white p-4">
       <h2 className="font-display text-lg font-bold mb-2">{title}</h2>
@@ -138,7 +146,10 @@ function PostenList({
         {rows.map(({ p, v }) => (
           <li key={p.hhst_id} className="border-b border-ink-line/60 pb-1.5">
             <Link to={`/posten/${p.hhst_id}`} className="flex justify-between gap-3 hover:text-red-600 transition-colors">
-              <span className="text-ink-soft">{p.grz_text ?? p.grz}</span>
+              <span className="flex items-baseline text-ink-soft">
+                <Nummer wert={p.hhst_id} sichtbar={zeigen || dup.has(p.grz_text ?? p.grz)} />
+                <span>{p.grz_text ?? p.grz}</span>
+              </span>
               <span className="tabular-nums shrink-0 font-medium">{fmtEur(v)}</span>
             </Link>
           </li>

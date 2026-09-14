@@ -42,7 +42,7 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
         aria-activedescendant={showList ? `such-option-${active}` : undefined}
         value={q}
         placeholder="Suchen…"
-        aria-label="Suche nach Themen, Einzelplänen und Einrichtungen"
+        aria-label="Suche nach Einzelplänen, Einrichtungen, Posten und Nummern"
         onChange={(e) => { setQ(e.target.value); setOpen(true); setActive(0); }}
         onFocus={() => setOpen(true)}
         onBlur={() => { blurTimer.current = window.setTimeout(() => setOpen(false), 120); }}
@@ -77,12 +77,12 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
               onMouseEnter={() => setActive(i)}
               onClick={() => go(r.route)}
               className={
-                "flex cursor-pointer items-center justify-between gap-3 px-3 py-1.5 text-sm " +
+                "cursor-pointer px-3 py-1.5 text-sm " +
                 (i === active ? "bg-cream-dark" : "")
               }
             >
-              <span className="truncate">{r.label}</span>
-              <span className="shrink-0 text-xs text-ink-muted">{r.sub}</span>
+              <span className="block truncate">{r.label}</span>
+              <span className="block truncate text-xs text-ink-muted">{r.sub}</span>
             </li>
           ))}
         </ul>

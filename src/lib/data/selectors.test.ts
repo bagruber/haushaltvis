@@ -15,10 +15,12 @@ import {
   isInternal,
   investmentsAll,
   postenSeries,
+  searchIndex,
   searchRank,
   type YearSeries,
 } from "./selectors";
 import { fmtEur, fmtEurShort, fmtEurFine } from "../format";
+import { doppelte } from "../nummern";
 
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(resolve(__dirname, `../../../public/data/${name}`), "utf8")) as T;
@@ -226,6 +228,45 @@ describe("searchRank", () => {
   });
   it("leere Suche liefert nichts", () => {
     expect(searchRank(items, "  ")).toEqual([]);
+  });
+
+  const index = searchIndex(data);
+  it("Alltagswort findet den Amtsbegriff (Müll → Abfall)", () => {
+    const hits = searchRank(index, "Müll");
+    expect(hits.some((h) => /abfall/i.test(h.label))).toBe(true);
+  });
+  it("Gliederungsnummer findet zuerst die Einrichtung", () => {
+    const glz = Object.values(budget.posten).find((p) => p.glz_text)!.glz;
+    expect(searchRank(index, glz)[0].route).toBe(`/einrichtung/${glz}`);
+  });
+  it("volle Haushaltsstelle findet genau diesen Posten", () => {
+    const p = Object.values(budget.posten).find((x) => !isInternal(x))!;
+    expect(searchRank(index, p.hhst_id)[0].route).toBe(`/posten/${p.hhst_id}`);
+  });
+  it("gleichnamige Posten sind in der Trefferliste unterscheidbar", () => {
+    const seen = new Set<string>();
+    for (const it of index) {
+      const key = `${it.label}|${it.sub}`;
+      expect(seen.has(key), `doppelt: ${key}`).toBe(false);
+      seen.add(key);
+    }
+  });
+});
+
+describe("doppelte (Nummern-Check)", () => {
+  it("findet Bezeichnungen, die in einer Liste mehrfach vorkommen", () => {
+    expect([...doppelte(["a", "b", "a", "c", "b", "a"])].sort()).toEqual(["a", "b"]);
+    expect(doppelte(["a", "b"]).size).toBe(0);
+  });
+  it("die echten Daten haben gleichnamige Posten innerhalb einer Einrichtung", () => {
+    // Genau diese Fälle bekommen ihre Nummer auch ohne Schalter angezeigt.
+    const byGlz = new Map<string, string[]>();
+    for (const p of Object.values(budget.posten)) {
+      if (p.ea !== "A") continue;
+      byGlz.set(p.glz, [...(byGlz.get(p.glz) ?? []), p.grz_text ?? p.grz]);
+    }
+    const betroffen = [...byGlz.values()].filter((labels) => doppelte(labels).size > 0);
+    expect(betroffen.length).toBeGreaterThan(0);
   });
 });
 

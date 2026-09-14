@@ -8,6 +8,7 @@ import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { ChartTable } from "@/components/ChartTable";
 import { Loading } from "@/components/ui";
+import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
 const STEUERN: [string, string][] = [
@@ -24,6 +25,7 @@ export function Einnahmen() {
 
   const { year: selYear } = useYearCtx();
   const [mode, setMode] = useState<TimelineMode>({});
+  const { zeigen } = useNummern();
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
@@ -112,7 +114,10 @@ export function Einnahmen() {
       </section>
 
       <div className="space-y-6">
-        {view.groups.map((g) => (
+        <NummernSchalter />
+        {view.groups.map((g) => {
+          const dup = doppelte(g.posten.slice(0, 8).map((p) => p.label));
+          return (
           <section key={g.key} className="border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
               <h2 className="font-display text-lg font-bold">{g.label}</h2>
@@ -122,7 +127,10 @@ export function Einnahmen() {
               {g.posten.slice(0, 8).map((p) => (
                 <li key={p.key} className="border-b border-ink-line/50 pb-1.5 last:border-0">
                   <Link to={`/posten/${p.key}`} className="flex items-center justify-between gap-3 hover:text-red-600 transition-colors">
-                    <span className="truncate">{p.label}</span>
+                    <span className="flex min-w-0 items-baseline">
+                      <Nummer wert={p.key} sichtbar={zeigen || dup.has(p.label)} />
+                      <span className="truncate">{p.label}</span>
+                    </span>
                     <span className="tabular-nums shrink-0 font-medium">{fmtEur(p.value)}</span>
                   </Link>
                 </li>
@@ -132,7 +140,8 @@ export function Einnahmen() {
               )}
             </ul>
           </section>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

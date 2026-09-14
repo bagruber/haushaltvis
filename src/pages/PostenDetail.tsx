@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useData, postenSeries, postenCrumb, eventsFor } from "@/lib/data";
 import { usePageTitle } from "@/lib/title";
 import { CaretRight } from "@phosphor-icons/react";
-import { Chip, Loading, ThemaPlatzhalter } from "@/components/ui";
+import { Chip, Loading, Teilen, ThemaPlatzhalter } from "@/components/ui";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 
 export function PostenDetail() {
@@ -50,11 +50,12 @@ export function PostenDetail() {
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-bold">{p.grz_text}</h1>
         {p.kontotext && <p className="text-ink-soft">{p.kontotext}</p>}
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap items-center gap-2 pt-1">
           <Chip>{p.ea === "E" ? "Einnahme" : "Ausgabe"}</Chip>
           <Chip>{p.haushalt === "verwaltung" ? "Verwaltungshaushalt" : "Vermögenshaushalt"}</Chip>
           <Chip>Haushaltsstelle {p.glz}.{p.grz}</Chip>
           <ThemaPlatzhalter />
+          <Teilen className="ml-auto" />
         </div>
       </header>
 

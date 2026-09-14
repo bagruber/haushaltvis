@@ -20,6 +20,7 @@ import {
 } from "@/components/ui";
 import { Term } from "@/components/Term";
 import { einzelplanKategorie } from "@/lib/kategorien";
+import { useNummern } from "@/lib/nummern";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const VERWALTUNG = "#8a7a5c";
@@ -47,6 +48,7 @@ export function Home() {
   const { data, error } = useData();
   const { year: selYear } = useYearCtx();
   const breit = useBreit();
+  const { zeigen } = useNummern();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -248,7 +250,10 @@ export function Home() {
           wert={view.proKopfNominal ? fmtEur(Math.round(view.proKopfNominal)) : "—"}
           label={view.pop ? `je Einwohner, bei ${view.pop.toLocaleString("de-DE")} Einwohnern` : "je Einwohner"}
         />
-        <Kennzahl wert={`${Math.round(view.investAnteil * 100)} %`} label="davon Investitionen, der Rest ist laufender Betrieb" />
+        <Kennzahl
+          wert={`${Math.round(view.investAnteil * 100)} %`}
+          label={<>davon <Term name="investition">Investitionen</Term>, der Rest ist laufender Betrieb</>}
+        />
       </section>
 
       <section className="max-w-2xl space-y-3">
@@ -400,6 +405,7 @@ export function Home() {
                       <span className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 text-sm text-ink-muted">
                         <KategorieZeile farbe={kat.farbe} icon={kat.icon}>{p.einzelplan_name}</KategorieZeile>
                         <span className="min-w-0 truncate">
+                          {zeigen && `${m.hhst_id} · `}
                           {m.context} · {fmtEurShort(m.from)} → {fmtEurShort(m.to)}
                         </span>
                       </span>

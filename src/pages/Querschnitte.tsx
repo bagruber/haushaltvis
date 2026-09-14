@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { useData, latestYear, adjustSeries } from "@/lib/data";
+import { useData, latestYear, adjustSeries, totals } from "@/lib/data";
+import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
 import type { Aggregator, YearSeries } from "@/lib/data";
 import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
@@ -10,7 +11,7 @@ import type { Icon } from "@phosphor-icons/react";
 import { Buildings, Desktop, Drop, HandCoins, Lightning, Tag, TreeStructure, Users } from "@phosphor-icons/react";
 import { KategorieZeile, Kennzahl, Klecks, Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
-import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
+import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
 
 // Fixed display order + colour per aggregator (keys from etl/aggregatoren.yaml).
 const ORDER = ["personal", "zuschuesse", "gebaeude", "it", "strom", "wasser"] as const;
@@ -71,6 +72,7 @@ function groupsOf(
         count: g.count,
         sum: g.sum,
         top,
+        doppelt: doppelte(top.map((r) => r.label)),
         restCount: g.count - top.length,
         restSum: g.sum - top.reduce((s, r) => s + r.sum, 0),
       };
@@ -82,6 +84,7 @@ export function Querschnitte() {
   usePageTitle("Querschnitte");
   const { data, error } = useData();
   const [mode, setMode] = useState<TimelineMode>({});
+  const { zeigen } = useNummern();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -151,12 +154,15 @@ export function Querschnitte() {
       })),
     };
 
+    const gesamt = totals(data.budget, latest).ausgaben;
     const cards = keys.map((k) => {
       const s = adjusted[k];
       return {
         key: k,
         agg: aggs[k],
         color: COLOR[k],
+        // Share from the raw Ansatz, so it stays right with the real / per-head switches on.
+        anteil: gesamt ? (aggs[k].reihe[String(latest)]?.ansatz ?? 0) / gesamt : null,
         ansatzLatest: s.ansatz[years.indexOf(latest)],
         ergebnisFinal: s.ergebnis[years.indexOf(finalYear)],
         groups: groupsOf(aggs[k], data.budget.posten, factSum),
@@ -190,7 +196,10 @@ export function Querschnitte() {
             {mode.perCapita && ", je Einwohner"}
           </span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
+        <div className="flex flex-wrap items-center gap-4">
+          <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
+          <NummernSchalter className="mb-1" />
+        </div>
         <EChart
           option={view.overview}
           ariaLabel="Entwicklung der Kostenblöcke über die Jahre — Zahlen in der Tabelle darunter"
@@ -221,7 +230,11 @@ export function Querschnitte() {
           </div>
 
           <div className="flex flex-wrap gap-x-10 gap-y-3">
-            <Kennzahl wert={view.fmtV(c.ansatzLatest)} label={`Ansatz ${view.latest}`} className="text-2xl" />
+            <Kennzahl
+              wert={view.fmtV(c.ansatzLatest)}
+              label={c.anteil ? `Ansatz ${view.latest}, ${fmtPct(c.anteil)} aller Ausgaben` : `Ansatz ${view.latest}`}
+              className="text-2xl"
+            />
             <Kennzahl wert={view.fmtV(c.ergebnisFinal)} label={`Ergebnis ${view.finalYear}`} className="text-2xl" />
           </div>
 
@@ -255,7 +268,10 @@ export function Querschnitte() {
                           to={`/posten/${r.hhst}`}
                           className="flex items-baseline justify-between gap-3 border-b border-ink-line/40 py-1 hover:text-red-600 transition-colors"
                         >
-                          <span className="min-w-0 truncate text-ink-soft">{r.label}</span>
+                          <span className="flex min-w-0 items-baseline text-ink-soft">
+                            <Nummer wert={r.hhst} sichtbar={zeigen || g.doppelt.has(r.label)} />
+                            <span className="truncate">{r.label}</span>
+                          </span>
                           <span className="shrink-0 tabular-nums">{view.fmtV(r.sum)}</span>
                         </Link>
                       </li>

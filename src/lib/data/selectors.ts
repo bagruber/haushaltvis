@@ -862,6 +862,8 @@ export function einzelplanSections(
  * arten | Einzelpläne}. Two subtrees off one root → planar (no bowtie crossing).
  * Internal transfers are excluded so the picture isn't double-counted.
  */
+const EINNAHMEN_NEUTRAL = "#bdb5a6";
+
 export function kameralBothSidesTree(data: Data, year: number): KameralTree {
   const eps = new Map<string, { total: number; name: string }>();
   const inc = new Map<string, number>();
@@ -892,15 +894,17 @@ export function kameralBothSidesTree(data: Data, year: number): KameralTree {
   // central node reads cleanly (deficit covered by reserves, or surplus saved).
   const hub = add(`Haushalt ${year}`, "#a8a193", 1);
 
+  // Income stays one neutral tone, so colour in this chart only ever means
+  // "Einzelplan" (usability round 1: gold income shades reappeared among the
+  // expenses and the two sides were mixed up).
   const incEntries = [...inc.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
-  const goldShades = shades(GOLD_BASE, incEntries.length);
-  incEntries.forEach(([cat, v], i) => {
-    const n = add(cat, goldShades[i], 0, "left");
+  incEntries.forEach(([cat, v]) => {
+    const n = add(cat, EINNAHMEN_NEUTRAL, 0, "left");
     nav[n] = "/einnahmen";
     links.push({ source: n, target: hub, value: Math.round(v) });
   });
   if (totEx > totIn) {
-    const n = add("Rücklagen / Finanzierung", "#b39f7a", 0, "left");
+    const n = add("Rücklagen / Finanzierung", EINNAHMEN_NEUTRAL, 0, "left");
     nav[n] = "/einnahmen";
     links.push({ source: n, target: hub, value: Math.round(totEx - totIn) });
   }
@@ -1228,15 +1232,25 @@ export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
   return { years, series };
 }
 
-// ── Search index (real-name entities only) ──────────────────────────────────
+// ── Search index ────────────────────────────────────────────────────────────
 
 export interface SearchItem {
   label: string;
   sub: string;
   route: string;
+  /** numbers that find this item by prefix (Einzelplan, Gliederung, Haushaltsstelle) */
+  keys?: string[];
+  /** 0 = overview entities, 1 = single Posten; Posten rank below at equal match quality */
+  rank?: number;
 }
 
-/** Searchable entities with everyday names: Themen, Einzelpläne, Einrichtungen. */
+const cleanText = (s: string) => s.replace(/\s+/g, " ").trim();
+
+/**
+ * Searchable entities: Themen, Einzelpläne, Einrichtungen and single Posten.
+ * Many Posten share a name across Einrichtungen (the same Gruppierung in 143
+ * facilities), so a Posten's sub line always names its Einrichtung and number.
+ */
 export function searchIndex(data: Data): SearchItem[] {
   const items: SearchItem[] = [];
   for (const [id, t] of Object.entries(data.themes.themes)) {
@@ -1245,30 +1259,86 @@ export function searchIndex(data: Data): SearchItem[] {
   const eps = new Map<string, string>();
   for (const p of Object.values(data.budget.posten)) if (!eps.has(p.einzelplan)) eps.set(p.einzelplan, p.einzelplan_name);
   for (const [ep, name] of [...eps].sort()) {
-    items.push({ label: `${ep} · ${name}`, sub: "Einzelplan", route: `/einzelplan/${ep}` });
+    items.push({ label: `${ep} · ${name}`, sub: "Einzelplan", route: `/einzelplan/${ep}`, keys: [ep] });
   }
   const seen = new Set<string>();
   for (const p of Object.values(data.budget.posten)) {
     if (p.glz_text && !seen.has(p.glz)) {
       seen.add(p.glz);
-      items.push({ label: p.glz_text.replace(/\s+/g, " ").trim(), sub: "Einrichtung", route: `/einrichtung/${p.glz}` });
+      items.push({ label: cleanText(p.glz_text), sub: `Einrichtung ${p.glz}`, route: `/einrichtung/${p.glz}`, keys: [p.glz] });
     }
+  }
+  for (const p of Object.values(data.budget.posten)) {
+    if (isInternal(p)) continue;
+    items.push({
+      label: cleanText(p.grz_text ?? p.hhst_id),
+      sub: `${cleanText(p.glz_text ?? p.glz)} · ${p.hhst_id}`,
+      route: `/posten/${p.hhst_id}`,
+      keys: [p.hhst_id],
+      rank: 1,
+    });
   }
   return items;
 }
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
-/** Rank search items for a query: prefix matches first, then substring, shortest first. */
+/**
+ * Everyday words mapped to the terms the budget actually uses (usability round
+ * 1: "Müll" found nothing). Keys and targets are normalised like `norm`; every
+ * target occurs in the data.
+ */
+const SYNONYME: Record<string, string[]> = {
+  mull: ["abfall", "mullabfuhr", "wertstoff", "entsorgung"],
+  muell: ["abfall", "mullabfuhr", "wertstoff", "entsorgung"],
+  kita: ["kindergarten", "kinderkrippe", "kinderhort"],
+  kindertagesstatte: ["kindergarten", "kinderkrippe", "kinderhort"],
+  schwimmbad: ["hallenbad", "freibad", "schwimmhalle"],
+  bibliothek: ["bucherei"],
+  abwasser: ["kanal", "entwasserung", "klaranlage"],
+  friedhof: ["bestattung"],
+  beerdigung: ["bestattung", "friedhof"],
+  sporthalle: ["turnhalle", "sportanlage"],
+  park: ["grunanlage"],
+  vhs: ["volkshochschule"],
+  schnee: ["winterdienst"],
+  strasse: ["straße"],
+  strom: ["energie"],
+  jugendzentrum: ["jugendhaus", "jugendarbeit"],
+};
+
+/** The query itself plus the targets of every synonym it starts or completes. */
+function suchbegriffe(q: string): string[] {
+  const extra = Object.entries(SYNONYME)
+    .filter(([k]) => q.startsWith(k) || (q.length >= 3 && k.startsWith(q)))
+    .flatMap(([, v]) => v);
+  return [q, ...new Set(extra)];
+}
+
+/**
+ * Rank search items for a query. Numbers match the item keys by prefix, the
+ * shortest key first. Words match the label: prefix before substring, shortest
+ * first, synonym hits after direct hits. Single Posten come after overview
+ * entities of the same match quality.
+ */
 export function searchRank(items: SearchItem[], query: string, limit = 10): SearchItem[] {
   const q = norm(query.trim());
   if (!q) return [];
+  const zahl = /^\d/.test(q);
+  const begriffe = zahl ? [] : suchbegriffe(q);
   const scored: { it: SearchItem; score: number }[] = [];
   for (const it of items) {
-    const l = norm(it.label);
-    const i = l.indexOf(q);
-    if (i < 0) continue;
-    scored.push({ it, score: (i === 0 ? 0 : 100) + i + l.length * 0.01 });
+    let best = Infinity;
+    if (zahl) {
+      for (const k of it.keys ?? []) if (k.startsWith(q)) best = Math.min(best, k.length);
+    } else {
+      const l = norm(it.label);
+      begriffe.forEach((t, n) => {
+        const i = l.indexOf(t);
+        if (i >= 0) best = Math.min(best, (i === 0 ? 0 : 100) + i + l.length * 0.01 + (n > 0 ? 50 : 0));
+      });
+    }
+    if (best < Infinity) scored.push({ it, score: best + (it.rank ?? 0) * 200 });
   }
   return scored.sort((a, b) => a.score - b.score).slice(0, limit).map((x) => x.it);
 }

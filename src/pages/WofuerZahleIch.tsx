@@ -4,7 +4,7 @@ import { useData, netBurdenByEinzelplan, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { ArrowRight, CaretDown, CaretRight } from "@phosphor-icons/react";
-import { Klecks, Loading, SeitenKopf, Stripe } from "@/components/ui";
+import { Klecks, Loading, SeitenKopf, Stripe, Teilen } from "@/components/ui";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { cn } from "@/lib/cn";
 import { Term } from "@/components/Term";
@@ -144,6 +144,8 @@ export function WofuerZahleIch() {
         <p className="mt-1 font-display text-4xl font-semibold text-gold-200 lining-nums tabular-nums">
           {fmtEur(view.beitrag)} <span className="font-sans text-base font-normal text-cream">pro Jahr</span>
         </p>
+        {/* The URL carries both amounts, so a shared link opens this exact result. */}
+        <Teilen hell label="Ergebnis teilen" className="mt-4" />
         <Stripe className="absolute inset-x-0 bottom-0" />
       </section>
 

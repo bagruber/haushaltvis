@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
+import { ArrowsLeftRight, ArrowsVertical, CursorClick } from "@phosphor-icons/react";
 import { EChart } from "@/components/EChart";
 import { useData, kameralBothSidesTree, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { sankeyTooltip } from "@/lib/charts";
+import { sankeyTooltipMitAnteil } from "@/lib/charts";
 import { ChartTable } from "@/components/ChartTable";
 import { Loading, SeitenKopf } from "@/components/ui";
 import { fmtEur, fmtEurShort } from "@/lib/format";
@@ -22,18 +23,20 @@ export function Erkunden() {
     const tree = kameralBothSidesTree(data, y);
     const t = totals(data.budget, y);
     const option: EChartsOption = {
-      tooltip: { trigger: "item", formatter: sankeyTooltip },
+      tooltip: { trigger: "item", formatter: sankeyTooltipMitAnteil(tree.total) },
       series: [
         {
           type: "sankey",
-          left: 210,
-          right: 230,
+          // Room for the longest names in the wider text face ("Wirtschaftliche Unternehmen, allg. Grund-/Sondervermögen").
+          left: 250,
+          right: 370,
           top: 10,
           bottom: 10,
           nodeWidth: 16,
           nodeGap: 10,
           layoutIterations: 32, // let ECharts minimise crossings at the central hub
           draggable: false,
+          cursor: "pointer",
           emphasis: { focus: "adjacency" },
           data: tree.nodes,
           links: tree.links,
@@ -48,9 +51,15 @@ export function Erkunden() {
   const onEvents = useMemo(
     () => ({
       click: (p: unknown) => {
-        const i = p as { dataType?: string; name?: string };
-        if (i.dataType !== "node") return;
-        const route = view?.tree.nav[i.name ?? ""];
+        const i = p as { dataType?: string; name?: string; data?: { source?: string; target?: string } };
+        const nav = view?.tree.nav ?? {};
+        // A band leads where it flows: to its Einzelplan, or for income to the Einnahmen view.
+        const route =
+          i.dataType === "node"
+            ? nav[i.name ?? ""]
+            : i.dataType === "edge"
+              ? nav[i.data?.target ?? ""] ?? nav[i.data?.source ?? ""]
+              : undefined;
         if (route) navigate(route);
       },
     }),
@@ -63,11 +72,7 @@ export function Erkunden() {
   return (
     <div className="space-y-6">
       <SeitenKopf titel="Haushalt erkunden" script="nachvollziehbar">
-        <p>
-          Der ganze Haushalt auf einen Blick: <b>links</b> woher das Geld kommt (Einnahmen),
-          in der Mitte der Gesamthaushalt, <b>rechts</b> wohin es geht (Ausgaben nach
-          Einzelplänen). Klick auf eine Einnahmeart oder einen Einzelplan führt eine Ebene tiefer.
-        </p>
+        <p>Der ganze Haushalt eines Jahres auf einen Blick, von den Einnahmen bis zu den Einzelplänen.</p>
       </SeitenKopf>
 
       {view && (
@@ -81,14 +86,34 @@ export function Erkunden() {
         </div>
       )}
 
-      <section className="space-y-2 border-t border-ink-line pt-4">
+      <section className="space-y-3 border-t border-ink-line pt-4">
+        {/* Reading aid right at the chart: round 1 found the Sankey unfamiliar (3/5). */}
+        <ul className="grid gap-2 text-sm text-ink-soft sm:grid-cols-3">
+          <li className="flex gap-2">
+            <ArrowsLeftRight size={18} aria-hidden className="mt-0.5 shrink-0 text-ink-muted" />
+            Links die Einnahmen, rechts die Ausgaben nach Einzelplan.
+          </li>
+          <li className="flex gap-2">
+            <ArrowsVertical size={18} aria-hidden className="mt-0.5 shrink-0 text-ink-muted" />
+            Je breiter ein Band, desto mehr Geld fließt.
+          </li>
+          <li className="flex gap-2">
+            <CursorClick size={18} aria-hidden className="mt-0.5 shrink-0 text-ink-muted" />
+            Ein Klick auf Balken oder Band führt eine Ebene tiefer.
+          </li>
+        </ul>
         <p className="text-xs text-ink-muted">
           Interne Verrechnungen sind ausgeblendet. <span className="md:hidden">Auf kleinen Bildschirmen seitlich scrollen.</span>
         </p>
         {view ? (
           <>
             <div className="overflow-x-auto">
-              <div className="min-w-[680px]">
+              <div className="min-w-[860px]">
+                {/* Round 1: which side is income was not obvious; the labels now sit over each side. */}
+                <div className="flex justify-between border-b border-ink-line pb-1.5 text-sm font-semibold">
+                  <span>Einnahmen: woher das Geld kommt</span>
+                  <span>Ausgaben: wohin es geht</span>
+                </div>
                 <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts — Zahlen in der Tabelle darunter`} style={{ height }} />
               </div>
             </div>

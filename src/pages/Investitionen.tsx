@@ -15,6 +15,8 @@ import {
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Kennzahl, Loading } from "@/components/ui";
+import { Term } from "@/components/Term";
+import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -53,6 +55,7 @@ export function Investitionen() {
   usePageTitle("Investitionen");
   const { data, error } = useData();
   const navigate = useNavigate();
+  const { zeigen } = useNummern();
   const { year: selYear } = useYearCtx();
 
   const view = useMemo(() => {
@@ -136,7 +139,11 @@ export function Investitionen() {
     const vorhaben = projects.filter((p) => !p.daueransatz).slice(0, 20);
     const dauer = projects.filter((p) => p.daueransatz);
 
-    return { y, projects, imJahr, top, cov, jahrOpt, totalJahr, covJahr, stackedOpt, stackedYears: stacked.years, stackedTotals, vorhaben, dauer };
+    return {
+      y, projects, imJahr, top, cov, jahrOpt, totalJahr, covJahr, stackedOpt, stackedYears: stacked.years, stackedTotals, vorhaben, dauer,
+      dupVorhaben: doppelte(vorhaben.map((p) => p.label)),
+      dupDauer: doppelte(dauer.map((p) => p.label)),
+    };
   }, [data, selYear]);
 
   const onEvents = useMemo(
@@ -160,8 +167,13 @@ export function Investitionen() {
     <div className="space-y-10">
       <header className="max-w-2xl space-y-3">
         <h1 className="headline text-3xl">Investitionen</h1>
+        {/* Round 1: the word "Investitionen" itself was unclear, so the page opens with what it means. */}
+        <p className="text-lg">
+          <Term name="investition">Investitionen</Term> sind Ausgaben für Dinge, die viele Jahre bleiben:
+          Schulhäuser, Straßen, Grundstücke, Fahrzeuge.
+        </p>
         <p className="text-ink-soft">
-          Der Vermögenshaushalt: Bauten, Grundstücke und Anschaffungen. Ein Vorhaben läuft meist
+          Sie stehen im <Term name="vermoegenshaushalt">Vermögenshaushalt</Term>. Ein Vorhaben läuft meist
           über mehrere Jahre — hier steht es als Ganzes, mit seiner Laufzeit und dem, was am Ende
           die Stadt selbst trägt.
         </p>
@@ -220,6 +232,7 @@ export function Investitionen() {
           {view.stackedYears[view.stackedYears.length - 1]} endet, sind Vorhaben an diesen Rändern
           als offen gekennzeichnet — sie liefen schon vorher oder laufen weiter.
         </p>
+        <NummernSchalter />
         <ul>
           {view.vorhaben.map((p) => {
             const c = coverage(p.total, p.funding);
@@ -230,7 +243,10 @@ export function Investitionen() {
                   className="group block border-b border-ink-line py-3 hover:border-ink-soft transition-colors"
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span className="font-medium group-hover:text-red-600 transition-colors">{p.label}</span>
+                    <span className="flex items-baseline font-medium group-hover:text-red-600 transition-colors">
+                      <Nummer wert={p.glz} sichtbar={zeigen || view.dupVorhaben.has(p.label)} />
+                      {p.label}
+                    </span>
                     <span className="font-display font-bold tabular-nums">{fmtEur(p.total)}</span>
                   </div>
                   <div className="mt-1.5 flex h-1.5 w-full overflow-hidden rounded-sm bg-cream-dark">
@@ -277,7 +293,10 @@ export function Investitionen() {
                   to={`/einrichtung/${p.glz}`}
                   className="group flex flex-wrap items-baseline justify-between gap-x-4 border-b border-ink-line py-2.5 hover:border-ink-soft transition-colors"
                 >
-                  <span className="group-hover:text-red-600 transition-colors">{p.label}</span>
+                  <span className="flex items-baseline group-hover:text-red-600 transition-colors">
+                    <Nummer wert={p.glz} sichtbar={zeigen || view.dupDauer.has(p.label)} />
+                    {p.label}
+                  </span>
                   <span className="tabular-nums text-ink-soft">
                     {fmtEur(p.total)} <span className="text-xs text-ink-muted">seit {p.first}</span>
                   </span>

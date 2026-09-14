@@ -1,20 +1,22 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear } from "@/lib/data";
+import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear, totals } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { CaretRight } from "@phosphor-icons/react";
-import { Klecks, Loading } from "@/components/ui";
+import { Klecks, Loading, Teilen } from "@/components/ui";
+import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { einzelplanKategorie } from "@/lib/kategorien";
-import { fmtEur, fmtEurShort } from "@/lib/format";
+import { fmtEur, fmtEurFine, fmtEurShort, fmtPct } from "@/lib/format";
 
 export function EinzelplanDetail() {
   const { ep = "" } = useParams();
   const { data, error } = useData();
   const [mode, setMode] = useState<TimelineMode>({});
   const { year: selYear } = useYearCtx();
+  const { zeigen } = useNummern();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -39,6 +41,8 @@ export function EinzelplanDetail() {
       hasInvest,
       hasEinnahmen,
       hasContext: !!(data.context.cpi || data.context.population),
+      gesamt: totals(data.budget, y).ausgaben,
+      pop: data.context.population?.[String(y)],
       name: einzelplanName(data, ep),
       intro: data.einleitungen[`ep:${ep}`],
     };
@@ -65,13 +69,20 @@ export function EinzelplanDetail() {
         <div className="flex items-center gap-3">
           <Klecks farbe={color} icon={einzelplanKategorie(ep).icon} />
           <h1 className="font-display text-3xl font-bold">{ep} · {view.name}</h1>
+          <Teilen className="ml-auto" />
         </div>
         {view.intro && <p className="max-w-3xl text-ink-soft">{view.intro}</p>}
       </header>
 
       <div className="flex flex-wrap items-center gap-4">
-        <span className="rounded-md bg-white border border-ink-line px-3 py-1.5 text-sm">Ausgaben {view.y}: <b>{fmtEurShort(view.total)}</b></span>
+        {/* Round 1: millions are hard to picture; a share and a per-head figure make them tangible. */}
+        <span className="rounded-md bg-white border border-ink-line px-3 py-1.5 text-sm">
+          Ausgaben {view.y}: <b>{fmtEurShort(view.total)}</b>
+          {view.gesamt > 0 && <span className="text-ink-muted"> · {fmtPct(view.total / view.gesamt)} aller Ausgaben</span>}
+          {view.pop && <span className="text-ink-muted"> · {fmtEurFine(view.total / view.pop)} je Einwohner</span>}
+        </span>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={view.hasInvest} hasEinnahmen={view.hasEinnahmen} />
+        <NummernSchalter className="mb-1" />
       </div>
 
       <div className="space-y-4">
@@ -85,10 +96,13 @@ export function EinzelplanDetail() {
             <Timeline laufend={s.laufend} invest={s.invest} einnahmen={s.einnahmen} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} />
 
             <ul className="space-y-1.5 text-sm mt-3">
-              {s.einrichtungen.map((e) => (
+              {s.einrichtungen.map((e, _, alle) => (
                 <li key={e.glz} className="border-b border-ink-line/50 pb-1.5 last:border-0">
                   <Link to={`/einrichtung/${e.glz}`} className="flex items-center justify-between gap-3 hover:text-red-600 transition-colors">
-                    <span className="min-w-0 truncate">{e.label}</span>
+                    <span className="flex min-w-0 items-baseline">
+                      <Nummer wert={e.glz} sichtbar={zeigen || doppelte(alle.map((x) => x.label)).has(e.label)} />
+                      <span className="truncate">{e.label}</span>
+                    </span>
                     <span className="tabular-nums shrink-0 font-medium">{fmtEur(e.value)}</span>
                   </Link>
                 </li>

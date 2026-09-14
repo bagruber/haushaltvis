@@ -26,6 +26,12 @@ vermoegenshaushalt:
     Die Investitionen — Bau, Grundstücke, Anschaffungen —, finanziert aus
     Förderungen, Verkäufen, Rücklagen und Krediten. Von Jahr zu Jahr sehr
     unterschiedlich.
+investition:
+  title: "Investition"
+  text: >
+    Geld für etwas, das viele Jahre genutzt wird: ein Schulhaus, eine Straße,
+    ein Grundstück, ein Fahrzeug. Investitionen stehen im Vermögenshaushalt;
+    Gehälter, Strom und Unterhalt dagegen im Verwaltungshaushalt.
 einzelplan:
   title: "Einzelplan"
   text: >

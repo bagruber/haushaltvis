@@ -1,7 +1,7 @@
 // Small shared UI primitives, previously duplicated across pages.
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import type { Icon } from "@phosphor-icons/react";
+import { ShareNetwork, type Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import { kategorieTon } from "@/lib/kategorien";
 
@@ -255,6 +255,42 @@ export function SegmentedToggle<T extends string>({ value, onChange, options, la
         </button>
       ))}
     </div>
+  );
+}
+
+/**
+ * Share the current page: the system share sheet where there is one, otherwise
+ * the link is copied. The URL already carries the Stichjahr and calculator input.
+ */
+export function Teilen({ hell, label = "Teilen", className }: { hell?: boolean; label?: string; className?: string }) {
+  const [kopiert, setKopiert] = useState(false);
+  const teilen = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      await navigator.share({ title: document.title, url }).catch(() => undefined);
+      return;
+    }
+    await navigator.clipboard.writeText(url).then(
+      () => {
+        setKopiert(true);
+        window.setTimeout(() => setKopiert(false), 2500);
+      },
+      () => undefined,
+    );
+  };
+  return (
+    <button
+      type="button"
+      onClick={teilen}
+      className={cn(
+        "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition-colors",
+        hell ? "bg-cream/15 text-cream hover:bg-cream/25" : "bg-cream-dark text-ink hover:bg-ink-line",
+        className,
+      )}
+    >
+      <ShareNetwork size={16} aria-hidden />
+      <span aria-live="polite">{kopiert ? "Link kopiert" : label}</span>
+    </button>
   );
 }
 
