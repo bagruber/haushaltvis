@@ -38,7 +38,8 @@ export function Erkunden() {
           draggable: false,
           cursor: "pointer",
           emphasis: { focus: "adjacency" },
-          data: tree.nodes,
+          // The hub's name sits in the column header above, level with the two sides.
+          data: tree.nodes.map((n) => (n.depth === 1 ? { ...n, label: { show: false } } : n)),
           links: tree.links,
           label: { color: "#1c1c1c", fontSize: 12 },
           lineStyle: { color: "gradient", opacity: 0.45, curveness: 0.5 },
@@ -110,8 +111,13 @@ export function Erkunden() {
             <div className="overflow-x-auto">
               <div className="min-w-[860px]">
                 {/* Round 1: which side is income was not obvious; the labels now sit over each side. */}
-                <div className="flex justify-between border-b border-ink-line pb-1.5 text-sm font-semibold">
+                <div className="relative flex justify-between border-b border-ink-line pb-1.5 text-sm font-semibold">
                   <span>Einnahmen: woher das Geld kommt</span>
+                  {/* Over the middle column: the plot runs from 250 px left to 370 px right,
+                      the hub sits halfway between, which is 60 px left of the centre. */}
+                  <span className="absolute -translate-x-1/2 whitespace-nowrap" style={{ left: "calc(50% - 60px)" }}>
+                    Haushalt {view.y}
+                  </span>
                   <span>Ausgaben: wohin es geht</span>
                 </div>
                 <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts — Zahlen in der Tabelle darunter`} style={{ height }} />

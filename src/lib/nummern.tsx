@@ -49,7 +49,9 @@ export function NummernSchalter({ className }: { className?: string }) {
   return (
     <label className={`flex cursor-pointer items-center gap-1.5 text-xs ${className ?? ""}`}>
       <input type="checkbox" checked={zeigen} onChange={(e) => setZeigen(e.target.checked)} />
-      <span>Nummern zeigen</span>
+      <span>
+        Nummern<span className="hidden sm:inline"> zeigen</span>
+      </span>
     </label>
   );
 }

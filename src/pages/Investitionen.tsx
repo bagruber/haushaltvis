@@ -16,7 +16,7 @@ import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Kennzahl, Loading } from "@/components/ui";
 import { Term } from "@/components/Term";
-import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -232,7 +232,6 @@ export function Investitionen() {
           {view.stackedYears[view.stackedYears.length - 1]} endet, sind Vorhaben an diesen Rändern
           als offen gekennzeichnet — sie liefen schon vorher oder laufen weiter.
         </p>
-        <NummernSchalter />
         <ul>
           {view.vorhaben.map((p) => {
             const c = coverage(p.total, p.funding);

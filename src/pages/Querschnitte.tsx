@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, latestYear, adjustSeries, totals } from "@/lib/data";
-import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import type { Aggregator, YearSeries } from "@/lib/data";
 import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
@@ -196,10 +196,7 @@ export function Querschnitte() {
             {mode.perCapita && ", je Einwohner"}
           </span>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-          <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
-          <NummernSchalter className="mb-1" />
-        </div>
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
         <EChart
           option={view.overview}
           ariaLabel="Entwicklung der Kostenblöcke über die Jahre — Zahlen in der Tabelle darunter"

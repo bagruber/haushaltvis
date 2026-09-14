@@ -235,7 +235,7 @@ export function Home() {
 
   return (
     <div className="space-y-12">
-      <SeitenKopf titel="Der Haushalt, öffentlich lesbar" script="öffentlich" className="sm:text-5xl">
+      <SeitenKopf titel="Der Haushalt, öffentlich lesbar" script="transparent" className="sm:text-5xl">
         <p className="text-lg">
           Jedes Jahr beschließt der Stadtrat, wofür Moosburg Geld ausgibt und woher es kommt.
           Dieser Beschluss ist der <b>Haushalt</b> — {fmtEurShort(view.ausgaben)} im Jahr {view.y}.
@@ -278,7 +278,7 @@ export function Home() {
           <SketchGround className="-bottom-10 -right-8 h-[380px] w-[440px] bg-cream opacity-[0.14]" />
           <div className="relative max-w-2xl px-6 pt-7 pb-10 sm:px-10 sm:pt-9 sm:pb-12">
             <KategorieZeile icon={Coins} className="text-gold-200">Wofür zahle ich?</KategorieZeile>
-            <SeitenTitel as="h2" script="pro Kopf" className="mt-[1.1em] text-3xl" scriptClassName="text-gold-200/55">
+            <SeitenTitel as="h2" script="pro Kopf" className="text-3xl" scriptClassName="text-gold-200/55">
               Was Moosburg {view.y} für jeden ausgibt
             </SeitenTitel>
             <p className="mt-4 whitespace-nowrap font-display text-5xl font-semibold text-gold-200 lining-nums tabular-nums">

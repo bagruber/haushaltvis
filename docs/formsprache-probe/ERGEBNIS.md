@@ -97,6 +97,14 @@ und Text; gerechnet mit der WCAG-Formel wie in `kontrast.mjs`.
 Farbfläche: Creme auf Tiefrot 11,57:1, Gold-200 auf Tiefrot 8,53:1; Creme auf Erdbraun
 12,02:1, Gold-200 auf Erdbraun 8,86:1.
 
+## Rückmeldung vom 14.09.2026
+
+- Farbfläche in Tiefrot, aktive Zustände in Tinte, Null mit Schrägstrich: vorerst so lassen.
+- Handschrift-Wörter: „transparent“ statt „öffentlich“ (Home), „noch nicht verfügbar“ statt
+  „bald“ (Themen). Ersatz für „pro Kopf“ noch offen.
+- Die Handschrift darf stärker in die Überschrift reichen: Versatz jetzt −0,42 em statt
+  −0,7 em, Abstand über dem Titel 0,85 em statt 1,15 em.
+
 ## Offene Fragen für Benedict
 
 | Frage | Vorlage |

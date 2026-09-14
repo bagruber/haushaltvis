@@ -18,8 +18,9 @@ Noch offen:
 - **Madelon Script:** Lizenz ungeklaert; oeffentlich vorerst erlaubt, weil die
   Schrift als aufgegeben gilt. Ersatz bei Bedarf Ms Madi (OFL), Tausch ueber
   `--font-script`.
-- **Themenfarbe der Farbflaeche:** gebaut mit Tiefrot, Paar mit Erdbraun liegt vor.
-- **Null mit Schraegstrich** in Atkinson: kein OpenType-Feature schaltet sie ab.
+- **Themenfarbe der Farbflaeche** (Tiefrot) und **Null mit Schraegstrich** in
+  Atkinson: am 14.09.2026 vorerst so akzeptiert, vor einer endgueltigen
+  Entscheidung noch einmal ansehen.
 - **Vor einem Merge nach `main`:** `noindex` aus `index.html` entfernen, die
   Schriftpakete in `hausbasis/baseline.json` eintragen, den Vorschau-Schritt in
   `pages.yml` und `probe-vorschau.yml` wieder entfernen.

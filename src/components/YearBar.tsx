@@ -1,8 +1,13 @@
 import { useData } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
+import { NummernSchalter } from "@/lib/nummern";
 
-/** Global year selector for snapshot views (treemap, sankey, category lists). */
-export function YearBar() {
+/**
+ * Global year selector for snapshot views (treemap, sankey, category lists).
+ * On pages with numbered lists it also carries the numbers switch: sticky, and
+ * apart from the chart options it has nothing to do with.
+ */
+export function YearBar({ nummern }: { nummern?: boolean }) {
   const { data } = useData();
   const { year, setYear } = useYearCtx();
   if (!data) return null;
@@ -22,7 +27,7 @@ export function YearBar() {
           step={1}
           value={current}
           onChange={(e) => setYear(Number(e.target.value))}
-          className="flex-1 max-w-md accent-red-600"
+          className="flex-1 min-w-0 max-w-md accent-red-600"
           aria-label="Stichjahr wählen"
         />
         <span className="font-display font-bold text-ink tabular-nums w-12">{current}</span>
@@ -32,6 +37,7 @@ export function YearBar() {
             aktuellstes
           </button>
         )}
+        {nummern && <NummernSchalter className="ml-auto shrink-0 text-ink-soft" />}
       </div>
     </div>
   );

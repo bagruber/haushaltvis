@@ -8,7 +8,7 @@ import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { ChartTable } from "@/components/ChartTable";
 import { Loading } from "@/components/ui";
-import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
 const STEUERN: [string, string][] = [
@@ -114,7 +114,6 @@ export function Einnahmen() {
       </section>
 
       <div className="space-y-6">
-        <NummernSchalter />
         {view.groups.map((g) => {
           const dup = doppelte(g.posten.slice(0, 8).map((p) => p.label));
           return (

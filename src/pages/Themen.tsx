@@ -13,7 +13,7 @@ export function Themen() {
   usePageTitle("Themen");
   return (
     <div className="space-y-8">
-      <SeitenKopf titel="Themen" script="bald">
+      <SeitenKopf titel="Themen" script="noch nicht verfügbar">
         <RoseStatus>In Vorbereitung</RoseStatus>
       </SeitenKopf>
 

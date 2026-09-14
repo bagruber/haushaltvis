@@ -101,7 +101,7 @@ export function EinrichtungDetail() {
         <Timeline laufend={laufend} invest={invest} einnahmen={einnahmen} mode={mode} context={data!.context} baseYear={y} height={300} />
         {hasEinnahmen && (
           <p className="text-xs text-ink-muted">
-            „Mit eigenen Einnahmen verrechnet" zieht die eigenen Einnahmen (Gebühren, Mieten, Entgelte) ab — es bleibt der
+            „Mit Einnahmen verrechnet" zieht die eigenen Einnahmen (Gebühren, Mieten, Entgelte) ab — es bleibt der
             Betrag, den der allgemeine Haushalt trägt. Die graue Linie zeigt weiter die Bruttoausgaben.
           </p>
         )}

@@ -169,13 +169,14 @@ export function SeitenTitel({ script, as: Tag = "h1", className, scriptClassName
   children: ReactNode;
 }) {
   return (
-    // The top margin keeps the script clear of whatever sits above the heading.
-    <Tag className={cn("headline relative", script && "mt-[1.15em]", className)}>
+    // The script reaches well into the heading; the top margin keeps it clear
+    // of whatever sits above.
+    <Tag className={cn("headline relative", script && "mt-[0.85em]", className)}>
       {script && (
         <span
           aria-hidden
           className={cn(
-            "pointer-events-none absolute -left-[0.05em] -top-[0.7em] origin-bottom-left -rotate-6 select-none whitespace-nowrap font-script text-[1.45em] font-normal leading-none text-gold-500/55",
+            "pointer-events-none absolute -left-[0.05em] -top-[0.42em] origin-bottom-left -rotate-6 select-none whitespace-nowrap font-script text-[1.45em] font-normal leading-none text-gold-500/55",
             scriptClassName,
           )}
         >

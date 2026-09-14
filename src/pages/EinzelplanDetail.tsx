@@ -6,7 +6,7 @@ import { usePageTitle } from "@/lib/title";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { CaretRight } from "@phosphor-icons/react";
 import { Klecks, Loading, Teilen } from "@/components/ui";
-import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { fmtEur, fmtEurFine, fmtEurShort, fmtPct } from "@/lib/format";
@@ -82,7 +82,6 @@ export function EinzelplanDetail() {
           {view.pop && <span className="text-ink-muted"> · {fmtEurFine(view.total / view.pop)} je Einwohner</span>}
         </span>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={view.hasInvest} hasEinnahmen={view.hasEinnahmen} />
-        <NummernSchalter className="mb-1" />
       </div>
 
       <div className="space-y-4">

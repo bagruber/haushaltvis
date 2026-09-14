@@ -147,7 +147,7 @@ export function TimelineControls({
           <input type="checkbox" checked={!!mode.netto} onChange={(e) => setMode((m) => ({ ...m, netto: e.target.checked }))} />
           {/* Round 1: "bilanziert (Zuschussbedarf)" was misread; plain words instead. */}
           <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
-            mit eigenen Einnahmen verrechnet
+            mit Einnahmen verrechnet
           </span>
         </label>
       )}
