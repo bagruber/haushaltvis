@@ -6,7 +6,6 @@ import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { useData, incomeByCategory, incomeCategorySeries, adjustSeries, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { shades, GOLD_BASE } from "@/lib/colors";
 import { ChartTable } from "@/components/ChartTable";
 import { Loading } from "@/components/ui";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
@@ -52,7 +51,7 @@ export function Einnahmen() {
     ]);
     const steuerOpt: EChartsOption = {
       tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
-      grid: { left: 66, right: 16, top: 12, bottom: 56 },
+      grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
       legend: { bottom: 0, type: "scroll", data: STEUERN.map(([n]) => n) },
@@ -83,7 +82,7 @@ export function Einnahmen() {
     };
 
     const hasContext = !!(data.context.cpi || data.context.population);
-    return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext };
+    return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext };
   }, [data, selYear, mode]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
@@ -113,8 +112,8 @@ export function Einnahmen() {
       </section>
 
       <div className="space-y-6">
-        {view.groups.map((g, i) => (
-          <section key={g.key} className="border-t-2 pt-3" style={{ borderColor: view.colors[i] }}>
+        {view.groups.map((g) => (
+          <section key={g.key} className="border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
               <h2 className="font-display text-lg font-bold">{g.label}</h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(g.value)}</span>

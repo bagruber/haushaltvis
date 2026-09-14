@@ -6,7 +6,9 @@ import { useData, latestYear, adjustSeries } from "@/lib/data";
 import type { Aggregator, YearSeries } from "@/lib/data";
 import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import type { Icon } from "@phosphor-icons/react";
+import { Buildings, Desktop, Drop, HandCoins, Lightning, Tag, TreeStructure, Users } from "@phosphor-icons/react";
+import { KategorieZeile, Kennzahl, Klecks, Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
@@ -19,6 +21,14 @@ const COLOR: Record<string, string> = {
   it: "#0a9e4c",
   strom: "#d4a017",
   wasser: "#3a8fb7",
+};
+const ICON: Record<string, Icon> = {
+  personal: Users,
+  zuschuesse: HandCoins,
+  gebaeude: Buildings,
+  it: Desktop,
+  strom: Lightning,
+  wasser: Drop,
 };
 
 /** How many single Posten to name inside each Gruppierung before summarising. */
@@ -126,7 +136,7 @@ export function Querschnitte() {
         order: "valueDesc",
       },
       legend: { bottom: 0 },
-      grid: { left: 66, right: 16, top: 12, bottom: 44 },
+      grid: { left: 8, right: 16, top: 12, bottom: 44, containLabel: true },
       xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({
@@ -196,30 +206,30 @@ export function Querschnitte() {
         />
       </section>
 
-      {view.cards.map((c) => (
-        <section key={c.key} className="space-y-3 border-t-2 pt-4" style={{ borderColor: c.color }}>
+      {view.cards.map((c, i) => (
+        <section key={c.key} className="space-y-4 rounded-lg border border-ink-line bg-white p-5">
+          <div className="flex items-center gap-3">
+            <Klecks farbe={c.color} icon={ICON[c.key] ?? Buildings} variante={i} />
+            <KategorieZeile farbe={c.color} icon={c.agg.art === "struktur" ? TreeStructure : Tag}>
+              {c.agg.art === "struktur" ? "Gruppierungsplan" : "Stichwort-Auswahl"}
+            </KategorieZeile>
+          </div>
           <div className="space-y-1">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h2 className="font-display text-xl font-bold">{c.agg.title}</h2>
-              <span className="eyebrow text-ink-muted">
-                {c.agg.art === "struktur" ? "Gruppierungsplan" : "Stichwort-Auswahl"}
-              </span>
-            </div>
+            <h2 className="font-display text-2xl font-bold">{c.agg.title}</h2>
             <p className="max-w-2xl text-sm text-ink-soft">{c.agg.beschreibung}</p>
             <p className="text-xs text-ink-muted">Kriterium: {c.agg.kriterium}</p>
           </div>
 
           <div className="flex flex-wrap gap-x-10 gap-y-3">
-            {[
-              [`Ansatz ${view.latest}`, view.fmtV(c.ansatzLatest)],
-              [`Ergebnis ${view.finalYear}`, view.fmtV(c.ergebnisFinal)],
-              ["Haushaltsstellen", String(c.agg.hhst.length)],
-            ].map(([label, value]) => (
-              <div key={label}>
-                <div className="eyebrow text-ink-muted">{label}</div>
-                <div className="font-display text-xl font-bold tabular-nums">{value}</div>
-              </div>
-            ))}
+            <Kennzahl wert={view.fmtV(c.ansatzLatest)} label={`Ansatz ${view.latest}`} className="text-2xl" />
+            <Kennzahl wert={view.fmtV(c.ergebnisFinal)} label={`Ergebnis ${view.finalYear}`} className="text-2xl" />
+          </div>
+
+          <div className="flex items-baseline gap-2 border-t border-ink-line pt-3">
+            <span className="font-display text-3xl font-semibold lining-nums tabular-nums">
+              {c.agg.hhst.length.toLocaleString("de-DE")}
+            </span>
+            <span className="text-sm text-ink-muted">Haushaltsstellen</span>
           </div>
 
           <details className="group">

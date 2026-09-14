@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
+import { CaretRight } from "@phosphor-icons/react";
 import { EChart } from "@/components/EChart";
 import {
   useData,
@@ -144,8 +145,9 @@ export function ThemeDetail() {
 
   return (
     <div className="space-y-10">
-      <nav className="text-sm text-ink-muted">
-        <Link to="/intern/themen" className="hover:text-ink">Themen</Link> ›{" "}
+      <nav className="flex items-center gap-1.5 text-sm text-ink-muted">
+        <Link to="/intern/themen" className="hover:text-ink">Themen</Link>
+        <CaretRight size={12} aria-hidden />
         <span className="text-ink">{def.label}</span>
       </nav>
 
@@ -255,7 +257,7 @@ export function ThemeDetail() {
                   <div className="font-medium">
                     {e.title}
                     {(e as { _auto?: boolean })._auto && (
-                      <span className="ml-2 text-[10px] uppercase tracking-wide text-ink-muted">automatisch erkannt</span>
+                      <span className="ml-2 text-xs text-ink-muted">automatisch erkannt</span>
                     )}
                   </div>
                   {e.text && <div className="text-sm text-ink-muted">{e.text}</div>}

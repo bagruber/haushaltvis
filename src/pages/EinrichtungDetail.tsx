@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
-import { Chip, Loading, ThemaPlatzhalter } from "@/components/ui";
+import { CaretRight } from "@phosphor-icons/react";
+import { Chip, Kennzahl, Loading, ThemaPlatzhalter } from "@/components/ui";
 import {
   useData,
   einrichtungInfo,
@@ -65,7 +66,7 @@ export function EinrichtungDetail() {
     <div className="space-y-6">
       <nav className="text-sm text-ink-muted flex flex-wrap items-center gap-1.5">
         <Link to={`/einzelplan/${info.glz[0]}`} className="hover:text-ink underline-offset-2 hover:underline">{info.crumb.aufgabenbereich}</Link>
-        <span aria-hidden>›</span>
+        <CaretRight size={12} aria-hidden />
         <span className="text-ink-soft">{info.crumb.bereich}</span>
       </nav>
 
@@ -79,22 +80,11 @@ export function EinrichtungDetail() {
 
       {hasEinnahmen && deckung != null && (
         <div className="flex flex-wrap gap-x-10 gap-y-3 border-y border-ink-line py-4">
-          <div>
-            <div className="eyebrow text-ink-muted">Ausgaben {y}</div>
-            <div className="font-display text-xl font-bold tabular-nums">{fmtEur(aus)}</div>
-          </div>
-          <div>
-            <div className="eyebrow text-ink-muted">Eigene Einnahmen</div>
-            <div className="font-display text-xl font-bold tabular-nums">{fmtEur(ein)}</div>
-          </div>
-          <div>
-            <div className="eyebrow text-ink-muted">Zuschussbedarf</div>
-            <div className="font-display text-xl font-bold tabular-nums text-red-600">{fmtEur(aus - ein)}</div>
-          </div>
-          <div>
-            <div className="eyebrow text-ink-muted">Kostendeckung</div>
-            <div className="font-display text-xl font-bold tabular-nums">{Math.round(deckung * 100)} %</div>
-          </div>
+          <Kennzahl wert={fmtEur(aus)} label={`Ausgaben ${y}`} className="text-2xl" />
+          <Kennzahl wert={fmtEur(ein)} label="Eigene Einnahmen" className="text-2xl" />
+          {/* Red is right here: this figure is the shortfall the general budget covers. */}
+          <Kennzahl wert={fmtEur(aus - ein)} label="Zuschussbedarf" className="text-2xl text-red-600" />
+          <Kennzahl wert={`${Math.round(deckung * 100)} %`} label="Kostendeckung" className="text-2xl" />
         </div>
       )}
 

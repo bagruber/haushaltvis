@@ -1,24 +1,52 @@
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { Link } from "react-router-dom";
 import type { EChartsOption } from "echarts";
+import { ArrowRight, CaretRight, Coins, FlowArrow, SquaresFour } from "@phosphor-icons/react";
 import { EChart } from "@/components/EChart";
 import { ChartTable } from "@/components/ChartTable";
 import { useData, budgetYearSeries, adjustSeries, latestYear, topMovers } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import {
+  Kennzahl,
+  KategorieZeile,
+  Klecks,
+  Loading,
+  RoseStatus,
+  SeitenKopf,
+  SeitenTitel,
+  SketchGround,
+  Stripe,
+} from "@/components/ui";
 import { Term } from "@/components/Term";
+import { einzelplanKategorie } from "@/lib/kategorien";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const VERWALTUNG = "#8a7a5c";
 const VERMOEGEN = "#c8102e";
 const PROKOPF_LINE = "#b8964e";
 const REAL_LINE = "#2f6f8f";
+const NOTIZ = "#6e5a30"; // gold-700
+const NOTIZ_PFEIL = "#b8964e"; // gold-500
+
+// The chart note needs room; below 640 px there is none, so it is left out.
+const BREIT = "(min-width: 640px)";
+function useBreit() {
+  return useSyncExternalStore(
+    (cb) => {
+      const m = window.matchMedia(BREIT);
+      m.addEventListener("change", cb);
+      return () => m.removeEventListener("change", cb);
+    },
+    () => window.matchMedia(BREIT).matches,
+  );
+}
 
 export function Home() {
   usePageTitle();
   const { data, error } = useData();
   const { year: selYear } = useYearCtx();
+  const breit = useBreit();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -48,6 +76,11 @@ export function Home() {
     const pop = ctx.population?.[String(y)];
     const popFirst = ctx.population?.[String(years[0])];
 
+    // Handwritten note on the year with the highest Ansatz, computed, never fixed.
+    const summen = years.map((_, k) => (vwh.ansatz[k] ?? 0) + (vmh.ansatz[k] ?? 0));
+    const hoechstes = summen.indexOf(Math.max(...summen));
+    const scriptFont = getComputedStyle(document.documentElement).getPropertyValue("--font-script");
+
     // Chart 1 — the two budgets side by side over time.
     const haushalte: EChartsOption = {
       tooltip: {
@@ -56,7 +89,7 @@ export function Home() {
         valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
-      grid: { left: 64, right: 16, top: 16, bottom: 48 },
+      grid: { left: 8, right: 16, top: breit ? 64 : 16, bottom: 48, containLabel: true },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
       series: [
@@ -73,6 +106,26 @@ export function Home() {
           stack: "h",
           data: vmh.ansatz,
           itemStyle: { color: VERMOEGEN },
+          markPoint: breit
+            ? {
+                silent: true,
+                symbol: "path://M4,0 L6,0 L6,10 L10,10 L5,16 L0,10 L4,10 Z",
+                symbolSize: [9, 16],
+                symbolOffset: [0, -12],
+                itemStyle: { color: NOTIZ_PFEIL },
+                label: {
+                  show: true,
+                  position: "top",
+                  distance: 2,
+                  formatter: "höchster Ansatz",
+                  fontFamily: scriptFont,
+                  fontSize: 28,
+                  color: NOTIZ,
+                  rotate: 4,
+                },
+                data: [{ name: "höchster Ansatz", coord: [String(years[hoechstes]), summen[hoechstes]] }],
+              }
+            : undefined,
         },
       ],
     };
@@ -107,12 +160,12 @@ export function Home() {
         },
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
-      grid: { left: 48, right: 16, top: 16, bottom: 64 },
+      grid: { left: 8, right: 16, top: 28, bottom: 64, containLabel: true },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: {
         type: "value",
         name: `Index ${basis} = 100`,
-        nameTextStyle: { color: "#6f6b63", fontSize: 11 },
+        nameTextStyle: { color: "#6f6b63", fontSize: 11, align: "left" },
         axisLabel: { formatter: (v: number) => String(v) },
       },
       series: [
@@ -163,7 +216,7 @@ export function Home() {
       proKopfOpt,
       series: { vwh, vmh, ausgaben, proKopf, proKopfReal },
     };
-  }, [data, selYear]);
+  }, [data, selYear, breit]);
 
   const movers = useMemo(() => {
     if (!data) return [];
@@ -180,37 +233,22 @@ export function Home() {
 
   return (
     <div className="space-y-12">
-      <section className="max-w-2xl space-y-4">
-        <p className="eyebrow text-ink-muted">Stadt Moosburg an der Isar</p>
-        <h1 className="headline text-4xl text-ink">Der Haushalt, öffentlich lesbar</h1>
-        <p className="text-lg text-ink-soft">
+      <SeitenKopf titel="Der Haushalt, öffentlich lesbar" script="öffentlich" className="sm:text-5xl">
+        <p className="text-lg">
           Jedes Jahr beschließt der Stadtrat, wofür Moosburg Geld ausgibt und woher es kommt.
           Dieser Beschluss ist der <b>Haushalt</b> — {fmtEurShort(view.ausgaben)} im Jahr {view.y}.
           Diese Seite macht ihn durchsuchbar, bis zur einzelnen Buchungszeile.
         </p>
-      </section>
+      </SeitenKopf>
 
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4 border-y border-ink-line py-6">
-        {[
-          ["Ausgaben " + view.y, fmtEurShort(view.ausgaben), "Ansatz, beide Haushalte"],
-          ["Einnahmen " + view.y, fmtEurShort(view.einnahmen), "Ansatz, beide Haushalte"],
-          [
-            "Je Einwohner",
-            view.proKopfNominal ? fmtEur(Math.round(view.proKopfNominal)) : "—",
-            view.pop ? `${view.pop.toLocaleString("de-DE")} Einwohner` : "",
-          ],
-          [
-            "Davon Investitionen",
-            `${Math.round(view.investAnteil * 100)} %`,
-            "Rest: laufender Betrieb",
-          ],
-        ].map(([label, value, hint]) => (
-          <div key={label}>
-            <div className="eyebrow text-ink-muted">{label}</div>
-            <div className="mt-1.5 font-display text-3xl font-bold tabular-nums">{value}</div>
-            {hint && <div className="mt-0.5 text-xs text-ink-muted">{hint}</div>}
-          </div>
-        ))}
+        <Kennzahl wert={fmtEurShort(view.ausgaben)} label={`Ausgaben ${view.y}, Ansatz beider Haushalte`} />
+        <Kennzahl wert={fmtEurShort(view.einnahmen)} label={`Einnahmen ${view.y}, Ansatz beider Haushalte`} />
+        <Kennzahl
+          wert={view.proKopfNominal ? fmtEur(Math.round(view.proKopfNominal)) : "—"}
+          label={view.pop ? `je Einwohner, bei ${view.pop.toLocaleString("de-DE")} Einwohnern` : "je Einwohner"}
+        />
+        <Kennzahl wert={`${Math.round(view.investAnteil * 100)} %`} label="davon Investitionen, der Rest ist laufender Betrieb" />
       </section>
 
       <section className="max-w-2xl space-y-3">
@@ -230,6 +268,34 @@ export function Home() {
         </p>
       </section>
 
+      {view.proKopfNominal != null && (
+        <section className="relative overflow-hidden rounded-lg bg-flaeche-haushalt text-cream">
+          <SketchGround className="-bottom-10 -right-8 h-[380px] w-[440px] bg-cream opacity-[0.14]" />
+          <div className="relative max-w-2xl px-6 pt-7 pb-10 sm:px-10 sm:pt-9 sm:pb-12">
+            <KategorieZeile icon={Coins} className="text-gold-200">Wofür zahle ich?</KategorieZeile>
+            <SeitenTitel as="h2" script="pro Kopf" className="mt-[1.1em] text-3xl" scriptClassName="text-gold-200/55">
+              Was Moosburg {view.y} für jeden ausgibt
+            </SeitenTitel>
+            <p className="mt-4 whitespace-nowrap font-display text-5xl font-semibold text-gold-200 lining-nums tabular-nums">
+              {fmtEur(Math.round(view.proKopfNominal))}
+            </p>
+            {view.pop && (
+              <p className="mt-2 max-w-md">
+                Die Ausgaben beider Haushalte, geteilt durch {view.pop.toLocaleString("de-DE")} Einwohner.
+              </p>
+            )}
+            <Link
+              to="/wofuer-zahle-ich"
+              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-lg bg-cream px-[18px] font-semibold text-ink transition-colors hover:bg-gold-200"
+            >
+              Aufschlüsseln
+              <ArrowRight size={18} aria-hidden />
+            </Link>
+          </div>
+          <Stripe className="absolute inset-x-0 bottom-0" />
+        </section>
+      )}
+
       <section className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
           <h2 className="font-display text-2xl font-bold">Der Haushalt über die Jahre</h2>
@@ -238,7 +304,7 @@ export function Home() {
         <EChart
           option={view.haushalte}
           ariaLabel="Ausgaben je Jahr, aufgeteilt in Verwaltungshaushalt und Vermögenshaushalt — Zahlen in der Tabelle darunter"
-          style={{ height: 340 }}
+          style={{ height: breit ? 380 : 340 }}
         />
         <ChartTable
           summary="Jahreswerte als Tabelle"
@@ -280,7 +346,7 @@ export function Home() {
               <span>
                 <b>{label as string}</b>
                 {delta != null && (
-                  <span className="ml-2 font-display font-bold tabular-nums">{pct(delta as number)}</span>
+                  <span className="ml-2 font-display font-bold lining-nums tabular-nums">{pct(delta as number)}</span>
                 )}
                 <span className="block text-ink-muted">{text as string}</span>
               </span>
@@ -314,13 +380,15 @@ export function Home() {
           <ul>
             {movers.map((m) => {
               const up = m.delta > 0;
+              const p = data!.budget.posten[m.hhst_id];
+              const kat = einzelplanKategorie(p.einzelplan);
               return (
                 <li key={m.hhst_id}>
                   <Link
                     to={`/posten/${m.hhst_id}`}
                     className="group flex items-baseline gap-4 border-b border-ink-line py-3 hover:border-ink-soft transition-colors"
                   >
-                    <span className="w-24 shrink-0 text-right font-display text-lg font-bold tabular-nums">
+                    <span className="w-24 shrink-0 text-right font-display text-lg font-bold lining-nums tabular-nums">
                       <span className="sr-only">{up ? "gestiegen um" : "gesunken um"}</span>
                       {up ? "+" : "−"}
                       {fmtEurShort(Math.abs(m.delta))}
@@ -329,8 +397,11 @@ export function Home() {
                       <span className="block truncate font-medium group-hover:text-red-600 transition-colors">
                         {m.label}
                       </span>
-                      <span className="block truncate text-xs text-ink-muted">
-                        {m.context} · {fmtEurShort(m.from)} → {fmtEurShort(m.to)}
+                      <span className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 text-sm text-ink-muted">
+                        <KategorieZeile farbe={kat.farbe} icon={kat.icon}>{p.einzelplan_name}</KategorieZeile>
+                        <span className="min-w-0 truncate">
+                          {m.context} · {fmtEurShort(m.from)} → {fmtEurShort(m.to)}
+                        </span>
                       </span>
                     </span>
                   </Link>
@@ -341,31 +412,39 @@ export function Home() {
         </section>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2">
-        <Link
-          to="/erkunden"
-          className="group border-l-2 border-red-500 pl-5 py-1 hover:border-red-700 transition-colors"
-        >
-          <span className="block font-display text-xl font-bold group-hover:text-red-600 transition-colors">
-            Haushalt erkunden →
-          </span>
-          <span className="mt-1 block text-sm text-ink-soft">
-            Vom Gesamthaushalt bis zur einzelnen Haushaltsstelle: Geldfluss, Einnahmen,
-            Investitionen und Querschnitte.
-          </span>
-        </Link>
-        <Link
-          to="/themen"
-          className="group border-l-2 border-ink-line pl-5 py-1 hover:border-gold-500 transition-colors"
-        >
-          <span className="block font-display text-xl font-bold group-hover:text-gold-700 transition-colors">
-            Themen-Sicht →
-          </span>
-          <span className="mt-1 block text-sm text-ink-soft">
-            Der Haushalt nach Lebensbereichen statt nach Aktenzeichen. In Vorbereitung — die
-            Zuordnung ist noch nicht freigegeben.
-          </span>
-        </Link>
+      {/* Tiles from sm on; below that register entries without frame. */}
+      <section className="grid sm:grid-cols-2 sm:gap-4">
+        {[
+          {
+            to: "/erkunden",
+            titel: "Haushalt erkunden",
+            satz: "Vom Gesamthaushalt bis zur einzelnen Haushaltsstelle, mit Einnahmen, Investitionen und Querschnitten.",
+            klecks: <Klecks farbe="#c8102e" icon={FlowArrow} />,
+          },
+          {
+            to: "/themen",
+            titel: "Themen-Sicht",
+            satz: "Der Haushalt nach Lebensbereichen statt nach Aktenzeichen.",
+            klecks: <Klecks farbe="#b8964e" icon={SquaresFour} variante={1} />,
+            status: <RoseStatus className="mt-2">In Vorbereitung</RoseStatus>,
+          },
+        ].map((k) => (
+          <Link
+            key={k.to}
+            to={k.to}
+            className="group grid grid-cols-[46px_1fr_18px] items-center gap-3 border-t border-ink-line py-3 first:border-t-0 sm:grid-cols-1 sm:content-start sm:gap-3 sm:rounded-lg sm:border sm:bg-white sm:p-5 sm:first:border-t sm:hover:border-ink-muted transition-colors"
+          >
+            {k.klecks}
+            <span>
+              <span className="block font-display text-xl font-semibold group-hover:text-red-600 transition-colors">
+                {k.titel}
+              </span>
+              <span className="mt-1 block text-sm text-ink-muted">{k.satz}</span>
+              {k.status}
+            </span>
+            <CaretRight size={18} aria-hidden className="text-ink-muted sm:hidden" />
+          </Link>
+        ))}
       </section>
     </div>
   );

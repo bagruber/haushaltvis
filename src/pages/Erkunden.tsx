@@ -7,7 +7,7 @@ import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { sankeyTooltip } from "@/lib/charts";
 import { ChartTable } from "@/components/ChartTable";
-import { Loading } from "@/components/ui";
+import { Loading, SeitenKopf } from "@/components/ui";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 export function Erkunden() {
@@ -62,14 +62,13 @@ export function Erkunden() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="headline text-3xl">Haushalt erkunden</h1>
-        <p className="max-w-2xl text-ink-soft">
+      <SeitenKopf titel="Haushalt erkunden" script="nachvollziehbar">
+        <p>
           Der ganze Haushalt auf einen Blick: <b>links</b> woher das Geld kommt (Einnahmen),
           in der Mitte der Gesamthaushalt, <b>rechts</b> wohin es geht (Ausgaben nach
           Einzelplänen). Klick auf eine Einnahmeart oder einen Einzelplan führt eine Ebene tiefer.
         </p>
-      </header>
+      </SeitenKopf>
 
       {view && (
         <div className="flex flex-wrap gap-3 text-sm">

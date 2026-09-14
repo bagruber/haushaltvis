@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "@phosphor-icons/react";
 import { useData } from "@/lib/data";
 
 /**
@@ -28,8 +29,8 @@ export function Term({ name, children }: { name: string; children: React.ReactNo
           className="absolute left-0 bottom-full z-30 mb-1 w-64 rounded-lg border border-ink-line bg-white p-3 text-xs font-normal leading-snug text-ink-soft shadow-lift"
         >
           {entry.text}
-          <Link to={`/glossar#${name}`} className="mt-1.5 block text-red-600 hover:underline">
-            Im Glossar nachschlagen →
+          <Link to={`/glossar#${name}`} className="mt-1.5 flex items-center gap-1 text-red-600 hover:underline">
+            Im Glossar nachschlagen <ArrowRight size={12} aria-hidden />
           </Link>
         </span>
       )}

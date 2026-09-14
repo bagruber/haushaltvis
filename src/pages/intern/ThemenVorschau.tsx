@@ -115,7 +115,7 @@ export default function ThemenVorschau() {
 
   return (
     <div className="space-y-8">
-      <div className="border-l-2 border-red-500 bg-cream-dark px-4 py-3 text-sm">
+      <div className="rounded-lg border border-gold-200 bg-gold-100 px-4 py-3 text-sm">
         <b>Interne Vorschau.</b> Die Themen-Zuordnung ist ein Entwurf und nicht von der Stadt
         freigegeben. Diese Seite ist nicht verlinkt und nicht für die Öffentlichkeit bestimmt.
       </div>

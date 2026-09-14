@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, postenSeries, postenCrumb, eventsFor } from "@/lib/data";
 import { usePageTitle } from "@/lib/title";
+import { CaretRight } from "@phosphor-icons/react";
 import { Chip, Loading, ThemaPlatzhalter } from "@/components/ui";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
 
@@ -40,9 +41,9 @@ export function PostenDetail() {
     <div className="space-y-6">
       <nav className="text-sm text-ink-muted flex flex-wrap items-center gap-1.5">
         <Link to={`/einzelplan/${p.einzelplan}`} className="hover:text-ink underline-offset-2 hover:underline">{crumb.aufgabenbereich}</Link>
-        <span aria-hidden>›</span>
+        <CaretRight size={12} aria-hidden />
         <span>{crumb.bereich}</span>
-        <span aria-hidden>›</span>
+        <CaretRight size={12} aria-hidden />
         <Link to={`/einrichtung/${p.glz}`} className="text-ink-soft hover:text-ink underline-offset-2 hover:underline">{crumb.einrichtung}</Link>
       </nav>
 

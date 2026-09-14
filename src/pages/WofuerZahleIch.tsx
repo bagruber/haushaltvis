@@ -3,7 +3,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useData, netBurdenByEinzelplan, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import { ArrowRight, CaretDown, CaretRight } from "@phosphor-icons/react";
+import { Klecks, Loading, SeitenKopf, Stripe } from "@/components/ui";
+import { einzelplanKategorie } from "@/lib/kategorien";
+import { cn } from "@/lib/cn";
 import { Term } from "@/components/Term";
 import { fmtEur, fmtEurFine } from "@/lib/format";
 
@@ -33,7 +36,7 @@ function NumberField({ id, label, hint, value, onChange }: {
           inputMode="numeric"
           value={Number.isFinite(value) ? value : 0}
           onChange={(e) => onChange(Math.max(0, Number(e.target.value)))}
-          className="w-32 rounded-md border border-ink-line bg-white px-3 py-1.5 text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="h-10 w-32 rounded-lg border border-ink-line bg-white px-3 text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-red-500"
         />
         <span className="text-ink-muted">€ / Jahr</span>
       </div>
@@ -84,28 +87,38 @@ export function WofuerZahleIch() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <header className="space-y-2">
-        <h1 className="headline text-3xl">Wofür zahle ich?</h1>
-        <p className="text-ink-soft">
+      <SeitenKopf titel="Wofür zahle ich?" script="pro Kopf">
+        <p>
           Gib deine jährliche Einkommensteuer und Grundsteuer ein — der Rechner schätzt deinen{" "}
           <b>kommunalen Beitrag</b> und zeigt, wohin er {view.y} fließt. Verteilt wird nach{" "}
           <b>Zuschussbedarf</b>: Bereiche, die sich über Gebühren selbst tragen, kosten dich fast
           nichts — Steuergeld deckt vor allem das, was übrig bleibt.
         </p>
-      </header>
+      </SeitenKopf>
 
       <section className="rounded-lg border border-ink-line bg-white p-4">
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-ink-muted">Beispiele:</span>
-          {PRESETS.map((p) => (
-            <button
-              key={p.label}
-              onClick={() => setAmounts(p.est, p.grund)}
-              className="rounded-md border border-ink-line bg-cream px-2.5 py-1 text-xs text-ink-soft hover:bg-cream-dark hover:text-ink transition-colors"
-            >
-              {p.label}
-            </button>
-          ))}
+        <div className="mb-4 flex items-center gap-2">
+          <span className="shrink-0 text-xs text-ink-muted">Beispiele:</span>
+          {/* Chips as one row that scrolls sideways when it runs out of room. */}
+          <div className="-my-1 flex min-w-0 gap-2 overflow-x-auto py-1">
+            {PRESETS.map((p) => {
+              const gewaehlt = est === p.est && grund === p.grund;
+              return (
+                <button
+                  key={p.label}
+                  type="button"
+                  aria-pressed={gewaehlt}
+                  onClick={() => setAmounts(p.est, p.grund)}
+                  className={cn(
+                    "h-9 shrink-0 whitespace-nowrap rounded-full border px-3.5 text-sm transition-colors",
+                    gewaehlt ? "border-ink bg-ink text-cream" : "border-ink-line bg-white text-ink-soft hover:text-ink",
+                  )}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className="flex flex-wrap gap-5">
           <NumberField
@@ -123,17 +136,21 @@ export function WofuerZahleIch() {
             onChange={setGrund}
           />
         </div>
-        <p className="mt-4 border-t border-ink-line pt-3 text-sm">
-          Dein geschätzter kommunaler Beitrag:{" "}
-          <b className="font-display text-xl text-red-600">{fmtEur(view.beitrag)}</b> / Jahr
+      </section>
+
+      <section className="relative overflow-hidden rounded-lg bg-flaeche-haushalt px-6 pt-5 pb-7 text-cream">
+        <p className="text-sm">Dein geschätzter kommunaler Beitrag</p>
+        <p className="mt-1 font-display text-4xl font-semibold text-gold-200 lining-nums tabular-nums">
+          {fmtEur(view.beitrag)} <span className="font-sans text-base font-normal text-cream">pro Jahr</span>
         </p>
+        <Stripe className="absolute inset-x-0 bottom-0" />
       </section>
 
       <section className="space-y-2">
         <h2 className="font-display text-xl font-bold">… davon finanzierst du etwa</h2>
         <p className="text-xs text-ink-muted">Auf einen Bereich tippen, um ihn aufzuklappen.</p>
         <ul className="space-y-2">
-          {view.shares.map((s) => {
+          {view.shares.map((s, i) => {
             const isOpen = open.has(s.ep);
             return (
               <li key={s.ep}>
@@ -143,8 +160,10 @@ export function WofuerZahleIch() {
                   className="w-full grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-left"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-ink-muted text-xs w-3 shrink-0" aria-hidden>{isOpen ? "▾" : "▸"}</span>
-                    <span className="inline-block h-3 w-3 rounded-sm shrink-0" style={{ background: s.color }} />
+                    {isOpen
+                      ? <CaretDown size={14} aria-hidden className="shrink-0 text-ink-muted" />
+                      : <CaretRight size={14} aria-hidden className="shrink-0 text-ink-muted" />}
+                    <Klecks farbe={s.color} icon={einzelplanKategorie(s.ep).icon} dicht variante={i} />
                     <span className="truncate font-medium">{s.label}</span>
                   </div>
                   <span className="tabular-nums text-right font-medium">
@@ -157,7 +176,7 @@ export function WofuerZahleIch() {
                 </button>
 
                 {isOpen && (
-                  <ul className="mt-1.5 ml-6 space-y-1 border-l border-ink-line pl-3">
+                  <ul className="mt-1.5 ml-[60px] space-y-1 border-l border-ink-line pl-3">
                     {s.einnahmen > 0 && (
                       <li className="pb-1 text-xs text-ink-muted">
                         {fmtEur(s.ausgaben)} Ausgaben, davon {fmtEur(s.einnahmen)} über eigene
@@ -171,7 +190,9 @@ export function WofuerZahleIch() {
                       </li>
                     ))}
                     <li className="pt-0.5">
-                      <Link to={`/einzelplan/${s.ep}`} className="text-xs text-red-600 hover:underline">Aufgabenbereich öffnen →</Link>
+                      <Link to={`/einzelplan/${s.ep}`} className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline">
+                        Aufgabenbereich öffnen <ArrowRight size={12} aria-hidden />
+                      </Link>
                     </li>
                   </ul>
                 )}

@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
+import { ArrowRight, FlowArrow, SquaresFour, Wrench } from "@phosphor-icons/react";
 import { usePageTitle } from "@/lib/title";
+import { Klecks, RoseStatus, SeitenKopf } from "@/components/ui";
+import { GOLD_BASE } from "@/lib/colors";
 
 /**
  * Placeholder while the thematic view is unreleased: the M:N assignment of
@@ -10,12 +13,11 @@ export function Themen() {
   usePageTitle("Themen");
   return (
     <div className="max-w-2xl space-y-8">
-      <header className="space-y-3">
-        <p className="eyebrow text-ink-muted">In Vorbereitung</p>
-        <h1 className="headline text-3xl">Themen</h1>
-      </header>
+      <SeitenKopf titel="Themen" script="bald">
+        <RoseStatus>In Vorbereitung</RoseStatus>
+      </SeitenKopf>
 
-      <div className="border-l-2 border-gold-500 pl-5 space-y-3">
+      <div className="space-y-3 rounded-lg border border-gold-200 bg-gold-100 p-5">
         <p className="text-ink-soft">
           Diese Ansicht soll den Haushalt nach Lebensbereichen bündeln — Bildung, Mobilität,
           Kultur — statt nach kameralen Aktenzeichen. Ein Posten kann dabei zu mehreren Themen
@@ -36,21 +38,22 @@ export function Themen() {
           uneingeschränkt nutzbar:
         </p>
         <ul>
-          {[
-            ["/erkunden", "Geldfluss", "Einnahmen und Ausgaben des Gesamthaushalts, bis zur einzelnen Haushaltsstelle."],
-            ["/erkunden/investitionen", "Investitionen", "Vorhaben des Vermögenshaushalts mit Förderung und Eigenanteil."],
-            ["/erkunden/querschnitte", "Querschnitte", "Kostenblöcke wie Personal, Bauen oder Energie über den ganzen Haushalt hinweg."],
-          ].map(([to, title, text]) => (
+          {([
+            ["/erkunden", "Geldfluss", "Einnahmen und Ausgaben des Gesamthaushalts, bis zur einzelnen Haushaltsstelle.", FlowArrow],
+            ["/erkunden/investitionen", "Investitionen", "Vorhaben des Vermögenshaushalts mit Förderung und Eigenanteil.", Wrench],
+            ["/erkunden/querschnitte", "Querschnitte", "Kostenblöcke wie Personal, Bauen oder Energie über den ganzen Haushalt hinweg.", SquaresFour],
+          ] as const).map(([to, title, text, icon], i) => (
             <li key={to}>
               <Link
                 to={to}
-                className="group flex gap-3 border-b border-ink-line py-3 hover:border-ink-soft transition-colors"
+                className="group grid grid-cols-[38px_1fr_18px] items-center gap-3 border-b border-ink-line py-3 hover:border-ink-soft transition-colors"
               >
-                <span className="text-ink-muted group-hover:text-red-600 transition-colors" aria-hidden>→</span>
+                <Klecks farbe={GOLD_BASE} icon={icon} dicht variante={i} />
                 <span>
                   <span className="block font-semibold group-hover:text-red-600 transition-colors">{title}</span>
                   <span className="block text-sm text-ink-muted">{text}</span>
                 </span>
+                <ArrowRight size={18} aria-hidden className="text-ink-muted group-hover:text-ink transition-colors" />
               </Link>
             </li>
           ))}

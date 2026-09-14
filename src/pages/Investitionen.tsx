@@ -14,7 +14,7 @@ import {
 } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import { Kennzahl, Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -116,7 +116,7 @@ export function Investitionen() {
     const stackedOpt: EChartsOption = {
       tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "—"), order: "valueDesc" },
       legend: { type: "scroll", bottom: 0 },
-      grid: { left: 64, right: 16, top: 12, bottom: 56 },
+      grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
       xAxis: { type: "category", boundaryGap: false, data: stacked.years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
       series: stacked.series.map((s) => ({
@@ -174,11 +174,7 @@ export function Investitionen() {
           ["Eigenanteil der Stadt", fmtEurShort(covJahr.eigen), "aus Steuern und Krediten"],
           ["Davon Förderung", fmtEurShort(covJahr.parts.foerderung), "Zuweisungen und Zuschüsse"],
         ].map(([label, value, hint]) => (
-          <div key={label}>
-            <div className="eyebrow text-ink-muted">{label}</div>
-            <div className="mt-1.5 font-display text-2xl font-bold tabular-nums">{value}</div>
-            <div className="mt-0.5 text-xs text-ink-muted">{hint}</div>
-          </div>
+          <Kennzahl key={label} wert={value} label={`${label}, ${hint}`} className="text-2xl" />
         ))}
       </section>
 

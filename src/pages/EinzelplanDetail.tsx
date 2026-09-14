@@ -4,8 +4,10 @@ import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear 
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
-import { Loading } from "@/components/ui";
+import { CaretRight } from "@phosphor-icons/react";
+import { Klecks, Loading } from "@/components/ui";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
+import { einzelplanKategorie } from "@/lib/kategorien";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 export function EinzelplanDetail() {
@@ -53,14 +55,15 @@ export function EinzelplanDetail() {
 
   return (
     <div className="space-y-6">
-      <nav className="text-sm text-ink-muted">
-        <Link to="/erkunden" className="hover:text-ink">Haushalt erkunden</Link> ›{" "}
+      <nav className="flex flex-wrap items-center gap-1.5 text-sm text-ink-muted">
+        <Link to="/erkunden" className="hover:text-ink">Haushalt erkunden</Link>
+        <CaretRight size={12} aria-hidden />
         <span className="text-ink">Einzelplan {ep}</span>
       </nav>
 
       <header className="space-y-3">
         <div className="flex items-center gap-3">
-          <span className="inline-block h-6 w-6 rounded" style={{ background: color }} />
+          <Klecks farbe={color} icon={einzelplanKategorie(ep).icon} />
           <h1 className="font-display text-3xl font-bold">{ep} · {view.name}</h1>
         </div>
         {view.intro && <p className="max-w-3xl text-ink-soft">{view.intro}</p>}
@@ -73,7 +76,7 @@ export function EinzelplanDetail() {
 
       <div className="space-y-4">
         {view.sections.map((s) => (
-          <section key={s.code} className="border-t-2 pt-3" style={{ borderColor: color }}>
+          <section key={s.code} className="border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
               <h2 className="font-display text-lg font-bold">{s.label}</h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(s.total)}</span>
