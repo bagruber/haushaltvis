@@ -4,6 +4,16 @@
 nicht abhaken — die Datei soll kurz bleiben.*
 
 
+## Formsprache-Probe (seit 14.09.2026, noch nicht begonnen)
+
+Dieses Repo ist Pilot fuer die neue Formsprache der Moosburg-Projekte. Die
+Entscheidungen dafuer sind **vorlaeufig**. Vor jeder Arbeit daran lesen:
+`docs/briefing-formsprache-probe.md` (Briefing, Branch `probe/formsprache`, nie
+auf `main`) und `../moosburg-design/docs/formsprache/ENTSCHEIDUNGEN.md`
+(Protokoll). Offen und vor dem Einbau zu klaeren: Lizenz von Madelon Script,
+Themenfarbe der Farbflaeche (Rot steht hier fuer Defizit), Null mit Schraegstrich
+in Atkinson Hyperlegible Next.
+
 ## Toolchain-Stand
 
 Dieses Repo laeuft seit dem 26.08.2026 auf **pnpm** (nicht npm) und auf der
