@@ -21,6 +21,7 @@ import {
 } from "./selectors";
 import { fmtEur, fmtEurShort, fmtEurFine } from "../format";
 import { doppelte } from "../nummern";
+import { extremImFenster } from "../notiz";
 
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(resolve(__dirname, `../../../public/data/${name}`), "utf8")) as T;
@@ -250,6 +251,15 @@ describe("searchRank", () => {
       expect(seen.has(key), `doppelt: ${key}`).toBe(false);
       seen.add(key);
     }
+  });
+});
+
+describe("extremImFenster (Notizen im Diagramm)", () => {
+  const years = [2019, 2020, 2021, 2022];
+  it("findet Tief- und Höchstwert nur innerhalb des Fensters, Lücken zählen nicht", () => {
+    expect(extremImFenster(years, [5, 3, null, 1], [2020, 2021], "min")).toBe(1);
+    expect(extremImFenster(years, [5, 3, 4, 9], [2020, 2021], "max")).toBe(2);
+    expect(extremImFenster(years, [5, null, null, 1], [2020, 2021], "min")).toBeNull();
   });
 });
 

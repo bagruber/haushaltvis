@@ -1,4 +1,4 @@
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { ArrowRight, CaretRight, Coins, FlowArrow, SquaresFour } from "@phosphor-icons/react";
@@ -21,27 +21,13 @@ import {
 import { Term } from "@/components/Term";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { useNummern } from "@/lib/nummern";
+import { notiz, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const VERWALTUNG = "#8a7a5c";
 const VERMOEGEN = "#c8102e";
 const PROKOPF_LINE = "#b8964e";
 const REAL_LINE = "#2f6f8f";
-const NOTIZ = "#6e5a30"; // gold-700
-const NOTIZ_PFEIL = "#b8964e"; // gold-500
-
-// The chart note needs room; below 640 px there is none, so it is left out.
-const BREIT = "(min-width: 640px)";
-function useBreit() {
-  return useSyncExternalStore(
-    (cb) => {
-      const m = window.matchMedia(BREIT);
-      m.addEventListener("change", cb);
-      return () => m.removeEventListener("change", cb);
-    },
-    () => window.matchMedia(BREIT).matches,
-  );
-}
 
 export function Home() {
   usePageTitle();
@@ -81,7 +67,6 @@ export function Home() {
     // Handwritten note on the year with the highest Ansatz, computed, never fixed.
     const summen = years.map((_, k) => (vwh.ansatz[k] ?? 0) + (vmh.ansatz[k] ?? 0));
     const hoechstes = summen.indexOf(Math.max(...summen));
-    const scriptFont = getComputedStyle(document.documentElement).getPropertyValue("--font-script");
 
     // Chart 1 — the two budgets side by side over time.
     const haushalte: EChartsOption = {
@@ -108,26 +93,7 @@ export function Home() {
           stack: "h",
           data: vmh.ansatz,
           itemStyle: { color: VERMOEGEN },
-          markPoint: breit
-            ? {
-                silent: true,
-                symbol: "path://M4,0 L6,0 L6,10 L10,10 L5,16 L0,10 L4,10 Z",
-                symbolSize: [9, 16],
-                symbolOffset: [0, -12],
-                itemStyle: { color: NOTIZ_PFEIL },
-                label: {
-                  show: true,
-                  position: "top",
-                  distance: 2,
-                  formatter: "höchster Ansatz",
-                  fontFamily: scriptFont,
-                  fontSize: 28,
-                  color: NOTIZ,
-                  rotate: 4,
-                },
-                data: [{ name: "höchster Ansatz", coord: [String(years[hoechstes]), summen[hoechstes]] }],
-              }
-            : undefined,
+          markPoint: breit ? notiz("höchster Ansatz", [String(years[hoechstes]), summen[hoechstes]]) : undefined,
         },
       ],
     };

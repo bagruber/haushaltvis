@@ -9,6 +9,7 @@ import { usePageTitle } from "@/lib/title";
 import { ChartTable } from "@/components/ChartTable";
 import { Loading } from "@/components/ui";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
+import { extremImFenster, notiz, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
 const STEUERN: [string, string][] = [
@@ -18,6 +19,7 @@ const STEUERN: [string, string][] = [
   ["Grundsteuer", "#009ac7"],
   ["Umsatzsteuer-Anteil", "#0a9e4c"],
 ];
+const GEWERBE = STEUERN.findIndex(([n]) => n === "Gewerbesteuer");
 
 export function Einnahmen() {
   usePageTitle("Einnahmen");
@@ -26,6 +28,7 @@ export function Einnahmen() {
   const { year: selYear } = useYearCtx();
   const [mode, setMode] = useState<TimelineMode>({});
   const { zeigen } = useNummern();
+  const breit = useBreit();
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
@@ -46,6 +49,8 @@ export function Einnahmen() {
       const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst ? values[i] : null));
       return { name, values, ist, plan, lastIst };
     });
+    // Note on the Gewerbesteuer dip: its lowest Ist in the first two pandemic years.
+    const pandemie = breit ? extremImFenster(years, steuerSeries[GEWERBE].ist, [2020, 2021], "min") : null;
     const fmtCell = (v: number | null) => (v == null ? "-" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
     const steuerRows = years.map((yy, i) => [
       `${yy}${steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
@@ -84,6 +89,9 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color },
           itemStyle: { color },
           connectNulls: true,
+          ...(si === GEWERBE && pandemie != null
+            ? { markPoint: notiz("Corona-Pandemie", [String(years[pandemie]), steuerSeries[si].ist[pandemie]!]) }
+            : {}),
         })),
         // Plan tail: same colour, dashed, kept out of the legend so it reads as a
         // continuation rather than a second series. The tooltip above covers it.
@@ -102,7 +110,7 @@ export function Einnahmen() {
 
     const hasContext = !!(data.context.cpi || data.context.population);
     return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext };
-  }, [data, selYear, mode]);
+  }, [data, selYear, mode, breit]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
