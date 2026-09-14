@@ -4,15 +4,25 @@
 nicht abhaken — die Datei soll kurz bleiben.*
 
 
-## Formsprache-Probe (seit 14.09.2026, noch nicht begonnen)
+## Formsprache-Probe (seit 14.09.2026, umgesetzt auf dem Branch)
 
 Dieses Repo ist Pilot fuer die neue Formsprache der Moosburg-Projekte. Die
-Entscheidungen dafuer sind **vorlaeufig**. Vor jeder Arbeit daran lesen:
-`docs/briefing-formsprache-probe.md` (Briefing, Branch `probe/formsprache`, nie
-auf `main`) und `../moosburg-design/docs/formsprache/ENTSCHEIDUNGEN.md`
-(Protokoll). Offen und vor dem Einbau zu klaeren: Lizenz von Madelon Script,
-Themenfarbe der Farbflaeche (Rot steht hier fuer Defizit), Null mit Schraegstrich
-in Atkinson Hyperlegible Next.
+Entscheidungen dafuer sind **vorlaeufig**. Umgesetzt auf `probe/formsprache`,
+Vorschau unter https://bagruber.github.io/haushaltvis/v2/ (die Wurzel bleibt
+`main`). Ergebnis und offene Fragen: `docs/formsprache-probe/ERGEBNIS.md`.
+Briefing: `docs/briefing-formsprache-probe.md`, Protokoll:
+`../moosburg-design/docs/formsprache/ENTSCHEIDUNGEN.md`.
+
+Noch offen:
+
+- **Madelon Script:** Lizenz ungeklaert; oeffentlich vorerst erlaubt, weil die
+  Schrift als aufgegeben gilt. Ersatz bei Bedarf Ms Madi (OFL), Tausch ueber
+  `--font-script`.
+- **Themenfarbe der Farbflaeche:** gebaut mit Tiefrot, Paar mit Erdbraun liegt vor.
+- **Null mit Schraegstrich** in Atkinson: kein OpenType-Feature schaltet sie ab.
+- **Vor einem Merge nach `main`:** `noindex` aus `index.html` entfernen, die
+  Schriftpakete in `hausbasis/baseline.json` eintragen, den Vorschau-Schritt in
+  `pages.yml` und `probe-vorschau.yml` wieder entfernen.
 
 ## Toolchain-Stand
 
