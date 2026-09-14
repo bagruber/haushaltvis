@@ -7,8 +7,10 @@
       // SPA fallback for GitHub Pages: preserve original path in a query param,
       // root index.html picks it up. https://github.com/rafgraph/spa-github-pages
       (function () {
-        var segmentCount = 1; // /haushaltvis/  → one segment to preserve
         var l = window.location;
+        // /haushaltvis/ → one segment to preserve; the preview under
+        // /haushaltvis/v2/ is its own app and needs both segments.
+        var segmentCount = /^\/haushaltvis\/v2(\/|$)/.test(l.pathname) ? 2 : 1;
         l.replace(
           l.protocol +
             "//" +

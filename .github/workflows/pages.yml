@@ -29,6 +29,25 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
 
+      # Die Formsprache-Probe laeuft als Vorschau unter /haushaltvis/v2/, gebaut
+      # vom Branch probe/formsprache. Die Wurzel bleibt der Stand von main.
+      # Gebaut wird hier und nicht im Branch, weil die Umgebung github-pages nur
+      # Deploys von main zulaesst; der Branch stoesst diesen Workflow nur an.
+      - name: Branch probe/formsprache holen
+        id: probe
+        run: |
+          if git ls-remote --exit-code --heads origin probe/formsprache; then
+            git fetch --depth 1 origin probe/formsprache
+            git worktree add "$RUNNER_TEMP/probe" FETCH_HEAD
+            echo "da=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Probe nach dist/v2 bauen
+        if: steps.probe.outputs.da == 'true'
+        working-directory: ${{ runner.temp }}/probe
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build --base /haushaltvis/v2/ --outDir "$GITHUB_WORKSPACE/dist/v2" --emptyOutDir
+
       - name: Sanity-check dist/
         run: |
           echo "── dist root ─────────────────────"
