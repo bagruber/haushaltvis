@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts/core";
 import { BarChart, LineChart, SankeyChart, SunburstChart, TreemapChart } from "echarts/charts";
-import { TooltipComponent, LegendComponent, GridComponent, AriaComponent } from "echarts/components";
+import { TooltipComponent, LegendComponent, GridComponent, AriaComponent, MarkPointComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import type { EChartsOption } from "echarts";
 
 // Register only what we actually use — keeps the bundle small.
 echarts.use([
   BarChart, LineChart, SankeyChart, SunburstChart, TreemapChart,
-  TooltipComponent, LegendComponent, GridComponent, AriaComponent,
+  TooltipComponent, LegendComponent, GridComponent, AriaComponent, MarkPointComponent,
   CanvasRenderer,
 ]);
 

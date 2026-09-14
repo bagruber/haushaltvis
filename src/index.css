@@ -21,6 +21,11 @@
      Suche, Flächen und Felder; 4 px (radius-md) bleibt für Marken. */
   --radius-lg: 10px;
   --radius-xl: 10px;
+
+  /* Probe Formsprache, vorläufig (14.09.2026): Ton der deckenden Farbfläche.
+     Tiefrot (= red-900), Creme darauf 11,6:1, Gold-200 8,5:1. Offen, ob Tiefrot
+     trägt, weil Rot im Haushalt Defizit heißt; Alternative Erdbraun #4a2a17. */
+  --color-flaeche-haushalt: #6d0818;
 }
 
 /* Probe Formsprache, vorläufig (14.09.2026): Madelon Script ist kein npm-Paket.
@@ -51,31 +56,25 @@ h1, h2, h3, .font-display {
   font-variant-numeric: lining-nums;
 }
 
-/* Page title in caps, per the Moosburg brand brief. Deliberately reserved for
-   the H1 of a top-level page — never for headings that carry data (a Posten or
-   Einrichtung name), where caps hurt legibility and inflate a value into a
-   label. Slight positive tracking keeps Playfair's caps from clotting. */
-.headline {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.015em;
-  font-weight: 700;
-  line-height: 1.08;
+/* Height of the sticky header (4 px stripe, 64 px row, 1 px border), so the
+   Stichjahr bar can stick right below it. */
+:root {
+  --kopf-hoehe: 69px;
 }
 
-/* Small caps kicker — labels a section without competing with its heading.
-   Same role as in the Moosburg design system. */
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-weight: 600;
-  font-size: 0.6875rem;
+/* Title of a top-level page. Probe Formsprache, vorläufig (14.09.2026): in
+   sentence case, no more caps. Caps would be allowed in a page title only as a
+   rare exception; in the Haushalt there is none. */
+.headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.08;
 }
 
 /* Rainbow stripe — 9 fixed segments, 4px, per Moosburg brand guideline */
 .rainbow-stripe {
   display: flex;
-  height: 3px;
+  height: 4px;
   width: 100%;
 }
 .rainbow-stripe > span { flex: 1; }

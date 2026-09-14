@@ -12,7 +12,7 @@ export function YearBar() {
   const current = year ?? max;
 
   return (
-    <div className="border-b border-ink-line bg-cream-dark/60">
+    <div className="border-b border-ink-line bg-cream-dark">
       <div className="mx-auto max-w-6xl px-5 py-2 flex items-center gap-3 text-sm">
         <span className="text-ink-muted shrink-0">Stichjahr</span>
         <input

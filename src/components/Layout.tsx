@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { Header } from "./Header";
+import { Header, TabLeiste } from "./Header";
 import { Footer } from "./Footer";
 import { YearBar } from "./YearBar";
 import { YearUrlSync } from "@/lib/year";
@@ -11,12 +11,13 @@ export function Layout() {
   const { pathname } = useLocation();
   const showYear = YEAR_ROUTES.some((r) => (r === "/" ? pathname === "/" : pathname.startsWith(r)));
   return (
-    <div className="min-h-screen flex flex-col">
+    // Bottom padding below lg keeps the footer clear of the fixed tab bar.
+    <div className="min-h-screen flex flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <a href="#inhalt" className="skip-link">Zum Inhalt springen</a>
       <YearUrlSync />
       <Header />
       {showYear && (
-        <div className="sticky top-[60px] z-10">
+        <div className="sticky top-[var(--kopf-hoehe)] z-10">
           <YearBar />
         </div>
       )}
@@ -24,6 +25,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <TabLeiste />
     </div>
   );
 }

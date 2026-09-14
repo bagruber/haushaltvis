@@ -1,8 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useData, searchIndex, searchRank } from "@/lib/data";
+import { cn } from "@/lib/cn";
 
-export function Search() {
+/** One search field for header and mobile panel; fixed width, no jump on focus. */
+export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: () => void }) {
   const { data } = useData();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -18,14 +21,21 @@ export function Search() {
     setQ("");
     setOpen(false);
     setActive(0);
+    onNavigate?.();
     navigate(route);
   };
 
   return (
     <div className="relative">
+      <MagnifyingGlass
+        size={18}
+        aria-hidden
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
+      />
       <input
         type="search"
         role="combobox"
+        autoFocus={mobil}
         aria-expanded={showList}
         aria-controls="such-ergebnisse"
         aria-autocomplete="list"
@@ -42,14 +52,20 @@ export function Search() {
           if (e.key === "Enter" && results[active]) go(results[active].route);
           if (e.key === "Escape") { setQ(""); setOpen(false); setActive(0); }
         }}
-        className="w-36 sm:w-48 rounded-md border border-ink-line bg-white px-3 py-1.5 text-sm focus:w-56 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
+        className={cn(
+          "rounded-lg border border-ink-line bg-white pl-9 pr-3 text-[15px] placeholder:text-ink-muted focus:outline-none focus:ring-1 focus:ring-red-500",
+          mobil ? "h-12 w-full" : "h-10 w-56",
+        )}
       />
       {showList && (
         <ul
           id="such-ergebnisse"
           role="listbox"
           aria-label="Suchergebnisse"
-          className="absolute right-0 top-full z-30 mt-1 w-72 max-h-80 overflow-auto rounded-lg border border-ink-line bg-white py-1 shadow-lift"
+          className={cn(
+            "absolute top-full z-30 mt-1 max-h-80 overflow-auto rounded-lg border border-ink-line bg-white py-1 shadow-lift",
+            mobil ? "inset-x-0" : "right-0 w-80",
+          )}
           onMouseDown={() => { if (blurTimer.current) window.clearTimeout(blurTimer.current); }}
         >
           {results.map((r, i) => (
