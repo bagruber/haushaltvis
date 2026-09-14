@@ -12,11 +12,12 @@ import { GOLD_BASE } from "@/lib/colors";
 export function Themen() {
   usePageTitle("Themen");
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="space-y-8">
       <SeitenKopf titel="Themen" script="bald">
         <RoseStatus>In Vorbereitung</RoseStatus>
       </SeitenKopf>
 
+      <div className="max-w-2xl space-y-8">
       <div className="space-y-3 rounded-lg border border-gold-200 bg-gold-100 p-5">
         <p className="text-ink-soft">
           Diese Ansicht soll den Haushalt nach Lebensbereichen bündeln — Bildung, Mobilität,
@@ -59,6 +60,7 @@ export function Themen() {
           ))}
         </ul>
       </section>
+      </div>
     </div>
   );
 }

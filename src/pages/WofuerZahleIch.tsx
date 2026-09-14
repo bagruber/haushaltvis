@@ -86,7 +86,7 @@ export function WofuerZahleIch() {
   if (!view) return <Loading />;
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <SeitenKopf titel="Wofür zahle ich?" script="pro Kopf">
         <p>
           Gib deine jährliche Einkommensteuer und Grundsteuer ein — der Rechner schätzt deinen{" "}
@@ -96,6 +96,7 @@ export function WofuerZahleIch() {
         </p>
       </SeitenKopf>
 
+      <div className="max-w-2xl space-y-6">
       <section className="rounded-lg border border-ink-line bg-white p-4">
         <div className="mb-4 flex items-center gap-2">
           <span className="shrink-0 text-xs text-ink-muted">Beispiele:</span>
@@ -212,6 +213,7 @@ export function WofuerZahleIch() {
         und daher nicht aufgeführt. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
+      </div>
     </div>
   );
 }
