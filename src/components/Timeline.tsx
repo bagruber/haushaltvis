@@ -36,7 +36,7 @@ interface Props {
 export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280 }: Props) {
   const { option, table } = useMemo(() => {
     const perKopf = (v: number) => `${fmtEurFine(v)}/Kopf`;
-    const fmt = (v: number | null) => (v == null ? "—" : mode.perCapita ? perKopf(v) : fmtEur(v));
+    const fmt = (v: number | null) => (v == null ? "-" : mode.perCapita ? perKopf(v) : fmtEur(v));
     const netto = !!(mode.netto && einnahmen);
     const base = netto ? netSeries(laufend, einnahmen!) : laufend;
     const lf = adjustSeries(base, context, mode, baseYear);
@@ -50,7 +50,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     // uncertainty about the one figure that is actually certain.
     const series: NonNullable<EChartsOption["series"]> = [
       {
-        name: netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)",
+        name: netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
         type: "line",
         data: lf.ergebnis,
         symbolSize: 7,
@@ -60,7 +60,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         z: 3,
       },
       {
-        name: netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
+        name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
         type: "line",
         data: lf.ansatz,
         symbol: "emptyCircle",
@@ -73,7 +73,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     ];
     if (brutto) {
       series.push({
-        name: "Ausgaben brutto",
+        name: "Ausgaben gesamt",
         type: "line",
         data: brutto.ansatz,
         symbol: "none",
@@ -98,9 +98,9 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
 
     const columns = [
       "Jahr",
-      netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)",
-      netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
-      ...(brutto ? ["Ausgaben brutto"] : []),
+      netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
+      netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
+      ...(brutto ? ["Ausgaben gesamt"] : []),
       ...(iv ? ["Investitionen (Ansatz)"] : []),
     ];
     const rows = lf.years.map((y, i) => [
@@ -117,7 +117,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     <div>
       <EChart
         option={option}
-        ariaLabel="Zeitverlauf von Ansatz (Plan) und Ergebnis (Ist) — Zahlen in der Tabelle darunter"
+        ariaLabel="Zeitverlauf von Ansatz (Plan) und Ergebnis (Ist), Zahlen in der Tabelle darunter"
         style={{ height }}
       />
       <ChartTable columns={table.columns} rows={table.rows} />

@@ -8,35 +8,33 @@
 ansatz:
   title: "Ansatz"
   text: >
-    Der für ein Jahr geplante Betrag (das „Soll"), der vor Jahresbeginn im
-    Haushaltsplan beschlossen wird.
+    Der für ein Jahr geplante Betrag (das „Soll"), vor Jahresbeginn im
+    Haushaltsplan beschlossen.
 ergebnis:
   title: "Ergebnis (Ist)"
   text: >
-    Der tatsächlich verbuchte Betrag eines Jahres (das „Ist"). Steht endgültig
-    erst mit dem Jahresabschluss fest; das laufende Jahr ist daher vorläufig.
+    Der tatsächlich verbuchte Betrag eines Jahres (das „Ist"). Steht erst mit dem
+    Jahresabschluss fest.
 verwaltungshaushalt:
   title: "Verwaltungshaushalt"
   text: >
-    Das laufende Tagesgeschäft der Stadt — Personal, Betrieb, Zuschüsse —,
-    finanziert aus laufenden Einnahmen wie Steuern und Gebühren.
+    Das laufende Tagesgeschäft der Stadt: Personal, Betrieb, Zuschüsse. Finanziert
+    aus laufenden Einnahmen wie Steuern und Gebühren.
 vermoegenshaushalt:
   title: "Vermögenshaushalt"
   text: >
-    Die Investitionen — Bau, Grundstücke, Anschaffungen —, finanziert aus
-    Förderungen, Verkäufen, Rücklagen und Krediten. Von Jahr zu Jahr sehr
-    unterschiedlich.
+    Die Investitionen, also Bau, Grundstücke und Anschaffungen. Finanziert aus
+    Förderungen, Verkäufen, Rücklagen und Krediten; schwankt stark von Jahr zu Jahr.
 investition:
   title: "Investition"
   text: >
-    Geld für etwas, das viele Jahre genutzt wird: ein Schulhaus, eine Straße,
-    ein Grundstück, ein Fahrzeug. Investitionen stehen im Vermögenshaushalt;
-    Gehälter, Strom und Unterhalt dagegen im Verwaltungshaushalt.
+    Geld für etwas, das viele Jahre genutzt wird, etwa ein Schulhaus, eine Straße
+    oder ein Fahrzeug. Steht im Vermögenshaushalt.
 einzelplan:
   title: "Einzelplan"
   text: >
-    Oberste Gliederungsebene des Haushalts (0–9), grob nach Aufgabenbereich —
-    z. B. „2 Schulen" oder „6 Bau und Verkehr".
+    Oberste Gliederungsebene des Haushalts (0 bis 9) nach Aufgabenbereich, z. B.
+    „2 Schulen" oder „6 Bau und Verkehr".
 abschnitt:
   title: "Abschnitt"
   text: >
@@ -45,29 +43,28 @@ abschnitt:
 unterabschnitt:
   title: "Unterabschnitt"
   text: >
-    Feinere kamerale Gliederungsebene. In dieser App steht der Begriff für die
-    benannte Einheit bzw. Einrichtung, z. B. „Freibad" oder „Stadtbücherei".
+    Feinere Gliederungsebene. Hier steht der Begriff für die benannte Einrichtung,
+    z. B. „Freibad" oder „Stadtbücherei".
 gliederung:
   title: "Gliederung (GLZ)"
   text: >
-    Die Nummer, die angibt, WOFÜR Geld ausgegeben oder eingenommen wird
-    (Aufgabe/Einrichtung). Zusammen mit der Gruppierung ergibt sie die
-    Haushaltsstelle.
+    Die Nummer, die angibt, wofür Geld fließt (Aufgabe oder Einrichtung). Mit der
+    Gruppierung ergibt sie die Haushaltsstelle.
 gruppierung:
   title: "Gruppierung (GRZ)"
   text: >
-    Die Nummer, die die ART der Einnahme oder Ausgabe angibt — z. B.
-    Personalausgaben, Sachkosten, Steuereinnahmen.
+    Die Nummer für die Art der Einnahme oder Ausgabe, z. B. Personalausgaben,
+    Sachkosten, Steuereinnahmen.
 haushaltsstelle:
   title: "Haushaltsstelle"
   text: >
-    Der einzelne Buchungsposten = Gliederung + Gruppierung, z. B. die
+    Der einzelne Buchungsposten aus Gliederung und Gruppierung, z. B. die
     Beamtenbezüge einer bestimmten Schule.
 hauptgruppe:
   title: "Hauptgruppe"
   text: >
-    Die erste Ziffer der Gruppierung. Sie bestimmt, ob es sich um eine Einnahme
-    oder Ausgabe handelt und ob sie zum Verwaltungs- oder Vermögenshaushalt gehört.
+    Die erste Ziffer der Gruppierung. Sie zeigt, ob es eine Einnahme oder Ausgabe
+    ist und zu welchem der beiden Haushalte sie gehört.
 schluesselzuweisung:
   title: "Schlüsselzuweisung"
   text: >
@@ -76,13 +73,13 @@ schluesselzuweisung:
 finanzausgleich:
   title: "Kommunaler Finanzausgleich"
   text: >
-    Das Ausgleichssystem zwischen Land und Kommunen — u. a. über
+    Das Ausgleichssystem zwischen Land und Kommunen, u. a. über
     Schlüsselzuweisungen und Umlagen.
 kreisumlage:
   title: "Kreisumlage"
   text: >
-    Abgabe der Stadt an den Landkreis zur Finanzierung von dessen Aufgaben — eine
-    der größten Ausgaben im Verwaltungshaushalt.
+    Abgabe der Stadt an den Landkreis für dessen Aufgaben. Eine der größten
+    Ausgaben im Verwaltungshaushalt.
 gewerbesteuerumlage:
   title: "Gewerbesteuerumlage"
   text: >
@@ -102,21 +99,21 @@ schuldendienst:
   text: >
     Zinsen und Tilgung für aufgenommene Kredite.
 zuschuss-aus-allg-haushalt:
-  title: "Zuschuss aus allgemeinem Haushalt"
+  title: "Eigenanteil der Stadt"
   text: >
-    Der Betrag, den ein Bereich mehr ausgibt, als er an eigenen Einnahmen erzielt
-    — gedeckt aus allgemeinen Haushaltsmitteln, vor allem Steuern.
+    Was ein Bereich mehr ausgibt, als er selbst einnimmt. Die Stadt trägt es aus
+    allgemeinen Mitteln, vor allem Steuern. Fachbegriff: Zuschussbedarf.
 interne-verrechnung:
   title: "Interne Verrechnung"
   text: >
     Buchung zwischen städtischen Stellen (z. B. Leistungen des Bauhofs) oder
-    zwischen den beiden Haushalten. In Übersichten ausgeblendet, da sie sonst
-    doppelt zählt.
+    zwischen den beiden Haushalten. In Übersichten ausgeblendet, sonst zählte sie
+    doppelt.
 freiwillige-leistung:
   title: "Freiwillige Leistung"
   text: >
-    Eine Ausgabe, zu der die Stadt gesetzlich nicht verpflichtet ist (z. B.
-    Kultur- oder Sportförderung) — im Gegensatz zur Pflichtaufgabe.
+    Eine Ausgabe ohne gesetzliche Pflicht, z. B. Kultur- oder Sportförderung.
+    Gegenteil der Pflichtaufgabe.
 pflichtaufgabe:
   title: "Pflichtaufgabe"
   text: >
@@ -125,15 +122,15 @@ pflichtaufgabe:
 kameralistik:
   title: "Kameralistik"
   text: >
-    Das traditionelle, an Einnahmen und Ausgaben orientierte Rechnungssystem
-    bayerischer Kommunen, nach dem dieser Haushalt aufgebaut ist.
+    Das an Einnahmen und Ausgaben orientierte Rechnungssystem bayerischer Kommunen,
+    nach dem dieser Haushalt aufgebaut ist.
 doppik:
   title: "Doppik"
   text: >
-    Die kaufmännische doppelte Buchführung, die die Kameralistik in vielen
-    Kommunen ablöst.
+    Die kaufmännische doppelte Buchführung, die in vielen Kommunen die
+    Kameralistik ablöst.
 haushaltsausgleich:
   title: "Haushaltsausgleich"
   text: >
-    Der Grundsatz, dass Einnahmen und Ausgaben je Haushalt gleich hoch sein
-    müssen — der Haushalt geht also immer „auf".
+    Der Grundsatz, dass Einnahmen und Ausgaben je Haushalt gleich hoch sind. Der
+    Haushalt geht also immer auf.

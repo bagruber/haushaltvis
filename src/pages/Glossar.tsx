@@ -32,8 +32,7 @@ export function Glossar() {
       <header className="space-y-2">
         <h1 className="headline text-3xl">Glossar</h1>
         <p className="text-ink-soft">
-          Fachbegriffe der Kameralistik und kommunaler Haushalte — kurz und
-          verständlich erklärt.
+          Fachbegriffe der Kameralistik und kommunaler Haushalte, kurz erklärt.
         </p>
       </header>
 

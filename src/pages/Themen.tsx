@@ -20,23 +20,20 @@ export function Themen() {
       <div className="max-w-2xl space-y-8">
       <div className="space-y-3 rounded-lg border border-gold-200 bg-gold-100 p-5">
         <p className="text-ink-soft">
-          Diese Ansicht soll den Haushalt nach Lebensbereichen bündeln — Bildung, Mobilität,
-          Kultur — statt nach kameralen Aktenzeichen. Ein Posten kann dabei zu mehreren Themen
-          gehören.
+          Diese Ansicht soll den Haushalt nach Lebensbereichen wie Bildung, Mobilität oder Kultur
+          bündeln statt nach kameralen Aktenzeichen. Ein Posten kann zu mehreren Themen gehören.
         </p>
         <p className="text-ink-soft">
-          Die dafür nötige Zuordnung der rund 4.300 Haushaltsstellen ist ein Entwurf und{" "}
-          <b>von der Stadt Moosburg bislang nicht freigegeben</b>. Solange sie ungeprüft ist,
-          zeigen wir keine thematischen Summen — auch nicht als Vorschau. Eine Fehlzuordnung
-          wäre sonst nicht von einer belastbaren Zahl zu unterscheiden.
+          Die Zuordnung der rund 4.300 Haushaltsstellen ist ein Entwurf und{" "}
+          <b>von der Stadt Moosburg noch nicht freigegeben</b>. Bis dahin zeigen wir keine
+          thematischen Summen, auch nicht als Vorschau.
         </p>
       </div>
 
       <section className="space-y-3">
         <h2 className="font-display text-xl font-bold">Was bis dahin verfügbar ist</h2>
         <p className="text-ink-soft">
-          Die kameralen Ansichten beruhen unmittelbar auf den amtlichen Haushaltsdaten und sind
-          uneingeschränkt nutzbar:
+          Diese Ansichten beruhen direkt auf den amtlichen Haushaltsdaten:
         </p>
         <ul>
           {([

@@ -46,13 +46,13 @@ export function Einnahmen() {
       const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst ? values[i] : null));
       return { name, values, ist, plan, lastIst };
     });
-    const fmtCell = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
+    const fmtCell = (v: number | null) => (v == null ? "-" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
     const steuerRows = years.map((yy, i) => [
       `${yy}${steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
       ...steuerSeries.map((s) => fmtCell(s.values[i])),
     ]);
     const steuerOpt: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "-" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
       grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
@@ -95,8 +95,8 @@ export function Einnahmen() {
       <header className="space-y-2">
         <h1 className="headline text-3xl">Woher das Geld kommt</h1>
         <p className="max-w-2xl text-ink-soft">
-          Die Einnahmen der Stadt nach Art geordnet — Steuern, Zuweisungen, Gebühren und mehr.
-          Interne Verrechnungen sind ausgeblendet.
+          Die Einnahmen der Stadt nach Art: Steuern, Zuweisungen, Gebühren und mehr. Interne
+          Verrechnungen sind ausgeblendet.
         </p>
         <span className="inline-block rounded-md bg-white border border-ink-line px-3 py-1.5 text-sm">
           Einnahmen {view.y}: <b>{fmtEurShort(view.total)}</b>
@@ -109,7 +109,7 @@ export function Einnahmen() {
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
-        <EChart option={view.steuerOpt} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen — Zahlen in der Tabelle darunter" style={{ height: 300 }} />
+        <EChart option={view.steuerOpt} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter" style={{ height: 300 }} />
         <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>
 

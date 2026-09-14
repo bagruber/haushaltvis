@@ -72,7 +72,7 @@ export function Investitionen() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
+        valueFormatter: (v) => (v ? fmtEur(v as number) : "-"),
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
       grid: { left: 8, right: 24, top: 8, bottom: 56, containLabel: true },
@@ -117,7 +117,7 @@ export function Investitionen() {
 
     const stacked = investmentStacked(data, 12);
     const stackedOpt: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "—"), order: "valueDesc" },
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "-"), order: "valueDesc" },
       legend: { type: "scroll", bottom: 0 },
       grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
       xAxis: { type: "category", boundaryGap: false, data: stacked.years.map(String) },
@@ -173,9 +173,8 @@ export function Investitionen() {
           Schulhäuser, Straßen, Grundstücke, Fahrzeuge.
         </p>
         <p className="text-ink-soft">
-          Sie stehen im <Term name="vermoegenshaushalt">Vermögenshaushalt</Term>. Ein Vorhaben läuft meist
-          über mehrere Jahre — hier steht es als Ganzes, mit seiner Laufzeit und dem, was am Ende
-          die Stadt selbst trägt.
+          Sie stehen im <Term name="vermoegenshaushalt">Vermögenshaushalt</Term>. Jedes Vorhaben
+          erscheint hier als Ganzes, mit Laufzeit und Eigenanteil der Stadt.
         </p>
       </header>
 
@@ -196,15 +195,14 @@ export function Investitionen() {
           <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
-          Jeder Balken ist ein Vorhaben im laufenden Jahr, aufgeteilt nach Herkunft des Geldes.
-          Getrennt ausgewiesen, weil es etwas anderes ist: <b>Förderung</b> kommt von Bund und
-          Land, <b>Anliegerbeiträge</b> von Grundstückseigentümern, <b>Verkaufserlöse</b> aus
-          veräußerten Grundstücken. Nur der rote Teil stammt aus Steuern und Krediten.
+          Jeder Balken ist ein Vorhaben, aufgeteilt nach Herkunft des Geldes: <b>Förderung</b> von
+          Bund und Land, <b>Anliegerbeiträge</b> von Grundstückseigentümern, <b>Verkaufserlöse</b>{" "}
+          aus Grundstücken. Nur der rote Teil kommt aus Steuern und Krediten.
         </p>
         <EChart
           option={view.jahrOpt}
           onEvents={onEvents}
-          ariaLabel={`Investitionsvorhaben ${y}, aufgeteilt nach Finanzierungsquelle — Zahlen in der Tabelle darunter`}
+          ariaLabel={`Investitionsvorhaben ${y}, aufgeteilt nach Finanzierungsquelle, Zahlen in der Tabelle darunter`}
           style={{ height: TOP_JAHR * 32 + 80 }}
         />
         <ChartTable
@@ -227,10 +225,8 @@ export function Investitionen() {
           <span className="text-xs text-ink-muted">Summe aller Jahre, größte zuerst</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
-          Die Laufzeit ist aus den Daten abgeleitet: Ein Vorhaben existiert in den Jahren, in
-          denen es einen Ansatz trägt. Weil die Datenreihe {view.stackedYears[0]} beginnt und{" "}
-          {view.stackedYears[view.stackedYears.length - 1]} endet, sind Vorhaben an diesen Rändern
-          als offen gekennzeichnet — sie liefen schon vorher oder laufen weiter.
+          Die Laufzeit sind die Jahre mit Ansatz. Vorhaben am Anfang ({view.stackedYears[0]}) oder
+          Ende ({view.stackedYears[view.stackedYears.length - 1]}) der Datenreihe gelten als offen.
         </p>
         <ul>
           {view.vorhaben.map((p) => {
@@ -262,7 +258,7 @@ export function Investitionen() {
                     {c.eigen > 0 && <span>Eigenanteil {fmtEur(Math.round(c.eigen))}</span>}
                     {c.ueberschuss > 0 && (
                       <span className="text-ink-soft">
-                        trägt sich selbst — Einnahmen übersteigen die Kosten um{" "}
+                        trägt sich selbst, Überschuss{" "}
                         {fmtEur(Math.round(c.ueberschuss))}
                       </span>
                     )}
@@ -281,9 +277,8 @@ export function Investitionen() {
             <span className="text-xs text-ink-muted">kein einzelnes Vorhaben</span>
           </div>
           <p className="max-w-2xl text-ink-soft">
-            Diese Positionen tragen in fast jedem Jahr einen Ansatz — Grunderwerb,
-            Straßenunterhalt, Fahrzeugbeschaffung. Sie sind Daueraufgaben, keine Projekte mit
-            Anfang und Ende.
+            Positionen mit Ansatz in fast jedem Jahr, etwa Grunderwerb, Straßenunterhalt oder
+            Fahrzeuge. Daueraufgaben, keine Projekte.
           </p>
           <ul>
             {view.dauer.map((p) => (
@@ -313,7 +308,7 @@ export function Investitionen() {
         </div>
         <EChart
           option={view.stackedOpt}
-          ariaLabel="Investitionen über die Jahre, gestapelt nach Einzelplan — Jahressummen in der Tabelle darunter"
+          ariaLabel="Investitionen über die Jahre, gestapelt nach Einzelplan, Jahressummen in der Tabelle darunter"
           style={{ height: 380 }}
         />
         <ChartTable

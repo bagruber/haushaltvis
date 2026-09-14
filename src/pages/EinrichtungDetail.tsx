@@ -87,7 +87,7 @@ export function EinrichtungDetail() {
           <Kennzahl wert={fmtEur(aus)} label={`Ausgaben ${y}${jeKopf(aus)}`} className="text-2xl" />
           <Kennzahl wert={fmtEur(ein)} label="Eigene Einnahmen" className="text-2xl" />
           {/* Red is right here: this figure is the shortfall the general budget covers. */}
-          <Kennzahl wert={fmtEur(aus - ein)} label={`Zuschussbedarf${jeKopf(aus - ein)}`} className="text-2xl text-red-600" />
+          <Kennzahl wert={fmtEur(aus - ein)} label={`Eigenanteil der Stadt${jeKopf(aus - ein)}`} className="text-2xl text-red-600" />
           <Kennzahl wert={`${Math.round(deckung * 100)} %`} label="Kostendeckung" className="text-2xl" />
         </div>
       )}
@@ -101,14 +101,13 @@ export function EinrichtungDetail() {
         <Timeline laufend={laufend} invest={invest} einnahmen={einnahmen} mode={mode} context={data!.context} baseYear={y} height={300} />
         {hasEinnahmen && (
           <p className="text-xs text-ink-muted">
-            „Mit Einnahmen verrechnet" zieht die eigenen Einnahmen (Gebühren, Mieten, Entgelte) ab — es bleibt der
-            Betrag, den der allgemeine Haushalt trägt. Die graue Linie zeigt weiter die Bruttoausgaben.
+            „Mit Einnahmen verrechnet" zieht Gebühren, Mieten und Entgelte ab. Übrig bleibt, was der
+            allgemeine Haushalt trägt; die graue Linie zeigt weiter alle Ausgaben.
           </p>
         )}
         {hasInvest && (
           <p className="text-xs text-ink-muted">
-            Investitionen (Vermögenshaushalt) sind von Jahr zu Jahr unregelmäßig und nur als Balken
-            eingeblendet, wenn aktiviert — sie taugen nicht als Trend.
+            Investitionen schwanken stark und erscheinen nur auf Wunsch, als Balken statt als Trend.
           </p>
         )}
       </section>

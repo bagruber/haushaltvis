@@ -120,7 +120,7 @@ export function Erkunden() {
                   </span>
                   <span>Ausgaben: wohin es geht</span>
                 </div>
-                <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts — Zahlen in der Tabelle darunter`} style={{ height }} />
+                <EChart option={view.option} onEvents={onEvents} ariaLabel={`Flussdiagramm des Haushalts ${view.y}: Einnahmen links, Ausgaben nach Einzelplänen rechts, Zahlen in der Tabelle darunter`} style={{ height }} />
               </div>
             </div>
             <ChartTable

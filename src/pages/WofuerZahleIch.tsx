@@ -87,12 +87,10 @@ export function WofuerZahleIch() {
 
   return (
     <div className="space-y-6">
-      <SeitenKopf titel="Wofür zahle ich?" script="pro Kopf">
+      <SeitenKopf titel="Wofür zahle ich?" script="dein Anteil">
         <p>
-          Gib deine jährliche Einkommensteuer und Grundsteuer ein — der Rechner schätzt deinen{" "}
-          <b>kommunalen Beitrag</b> und zeigt, wohin er {view.y} fließt. Verteilt wird nach{" "}
-          <b>Zuschussbedarf</b>: Bereiche, die sich über Gebühren selbst tragen, kosten dich fast
-          nichts — Steuergeld deckt vor allem das, was übrig bleibt.
+          Gib deine jährliche Einkommensteuer und Grundsteuer ein. Der Rechner schätzt deinen{" "}
+          <b>kommunalen Beitrag</b> und zeigt, wohin er {view.y} fließt.
         </p>
       </SeitenKopf>
 
@@ -206,13 +204,12 @@ export function WofuerZahleIch() {
       </section>
 
       <p className="text-xs text-ink-muted">
-        Vereinfachtes Modell: Berücksichtigt sind nur Einkommensteuer (15 % Gemeindeanteil) und
-        Grundsteuer B (100 %). Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich nicht
-        sinnvoll einzelnen Personen zuordnen und sind nicht enthalten. Die Stadt finanziert sich
-        zudem aus Zuweisungen, Gebühren und weiteren Quellen. Verteilt wird nach dem
-        Zuschussbedarf je <Term name="einzelplan">Einzelplan</Term> (Ausgaben abzüglich eigener
-        Einnahmen); die Finanzwirtschaft, aus der die Steuern selbst stammen, ist keine Ausgabe
-        und daher nicht aufgeführt. Siehe{" "}
+        Vereinfachtes Modell mit Einkommensteuer (15 % Gemeindeanteil) und Grundsteuer B (100 %).
+        Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich keiner Person zuordnen. Verteilt
+        wird nach dem <Term name="zuschuss-aus-allg-haushalt">Eigenanteil der Stadt</Term> je{" "}
+        <Term name="einzelplan">Einzelplan</Term>, also Ausgaben
+        minus eigene Einnahmen. Die Finanzwirtschaft fehlt, weil aus ihr die Steuern selbst
+        stammen. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
       </div>

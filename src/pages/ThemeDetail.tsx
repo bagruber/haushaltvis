@@ -178,7 +178,7 @@ export function ThemeDetail() {
                   <EChart
                     option={sankeyOpt}
                     onEvents={sankeyEvents}
-                    ariaLabel={`Geldfluss ${def.label} ${y}: Einnahmequellen, Bereiche und Einrichtungen — Zahlen in der Tabelle darunter`}
+                    ariaLabel={`Geldfluss ${def.label} ${y}: Einnahmequellen, Bereiche und Einrichtungen, Zahlen in der Tabelle darunter`}
                     style={{ height: sankeyHeight }}
                   />
                 </div>
@@ -202,7 +202,7 @@ export function ThemeDetail() {
             <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
             <Timeline laufend={vwSeries} mode={mode} context={data!.context} baseYear={y} color={def.color} height={300} />
           </Card>
-          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y} — Klick öffnet den Posten`}>
+          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y}, Klick öffnet den Posten`}>
             <ol className="space-y-1.5 text-sm">
               {vwTop.map((p) => (
                 <li key={p.key} className="border-b border-ink-line/60 pb-1.5">
@@ -226,18 +226,18 @@ export function ThemeDetail() {
           </div>
 
           <Card
-            title="Was Investitionen netto kosten"
-            hint={`Brutto-Investitionen ${fmtEurShort(vmTotal)}, davon durch Förderungen/Einnahmen gedeckt ${fmtEurShort(vmFoerder)}. Der farbige Teil bleibt an der Stadt hängen.`}
+            title="Was Investitionen die Stadt kosten"
+            hint={`Investitionen gesamt ${fmtEurShort(vmTotal)}, davon durch Förderungen und Einnahmen gedeckt ${fmtEurShort(vmFoerder)}. Der farbige Teil ist der Eigenanteil der Stadt.`}
           >
             {investOpt && (
               <EChart
                 option={investOpt}
-                ariaLabel={`Investitionen ${def.label} ${y} mit Förderung und Netto-Eigenanteil — Zahlen in der Tabelle darunter`}
+                ariaLabel={`Investitionen ${def.label} ${y} mit Förderung und Eigenanteil der Stadt, Zahlen in der Tabelle darunter`}
                 style={{ height: Math.max(280, invest.length * 36 + 80) }}
               />
             )}
             <ChartTable
-              columns={["Vorhaben", "Brutto", "Förderung", "Netto"]}
+              columns={["Vorhaben", "Gesamt", "Förderung", "Eigenanteil"]}
               rows={invest.map((i) => [i.label, fmtEur(i.invest), fmtEur(i.foerderung), fmtEur(i.netto)])}
             />
           </Card>

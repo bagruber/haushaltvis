@@ -123,7 +123,7 @@ export default function ThemenVorschau() {
       <section className="space-y-3">
         <h1 className="font-display text-4xl font-bold text-ink">Wohin fließt das Geld?</h1>
         <p className="max-w-2xl text-ink-soft">
-          Der Haushalt der Stadt Moosburg an der Isar — nach Themen geordnet, statt nach
+          Der Haushalt der Stadt Moosburg an der Isar, nach Themen geordnet, statt nach
           Aktenzeichen. Je größer die Fläche, desto mehr Geld.
         </p>
       </section>
@@ -172,7 +172,7 @@ export default function ThemenVorschau() {
                 <EChart
                   option={option}
                   onEvents={onEvents}
-                  ariaLabel={`Ausgaben ${year} nach Themen — Zahlen in der Tabelle darunter`}
+                  ariaLabel={`Ausgaben ${year} nach Themen, Zahlen in der Tabelle darunter`}
                   style={{ height: 560 }}
                 />
               )}
@@ -197,7 +197,7 @@ export default function ThemenVorschau() {
             <EChart
               option={option}
               onEvents={onEvents}
-              ariaLabel={`Ausgaben ${year} nach Themen — Zahlen in der Tabelle darunter`}
+              ariaLabel={`Ausgaben ${year} nach Themen, Zahlen in der Tabelle darunter`}
               style={{ height: 560 }}
             />
           )
@@ -215,7 +215,7 @@ export default function ThemenVorschau() {
 
       {movers.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold">Das fällt auf — größte Veränderungen {year - 1} → {year}</h2>
+          <h2 className="font-display text-xl font-bold">Das fällt auf: größte Veränderungen {year - 1} → {year}</h2>
           <ul className="grid sm:grid-cols-2 gap-2">
             {movers.map((m) => {
               const up = m.delta > 0;

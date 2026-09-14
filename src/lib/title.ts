@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 const SITE = "Haushalt Moosburg";
-const DEFAULT = `${SITE} — Wohin fließt das Geld?`;
+const DEFAULT = `${SITE} - Wohin fließt das Geld?`;
 
 /**
  * Per-page document title (tabs, bookmarks, screen-reader announcement).

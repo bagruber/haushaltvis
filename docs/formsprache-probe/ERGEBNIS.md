@@ -104,6 +104,11 @@ Farbfläche: Creme auf Tiefrot 11,57:1, Gold-200 auf Tiefrot 8,53:1; Creme auf E
   „bald“ (Themen). Ersatz für „pro Kopf“ noch offen.
 - Die Handschrift darf stärker in die Überschrift reichen: Versatz jetzt −0,42 em statt
   −0,7 em, Abstand über dem Titel 0,85 em statt 1,15 em.
+- „pro Kopf“ wird zu „dein Anteil“ (Rechner) und „je Einwohner“ (Farbfläche).
+- Begriffe: „Eigenanteil der Stadt“ statt Zuschussbedarf, „Ausgaben gesamt“ statt Ausgaben
+  brutto, „mit Einnahmen verrechnet“ statt bilanziert. Der Fachbegriff steht im Glossar.
+- Erklärungstexte knapper, ohne Behauptungen ohne Datenbezug. Statt Gedankenstrich „-“ im
+  sichtbaren Text; Zahlenbereiche wie 2016–2026 behalten den Halbgeviertstrich.
 
 ## Offene Fragen für Benedict
 

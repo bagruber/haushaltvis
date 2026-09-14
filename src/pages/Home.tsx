@@ -88,7 +88,7 @@ export function Home() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
+        valueFormatter: (v) => (v ? fmtEur(v as number) : "-"),
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
       grid: { left: 8, right: 16, top: breit ? 64 : 16, bottom: 48, containLabel: true },
@@ -152,10 +152,10 @@ export function Home() {
           const body = rows
             .map((r, k) => {
               const e = euro[k];
-              const shown = k === 0 ? (e == null ? "—" : fmtEurShort(e)) : e == null ? "—" : fmtEur(Math.round(e));
+              const shown = k === 0 ? (e == null ? "-" : fmtEurShort(e)) : e == null ? "-" : fmtEur(Math.round(e));
               return `<div style="display:flex;gap:8px;justify-content:space-between">
                 <span><span style="display:inline-block;width:8px;height:8px;background:${r.color};margin-right:6px"></span>${r.seriesName}</span>
-                <b>${r.value ?? "—"}</b> <span style="color:#888">${shown}</span></div>`;
+                <b>${r.value ?? "-"}</b> <span style="color:#888">${shown}</span></div>`;
             })
             .join("");
           return `<b>${years[i]}</b>${body}`;
@@ -237,9 +237,9 @@ export function Home() {
     <div className="space-y-12">
       <SeitenKopf titel="Der Haushalt, öffentlich lesbar" script="transparent" className="sm:text-5xl">
         <p className="text-lg">
-          Jedes Jahr beschließt der Stadtrat, wofür Moosburg Geld ausgibt und woher es kommt.
-          Dieser Beschluss ist der <b>Haushalt</b> — {fmtEurShort(view.ausgaben)} im Jahr {view.y}.
-          Diese Seite macht ihn durchsuchbar, bis zur einzelnen Buchungszeile.
+          Jedes Jahr beschließt der Stadtrat, wofür Moosburg Geld ausgibt und woher es kommt:
+          den <b>Haushalt</b>, {fmtEurShort(view.ausgaben)} im Jahr {view.y}. Hier ist er durchsuchbar,
+          bis zur einzelnen Buchungszeile.
         </p>
       </SeitenKopf>
 
@@ -247,7 +247,7 @@ export function Home() {
         <Kennzahl wert={fmtEurShort(view.ausgaben)} label={`Ausgaben ${view.y}, Ansatz beider Haushalte`} />
         <Kennzahl wert={fmtEurShort(view.einnahmen)} label={`Einnahmen ${view.y}, Ansatz beider Haushalte`} />
         <Kennzahl
-          wert={view.proKopfNominal ? fmtEur(Math.round(view.proKopfNominal)) : "—"}
+          wert={view.proKopfNominal ? fmtEur(Math.round(view.proKopfNominal)) : "-"}
           label={view.pop ? `je Einwohner, bei ${view.pop.toLocaleString("de-DE")} Einwohnern` : "je Einwohner"}
         />
         <Kennzahl
@@ -259,17 +259,15 @@ export function Home() {
       <section className="max-w-2xl space-y-3">
         <h2 className="font-display text-2xl font-bold">Zwei Haushalte, zwei Logiken</h2>
         <p className="text-ink-soft">
-          Moosburg rechnet <Term name="kameralistik">kameral</Term>. Das heißt: Der Haushalt
-          zerfällt in zwei Teile, die getrennt geführt werden. Der{" "}
-          <Term name="verwaltungshaushalt">Verwaltungshaushalt</Term> trägt den laufenden Betrieb —
-          Gehälter, Strom, Unterhalt, Umlagen. Der{" "}
+          Moosburg rechnet <Term name="kameralistik">kameral</Term>, in zwei getrennten Teilen: Der{" "}
+          <Term name="verwaltungshaushalt">Verwaltungshaushalt</Term> trägt den laufenden Betrieb
+          (Gehälter, Strom, Unterhalt, Umlagen), der{" "}
           <Term name="vermoegenshaushalt">Vermögenshaushalt</Term> finanziert, was länger bleibt:
           Schulhaus, Kanal, Fahrzeuge.
         </p>
         <p className="text-ink-soft">
-          Der laufende Betrieb wächst stetig, Investitionen springen — ein Schulbau schlägt in
-          zwei, drei Jahren durch und verschwindet dann wieder. Deshalb sagt ein einzelnes Jahr
-          wenig; erst die Reihe zeigt etwas.
+          Der laufende Betrieb wächst stetig, Investitionen schwanken stark. Aussagekräftig ist
+          deshalb erst die Reihe über mehrere Jahre.
         </p>
       </section>
 
@@ -278,7 +276,7 @@ export function Home() {
           <SketchGround className="-bottom-10 -right-8 h-[380px] w-[440px] bg-cream opacity-[0.14]" />
           <div className="relative max-w-2xl px-6 pt-7 pb-10 sm:px-10 sm:pt-9 sm:pb-12">
             <KategorieZeile icon={Coins} className="text-gold-200">Wofür zahle ich?</KategorieZeile>
-            <SeitenTitel as="h2" script="pro Kopf" className="text-3xl" scriptClassName="text-gold-200/55">
+            <SeitenTitel as="h2" script="je Einwohner" className="text-3xl" scriptClassName="text-gold-200/55">
               Was Moosburg {view.y} für jeden ausgibt
             </SeitenTitel>
             <p className="mt-4 whitespace-nowrap font-display text-5xl font-semibold text-gold-200 lining-nums tabular-nums">
@@ -308,7 +306,7 @@ export function Home() {
         </div>
         <EChart
           option={view.haushalte}
-          ariaLabel="Ausgaben je Jahr, aufgeteilt in Verwaltungshaushalt und Vermögenshaushalt — Zahlen in der Tabelle darunter"
+          ariaLabel="Ausgaben je Jahr, aufgeteilt in Verwaltungshaushalt und Vermögenshaushalt, Zahlen in der Tabelle darunter"
           style={{ height: breit ? 380 : 340 }}
         />
         <ChartTable
@@ -316,8 +314,8 @@ export function Home() {
           columns={["Jahr", "Laufender Betrieb", "Investitionen"]}
           rows={view.years.map((y, i) => [
             String(y),
-            view.series.vwh.ansatz[i] ? fmtEur(view.series.vwh.ansatz[i]!) : "—",
-            view.series.vmh.ansatz[i] ? fmtEur(view.series.vmh.ansatz[i]!) : "—",
+            view.series.vwh.ansatz[i] ? fmtEur(view.series.vwh.ansatz[i]!) : "-",
+            view.series.vmh.ansatz[i] ? fmtEur(view.series.vmh.ansatz[i]!) : "-",
           ])}
         />
       </section>
@@ -328,13 +326,12 @@ export function Home() {
           <span className="text-xs text-ink-muted">{view.basis} = 100</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
-          Ein größerer Haushalt heißt nicht automatisch mehr Leistung. Zwei Effekte blähen ihn
-          auf, ohne dass eine Straße breiter wird: Moosburg hat <b>mehr Einwohner</b>, und das
-          Geld ist <b>weniger wert</b>. Die drei Linien ziehen beide nacheinander ab.
+          Zwei Effekte vergrößern den Haushalt, ohne dass die Stadt mehr leistet: <b>mehr
+          Einwohner</b> und <b>Inflation</b>. Die Linien rechnen beide nacheinander heraus.
         </p>
         <EChart
           option={view.proKopfOpt}
-          ariaLabel={`Ausgabenentwicklung als Index, ${view.basis} gleich 100: insgesamt, je Einwohner und zusätzlich inflationsbereinigt — Zahlen in der Tabelle darunter`}
+          ariaLabel={`Ausgabenentwicklung als Index, ${view.basis} gleich 100: insgesamt, je Einwohner und zusätzlich inflationsbereinigt, Zahlen in der Tabelle darunter`}
           style={{ height: 360 }}
         />
         <ol className="max-w-2xl space-y-2 text-sm">
@@ -342,9 +339,9 @@ export function Home() {
             [VERMOEGEN, "Ausgaben insgesamt", fromIndex(view.idx.abs),
               "So viel mehr gibt die Stadt nominal aus als " + view.basis + "."],
             [PROKOPF_LINE, "je Einwohner", fromIndex(view.idx.pk),
-              `Bevölkerung ${view.popGrowth != null ? pct(view.popGrowth) : "gewachsen"} — pro Kopf bleibt weniger Zuwachs übrig.`],
+              `Bevölkerung ${view.popGrowth != null ? pct(view.popGrowth) : "gewachsen"}, pro Kopf bleibt weniger Zuwachs.`],
             [REAL_LINE, "je Einwohner, inflationsbereinigt", fromIndex(view.idx.real),
-              "Nach Abzug der Teuerung: der tatsächliche Zuwachs an Leistung."],
+              "Zusätzlich ohne Teuerung."],
           ].map(([color, label, delta, text]) => (
             <li key={label as string} className="flex gap-3">
               <span className="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: color as string }} />
@@ -363,9 +360,9 @@ export function Home() {
           columns={["Jahr", "Ausgaben insgesamt", "je Einwohner", "je Einwohner, real"]}
           rows={view.years.map((y, i) => [
             String(y),
-            view.series.ausgaben.ansatz[i] ? fmtEur(view.series.ausgaben.ansatz[i]!) : "—",
-            view.series.proKopf.ansatz[i] ? fmtEur(Math.round(view.series.proKopf.ansatz[i]!)) : "—",
-            view.series.proKopfReal.ansatz[i] ? fmtEur(Math.round(view.series.proKopfReal.ansatz[i]!)) : "—",
+            view.series.ausgaben.ansatz[i] ? fmtEur(view.series.ausgaben.ansatz[i]!) : "-",
+            view.series.proKopf.ansatz[i] ? fmtEur(Math.round(view.series.proKopf.ansatz[i]!)) : "-",
+            view.series.proKopfReal.ansatz[i] ? fmtEur(Math.round(view.series.proKopfReal.ansatz[i]!)) : "-",
           ])}
         />
         <p className="text-xs text-ink-muted">

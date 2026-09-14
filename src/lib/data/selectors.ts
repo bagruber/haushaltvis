@@ -259,7 +259,7 @@ export function topPosten(
     if (haushalt && p.haushalt !== haushalt) continue;
     const tag = themes.assignment[f.hhst_id]?.find((t) => t.theme === themeId);
     if (!tag) continue;
-    const label = [p.grz_text, p.kontotext].filter(Boolean).join(" – ") || p.hhst_id;
+    const label = [p.grz_text, p.kontotext].filter(Boolean).join(" - ") || p.hhst_id;
     const context = p.glz_text ? ` (${p.glz_text.replace(/\s+/g, " ").trim()})` : "";
     out.push({ key: f.hhst_id, label: label + context, value: Math.round(f.ansatz * tag.weight) });
   }
@@ -409,7 +409,7 @@ export interface Crumb {
 /** Human-readable path (Aufgabenbereich → Bereich → Einrichtung) for a Posten. */
 export function postenCrumb(data: Data, p: Posten): Crumb {
   return {
-    aufgabenbereich: `Einzelplan ${p.einzelplan} – ${p.einzelplan_name}`,
+    aufgabenbereich: `Einzelplan ${p.einzelplan} - ${p.einzelplan_name}`,
     bereich: abschnittName(data.labels, p.glz.slice(0, 2)),
     untergruppe: groupLabel(data.labels, p.glz),
     einrichtung: (p.glz_text ?? p.glz).replace(/\s+/g, " ").trim(),

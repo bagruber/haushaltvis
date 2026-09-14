@@ -31,14 +31,13 @@ export function Methodik() {
         <p className="text-ink-soft">
           Grundlage sind die <Term name="kameralistik">kameralen</Term> Haushaltspläne der
           Stadt Moosburg. Erfasst sind die Jahre 2016–2026, jeweils mit{" "}
-          <Term name="ansatz">Ansatz</Term> (Plan) und — soweit vorhanden —{" "}
-          <Term name="ergebnis">Ergebnis</Term> (Ist). Für das laufende Jahr steht nur der Plan; sein Ergebnis wird erst im Jahresverlauf gebucht und daher nicht ausgewiesen.
+          <Term name="ansatz">Ansatz</Term> (Plan) und, soweit vorhanden,{" "}
+          <Term name="ergebnis">Ergebnis</Term> (Ist). Für das laufende Jahr gibt es nur den Plan.
         </p>
         <p className="text-ink-soft">
-          Bei der Aufbereitung ändert sich an den Beträgen nichts. Eine Ausnahme betrifft nur die
-          Zuordnung: Einrichtungen, die bei der Umstellung 2022/23 eine neue Gliederungsnummer
-          bekamen, stehen unter der neuen Nummer. Liegen für ein Jahr beide Nummern vor, werden
-          ihre Beträge dort zusammengezählt.
+          An den Beträgen ändert die Aufbereitung nichts. Nur Einrichtungen, die 2022/23 eine neue
+          Gliederungsnummer bekamen, stehen unter der neuen Nummer; gibt es für ein Jahr beide,
+          werden die Beträge dort addiert.
         </p>
       </section>
 
@@ -48,8 +47,6 @@ export function Methodik() {
           Buchhalterisch ist der Haushalt geteilt: der{" "}
           <Term name="verwaltungshaushalt">Verwaltungshaushalt</Term> (laufender Betrieb)
           und der <Term name="vermoegenshaushalt">Vermögenshaushalt</Term> (Investitionen).
-          In der Themen-Sicht führen wir beide zusammen; in „Erkunden" bleiben sie der
-          kameralen Struktur treu.
         </p>
       </section>
 
@@ -81,9 +78,8 @@ export function Methodik() {
       <section className="space-y-2">
         <h2 className="font-display text-xl font-bold">Weitere Informationen</h2>
         <p className="text-ink-soft">
-          Detailliertere oder amtlich verbindliche Auskünfte zum Haushalt können direkt bei
-          der Stadt Moosburg a. d. Isar (Stadtkämmerei) angefragt werden. Ein offener
-          Datendownload ist für eine spätere Ausbaustufe vorgesehen.
+          Verbindliche Auskünfte zum Haushalt gibt die Stadtkämmerei Moosburg a. d. Isar. Ein
+          offener Datendownload ist für später geplant.
         </p>
       </section>
     </div>

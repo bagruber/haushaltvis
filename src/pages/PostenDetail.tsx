@@ -77,7 +77,7 @@ export function PostenDetail() {
                 <span className="font-semibold tabular-nums text-red-600 shrink-0">{e.year}</span>
                 <span>
                   <b>{e.title}</b>
-                  {e.text && <span className="text-ink-soft"> — {e.text}</span>}
+                  {e.text && <span className="text-ink-soft">: {e.text}</span>}
                 </span>
               </li>
             ))}

@@ -129,13 +129,13 @@ export function Querschnitte() {
     }
     const factSum = (h: string) => (factByHhstYear.get(h) ?? 0) * detailFactor;
 
-    const fmtV = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
+    const fmtV = (v: number | null) => (v == null ? "-" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
     const fmtAxis = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
 
     const overview: EChartsOption = {
       tooltip: {
         trigger: "axis",
-        valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)),
+        valueFormatter: (v) => (v == null ? "-" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)),
         order: "valueDesc",
       },
       legend: { bottom: 0 },
@@ -181,9 +181,8 @@ export function Querschnitte() {
       <header className="space-y-2">
         <h1 className="headline text-3xl">Querschnitte</h1>
         <p className="max-w-2xl text-ink-soft">
-          Manche Kosten verteilen sich über den ganzen Haushalt — Personal steckt in fast
-          jeder Einrichtung, Strom in jedem Gebäude. Diese <b>Kostenblöcke</b> bündeln solche
-          Ausgaben quer zur kameralen Gliederung, damit ihre Entwicklung sichtbar wird.
+          Personal steckt in fast jeder Einrichtung, Strom in jedem Gebäude. <b>Kostenblöcke</b>{" "}
+          bündeln solche Ausgaben quer über den ganzen Haushalt.
         </p>
       </header>
 
@@ -199,7 +198,7 @@ export function Querschnitte() {
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
         <EChart
           option={view.overview}
-          ariaLabel="Entwicklung der Kostenblöcke über die Jahre — Zahlen in der Tabelle darunter"
+          ariaLabel="Entwicklung der Kostenblöcke über die Jahre, Zahlen in der Tabelle darunter"
           style={{ height: 360 }}
         />
         <ChartTable
@@ -252,7 +251,7 @@ export function Querschnitte() {
                   <div className="flex items-baseline justify-between gap-3 border-b border-ink-line pb-1">
                     <span className="font-medium">{g.text}</span>
                     <span className="shrink-0 tabular-nums text-ink-soft">
-                      {g.sum ? view.fmtV(g.sum) : "—"}
+                      {g.sum ? view.fmtV(g.sum) : "-"}
                       <span className="ml-2 text-xs text-ink-muted">
                         {g.count} {g.count === 1 ? "Posten" : "Posten"}
                       </span>
@@ -276,15 +275,14 @@ export function Querschnitte() {
                     {g.restCount > 0 && (
                       <li className="flex items-baseline justify-between gap-3 py-1 text-xs text-ink-muted">
                         <span>+ {g.restCount} weitere</span>
-                        <span className="tabular-nums">{g.restSum > 0 ? view.fmtV(g.restSum) : "—"}</span>
+                        <span className="tabular-nums">{g.restSum > 0 ? view.fmtV(g.restSum) : "-"}</span>
                       </li>
                     )}
                   </ul>
                 </div>
               ))}
               <p className="text-xs text-ink-muted">
-                Beträge sind das Ergebnis {view.finalYear}. Ein Klick öffnet die Haushaltsstelle mit
-                ihrem Zeitverlauf.
+                Beträge: Ergebnis {view.finalYear}.
               </p>
             </div>
           </details>
@@ -292,10 +290,9 @@ export function Querschnitte() {
       ))}
 
       <p className="text-xs text-ink-muted max-w-2xl">
-        „Gruppierungsplan" heißt: exakt aus der kameralen Systematik abgeleitet.
-        „Stichwort-Auswahl" fasst Posten anhand ihrer Bezeichnung zusammen — die enthaltenen
-        Kostenarten sind oben aufklappbar. Für das laufende Jahr steht nur der Plan; das
-        Ergebnis stammt daher aus {view.finalYear}.
+        „Gruppierungsplan": exakt aus der kameralen Systematik. „Stichwort-Auswahl": nach
+        Bezeichnung zusammengefasst, die Kostenarten sind aufklappbar. Das Ergebnis stammt aus{" "}
+        {view.finalYear}, weil es für das laufende Jahr nur den Plan gibt.
       </p>
     </div>
   );
