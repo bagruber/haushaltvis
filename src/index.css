@@ -1,14 +1,38 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
-@import "@fontsource/playfair-display/400.css";
-@import "@fontsource/playfair-display/600.css";
-@import "@fontsource/playfair-display/700.css";
-@import "@fontsource/playfair-display/900.css";
+/* Probe Formsprache, vorläufig (14.09.2026): Source Serif 4 und Atkinson
+   Hyperlegible Next lösen Playfair und Inter ab. Die opsz-Datei deckt beide
+   Achsen ab (optische Größe und Gewicht 200 bis 900). Die alten Pakete bleiben
+   in der package.json, bis die Entscheidung endgültig ist. */
+@import "@fontsource-variable/source-serif-4/opsz.css";
+@import "@fontsource-variable/atkinson-hyperlegible-next";
 
-/* Die Tokens kommen aus dem gemeinsamen Kanon, ohne lokale Abweichung:
+/* Die Tokens kommen aus dem gemeinsamen Kanon:
    github.com/bagruber/moosburg-design. Die frühere lokale AA-Abdunklung
    von ink-muted ist inzwischen selbst der Kanon. */
 @import "moosburg-design/css/theme.css";
+
+@theme {
+  /* Probe Formsprache, vorläufig (14.09.2026): Schriften der Probe. */
+  --font-display: "Source Serif 4 Variable", Georgia, serif;
+  --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Madelon Script", cursive;
+
+  /* Probe Formsprache, vorläufig (14.09.2026): 10 px für Kacheln, Buttons,
+     Suche, Flächen und Felder; 4 px (radius-md) bleibt für Marken. */
+  --radius-lg: 10px;
+  --radius-xl: 10px;
+}
+
+/* Probe Formsprache, vorläufig (14.09.2026): Madelon Script ist kein npm-Paket.
+   Lizenz ungeklärt (Schrift gilt als aufgegeben), öffentlich vorerst erlaubt;
+   angesprochen wird sie nur über --font-script, damit ein Tausch eine Zeile ist. */
+@font-face {
+  font-family: "Madelon Script";
+  src: url("./assets/fonts/MadelonScript.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 html {
   scroll-behavior: smooth;
@@ -23,6 +47,8 @@ body {
 
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variant-numeric: lining-nums;
 }
 
 /* Page title in caps, per the Moosburg brand brief. Deliberately reserved for

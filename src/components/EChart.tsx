@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts/core";
 import { BarChart, LineChart, SankeyChart, SunburstChart, TreemapChart } from "echarts/charts";
 import { TooltipComponent, LegendComponent, GridComponent, AriaComponent } from "echarts/components";
@@ -39,10 +39,30 @@ export function EChart({ option, className, style, onEvents, ariaLabel }: Props)
     };
   }, []);
 
+  // Canvas text does not inherit CSS fonts, and a font that is not loaded yet
+  // falls back to the system font for good. So wait for the fonts, including
+  // the script font that chart notes draw on the canvas.
+  const [fontsReady, setFontsReady] = useState(false);
   useEffect(() => {
+    let alive = true;
+    const script = getComputedStyle(document.documentElement).getPropertyValue("--font-script");
+    Promise.all([document.fonts.ready, document.fonts.load(`1em ${script}`)])
+      .catch(() => undefined)
+      .then(() => alive && setFontsReady(true));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!fontsReady) return;
+    const fontFamily = getComputedStyle(document.body).fontFamily;
     // aria.enabled lets ECharts emit a generated description on the canvas.
-    inst.current?.setOption({ aria: { enabled: true }, ...option }, true);
-  }, [option]);
+    inst.current?.setOption(
+      { aria: { enabled: true }, ...option, textStyle: { fontFamily, ...(option.textStyle as object) } },
+      true,
+    );
+  }, [option, fontsReady]);
 
   useEffect(() => {
     const chart = inst.current;
