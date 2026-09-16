@@ -333,7 +333,7 @@ export function Home() {
           ])}
         />
         <p className="text-xs text-ink-muted">
-          Einwohnerzahlen: Bayerisches Landesamt für Statistik (Zwischenjahre interpoliert).
+          Einwohnerzahlen: GENESIS-Online, Stand jeweils 31.12. des Vorjahres.
           Preisentwicklung: Verbraucherpreisindex Deutschland, umbasiert auf {view.basis}.
         </p>
       </section>

@@ -1,27 +1,27 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Kontextdaten für relative Betrachtungen in den Timelines.
 #
-# population: Einwohnerzahl der Stadt Moosburg a.d. Isar je Jahr.
-#   Amtliche Stützpunkte: 2016, 2018–2022, 2025. Übrige Jahre linear interpoliert
-#   bzw. für 2026 fortgeschrieben (mit # markiert). 2022 = 19.505 laut LfStat/
-#   citypopulation; 2016 = 18.181 (von der Stadt gemeldet, vorläufig).
+# population: Einwohnerzahl der Stadt Moosburg a.d. Isar je Haushaltsjahr.
+#   Quelle: GENESIS-Online (amtlicher Bevölkerungsstand, öffentlich). Stichtag ist
+#   jeweils der 31.12.; ein Haushaltsjahr nutzt den Stand vom 31.12. des Vorjahres,
+#   damit auch das laufende Jahr einen Wert hat (2026 = Stand 31.12.2025).
 # cpi: Verbraucherpreisindex Deutschland, Jahresdurchschnitt, Basis 2020 = 100
 #   (Statistisches Bundesamt). 2025/2026 aus den amtlichen Inflationsraten
 #   fortgeschrieben (2025: +2,2 %; 2026: Prognose ~+2 %).
 # ─────────────────────────────────────────────────────────────────────────────
 
 population:
-  2016: 18181
-  2017: 18346   # interpoliert
-  2018: 18510
-  2019: 18656
-  2020: 18893
-  2021: 19309
-  2022: 19505
-  2023: 19706   # interpoliert
-  2024: 19906   # interpoliert
-  2025: 20107
-  2026: 20300   # Schätzung
+  2016: 17847   # Stand 31.12.2015
+  2017: 18181   # Stand 31.12.2016
+  2018: 18487   # Stand 31.12.2017
+  2019: 18510   # Stand 31.12.2018
+  2020: 18656   # Stand 31.12.2019
+  2021: 18893   # Stand 31.12.2020
+  2022: 19309   # Stand 31.12.2021
+  2023: 18681   # Stand 31.12.2022
+  2024: 19882   # Stand 31.12.2023
+  2025: 20012   # Stand 31.12.2024
+  2026: 20107   # Stand 31.12.2025
 
 cpi:
   2016: 94.9
