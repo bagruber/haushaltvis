@@ -4,7 +4,7 @@ import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, latestYear, adjustSeries, totals } from "@/lib/data";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
-import { extremImFenster, notiz, useBreit } from "@/lib/notiz";
+import { extremImFenster, useBreit } from "@/lib/notiz";
 import type { Aggregator, YearSeries } from "@/lib/data";
 import { TimelineControls, type TimelineMode } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
@@ -145,7 +145,7 @@ export function Querschnitte() {
         order: "valueDesc",
       },
       legend: { bottom: 0 },
-      grid: { left: 8, right: 16, top: 12, bottom: 44, containLabel: true },
+      grid: { left: 8, right: 16, top: gaskrise != null ? 56 : 12, bottom: 44, containLabel: true },
       xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({
@@ -157,9 +157,6 @@ export function Querschnitte() {
         lineStyle: { width: 2.5, color: COLOR[k] },
         itemStyle: { color: COLOR[k] },
         data: adjusted[k].ansatz,
-        ...(k === "strom" && gaskrise != null
-          ? { markPoint: notiz("Ukrainekrieg, Gaskrise", [String(years[gaskrise]), adjusted[k].ansatz[gaskrise]!]) }
-          : {}),
       })),
     };
 
@@ -179,7 +176,11 @@ export function Querschnitte() {
     });
 
     const hasContext = !!(ctx.cpi || ctx.population);
-    return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext };
+    const notiz =
+      gaskrise != null
+        ? { text: "Ukrainekrieg, Gaskrise", x: String(years[gaskrise]), y: adjusted.strom.ansatz[gaskrise]! }
+        : undefined;
+    return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext, notiz };
   }, [data, mode, breit]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
@@ -207,6 +208,7 @@ export function Querschnitte() {
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
         <EChart
           option={view.overview}
+          notiz={view.notiz}
           ariaLabel="Entwicklung der Kostenblöcke über die Jahre, Zahlen in der Tabelle darunter"
           style={{ height: 360 }}
         />

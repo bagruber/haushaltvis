@@ -21,7 +21,7 @@ import {
 import { Term } from "@/components/Term";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { useNummern } from "@/lib/nummern";
-import { notiz, useBreit } from "@/lib/notiz";
+import { useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const VERWALTUNG = "#8a7a5c";
@@ -93,7 +93,6 @@ export function Home() {
           stack: "h",
           data: vmh.ansatz,
           itemStyle: { color: VERMOEGEN },
-          markPoint: breit ? notiz("höchster Ansatz", [String(years[hoechstes]), summen[hoechstes]]) : undefined,
         },
       ],
     };
@@ -172,6 +171,7 @@ export function Home() {
     return {
       y,
       years,
+      notiz: breit ? { text: "höchster Ansatz", x: String(years[hoechstes]), y: summen[hoechstes] } : undefined,
       ausgaben: ausgaben.ansatz[i] ?? 0,
       einnahmen: einnahmen.ansatz[i] ?? 0,
       investAnteil: (vmh.ansatz[i] ?? 0) / ((vwh.ansatz[i] ?? 0) + (vmh.ansatz[i] ?? 1)),
@@ -272,6 +272,7 @@ export function Home() {
         </div>
         <EChart
           option={view.haushalte}
+          notiz={view.notiz}
           ariaLabel="Ausgaben je Jahr, aufgeteilt in Verwaltungshaushalt und Vermögenshaushalt, Zahlen in der Tabelle darunter"
           style={{ height: breit ? 380 : 340 }}
         />

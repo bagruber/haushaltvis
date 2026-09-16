@@ -9,7 +9,7 @@ import { usePageTitle } from "@/lib/title";
 import { ChartTable } from "@/components/ChartTable";
 import { Loading } from "@/components/ui";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
-import { extremImFenster, notiz, useBreit } from "@/lib/notiz";
+import { extremImFenster, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
 const STEUERN: [string, string][] = [
@@ -76,7 +76,7 @@ export function Einnahmen() {
           return `<b>${years[i]}</b>${body}`;
         },
       },
-      grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
+      grid: { left: 8, right: 16, top: pandemie != null ? 56 : 12, bottom: 56, containLabel: true },
       xAxis: { type: "category", data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
       legend: { bottom: 0, type: "scroll", data: STEUERN.map(([n]) => n) },
@@ -89,9 +89,6 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color },
           itemStyle: { color },
           connectNulls: true,
-          ...(si === GEWERBE && pandemie != null
-            ? { markPoint: notiz("Corona-Pandemie", [String(years[pandemie]), steuerSeries[si].ist[pandemie]!]) }
-            : {}),
         })),
         // Plan tail: same colour, dashed, kept out of the legend so it reads as a
         // continuation rather than a second series. The tooltip above covers it.
@@ -109,7 +106,11 @@ export function Einnahmen() {
     };
 
     const hasContext = !!(data.context.cpi || data.context.population);
-    return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext };
+    const notiz =
+      pandemie != null
+        ? { text: "Corona-Pandemie", x: String(years[pandemie]), y: steuerSeries[GEWERBE].ist[pandemie]! }
+        : undefined;
+    return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext, notiz };
   }, [data, selYear, mode, breit]);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
@@ -134,7 +135,7 @@ export function Einnahmen() {
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
-        <EChart option={view.steuerOpt} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter" style={{ height: 300 }} />
+        <EChart option={view.steuerOpt} notiz={view.notiz} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter" style={{ height: 300 }} />
         <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>
 

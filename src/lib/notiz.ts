@@ -1,5 +1,4 @@
 import { useSyncExternalStore } from "react";
-import type { MarkPointComponentOption } from "echarts";
 
 const BREIT = "(min-width: 640px)";
 
@@ -16,30 +15,14 @@ export function useBreit() {
 }
 
 /**
- * Handwritten note in a chart: script text in gold-700 with a short gold-500
- * arrow pointing down at one data point. At most one per chart. EChart waits
- * for the script font, so the canvas does not fall back to a system face.
+ * Handwritten note in a chart, pointing at one data point: x is the category
+ * (year), y the value. EChart draws the text in the free margin above the plot
+ * and a curved arrow down to the point. At most one per chart.
  */
-export function notiz(text: string, coord: [string, number]): MarkPointComponentOption {
-  const scriptFont = getComputedStyle(document.documentElement).getPropertyValue("--font-script");
-  return {
-    silent: true,
-    symbol: "path://M4,0 L6,0 L6,10 L10,10 L5,16 L0,10 L4,10 Z",
-    symbolSize: [9, 16],
-    symbolOffset: [0, -12],
-    itemStyle: { color: "#b8964e" },
-    label: {
-      show: true,
-      position: "top",
-      distance: 2,
-      formatter: text,
-      fontFamily: scriptFont,
-      fontSize: 28,
-      color: "#6e5a30",
-      rotate: 4,
-    },
-    data: [{ name: text, coord }],
-  };
+export interface Notiz {
+  text: string;
+  x: string;
+  y: number;
 }
 
 /**
