@@ -25,6 +25,37 @@ Noch offen:
   Schriftpakete in `hausbasis/baseline.json` eintragen, den Vorschau-Schritt in
   `pages.yml` und `probe-vorschau.yml` wieder entfernen.
 
+## Zwischenstand 2026 (seit 14.10.2026)
+
+Die Marken „gebucht/bezahlt bis 30.09." sind ein **Versuch** fuer die kommende
+Sitzung und die interne Arbeit, umgesetzt in der gemeinsamen `Timeline`
+(Posten, Einrichtung, Bereiche im Einzelplan). Offen:
+
+- **Vor einem Merge nach `main` neu entscheiden, ob der Zwischenstand bleibt.**
+  Zuruecknehmen heisst `public/data/zwischenstand.json` loeschen — kein
+  Code-Schalter noetig, die Tests ueberspringen dann ihren Block.
+- **Home, Einnahmen, Investitionen und Querschnitte** haben eigene Diagramme
+  und zeigen noch keinen Zwischenstand. Erst, wenn die Form traegt.
+- **Aussagekraeftig wird er erst im Vergleich** („bis 30.09.2025 waren 68 %
+  bezahlt, dieses Jahr 59 %"). Die Kaemmerei fragen, ob AKDB dieselbe
+  Auswertung zum 01.10. der Vorjahre rueckwirkend ausgibt.
+
+## Vorschaukarten (seit 14.10.2026)
+
+Je Adresse eine HTML-Datei mit eigener Karte (`scripts/karten.mjs`). Noch zu
+pruefen, was nur am echten Geraet geht:
+
+- **Messenger-Test** nach dem Deploy auf `/v2/`: Links in WhatsApp, Signal und
+  Telegram auf einem Telefon schicken, dazu Mastodon und LinkedIn
+  (Post Inspector). Einige Dienste schneiden quadratisch zu; geht dabei der
+  Titel verloren, die Raender anpassen.
+- **Buildzeit in CI** vor und nach dem Schritt notieren. Lokal brauchen die 358
+  Bilder rund 35 s; mehr als zwei Minuten zusaetzlich waere ein Grund, die
+  Einrichtungen auf eine gemeinsame Bildvorlage zurueckzunehmen.
+- **Betrieb bei der Stadt** ist offen (Abschnitt 7 des Briefings). Chromium
+  gehoert nicht auf staedtische Server: die Karten entstehen dort, wo gebaut
+  wird, und werden mit dem Ordner ausgeliefert.
+
 ## Toolchain-Stand
 
 Dieses Repo laeuft seit dem 26.08.2026 auf **pnpm** (nicht npm) und auf der

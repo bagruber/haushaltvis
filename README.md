@@ -100,6 +100,7 @@ public/data/     fertige JSONs für die Web-App
 src/lib/         Daten-Laden, Typen, Selektoren, Farben
 src/components/  Charts, Layout, Suche, Timeline, Glossar
 src/pages/       die Seiten/Routen
+scripts/         Vorschaukarten je Adresse (laeuft nach `vite build`)
 ```
 
 Die Roh-Exporte unter `haushaltsplaene/` sind bewusst nicht eingecheckt; die
@@ -107,6 +108,18 @@ fertig aufbereiteten Daten liegen in `public/data/` bzw. `data/processed/`.
 
 Deployment automatisch via GitHub Actions (`.github/workflows/pages.yml`) bei
 Push auf `main`.
+
+`pnpm build` baut die App und legt danach mit `node scripts/karten.mjs dist`
+fuer jede teilbare Adresse eine eigene HTML-Datei mit eigener Vorschaukarte ab
+(Messenger lesen nur die Metazeilen der Datei, die unter der Adresse liegt).
+Gerendert wird in einem lokalen Chromium; einmalig:
+
+```bash
+pnpm exec playwright-core install chromium
+```
+
+Wird spaeter nur `data/` getauscht, erzeugt `pnpm karten` die Karten auf dem
+fertigen Ordner neu, ohne die App neu zu bauen.
 
 ## Hosting-Portabilität & Doppik
 

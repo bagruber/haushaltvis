@@ -3,6 +3,7 @@ import type { Icon } from "@phosphor-icons/react";
 import { einzelplanKategorie } from "../kategorien";
 import { COLOR, ICON, ORDER } from "../kostenblock";
 import { SEITEN } from "../seiten";
+import { incomeCategory, isInternal } from "../kameral.mjs";
 import { abschnittName, groupLabel, factsOfYear, factsOfHhst, postenOfGlz } from "./core";
 import { shades, GOLD_BASE, ZUSCHUSS_RED, EINZELPLAN_COLORS } from "../colors";
 
@@ -309,60 +310,10 @@ export function topPosten(
 
 // ── Sankey: income sources → Haushalt → expense themes ──────────────────────
 
-/**
- * Internal / technical bookings that would double-count in a cash-flow Sankey:
- * transfers between the two Haushalte, internal cost allocations, reserves,
- * calculatory costs and year-end balancing entries.
- */
-export function isInternal(p: Posten): boolean {
-  const t = `${p.grz_text ?? ""} ${p.kontotext ?? ""}`.toLowerCase();
-  return (
-    t.includes("innere verrechnung") ||
-    t.includes("kalkulatorisch") ||
-    t.includes("zuführung") ||
-    t.includes("deckungsreserve") ||
-    t.includes("rücklage") ||
-    t.includes("abschlusstechni") ||
-    t.includes("fehlbetrag") ||
-    t.includes("überschuss") ||
-    t.includes("haushaltstechnische verrechnung")
-  );
-}
 
-/**
- * Laien-friendly income category for one Posten, finer than Hauptgruppe:
- * splits the big taxes (Gewerbesteuer, Einkommensteuer-Anteil, …) apart.
- */
-export function incomeCategory(p: Posten): string {
-  const g = p.grz;
-  if (p.haushalt === "vermoegen") {
-    if (g.startsWith("34")) return "Vermögensveräußerung";
-    if (g.startsWith("36")) return "Investitionszuschüsse";
-    if (g.startsWith("377") || g.startsWith("378")) return "Kreditaufnahmen";
-    return "Sonstige Investitionseinnahmen";
-  }
-  // Verwaltungshaushalt income (Hauptgruppen 0, 1, 2)
-  // Steuern & allgemeine Zuweisungen (HG 0)
-  if (g === "0030") return "Gewerbesteuer";
-  if (g === "0000" || g === "0010" || g === "0020") return "Grundsteuer";
-  if (g === "0100" || g === "0615") return "Einkommensteuer-Anteil";
-  if (g === "0120") return "Umsatzsteuer-Anteil";
-  if (g.startsWith("04") || g === "0611") return "Schlüsselzuweisungen & Finanzausgleich";
-  if (g[0] === "0") return "Sonstige Steuern & Zuweisungen";
-  // Einnahmen aus Verwaltung & Betrieb (HG 1) — aufgedröselt
-  if (g === "1111") return "Abwassergebühren";
-  if (g === "1171") return "Wassergebühren";
-  if (g === "1194" || g === "1195") return "Kita-Beiträge & -Entgelte";
-  if (g.startsWith("10")) return "Verwaltungsgebühren";
-  if (g.startsWith("11")) return "Sonstige Benutzungsgebühren";
-  if (g.startsWith("14")) return "Mieten & Pachten";
-  if (g.startsWith("16")) return "Erstattungen";
-  if (g.startsWith("17")) return "Zuweisungen & Zuschüsse (laufend)";
-  if (g[0] === "1") return "Sonstige Entgelte";
-  // Finanzeinnahmen (HG 2)
-  if (g.startsWith("22")) return "Konzessionsabgaben";
-  return "Zinsen & sonstige Einnahmen";
-}
+// Die beiden Regeln stehen in lib/kameral.mjs, weil das Kartenskript
+// (scripts/karten.mjs) sie unter Node braucht.
+export { incomeCategory, isInternal };
 
 /** Einnahmen grouped into laien-friendly sources (E side, one year). */
 export function incomeSources(

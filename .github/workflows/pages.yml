@@ -41,12 +41,40 @@ jobs:
             git worktree add "$RUNNER_TEMP/probe" FETCH_HEAD
             echo "da=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Probe nach dist/v2 bauen
+      - name: Abhaengigkeiten der Probe
+        id: probedeps
         if: steps.probe.outputs.da == 'true'
         working-directory: ${{ runner.temp }}/probe
         run: |
           pnpm install --frozen-lockfile
-          pnpm run build --base /haushaltvis/v2/ --outDir "$GITHUB_WORKSPACE/dist/v2" --emptyOutDir
+          echo "playwright=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # Die Vorschaukarten werden in einem lokalen Chromium gerendert
+      # (scripts/karten.mjs). Rund 150 MB, deshalb ueber die Playwright-Version
+      # gecacht statt in jedem Lauf neu geladen.
+      - name: Chromium aus dem Cache
+        if: steps.probe.outputs.da == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: chromium-${{ runner.os }}-${{ steps.probedeps.outputs.playwright }}
+
+      - name: Chromium bereitstellen
+        if: steps.probe.outputs.da == 'true'
+        working-directory: ${{ runner.temp }}/probe
+        run: pnpm exec playwright-core install --with-deps chromium
+
+      # Nicht `pnpm run build`: die angehaengten Argumente landeten sonst beim
+      # Kartenskript statt bei vite. Darum die drei Schritte einzeln.
+      - name: Probe nach dist/v2 bauen
+        if: steps.probe.outputs.da == 'true'
+        working-directory: ${{ runner.temp }}/probe
+        env:
+          SITE_URL: https://bagruber.github.io
+        run: |
+          pnpm exec tsc -b
+          pnpm exec vite build --base /haushaltvis/v2/ --outDir "$GITHUB_WORKSPACE/dist/v2" --emptyOutDir
+          node scripts/karten.mjs "$GITHUB_WORKSPACE/dist/v2"
 
       - name: Sanity-check dist/
         run: |
@@ -54,6 +82,10 @@ jobs:
           ls -la dist
           echo "── dist/data ────────────────────"
           ls -la dist/data
+          if [ -d dist/v2/karten ]; then
+            echo "── Vorschaukarten der Probe ─────"
+            echo "$(find dist/v2/karten -name '*.png' | wc -l) Bilder, $(find dist/v2 -name 'index.html' | wc -l) HTML-Dateien"
+          fi
 
       - uses: actions/upload-pages-artifact@v4
         with:

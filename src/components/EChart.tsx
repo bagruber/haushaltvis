@@ -37,12 +37,16 @@ const NOTIZ_PFEIL = "#b8964e"; // gold-500
  */
 function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
   if (!notiz) return;
-  const [px, py] = chart.convertToPixel({ gridIndex: 0 }, [notiz.x, notiz.y]) as number[];
   // The plot rectangle is not in the public API; the grid model exposes it.
   const modell = chart as unknown as {
-    getModel(): { getComponent(t: string, i: number): { coordinateSystem: { getRect(): { x: number; y: number; width: number } } } };
+    getModel(): { getComponent(t: string, i: number): { coordinateSystem: { getRect(): { x: number; y: number; width: number } } } } | undefined;
   };
-  const rect = modell.getModel().getComponent("grid", 0).coordinateSystem.getRect();
+  // A resize can fire before the first setOption — there is no grid to measure
+  // yet, and the note is drawn again right after the option arrives.
+  const gitter = modell.getModel()?.getComponent("grid", 0);
+  if (!gitter) return;
+  const [px, py] = chart.convertToPixel({ gridIndex: 0 }, [notiz.x, notiz.y]) as number[];
+  const rect = gitter.coordinateSystem.getRect();
   const script = getComputedStyle(document.documentElement).getPropertyValue("--font-script");
 
   // Text sits a little left of the point, kept inside the plot's width.
