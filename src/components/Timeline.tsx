@@ -39,6 +39,11 @@ interface Props {
   /** Handwritten note; only used where the chart has none of its own. */
   notiz?: Notiz;
   /**
+   * Notiz am Zwischenstand zeigen. Wie die Legende steht sie auf einer Seite
+   * mit vielen Diagrammen nur einmal — am ersten, das Rauten hat.
+   */
+  zwischenNotiz?: boolean;
+  /**
    * Legende zeigen. Auf einer Seite mit vielen gleich gebauten Diagrammen
    * (Einzelplan: ein Bereich je Diagramm) steht sie nur über dem ersten —
    * sie gilt ohnehin für alle.
@@ -65,14 +70,15 @@ function bisTag(iso: string): string {
   return `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.`;
 }
 
-/**
- * Whole months the figures cover. A Stichtag in mid-month counts the running
- * month not at all — the note may understate the period, never overstate it.
- */
-function monateBis(iso: string): number {
-  const d = vortag(iso);
-  const letzterImMonat = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
-  return d.getUTCMonth() + (d.getUTCDate() === letzterImMonat ? 1 : 0);
+const MONATE = [
+  "Januar", "Februar", "März", "April", "Mai", "Juni",
+  "Juli", "August", "September", "Oktober", "November", "Dezember",
+];
+
+/** "2026-10-01" → "01. Oktober" — der Stichtag, ausgeschrieben. */
+function standLang(iso: string): string {
+  const [, m, d] = iso.split("-");
+  return `${d}. ${MONATE[Number(m) - 1]}`;
 }
 
 /**
@@ -90,7 +96,7 @@ function marken(zw: Zwischen, art: EA) {
  * Ansatz-vs-Ergebnis timeline. Laufende Kosten (VwHH) as lines; Investitionen
  * (VmHH) — lumpy year to year — as bars, only when explicitly enabled.
  */
-export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280, art = "A", notiz, legende = true }: Props) {
+export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280, art = "A", notiz, legende = true, zwischenNotiz = true }: Props) {
   const breit = useBreit();
   const { aus, an, setAn } = useSerien();
   const [hervor, setHervor] = useState<string | null>(null);
@@ -201,10 +207,6 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
           symbolOffset: [6, 0],
           itemStyle: { color },
           z: 5,
-          tooltip: {
-            valueFormatter: (v: unknown) =>
-              anteil ? `${fmt(v as number)} · ${fmtPct((v as number) / anteil)} des Ansatzes` : fmt(v as number),
-          },
         },
       });
     }
@@ -258,19 +260,43 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     //
     // Nur eine Notiz je Diagramm: wo schon eine sitzt, gewinnt die vorhandene.
     // Unter 640 px gibt es keine; dort trägt die Achse den Stichtag.
+    // Die Notiz gehört zu den beiden Rauten: sind beide ausgeblendet, hat sie
+    // nichts mehr zu zeigen.
+    const rautenDa = sichtbar.some((b) => b.key === "gebucht" || b.key === "bezahlt");
     const dieNotiz: Notiz | undefined =
       notiz ??
-      (zw && zwIndex >= 0 && breit
-        ? { text: `erst ${monateBis(zw.stichtag)} Monate`, x: String(zw.jahr), y: zw.ist }
+      (zw && zwIndex >= 0 && breit && zwischenNotiz && rautenDa
+        ? { text: `Stand ${standLang(zw.stichtag)}`, x: String(zw.jahr), y: zw.ist, form: "kurz" }
         : undefined);
 
     const option: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => fmt(v as number | null) },
+      // Eigener Formatter, damit die Rauten-Zeilen nur im Jahr des
+      // Zwischenstands erscheinen statt in jedem Jahr als "-".
+      tooltip: {
+        trigger: "axis",
+        formatter: (params) => {
+          const zeilen = params as { dataIndex: number; seriesName: string; marker: string; value: number | null }[];
+          if (!zeilen.length) return "";
+          const i = zeilen[0].dataIndex;
+          const text = sichtbar
+            .filter((b) => b.werte[i] != null)
+            .map((b) => {
+              const marker = zeilen.find((z) => z.seriesName === b.name)?.marker ?? "";
+              const wert = fmt(b.werte[i]);
+              const anteilText =
+                b.key === "bezahlt" && anteil ? ` · ${fmtPct(b.werte[i]! / anteil)} des Ansatzes` : "";
+              return `<div style="display:flex;gap:12px;justify-content:space-between">
+                <span>${marker}${b.name}</span><b>${wert}${anteilText}</b></div>`;
+            })
+            .join("");
+          return `<b>${lf.years[i]}</b>${text}`;
+        },
+      },
       // Legende abgeschaltet: DiagrammLegende macht dasselbe per Tastatur,
       // mit den echten Symbolen und sichtbar ausgeschalteten Eintraegen.
       legend: { show: false },
       // Eine Notiz braucht Luft über der Grafik (siehe lib/notiz.ts).
-      grid: { left: 8, right: 16, top: dieNotiz ? 56 : 12, bottom: 44, containLabel: true },
+      grid: { left: 8, right: 16, top: dieNotiz && dieNotiz.form !== "kurz" ? 56 : 12, bottom: 44, containLabel: true },
       xAxis: {
         type: "category",
         data: laufend.years.map(String),
@@ -296,12 +322,13 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       option,
       table: { columns, rows },
       // Der Satz steht nur, wo wirklich etwas ausgeblendet wird.
-      hinweis: !!(netto && laufend.zwischen),
+      hinweis: netto && laufend.zwischen ? standLang(laufend.zwischen.stichtag) : null,
       dieNotiz,
-      stand: zw && zwIndex >= 0 ? standTag(zw.stichtag) : undefined,
+      // Wie Legende und Notiz: der Satz steht auf einer Seite nur einmal.
+      stand: zw && zwIndex >= 0 && zwischenNotiz && rautenDa ? standTag(zw.stichtag) : undefined,
       eintraege,
     };
-  }, [laufend, invest, einnahmen, mode, context, baseYear, color, art, notiz, breit, aus]);
+  }, [laufend, invest, einnahmen, mode, context, baseYear, color, art, notiz, breit, aus, zwischenNotiz]);
 
   return (
     <div>
@@ -317,7 +344,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       />
       {hinweis && (
         <p className="mt-1 text-xs text-ink-muted">
-          Der Zwischenstand nach neun Monaten ist hier ausgeblendet, weil Einnahmen und Ausgaben zu
+          Der Zwischenstand zum {hinweis} ist hier ausgeblendet, weil Einnahmen und Ausgaben zu
           verschiedenen Zeiten im Jahr anfallen.
         </p>
       )}

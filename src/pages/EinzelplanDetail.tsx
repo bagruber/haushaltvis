@@ -35,6 +35,9 @@ export function EinzelplanDetail() {
         hasEinnahmen: einnahmen.ansatz.some((v) => v) || einnahmen.ergebnis.some((v) => v),
       };
     });
+    // Notiz und Erklaersatz zum Zwischenstand stehen auf der Seite nur einmal,
+    // am ersten Bereich, der ueberhaupt Rauten hat.
+    const ersteMitZwischen = sections.findIndex((x) => x.laufend.zwischen);
     const total = sections.reduce((s, x) => s + x.total, 0);
     const hasInvest = sections.some((s) => s.invest.ansatz.some((v) => v) || s.invest.ergebnis.some((v) => v));
     const hasEinnahmen = sections.some((s) => s.hasEinnahmen);
@@ -44,6 +47,7 @@ export function EinzelplanDetail() {
       total,
       hasInvest,
       hasEinnahmen,
+      ersteMitZwischen,
       hasContext: !!(data.context.cpi || data.context.population),
       gesamt: totals(data.budget, y).ausgaben,
       pop: data.context.population?.[String(y)],
@@ -105,7 +109,7 @@ export function EinzelplanDetail() {
 
             {/* Die Legende gilt fuer alle Bereichsdiagramme der Seite und
                 steht deshalb nur ueber dem ersten. */}
-            <Timeline laufend={s.laufend} invest={s.invest} einnahmen={s.einnahmen} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} legende={i === 0} />
+            <Timeline laufend={s.laufend} invest={s.invest} einnahmen={s.einnahmen} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} legende={i === 0} zwischenNotiz={i === view.ersteMitZwischen} />
 
             <ul className="space-y-1.5 text-sm mt-3">
               {s.einrichtungen.map((e, _, alle) => (

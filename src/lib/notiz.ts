@@ -23,6 +23,13 @@ export interface Notiz {
   text: string;
   x: string;
   y: number;
+  /**
+   * `bogen` (Standard): Text im freien Rand über der Grafik, geschwungener
+   * Pfeil hinunter zum Punkt — für Notizen zu einem Ereignis, das irgendwo in
+   * der Fläche liegt. `kurz`: Text direkt neben dem Punkt, gerader Strich —
+   * für eine Marke am Rand, die keinen weiten Weg braucht.
+   */
+  form?: "bogen" | "kurz";
 }
 
 /**

@@ -54,6 +54,48 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
   const [px, py] = chart.convertToPixel({ gridIndex: 0 }, [notiz.x, notiz.y]) as number[];
   const rect = gitter.coordinateSystem.getRect();
   const script = getComputedStyle(document.documentElement).getPropertyValue("--font-script");
+  const strich = { stroke: NOTIZ_PFEIL, lineWidth: 1.6, fill: "none", lineCap: "round" as const, lineJoin: "round" as const };
+
+  if (notiz.form === "kurz") {
+    // Kurze Form: der Punkt liegt am rechten Rand, der Text daneben auf
+    // gleicher Höhe. Ein Bogen vom oberen Rand wäre hier ein Umweg.
+    const ende = [px - 14, py];
+    const start = [ende[0] - 24, py];
+    const spitze = (d: number) => [ende[0] - 8 * Math.cos(d), ende[1] - 8 * Math.sin(d)];
+    chart.setOption({
+      graphic: {
+        elements: [
+          {
+            id: "notiz-text",
+            type: "text",
+            x: start[0] - 8,
+            y: py,
+            rotation: 0.03,
+            silent: true,
+            z: 100,
+            style: { text: notiz.text, font: `26px ${script}`, fill: NOTIZ_TINTE, align: "right", verticalAlign: "middle" },
+          },
+          {
+            id: "notiz-bogen",
+            type: "line",
+            silent: true,
+            z: 100,
+            shape: { x1: start[0], y1: start[1], x2: ende[0], y2: ende[1] },
+            style: strich,
+          },
+          {
+            id: "notiz-spitze",
+            type: "polyline",
+            silent: true,
+            z: 100,
+            shape: { points: [spitze(0.5), ende, spitze(-0.5)] },
+            style: strich,
+          },
+        ],
+      },
+    });
+    return;
+  }
 
   // Text sits a little left of the point, kept inside the plot's width.
   const tx = Math.min(Math.max(px - 40, rect.x + 80), rect.x + rect.width - 80);
@@ -66,7 +108,6 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
   const cp2 = [ende[0] + Math.min(30, dy * 0.35), ende[1] - dy * 0.35];
   const winkel = Math.atan2(ende[1] - cp2[1], ende[0] - cp2[0]);
   const spitze = (d: number) => [ende[0] - 9 * Math.cos(winkel + d), ende[1] - 9 * Math.sin(winkel + d)];
-  const strich = { stroke: NOTIZ_PFEIL, lineWidth: 1.6, fill: "none", lineCap: "round" as const, lineJoin: "round" as const };
 
   chart.setOption({
     graphic: {
