@@ -38,9 +38,11 @@ describe("teilUrl", () => {
 });
 
 describe("ansicht (Diagramm-Schalter im Link)", () => {
-  it("liest die Schalter einzeln", () => {
+  // Alte Links bleiben gueltig: gelesen wird jede Reihenfolge.
+  it("liest die Schalter einzeln, in beliebiger Reihenfolge", () => {
+    expect(ansichtLesen("invest,real")).toEqual({ showInvest: true, real: true });
     expect(ansichtLesen("kopf")).toEqual({ perCapita: true });
-    expect(ansichtLesen("invest,real,kopf,netto")).toEqual({
+    expect(ansichtLesen("real,kopf,netto,invest")).toEqual({
       showInvest: true, real: true, perCapita: true, netto: true,
     });
   });
@@ -55,7 +57,7 @@ describe("ansicht (Diagramm-Schalter im Link)", () => {
   });
 
   it("schreibt in der Reihenfolge der Schalterzeile", () => {
-    expect(ansichtSchreiben({ netto: true, perCapita: true, showInvest: true })).toBe("invest,kopf,netto");
+    expect(ansichtSchreiben({ netto: true, perCapita: true, showInvest: true })).toBe("kopf,netto,invest");
   });
 
   it("laesst den Parameter weg, wenn kein Schalter an ist", () => {
@@ -63,7 +65,7 @@ describe("ansicht (Diagramm-Schalter im Link)", () => {
   });
 
   it("ist in beiden Richtungen dasselbe", () => {
-    for (const wert of ["invest", "real,netto", "invest,real,kopf,netto"]) {
+    for (const wert of ["invest", "real,netto", "real,kopf,netto,invest"]) {
       expect(ansichtSchreiben(ansichtLesen(wert))).toBe(wert);
     }
   });

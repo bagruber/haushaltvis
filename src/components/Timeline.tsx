@@ -279,12 +279,6 @@ export function TimelineControls({
   if (!hasContext && !hasInvest && !hasEinnahmen) return null;
   return (
     <div className="flex flex-wrap gap-4 text-xs mb-1">
-      {hasInvest && (
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input type="checkbox" checked={!!mode.showInvest} onChange={(e) => setMode((m) => ({ ...m, showInvest: e.target.checked }))} />
-          <span>Investitionen zeigen</span>
-        </label>
-      )}
       {hasContext && (
         <>
           <label className="flex items-center gap-1.5 cursor-pointer">
@@ -304,6 +298,12 @@ export function TimelineControls({
           <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
             mit Einnahmen verrechnet
           </span>
+        </label>
+      )}
+      {hasInvest && (
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" checked={!!mode.showInvest} onChange={(e) => setMode((m) => ({ ...m, showInvest: e.target.checked }))} />
+          <span>Investitionen zeigen</span>
         </label>
       )}
     </div>

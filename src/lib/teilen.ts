@@ -62,10 +62,10 @@ export function ansichtLesen(wert: string | null): TimelineMode {
 /** The switches that are on, in the order of the checkbox row; null when none is. */
 export function ansichtSchreiben(mode: TimelineMode): string | null {
   const an = [
-    mode.showInvest && "invest",
     mode.real && "real",
     mode.perCapita && "kopf",
     mode.netto && "netto",
+    mode.showInvest && "invest",
   ].filter(Boolean);
   return an.length ? an.join(",") : null;
 }
