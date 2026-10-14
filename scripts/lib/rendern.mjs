@@ -8,6 +8,41 @@ import { chromium } from 'playwright-core'
 
 const SEITEN = 4 // parallele Tabs; darueber bringt mehr Parallelitaet nichts
 
+// Was `playwright-core install chromium` ablegt, haengt vom System ab: unter
+// Linux kommt nur die Headless-Shell (115 MB), lokal oft beides. Fuer einen
+// Screenshot reicht die Shell, der volle Browser gewinnt nur, wenn er da ist.
+const BROWSER = [
+  ['chromium-', ['chrome-win64/chrome.exe', 'chrome-win/chrome.exe', 'chrome-linux/chrome',
+    'chrome-mac/Chromium.app/Contents/MacOS/Chromium']],
+  ['chromium_headless_shell-', ['chrome-headless-shell-win64/chrome-headless-shell.exe',
+    'chrome-win/headless_shell.exe', 'chrome-linux/headless_shell',
+    'chrome-headless-shell-linux64/chrome-headless-shell',
+    'chrome-mac/headless_shell', 'chrome-headless-shell-mac/chrome-headless-shell']],
+]
+
+const BINARIES = new Set([
+  'chrome', 'chrome.exe', 'Chromium', 'headless_shell',
+  'chrome-headless-shell', 'chrome-headless-shell.exe',
+])
+
+/** Eine Ebene unter dem Versionsordner nach dem Binary sehen. */
+function suchBinary(wurzel) {
+  let eintraege
+  try {
+    eintraege = fs.readdirSync(wurzel, { withFileTypes: true })
+  } catch {
+    return null
+  }
+  for (const e of eintraege) {
+    if (!e.isDirectory()) continue
+    const unter = path.join(wurzel, e.name)
+    for (const datei of fs.readdirSync(unter)) {
+      if (BINARIES.has(datei)) return path.join(unter, datei)
+    }
+  }
+  return null
+}
+
 /** Das Chromium, das `playwright-core install chromium` abgelegt hat. */
 export function findeChromium() {
   if (process.env.PLAYWRIGHT_CHROMIUM_PATH) return process.env.PLAYWRIGHT_CHROMIUM_PATH
@@ -17,17 +52,20 @@ export function findeChromium() {
     path.join(os.homedir(), '.cache/ms-playwright'),
     '/ms-playwright',
   ].filter(Boolean)
-  const relativ = [
-    'chrome-win64/chrome.exe', 'chrome-win/chrome.exe',
-    'chrome-linux/chrome', 'chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-  ]
-  for (const wurzel of wurzeln) {
-    if (!fs.existsSync(wurzel)) continue
-    const ordner = fs.readdirSync(wurzel).filter(d => d.startsWith('chromium-')).sort().reverse()
-    for (const dir of ordner) {
-      for (const rel of relativ) {
-        const exe = path.join(wurzel, dir, rel)
-        if (fs.existsSync(exe)) return exe
+  for (const [praefix, relativ] of BROWSER) {
+    for (const wurzel of wurzeln) {
+      if (!fs.existsSync(wurzel)) continue
+      const ordner = fs.readdirSync(wurzel).filter(d => d.startsWith(praefix)).sort().reverse()
+      for (const dir of ordner) {
+        for (const rel of relativ) {
+          const exe = path.join(wurzel, dir, rel)
+          if (fs.existsSync(exe)) return exe
+        }
+        // Playwright benennt den Unterordner je Version und System um. Wenn
+        // keiner der bekannten Pfade passt, eine Ebene tiefer nachsehen, statt
+        // am Namen zu scheitern.
+        const gefunden = suchBinary(path.join(wurzel, dir))
+        if (gefunden) return gefunden
       }
     }
   }
@@ -71,7 +109,10 @@ export async function renderePngs(aufgaben, { breite, hoehe, dichte = 2, fortsch
       } catch (err) {
         console.warn(`  ! ${path.basename(datei)}: ${err.message}`)
       }
-      fortschritt?.(++fertig, aufgaben.length)
+      // Nicht `fortschritt?.(++fertig, …)`: ohne Rueckruf wertet die
+      // Optional-Chain ihre Argumente nicht aus, und der Zaehler bliebe stehen.
+      fertig++
+      fortschritt?.(fertig, aufgaben.length)
     }
     await page.close()
   }
