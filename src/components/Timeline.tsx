@@ -142,15 +142,6 @@ export function TimelineControls({
   if (!hasContext && !hasInvest && !hasEinnahmen) return null;
   return (
     <div className="flex flex-wrap gap-4 text-xs mb-1">
-      {hasEinnahmen && (
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input type="checkbox" checked={!!mode.netto} onChange={(e) => setMode((m) => ({ ...m, netto: e.target.checked }))} />
-          {/* Round 1: "bilanziert (Zuschussbedarf)" was misread; plain words instead. */}
-          <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
-            mit Einnahmen verrechnet
-          </span>
-        </label>
-      )}
       {hasInvest && (
         <label className="flex items-center gap-1.5 cursor-pointer">
           <input type="checkbox" checked={!!mode.showInvest} onChange={(e) => setMode((m) => ({ ...m, showInvest: e.target.checked }))} />
@@ -168,6 +159,15 @@ export function TimelineControls({
             <span>je Einwohner</span>
           </label>
         </>
+      )}
+      {hasEinnahmen && (
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" checked={!!mode.netto} onChange={(e) => setMode((m) => ({ ...m, netto: e.target.checked }))} />
+          {/* Round 1: "bilanziert (Zuschussbedarf)" was misread; plain words instead. */}
+          <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
+            mit Einnahmen verrechnet
+          </span>
+        </label>
       )}
     </div>
   );
