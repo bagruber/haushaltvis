@@ -60,13 +60,14 @@ export function loadData(): Promise<Data> {
       optional<Record<string, import("./types").GlossarEntry>>("data/glossar.json", {}),
       optional<Record<string, import("./types").Aggregator>>("data/aggregatoren.json", {}),
       optional<Zuordnung>("data/zuordnung.json", {}),
-    ]).then(([budget, themes, ev, labels, context, einleitungen, glossar, aggregatoren, zuordnung]) => {
+      optional<import("./types").Zwischenstand | null>("data/zwischenstand.json", null),
+    ]).then(([budget, themes, ev, labels, context, einleitungen, glossar, aggregatoren, zuordnung, zwischenstand]) => {
       // A dropped-in Zuordnung (from the tool) wins over the baked assignment.
       const merged: Themes =
         zuordnungHasContent(zuordnung)
           ? { ...themes, assignment: resolveAssignment(budget, zuordnung) }
           : themes;
-      return { budget, themes: merged, events: ev.events ?? [], labels, context, einleitungen, glossar, aggregatoren };
+      return { budget, themes: merged, events: ev.events ?? [], labels, context, einleitungen, glossar, aggregatoren, zwischenstand };
     });
   }
   return cache;

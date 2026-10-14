@@ -111,6 +111,24 @@ nach `data/` legen → fertig (kein Build).
   {ansatz, ergebnis, prov} } }`. Wird von `build_web.py` aus `etl/aggregatoren.yaml`
   berechnet — dort lassen sich Kriterien und Stichwortlisten pflegen.
 - **`data/events.json`** — `{ "events": [ { scope, id, year, title, text } ] }`.
+- **`data/zwischenstand.json`** — der Vollzug des laufenden Jahres zu einem
+  Stichtag:
+
+  ```jsonc
+  {
+    "jahr": 2026,
+    "stichtag": "2026-10-01",
+    "quelle": "Haushalt 2026 Stand 01.10.2026 - mit Haushaltssperre.xlsx",
+    "werte": { "0000.4100": [100868.84, 100868.84] }   // [gebucht, bezahlt]
+  }
+  ```
+
+  `gebucht` ist das Anordnungs-Soll (AKDB-Spalte `Soll_HS`), `bezahlt` der
+  Abfluss (`Ist_HS`). Die Haushaltsstellen sind dieselben wie in `budget.json`;
+  was dort nicht vorkommt, wird nicht übernommen. Bewusst eine eigene Datei:
+  `budget.json` bleibt unverändert, ein neuer Stichtag ersetzt nur diese, und
+  ihr Löschen nimmt das Feature in der App zurück. Erzeugt von
+  `etl/zwischenstand.py` aus `haushaltsplaene/zwischenstand/`.
 
 Alle diese Dateien lassen sich einzeln austauschen; die App lädt sie tolerant
 (fehlt eine, läuft die App ohne das jeweilige Extra weiter).

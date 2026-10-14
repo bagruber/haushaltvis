@@ -3,9 +3,11 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import type { Budget, Data, Themes } from "./types";
+import type { Budget, Data, Themes, Zwischenstand } from "./types";
 import { factsOfYear, factsOfHhst, postenOfGlz, latestYear } from "./core";
 import {
+  bereichSeries,
+  einrichtungSeries,
   totals,
   expenseShareByPrimaryTheme,
   themeSankey,
@@ -26,6 +28,15 @@ import { extremImFenster } from "../notiz";
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(resolve(__dirname, `../../../public/data/${name}`), "utf8")) as T;
 
+/** Löschbare Datei: ihr Fehlen ist ein vorgesehener Zustand, kein Testfehler. */
+const readOptional = <T>(name: string): T | null => {
+  try {
+    return read<T>(name);
+  } catch {
+    return null;
+  }
+};
+
 const budget = read<Budget>("budget.json");
 const themes = read<Themes>("themes.json");
 const data: Data = {
@@ -37,7 +48,10 @@ const data: Data = {
   einleitungen: {},
   glossar: {},
   aggregatoren: read("aggregatoren.json"),
+  zwischenstand: readOptional<Zwischenstand>("zwischenstand.json"),
 };
+/** Wie die App ohne Stichtagsdatei aussieht — der Rückweg ist ein Löschen. */
+const ohneZwischenstand: Data = { ...data, zwischenstand: null };
 const year = latestYear(budget);
 
 describe("Datenintegrität", () => {
@@ -284,6 +298,81 @@ describe("searchRank", () => {
       expect(it.farbe, it.label).toBeUndefined();
       expect(it.icon, it.label).toBeTruthy();
     }
+  });
+});
+
+// Ohne die Datei gibt es nichts zu prüfen — genau das ist der Rückweg.
+describe.skipIf(!data.zwischenstand)("Zwischenstand (Stichtag des laufenden Jahres)", () => {
+  const zs = data.zwischenstand!;
+
+  it("der Stichtag liegt im Jahr, das nur einen Plan hat", () => {
+    expect(zs.jahr).toBe(latestYear(budget));
+    expect(zs.stichtag.startsWith(String(zs.jahr))).toBe(true);
+    for (const f of budget.facts.filter((x) => x.year === zs.jahr)) {
+      expect(f.ergebnis, `${f.hhst_id} hat ein Ergebnis im laufenden Jahr`).toBe(null);
+    }
+  });
+
+  it("jede Stichtagszahl verweist auf einen bekannten Posten", () => {
+    for (const hhst of Object.keys(zs.werte)) {
+      expect(budget.posten[hhst], `unbekannte Haushaltsstelle ${hhst}`).toBeTruthy();
+    }
+  });
+
+  it("die Einrichtung summiert genau ihre Posten", () => {
+    const glz = Object.values(budget.posten).find(
+      (p) => p.ea === "A" && p.haushalt === "verwaltung" && zs.werte[p.hhst_id]?.[0] > 0,
+    )!.glz;
+    const s = einrichtungSeries(data, glz, "A", "verwaltung");
+    let soll = 0;
+    let ist = 0;
+    for (const p of Object.values(budget.posten)) {
+      if (p.glz !== glz || p.ea !== "A" || p.haushalt !== "verwaltung") continue;
+      soll += zs.werte[p.hhst_id]?.[0] ?? 0;
+      ist += zs.werte[p.hhst_id]?.[1] ?? 0;
+    }
+    expect(s.zwischen!.soll).toBeCloseTo(soll, 2);
+    expect(s.zwischen!.ist).toBeCloseTo(ist, 2);
+  });
+
+  it("der Bereich ist die Summe seiner Einrichtungen", () => {
+    const ab = "46";
+    const glzs = [...new Set(Object.values(budget.posten).filter((p) => p.glz.startsWith(ab)).map((p) => p.glz))];
+    const teile = glzs.map((g) => einrichtungSeries(data, g, "A", "verwaltung").zwischen?.soll ?? 0);
+    const ganz = bereichSeries(data, ab, "A", "verwaltung").zwischen!;
+    expect(ganz.soll).toBeCloseTo(teile.reduce((x, y) => x + y, 0), 2);
+  });
+
+  // Im Ganzen ist bezahlt weniger als gebucht. Beim einzelnen Posten gilt das
+  // NICHT: 19 von 2742 liegen darüber, weil Geld auch ohne vorherige Anordnung
+  // fließt (Bankgebühren im Abbuchungsverfahren, Gebühren an der Kasse). Die
+  // Darstellung darf sich also nicht auf die Reihenfolge der beiden Marken
+  // verlassen.
+  it("im Ganzen ist bezahlt weniger als gebucht, beim einzelnen Posten nicht zwingend", () => {
+    const summe = Object.values(zs.werte).reduce(
+      (s, [soll, ist]) => ({ soll: s.soll + soll, ist: s.ist + ist }),
+      { soll: 0, ist: 0 },
+    );
+    expect(summe.ist).toBeLessThan(summe.soll);
+    expect(Object.values(zs.werte).some(([soll, ist]) => ist > soll)).toBe(true);
+  });
+
+  it("je Einwohner und inflationsbereinigt rechnen die Marken mit", () => {
+    const s = bereichSeries(data, "46", "A", "verwaltung");
+    const pop = read<{ population: Record<string, number> }>("context.json").population[String(zs.jahr)];
+    const kopf = adjustSeries(s, data.context, { perCapita: true }, zs.jahr);
+    expect(kopf.zwischen!.soll).toBeCloseTo(s.zwischen!.soll / pop, 6);
+  });
+
+  it("ohne Datendatei ist die Marke weg, nicht null oder 0", () => {
+    expect(bereichSeries(ohneZwischenstand, "46", "A", "verwaltung").zwischen).toBeUndefined();
+    expect(postenSeries(ohneZwischenstand, Object.keys(zs.werte)[0]).zwischen).toBeUndefined();
+  });
+
+  it("der Stichtag gilt fuer alle Marken derselben Datei", () => {
+    const s = bereichSeries(data, "46", "A", "verwaltung").zwischen!;
+    expect(s.stichtag).toBe(zs.stichtag);
+    expect(s.jahr).toBe(zs.jahr);
   });
 });
 

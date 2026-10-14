@@ -65,6 +65,19 @@ export interface Context {
   cpi?: Record<string, number>;
 }
 
+/**
+ * Vollzug des laufenden Jahres zu einem Stichtag (etl/zwischenstand.py), je
+ * Haushaltsstelle [Soll, Ist] — gebucht und bezahlt. Eigene Datei: fehlt sie,
+ * ist die Marke in der App weg.
+ */
+export interface Zwischenstand {
+  jahr: number;
+  /** ISO-Datum des Stichtags, z. B. "2026-10-01" */
+  stichtag: string;
+  quelle: string;
+  werte: Record<string, [number, number]>;
+}
+
 export interface GlossarEntry {
   title: string;
   text: string;
@@ -95,4 +108,6 @@ export interface Data {
   glossar: Record<string, GlossarEntry>;
   /** cross-cutting cost blocks, keyed by aggregator id */
   aggregatoren: Record<string, Aggregator>;
+  /** Vollzug des laufenden Jahres zum Stichtag — null, solange es keinen gibt */
+  zwischenstand: Zwischenstand | null;
 }

@@ -15,6 +15,15 @@ ergebnis:
   text: >
     Der tatsächlich verbuchte Betrag eines Jahres (das „Ist"). Steht erst mit dem
     Jahresabschluss fest.
+zwischenstand:
+  title: "Zwischenstand"
+  text: >
+    Der Stand des laufenden Jahres zu einem Stichtag, in zwei Schritten: „gebucht"
+    ist angeordnet (das Anordnungs-Soll), „bezahlt" ist tatsächlich abgeflossen.
+    Beide liegen unter dem Ansatz, weil erst ein Teil des Jahres gezählt ist — das
+    ist kein Sparen. Große Posten wie die Kreisumlage, Nachzahlungen und
+    Bauschlussrechnungen fallen gehäuft am Jahresende an, deshalb wird hier auch
+    nicht aufs Jahr hochgerechnet.
 verwaltungshaushalt:
   title: "Verwaltungshaushalt"
   text: >

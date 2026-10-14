@@ -169,6 +169,20 @@ def main():
         kb = (DST / name).stat().st_size / 1024
         print(f"{name:14} -> public/data/{name}  ({kb:,.0f} KB)")
 
+    # Zwischenstand: optional. Fehlt die Datei, fehlt in der App die Marke —
+    # das ist der Schalter (siehe etl/zwischenstand.py).
+    zw = SRC / "zwischenstand.json"
+    if zw.exists():
+        doc = json.loads(zw.read_text(encoding="utf-8"))
+        (DST / "zwischenstand.json").write_text(
+            json.dumps(doc, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        print(f"zwischenstand.json -> {len(doc['werte'])} Haushaltsstellen, Stichtag {doc['stichtag']}")
+    else:
+        (DST / "zwischenstand.json").unlink(missing_ok=True)
+        print("zwischenstand.json -> keine Stichtagsdaten, Marke bleibt aus")
+
     manual = load_manual_events()
     auto = derive_events(budget)
     events = {"events": manual + auto}

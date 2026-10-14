@@ -94,6 +94,36 @@ export interface YearSeries {
   ergebnis: (number | null)[];
   /** years for which ergebnis is provisional Ist (e.g. 2024) */
   provisional: Set<number>;
+  /** booked and paid up to the Stichtag of the running year, where measured */
+  zwischen?: Zwischen;
+}
+
+/** Part of a year: what is booked (Soll) and paid (Ist) up to the Stichtag. */
+export interface Zwischen {
+  jahr: number;
+  stichtag: string;
+  soll: number;
+  ist: number;
+}
+
+/**
+ * Sum the Stichtag figures over the same Posten the series aggregates, so a
+ * Bereich, an Einrichtung and a single Posten are counted by one rule.
+ */
+function zwischenOf(data: Data, pred: (p: Posten) => boolean): Zwischen | undefined {
+  const zs = data.zwischenstand;
+  if (!zs) return undefined;
+  let soll = 0;
+  let ist = 0;
+  let treffer = false;
+  for (const hhst in zs.werte) {
+    const p = data.budget.posten[hhst];
+    if (!p || !pred(p)) continue;
+    treffer = true;
+    soll += zs.werte[hhst][0];
+    ist += zs.werte[hhst][1];
+  }
+  return treffer ? { jahr: zs.jahr, stichtag: zs.stichtag, soll, ist } : undefined;
 }
 
 /**
@@ -162,11 +192,18 @@ export function adjustSeries(
     }
     return x;
   };
+  // Die Marken des Zwischenstands tragen die Faktoren ihres eigenen Jahres.
+  // Fehlt für dieses Jahr Einwohnerzahl oder VPI, fallen sie in dieser Ansicht
+  // weg, statt falsch skaliert dazustehen.
+  const zwischen = series.zwischen;
+  const soll = zwischen && adj(zwischen.soll, zwischen.jahr);
+  const ist = zwischen && adj(zwischen.ist, zwischen.jahr);
   return {
     years: series.years,
     ansatz: series.years.map((y, i) => adj(series.ansatz[i], y)),
     ergebnis: series.years.map((y, i) => adj(series.ergebnis[i], y)),
     provisional: series.provisional,
+    zwischen: zwischen && soll != null && ist != null ? { ...zwischen, soll, ist } : undefined,
   };
 }
 
@@ -385,6 +422,7 @@ export function eventsFor(data: Data, scope: EventScope, id: string): BudgetEven
 /** Ansatz/Ergebnis per year for a single Posten (Haushaltsstelle). */
 export function postenSeries(data: Data, hhst: string): YearSeries {
   const years = data.budget.meta.years;
+  const zwischen = zwischenOf(data, (p) => p.hhst_id === hhst);
   const a = new Map<number, number>();
   const e = new Map<number, number>();
   const provisional = new Set<number>();
@@ -400,6 +438,7 @@ export function postenSeries(data: Data, hhst: string): YearSeries {
     ansatz: years.map((y) => (a.has(y) ? a.get(y)! : null)),
     ergebnis: years.map((y) => (e.has(y) ? e.get(y)! : null)),
     provisional,
+    zwischen,
   };
 }
 
@@ -496,6 +535,7 @@ function aggSeries(data: Data, pred: (p: Posten) => boolean): YearSeries {
     ansatz: years.map((y) => (a.has(y) ? Math.round(a.get(y)!) : null)),
     ergebnis: years.map((y) => (e.has(y) ? Math.round(e.get(y)!) : null)),
     provisional,
+    zwischen: zwischenOf(data, pred),
   };
 }
 
