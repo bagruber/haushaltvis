@@ -1,9 +1,419 @@
 # Briefing: Teilen, Suche, Zwischenstand 2026, Vorschaukarten
 
-*Angelegt am 14.10.2026. Alle Entscheidungen sind getroffen, die Umsetzung
-kann beginnen. Fünf Arbeitspakete plus ein Aufräumschritt. Wer das Briefing
-abarbeitet, liest zuerst Abschnitt 0 ganz. Abschnitt 7 (Betrieb) ist nur
-Hintergrund und wird nicht umgesetzt.*
+*Angelegt am 14.10.2026. **Runde 1 (Abschnitte 0 bis 6) ist umgesetzt**
+(Commits `dde0168` bis `5e9e796` auf `probe/formsprache`) und bleibt hier als
+Begründung stehen. **Offen ist Runde 2** (15.10.2026), direkt im Anschluss.
+Wo Runde 2 etwas aus Runde 1 ändert, gilt Runde 2. Abschnitt 7 (Betrieb) ist
+nur Hintergrund und wird nicht umgesetzt.*
+
+---
+
+# Runde 2 (15.10.2026)
+
+Nach Durchsicht der umgesetzten Runde 1. **Alles in Runde 2 ist entschieden**
+(R2.4 und R2.5 am 15.10.2026 von Benedict bestätigt) und kann umgesetzt werden.
+Reihenfolge am Ende von Runde 2.
+
+## R2.1 Reihenfolge der Diagramm-Schalter
+
+Neue Reihenfolge in `TimelineControls`
+([src/components/Timeline.tsx](../src/components/Timeline.tsx)):
+
+**inflationsbereinigt · je Einwohner · mit Einnahmen verrechnet · Investitionen zeigen**
+
+`ansichtSchreiben` in [src/lib/teilen.ts](../src/lib/teilen.ts) schreibt die
+Wörter laut Kommentar „in der Reihenfolge der Schalterzeile“; dort dieselbe
+Reihenfolge herstellen (`real,kopf,netto,invest`). `ansichtLesen` liest
+weiterhin jede Reihenfolge, alte Links bleiben gültig. Test in
+`teilen.test.ts` anpassen.
+
+Mit R2.4a wandert „Investitionen zeigen“ danach aus der Schalterzeile in die
+Legende; die drei übrigen Schalter behalten diese Reihenfolge. R2.1 trotzdem
+zuerst umsetzen: Es ist ein Zweizeiler, und `?ansicht=invest` bleibt als Wort
+für die Legendenauswahl erhalten.
+
+**Prüfen:** Einrichtung mit Einnahmen und Investitionen (Freibad, `/einrichtung/5701`)
+zeigt die vier Schalter in der neuen Reihenfolge; `?ansicht=invest,real` aus
+einem alten Link schaltet beides ein.
+
+## R2.2 Suchtreffer mit einheitlicher Grammatik
+
+### Problem
+
+Die zweite Zeile eines Treffers folgt heute keiner Regel. Bei Seiten, Themen,
+Einzelplänen, Bereichen und Einrichtungen steht dort die **Art** („Einrichtung
+5702“), bei Posten aber der **Ort** („Hallenbad · 5702.4107“). Wer „Hallenbad“
+sucht, sieht die Einrichtung Hallenbad und darunter Posten, bei denen ebenfalls
+„Hallenbad“ an derselben Stelle steht. Das Icon hilft nicht, weil es nach dem
+Einzelplan geht: Einrichtung und Posten tragen dasselbe grüne Icon.
+
+### Regel
+
+Jeder Treffer hat drei feste Plätze, für jede Art gleich belegt:
+
+| Platz | Inhalt | Beispiel |
+|---|---|---|
+| Zeile 1 | Name | „Badegebühren u.ä. Entgelte“ |
+| Zeile 2, vorn | **Art**, immer, aus einem festen Wortschatz, `font-semibold text-ink-soft` | „Posten“ |
+| Zeile 2, danach | Ort: die nächsthöhere Ebene **mit Namen**, `text-ink-muted` | „· Hallenbad · Einnahme“ |
+| rechts | Nummerngerüst, wie heute | `5702.1161` |
+
+Das Icon bleibt beim Einzelplan: Es sagt **wo**, das Art-Wort sagt **was**.
+
+Wortschatz und Ort je Art (die Namen der Ebenen wie in `src/lib/hierarchy.ts`
+und der Oberfläche, keine neuen Begriffe):
+
+| Art | Zeile 2 | rechts | Icon |
+|---|---|---|---|
+| Seite | `Seite` · Erkunden / Über das Projekt (wo sie im Menü hängt) | — | Seiten-Icon, grau |
+| Kostenblock | `Kostenblock` · Querschnitt | — | eigenes Icon und Farbe |
+| Thema | `Thema` | — | `SquaresFour` in der Themenfarbe |
+| Einzelplan | `Einzelplan` | `2` | Einzelplan-Icon |
+| Bereich | `Bereich` · Name des Einzelplans | `21xx` | Einzelplan-Icon |
+| Einrichtung | `Einrichtung` · Name des Bereichs | `5702` | Einzelplan-Icon |
+| Posten | `Posten` · Name der Einrichtung, bei Einnahmen und Investitionen zusätzlich `· Einnahme` bzw. `· Investition` | `5702.1161` | Einzelplan-Icon |
+
+- **Bereich und Einrichtung sind verschiedene Ebenen**: Bereich = zweistellig
+  (`57xx` Bäder), Einrichtung = vier- bis fünfstellig (`5701` Freibad, `5702`
+  Hallenbad); ein Bereich enthält eine oder mehrere Einrichtungen. 14 der 56
+  Bereiche haben nur eine Einrichtung, drei davon mit gleichem Namen (`16`
+  Rettungsdienst, `40` Allgemeine Sozialverwaltung, `92` Abwicklung der
+  Vorjahre). Dort erscheinen zwei gleichnamige Treffer, die sich nur in Art und
+  Nummer unterscheiden. Das ist richtig so und nicht zusammenzulegen: Die
+  Bereichsadresse führt zur Einzelplan-Seite, die Einrichtung zu ihrer eigenen.
+- **„Kostenblock“** ist das Wort für die Einträge der Querschnitte (Personal,
+  Strom & Energie …). So heißen sie schon in `etl/aggregatoren.yaml` und auf
+  den Vorschaukarten. „Querschnitt“ bleibt der Name der Seite, die sie
+  sammelt, und steht deshalb als Ort dahinter.
+- Die Nummer rutscht aus der zweiten Zeile ganz nach rechts; sie steht nicht
+  doppelt.
+- Bei Seiten fallen die Stichworte aus der zweiten Zeile weg. Sie bleiben im
+  Index und werden weiter durchsucht, sind aber Suchhilfe, kein Ort.
+- Posten-Zusatz: `ea === "E"` → „Einnahme“, `haushalt === "vermoegen"` und
+  `ea === "A"` → „Investition“, laufende Ausgaben ohne Zusatz. So lassen sich
+  „Badegebühren“ (`5701.1161`), „Bewirtschaftung der Grundstücke und Gebäude“
+  (`5701.5400`) und „Hochbaumaßnahmen“ (`5701.9400`) desselben Bads
+  auseinanderhalten.
+- Technisch: `SearchItem` bekommt `art` (aus dem Wortschatz) und `ort` statt
+  des freien `sub`; `Search.tsx` setzt beide zusammen. So kann keine neue
+  Trefferart die Regel unterlaufen.
+- `aria-label` der Option: „{Name}, {Art}, {Ort}“.
+
+Rangfolge bleibt wie in Runde 1 (Posten nach allem anderen).
+
+**Prüfen:**
+- Test: Jeder Eintrag in `searchIndex` hat eine `art` aus dem Wortschatz und,
+  außer Einzelplan, Thema und Seite ohne Menüort, einen nichtleeren `ort`.
+- Test: `searchRank(index, "hallenbad")` liefert die Einrichtung `5702` mit Art
+  „Einrichtung“ vor allen Treffern der Art „Posten“.
+- Von Hand: „Hallenbad“, „Strom“, „Schule“, „46“ eintippen, bei 375 px und
+  Desktop. Jede zweite Zeile beginnt mit dem Art-Wort.
+
+## R2.3 Zwischenstand: Notiz, Tooltip, Legende
+
+Ändert Abschnitt 4 „Gegen Fehllesen“ und „Darstellung in der Timeline“.
+
+1. **Text der Notiz:** „Stand 01. Oktober“, aus `stichtag` gebildet (Tag
+   zweistellig, Monat ausgeschrieben). Kein „erst 9 Monate“ mehr; `monateBis`
+   entfällt, wenn nichts anderes es nutzt. Der Hinweissatz in der Ansicht „mit
+   Einnahmen verrechnet“ verliert ebenfalls die „neun Monate“: „Der
+   Zwischenstand zum 01. Oktober ist hier ausgeblendet, weil …“.
+2. **Kurzer, schlichter Pfeil.** Für diese Notiz kein S-Bogen vom oberen Rand:
+   Text links neben den Rauten, auf ihrer Höhe, ein gerader Strich von etwa
+   24 px mit kleiner Spitze. Umsetzung als zweite Form in `zeichneNotiz`
+   ([src/components/EChart.tsx](../src/components/EChart.tsx)), gewählt über ein
+   neues Feld `Notiz.form?: "bogen" | "kurz"` (Standard `"bogen"`, damit die
+   bestehenden Notizen „Corona-Pandemie“ und „Gaskrise“ bleiben, wie sie
+   sind). Für `"kurz"` braucht das Grid oben keine 56 px Luft.
+3. **Einmal je Seite.** Auf der Einzelplan-Seite trägt nur das **erste**
+   Bereichsdiagramm, das Rauten zeigt, die Notiz. `Timeline` bekommt dafür
+   `zwischenNotiz?: boolean` (Standard `true`); `EinzelplanDetail` setzt es
+   nur für den ersten passenden Bereich. Der Satz unter dem Diagramm („Die
+   Rauten sind der Zwischenstand …“) steht dort ebenfalls nur einmal, unter
+   der Schalterzeile statt unter jedem Diagramm.
+4. **Nur wenn eine Raute sichtbar ist.** Blendet jemand in der Legende
+   „gebucht“ und „bezahlt“ beide aus, verschwindet die Notiz. Das ist der
+   allgemeine Mechanismus aus R2.4h: Die Notiz gehört zu den Serien
+   `gebucht` und `bezahlt`. Die Sichtbarkeit kommt aus der eigenen Legende
+   (R2.4b).
+5. **Tooltip:** Die Zeilen „gebucht …“ und „bezahlt …“ erscheinen nur im
+   Tooltip des Jahres mit Zwischenstand (2026). In allen anderen Jahren bleibt
+   es bei Ergebnis, Ansatz und gegebenenfalls Investitionen und „Ausgaben
+   gesamt“. Umsetzung: eigener `tooltip.formatter`, der Zeilen der beiden
+   Rauten-Serien mit Wert `null` weglässt. Reihenfolge der Zeilen fest:
+   Ergebnis, Ansatz, gebucht, bezahlt, Ausgaben gesamt, Investitionen.
+6. **Raute in der Legende quadratisch.** Erledigt sich mit der eigenen
+   Legende (R2.4b): Dort ist die Raute ein quadratisches SVG. Heute zieht
+   ECharts eingebaute Symbole wie `diamond` auf `itemWidth × itemHeight`
+   (25 × 14), daher die Breite.
+
+**Prüfen:**
+- `/einzelplan/5`: genau eine Notiz auf der Seite, „Stand 01. Oktober“, kurzer
+  Pfeil, am ersten Bereich mit Rauten.
+- In der Legende beide Rauten aus → Notiz weg; eine wieder an → Notiz da.
+- Tooltip über 2025: keine Zeilen „gebucht/bezahlt“. Über 2026: beide, mit
+  „x % des Ansatzes“ beim bezahlten Wert.
+- Legende: Rauten so hoch wie breit.
+- Die Notizen „Corona-Pandemie“ (Einnahmen) und „Gaskrise“ (Querschnitte)
+  unverändert.
+
+## R2.4 Diagramme verständlicher, ohne Funktion zu verlieren
+
+**Beschlossen: a bis f, dazu h.** g bleibt bewusst draußen.
+
+Heute gibt es zwei Bedienungen für dasselbe: Die Schalterzeile über dem
+Diagramm und die klickbare ECharts-Legende darunter. „Investitionen zeigen“
+schaltet eine Serie ein, die dann in der Legende noch einmal ein- und
+ausgeschaltet werden kann. Die Legende ist außerdem nicht per Tastatur
+erreichbar und hat die zu breite Raute.
+
+**a) Eine Regel: Legende = was ich sehe, Schalter = wie gerechnet wird.**
+Investitionen sind eine Serie, keine Rechenart. „Investitionen
+zeigen“ verschwindet aus der Schalterzeile; der Legendeneintrag
+„Investitionen“ ist anfangs aus (ausgegraut) und lässt sich dort einschalten.
+In der Schalterzeile bleiben nur Umrechnungen: inflationsbereinigt · je
+Einwohner · mit Einnahmen verrechnet.
+
+**b) Eigene Legende statt der von ECharts**, zusammen mit a. Als Reihe von Knöpfen (`<button aria-pressed>`) direkt über dem Diagramm, neben
+der Schalterzeile:
+
+```
+Zeigen:     [━ Ergebnis] [╌○ Ansatz] [◇ gebucht] [◆ bezahlt] [▮ Investitionen]
+Rechnen:    [ ] inflationsbereinigt  [ ] je Einwohner  [ ] mit Einnahmen verrechnet
+```
+
+Gewinn: per Tastatur bedienbar, Symbole exakt wie im Diagramm (gestrichelter
+Ansatz, quadratische Rauten), ausgeschaltete Einträge sichtbar als aus statt
+nur blasser. Die ECharts-Legende wird abgeschaltet (`legend: { show: false }`),
+die Sichtbarkeit über `legend.selected` gesteuert. Fährt man mit Maus oder
+Fokus über einen Legendenknopf, wird die Serie hervorgehoben
+(`dispatchAction({ type: "highlight", seriesName })`), wie es die
+ECharts-Legende bisher tat. Eine Komponente `DiagrammLegende` für alle
+Timeline-Diagramme; Home, Einnahmen, Investitionen und Querschnitte können
+später folgen.
+
+**c) Die Grafik sagt, was gerade gerechnet ist.** Sobald ein
+Rechen-Schalter an ist, steht über der y-Achse eine kurze Zeile, z. B. „€ je
+Einwohner, in Preisen von 2026“ oder „Eigenanteil nach Abzug der Einnahmen“.
+Ein Screenshot erklärt sich dann selbst, und niemand vergleicht versehentlich
+eine bereinigte mit einer unbereinigten Kurve.
+
+**d) „Ansicht zurücksetzen“.** Ein Textlink am Ende der
+Schalterzeile, nur sichtbar, wenn etwas vom Standard abweicht.
+
+**e) Auswahl beim Weitergehen mitnehmen** (mittlerer Aufwand). Heute hängt die Auswahl an `?ansicht=` der aktuellen Seite; ein Klick
+auf einen Posten verliert sie, weil der Link ohne Query gebaut ist. Lösung
+nach dem Muster des Stichjahrs (`YearProvider` + `YearUrlSync` in
+[src/lib/year.tsx](../src/lib/year.tsx)):
+
+- `AnsichtProvider` im Layout hält Schalter **und** Legendenauswahl
+  (Serien-Kennungen `ist`, `plan`, `gebucht`, `bezahlt`, `invest`, `brutto`).
+- `AnsichtUrlSync` spiegelt den Zustand auf jeder Seite in `?ansicht=` (und
+  `?aus=` für ausgeblendete Serien), wie `jahr`.
+- Ein frischer Link mit `?ansicht=` gewinnt einmal, wie beim Jahr.
+- Was auf einer Seite nicht passt (verrechnet ohne Einnahmen, Investitionen
+  ohne Vermögenshaushalt), bleibt im Zustand gespeichert, wird dort aber weder
+  angewendet noch als „an“ angezeigt. Zurück auf einer passenden Seite ist es
+  wieder da.
+
+Aufwand: ein Kontext, die beiden Hooks, `useAnsicht` greift auf den Kontext
+statt auf die Query zu. Die Seiten selbst ändern sich kaum.
+
+**f) Feste Reihenfolge und Wortwahl in Tooltip, Legende und Tabelle** (klein).
+Überall dieselbe Reihenfolge (Ergebnis, Ansatz,
+gebucht, bezahlt, Ausgaben gesamt, Investitionen) und dieselben Wörter. Heute
+heißt die Investitions-Serie „Investitionen (Ansatz)“, der Schalter
+„Investitionen zeigen“.
+
+**g) Bewusst nicht:** Abweichung Plan/Ist in Prozent im Tooltip. Das ist eine
+Daten-Auswertung, und die sind für eine spätere Phase zurückgestellt.
+
+**h) Notizen folgen ihrer Linie.** Eine handschriftliche Notiz gehört fast
+immer zu einer bestimmten Serie: „Corona-Pandemie“ zur Gewerbesteuer
+(Einnahmen), „Gaskrise“ zu Strom & Energie (Querschnitte), „Stand 01. Oktober“
+zu den beiden Rauten. Heute bleibt sie voll sichtbar, wenn man über eine
+andere Linie fährt und die eigene ausgegraut wird.
+
+- `Notiz` bekommt `serien?: string[]`, die Namen der Serien, zu denen sie
+  gehört. Ohne das Feld verhält sie sich wie heute.
+- **Ausgrauen:** Wird eine Serie hervorgehoben, die nicht in `serien` steht,
+  sinkt die Deckkraft von Text, Bogen und Spitze auf etwa 0,2 (im Bild an die
+  Blässe der ausgegrauten Linien angleichen). Endet die Hervorhebung, wieder 1.
+  In `EChart` dafür auf `highlight`/`downplay` hören (die feuern bei
+  Legenden-Hover und bei `dispatchAction`) und zusätzlich auf
+  `mouseover`/`mouseout` der Serien (Hover direkt auf der Linie). Die
+  Grafik-Elemente per `setOption({ graphic })` mit derselben `id` umfärben,
+  nicht neu zeichnen.
+- **Ausblenden:** Ist keine der Serien in `serien` sichtbar (Legende), wird die
+  Notiz gar nicht gezeichnet. Das deckt R2.3 Punkt 4 ab.
+- Das Ausgrauen setzt voraus, dass die anderen Linien beim Hover überhaupt
+  verblassen. Querschnitte hat `emphasis: { focus: "series" }`, das
+  Steuer-Diagramm auf der Einnahmen-Seite nicht. Dort dasselbe ergänzen, damit
+  sich beide Diagramme gleich verhalten.
+
+**Prüfen (h):** Querschnitte, Hover über „Personal“ → Linie Strom und Notiz
+„Gaskrise“ verblassen gemeinsam; Hover über Strom → beide voll. Dasselbe auf
+der Einnahmen-Seite mit „Corona-Pandemie“. Strom in der Legende aus → Notiz weg.
+
+Reihenfolge innerhalb von R2.4: f → a+b (zusammen, weil a ohne b die
+Investitionen in die ECharts-Legende schieben würde) → h → c → d → e. Mit b
+erledigen sich R2.3 Punkt 4 und 6.
+
+## R2.5 Gesamtliste: der ganze Haushalt auf einer Seite
+
+**Beschlossen** (15.10.2026): Name „Gesamtliste“, eigener Eintrag in der
+Hauptnavigation, keine Untergruppen-Ebene, CSV-Export nur vorbereitet.
+
+Eine Seite, die den Haushalt so zeigt wie die AKDB-Excel: alle
+Haushaltsstellen der Reihe nach, ohne Diagramme pro Bereich.
+
+### Ort und Name
+
+- **Eigener Eintrag in der Hauptnavigation**, auf einer Ebene mit Erkunden:
+  Überblick · Erkunden · **Gesamtliste** · Themen · Wofür zahle ich?. Route
+  `/gesamtliste`. Überschrift „Der ganze Haushalt, Stelle für Stelle“. Nicht
+  „Haushaltsplan“: Das ist das verbindliche Dokument der Stadt, und diese
+  Seite ist es nicht.
+- Eintrag in `SEITEN` ([src/lib/seiten.ts](../src/lib/seiten.ts)), daraus
+  bauen Header und Suche: Icon `ListNumbers`, Stichworte „alle
+  Haushaltsstellen“, „Tabelle“, „Excel“, „Liste“. In `Header.tsx` in `links`
+  nach Erkunden einhängen.
+- **Untere Tab-Leiste (unter `lg`) bekommt damit fünf Einträge.** Bei 320 px
+  und 375 px prüfen, dass Icon und Beschriftung nicht umbrechen oder
+  überlappen; notfalls die Beschriftung dort auf „Liste“ kürzen.
+- Nicht in `NUMMERN_ROUTES` aufnehmen: In der Gesamtliste stehen die Nummern
+  immer, ein Schalter wäre sinnlos. Die Jahresleiste gilt dagegen (sie hängt
+  am Layout und bestimmt die Spalten).
+- Teilbare Abschnitte nach dem Muster aus Paket 2: `/gesamtliste/2`
+  (Einzelplan), `/gesamtliste/21` (Bereich), `/gesamtliste/5701`
+  (Einrichtung). Die Stellenzahl unterscheidet die Ebene.
+- Vorschaukarten (Paket 6): `karten.mjs` legt auch für `/gesamtliste` (Vorlage
+  Seite) und für jede `/gesamtliste/<nummer>` eine HTML-Datei ab. Die
+  Unterseiten bekommen **kein neues Bild**, sondern zeigen auf das
+  vorhandene Bild des Einzelplans, Bereichs oder der Einrichtung.
+
+### Aufbau
+
+Gegliedert wie die Einzelplan-Seiten, aber **alle Einzelpläne untereinander und
+alles in Nummernfolge**:
+
+```
+Einzelplan 5 · Gesundheit, Sport, Erholung          Einnahmen … · Ausgaben … · Investitionen …
+  57xx Bäder (Frei- & Hallenbad)                    …
+    5701 Freibad                                    …
+      Einnahmen · Verwaltungshaushalt
+        5701.1161  Badegebühren u.ä. Entgelte       Ansatz 2026 · Ansatz 2025 · Ergebnis 2025
+        …
+      Einnahmen · Vermögenshaushalt
+        5701.3610  Investitionszuweisungen vom Land
+      Ausgaben · Verwaltungshaushalt
+        5701.4140  Entgelte für tariflich Beschäftigte
+        …
+        5701.6790  Innere Verrechnungen Bauhof     (intern, gedämpft)
+      Ausgaben · Vermögenshaushalt (Investitionen)
+        5701.9400  Hochbaumaßnahmen
+```
+
+- Innerhalb einer Einrichtung nach der Gruppierungsnummer sortieren. Die erste
+  Ziffer der GRZ trennt schon kameral: 0–2 Einnahmen Verwaltungshaushalt, 3
+  Einnahmen Vermögenshaushalt, 4–8 Ausgaben Verwaltungshaushalt, 9 Ausgaben
+  Vermögenshaushalt. Die Nummernfolge ist also zugleich die Gruppierung; eine
+  Zwischenzeile erscheint, wo die Gruppe wechselt.
+- Keine Untergruppen-Ebene (3-stellig): Einzelplan → Bereich → Einrichtung
+  reicht und entspricht den übrigen Seiten. Kann später dazukommen; die Namen
+  stehen schon in `labels.json` (`unterabschnitt`).
+- Kopfzeilen von Einzelplan, Bereich und Einrichtung tragen ihre Summen:
+  Einnahmen, Ausgaben, Investitionen. Ganz oben die Summen des ganzen
+  Haushalts, getrennt nach Verwaltungs- und Vermögenshaushalt.
+- Interne Verrechnungen bleiben drin (sonst stimmen die Summen nicht mit der
+  Excel), gedämpft und mit dem Wort „intern“ markiert.
+
+### Spalten
+
+- Mit Stichjahr 2026: **Ansatz 2026 · Ansatz 2025 · Ergebnis 2025**. Das
+  Stichjahr aus der Jahresleiste bestimmt die Spalten. Der amtliche Plan zeigt
+  das Ergebnis des Vorvorjahrs, weil das Vorjahr bei Planaufstellung noch
+  nicht abgerechnet ist. Hier liegt es schon vor und ist aussagekräftiger.
+- Zwischenstand: Wenn `zwischenstand.json` da ist und das Stichjahr passt,
+  zwei weitere Spalten „gebucht bis 30.09.“ und „bezahlt bis 30.09.“, mit
+  einem Schalter „Stand 01. Oktober zeigen“ (aus per Standard). Für die
+  Sitzung ist das vermutlich die nützlichste Ansicht überhaupt.
+- Nummer, Name und darunter klein der Kontotext, wo es einen gibt.
+- Jede Zeile verlinkt auf ihren Posten, jede Einrichtungszeile auf ihre
+  Einrichtung.
+
+### Balken
+
+Als Datenbalken in der Liste, nicht als eigenes Diagramm. Hinter
+der Ansatz-Spalte ein dünner Balken, Länge proportional zum Betrag, ein
+gemeinsamer Maßstab für die ganze Seite. So springen beim Scrollen die großen
+Stellen ins Auge, ohne dass ein Diagramm dazukommt.
+
+- Verwaltungshaushalt im getönten Einzelplan-Ton, **Vermögenshaushalt im
+  Investitions-Ocker** (`#b39f7a`, derselbe wie die Investitions-Balken in der
+  Timeline). Damit gilt in der ganzen App: **Investitionen sind ockerfarbene
+  Balken.** Das beantwortet die Frage nach einer globalen Balkensicht für
+  Investitionen, ohne eine weitere Seite zu bauen.
+- Kleine Beträge werden bei einem gemeinsamen Maßstab fast unsichtbar. Das ist
+  gewollt: Der Balken soll das Große zeigen, die Zahl steht daneben.
+
+### Bedienung
+
+- Filter oben: Haushalt [beide · Verwaltung · Vermögen], Art [beide ·
+  Einnahmen · Ausgaben], ein Textfeld „in der Liste filtern“ (Name oder
+  Nummer, filtert live), Sprungleiste 0–9 zu den Einzelplänen. „Nur
+  Verwaltungshaushalt“ ergibt genau den ersten Teil des amtlichen Plans in
+  dessen Reihenfolge.
+- Leere Stellen (alle gezeigten Spalten 0 oder leer) per Standard ausblenden,
+  Schalter „auch leere Stellen“.
+- **CSV-Export nur vorbereiten, noch kein Knopf.** Eine reine Funktion
+  `gesamtlisteCsv(zeilen, spalten): string` neben den Selektoren, die genau
+  die gefilterten, sichtbaren Zeilen mit den sichtbaren Spalten ausgibt.
+  Format für deutsches Excel: Semikolon als Trenner, Dezimalkomma, UTF-8 mit
+  BOM (sonst zeigt Excel die Umlaute falsch), Nummern als Text, damit
+  `0301` seine führende Null behält. Mit Test. Die Seite hält den gefilterten
+  Zeilenstand so, dass ein Knopf später nur noch die Funktion aufrufen und
+  einen Download anstoßen muss. Knopf und Download bauen wir erst nach
+  Rückmeldung.
+- Unter 640 px: jede Stelle zweizeilig (Nummer und Name, darunter die Beträge).
+- Rund 2.700 Stellen je Jahr. Ohne Virtualisierung rendern, aber je Einzelplan
+  `content-visibility: auto`, damit nur das Sichtbare gezeichnet wird. Erst
+  messen, dann optimieren.
+
+### Prüfen
+
+- Test: Summe Ansatz Verwaltungshaushalt Einnahmen = Ausgaben (kameraler
+  Haushaltsausgleich; für 2026 beide 66.903.830 €), ebenso Vermögenshaushalt
+  (31.880.027 €). Die Summen der Liste müssen das exakt treffen.
+- Test: Die Reihenfolge der Zeilen ist streng aufsteigend nach `hhst_id`
+  innerhalb jeder Einrichtung, Einrichtungen aufsteigend nach GLZ.
+- Test für `gesamtlisteCsv`: Kopfzeile, Semikolon, Dezimalkomma, BOM am
+  Anfang, `0301.6322` bleibt mit führender Null erhalten, ein Name mit
+  Semikolon wird korrekt in Anführungszeichen gesetzt.
+- Von Hand: Filter „Vermögen“ + „Ausgaben“ zeigt nur Gruppierungen 9xxx;
+  `/gesamtliste/5701` springt zum Freibad; Stichjahr 2024 wechselt die
+  Spalten; die Hauptnavigation markiert „Gesamtliste“ als aktiv.
+- Untere Tab-Leiste mit fünf Einträgen bei 320 px und 375 px.
+- Scroll-Leistung auf einem mittleren Telefon prüfen.
+
+## Reihenfolge Runde 2
+
+1. R2.1 Schalter-Reihenfolge
+2. R2.2 Such-Grammatik
+3. R2.4f feste Reihenfolge und Wortwahl
+4. R2.4a+b eigene Legende, Investitionen in die Legende
+5. R2.3 Zwischenstand (Notiz-Text, kurzer Pfeil, einmal je Seite, Tooltip);
+   Punkt 4 und 6 sind mit b schon erledigt
+6. R2.4h Notizen folgen ihrer Linie
+7. R2.4c, d, e (Rechenzeile, Zurücksetzen, Auswahl mitnehmen)
+8. R2.5 Gesamtliste
+
+Nach jedem Schritt: `pnpm typecheck && pnpm test && pnpm build`, Sichtprüfung
+bei 375 px und Desktop.
+
+---
+
+# Runde 1 (14.10.2026, umgesetzt)
 
 Rahmen, der für alle Pakete gilt:
 
@@ -56,7 +466,7 @@ Am 14.10.2026 von Benedict bestätigt:
 
 ## 1. Checkbox „mit Einnahmen verrechnet“ ans Ende
 
-Klein und unabhängig, daher zuerst.
+*Überholt durch R2.1.* Klein und unabhängig, daher zuerst.
 
 In `TimelineControls` ([src/components/Timeline.tsx](../src/components/Timeline.tsx))
 den `hasEinnahmen`-Block hinter den `hasContext`-Block verschieben. Reihenfolge
@@ -362,6 +772,8 @@ Vollzug wie bisher, die Füllung trennt bezahlt von gebucht.
   Ausgaben zu verschiedenen Zeiten im Jahr anfallen.“
 
 ### Gegen Fehllesen
+
+*Text, Pfeil und Häufigkeit der Notiz sowie der Tooltip überholt durch R2.3.*
 
 Die größte Gefahr: Jede Raute liegt unter dem Ansatz, und wer nicht weiß, dass
 nur neun Monate gezählt sind, liest überall „Stadt gibt weniger aus als geplant“.
