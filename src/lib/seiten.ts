@@ -21,7 +21,13 @@ export interface Seite {
   icon: Icon;
   /** Words that also find the page. They rank behind the label (Synonym-Malus). */
   stichworte?: string[];
+  /** Where the page hangs in the menu — the Ort of a search hit. */
+  ort?: string;
 }
+
+/** Die beiden Sammelstellen der Navigation. */
+const ERKUNDEN = "Erkunden";
+const PROJEKT = "Über das Projekt";
 
 /**
  * Every page of the app, once: name, icon and the words that find it. The
@@ -34,33 +40,36 @@ export interface Seite {
  */
 export const SEITEN: Seite[] = [
   { route: "/", label: "Überblick", icon: House, stichworte: ["Startseite", "Gesamthaushalt", "Wachstum"] },
-  { route: "/erkunden", label: "Geldfluss", icon: FlowArrow, stichworte: ["Einzelpläne", "woher und wohin", "Baum"] },
+  { route: "/erkunden", label: "Geldfluss", icon: FlowArrow, stichworte: ["Einzelpläne", "woher und wohin", "Baum"], ort: ERKUNDEN },
   {
     route: "/erkunden/einnahmen",
     label: "Einnahmen",
     icon: TrayArrowDown,
     stichworte: ["Steuern", "Gebühren", "Zuweisungen", "woher das Geld kommt"],
+    ort: ERKUNDEN,
   },
   {
     route: "/erkunden/investitionen",
     label: "Investitionen",
     icon: Crane,
     stichworte: ["Vorhaben", "Bauprojekte", "Förderung", "Eigenanteil"],
+    ort: ERKUNDEN,
   },
   {
     route: "/erkunden/querschnitte",
     label: "Querschnitte",
     icon: TreeStructure,
     stichworte: ["Personal", "Strom", "Gebäude", "Wasser", "Kostenblöcke"],
+    ort: ERKUNDEN,
   },
   { route: "/wofuer-zahle-ich", label: "Wofür zahle ich?", icon: Wallet, stichworte: ["Rechner", "Steuerbeitrag", "je Einwohner"] },
   { route: "/themen", label: "Themen", icon: SquaresFour, stichworte: ["Bildung", "Mobilität", "Soziales", "Umwelt"] },
-  { route: "/methodik", label: "Methodik und Daten", icon: Scroll, stichworte: ["Quellen", "AKDB", "Kameralistik"] },
-  { route: "/glossar", label: "Glossar", icon: BookOpen, stichworte: ["Fachbegriffe", "Ansatz", "Haushaltsstelle"] },
-  { route: "/info", label: "Über das Projekt", icon: Info, stichworte: ["Hintergrund", "wer dahintersteht"] },
-  { route: "/impressum", label: "Impressum", icon: Envelope, stichworte: ["Kontakt", "verantwortlich"] },
-  { route: "/datenschutz", label: "Datenschutz", icon: Lock, stichworte: ["Cookies", "Tracking"] },
-  { route: "/barrierefreiheit", label: "Barrierefreiheit", icon: PersonArmsSpread, stichworte: ["Screenreader", "Tastatur"] },
+  { route: "/methodik", label: "Methodik und Daten", icon: Scroll, stichworte: ["Quellen", "AKDB", "Kameralistik"], ort: PROJEKT },
+  { route: "/glossar", label: "Glossar", icon: BookOpen, stichworte: ["Fachbegriffe", "Ansatz", "Haushaltsstelle"], ort: PROJEKT },
+  { route: "/info", label: "Über das Projekt", icon: Info, stichworte: ["Hintergrund", "wer dahintersteht"], ort: PROJEKT },
+  { route: "/impressum", label: "Impressum", icon: Envelope, stichworte: ["Kontakt", "verantwortlich"], ort: PROJEKT },
+  { route: "/datenschutz", label: "Datenschutz", icon: Lock, stichworte: ["Cookies", "Tracking"], ort: PROJEKT },
+  { route: "/barrierefreiheit", label: "Barrierefreiheit", icon: PersonArmsSpread, stichworte: ["Screenreader", "Tastatur"], ort: PROJEKT },
 ];
 
 /** One page by its route. The routes are constants, so a miss is a typo. */

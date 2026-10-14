@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Budget, Data, Themes, Zwischenstand } from "./types";
 import { factsOfYear, factsOfHhst, postenOfGlz, latestYear } from "./core";
+import type { SearchItem } from "./selectors";
 import {
   bereichSeries,
   einrichtungSeries,
@@ -234,9 +235,9 @@ describe("incomeCategory / isInternal (Klassifikationsregeln)", () => {
 });
 
 describe("searchRank", () => {
-  const items = [
-    { label: "Bildung & Schulen", sub: "Thema", route: "/a" },
-    { label: "Schulden", sub: "Thema", route: "/b" },
+  const items: SearchItem[] = [
+    { label: "Bildung & Schulen", art: "Thema", route: "/a" },
+    { label: "Schulden", art: "Thema", route: "/b" },
   ];
   it("Präfix-Treffer vor Substring-Treffern", () => {
     expect(searchRank(items, "schul")[0].route).toBe("/b");
@@ -258,13 +259,41 @@ describe("searchRank", () => {
     const p = Object.values(budget.posten).find((x) => !isInternal(x))!;
     expect(searchRank(index, p.hhst_id)[0].route).toBe(`/posten/${p.hhst_id}`);
   });
-  it("gleichnamige Posten sind in der Trefferliste unterscheidbar", () => {
+  it("gleichnamige Treffer sind an Art, Ort und Nummer unterscheidbar", () => {
     const seen = new Set<string>();
     for (const it of index) {
-      const key = `${it.label}|${it.sub}`;
+      const key = `${it.label}|${it.art}|${it.ort ?? ""}|${it.nummer ?? ""}`;
       expect(seen.has(key), `doppelt: ${key}`).toBe(false);
       seen.add(key);
     }
+  });
+
+  // R2.2: Die zweite Zeile folgt einer Regel statt dem Zufall der Datenquelle.
+  it("jeder Treffer traegt ein Art-Wort aus dem Wortschatz", () => {
+    const wortschatz = new Set(["Seite", "Kostenblock", "Thema", "Einzelplan", "Bereich", "Einrichtung", "Posten"]);
+    for (const it of index) expect(wortschatz.has(it.art), `${it.label}: ${it.art}`).toBe(true);
+  });
+
+  it("jede Ebene unter dem Einzelplan nennt ihren Ort", () => {
+    for (const it of index) {
+      if (it.art === "Einzelplan" || it.art === "Thema" || it.art === "Seite") continue;
+      expect(it.ort, `${it.art} ${it.label} ohne Ort`).toBeTruthy();
+    }
+  });
+
+  it("die Einrichtung steht vor ihren Posten, auch wenn beide gleich heissen", () => {
+    const treffer = searchRank(index, "hallenbad");
+    const einrichtung = treffer.findIndex((h) => h.art === "Einrichtung");
+    const posten = treffer.findIndex((h) => h.art === "Posten");
+    expect(einrichtung).toBeGreaterThanOrEqual(0);
+    expect(posten === -1 || einrichtung < posten).toBe(true);
+  });
+
+  it("Posten des Vermoegenshaushalts und Einnahmen sagen das in der Zeile", () => {
+    const einnahme = index.find((it) => it.art === "Posten" && it.route === "/posten/5701.1161");
+    const invest = index.find((it) => it.art === "Posten" && it.route === "/posten/5701.9400");
+    expect(einnahme?.ort).toMatch(/· Einnahme$/);
+    expect(invest?.ort).toMatch(/· Investition$/);
   });
   it("zweistellige Nummer findet zuerst den Bereich, nicht seine Posten", () => {
     expect(searchRank(index, "21")[0].route).toBe("/bereich/21");
@@ -294,7 +323,7 @@ describe("searchRank", () => {
     }
   });
   it("Seiten bleiben farblos, damit farbig 'Teil des Haushalts' heisst", () => {
-    for (const it of index.filter((x) => x.sub.startsWith("Seite"))) {
+    for (const it of index.filter((x) => x.art === "Seite")) {
       expect(it.farbe, it.label).toBeUndefined();
       expect(it.icon, it.label).toBeTruthy();
     }

@@ -78,6 +78,7 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
               id={`such-option-${i}`}
               role="option"
               aria-selected={i === active}
+              aria-label={[r.label, r.art, r.ort].filter(Boolean).join(", ")}
               onMouseEnter={() => setActive(i)}
               onClick={() => go(r.route)}
               className={
@@ -97,7 +98,11 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
               )}
               <span className="min-w-0 flex-1">
                 <span className="block truncate">{r.label}</span>
-                <span className="block truncate text-xs text-ink-muted">{r.sub}</span>
+                {/* Zwei feste Plaetze: erst was es ist, dann wo es sitzt. */}
+                <span className="block truncate text-xs">
+                  <span className="font-semibold text-ink-soft">{r.art}</span>
+                  {r.ort && <span className="text-ink-muted"> · {r.ort}</span>}
+                </span>
               </span>
               {r.nummer && <Nummerngeruest wert={r.nummer} className="shrink-0 text-xs text-ink-soft" />}
             </li>

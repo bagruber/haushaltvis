@@ -1,5 +1,6 @@
 import type { Budget, Data, Posten, EA, Haushalt, ThemeTag, BudgetEvent, EventScope, Context } from "./types";
 import type { Icon } from "@phosphor-icons/react";
+import { SquaresFour } from "@phosphor-icons/react";
 import { einzelplanKategorie } from "../kategorien";
 import { COLOR, ICON, ORDER } from "../kostenblock";
 import { SEITEN } from "../seiten";
@@ -1229,9 +1230,25 @@ export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
 
 // ── Search index ────────────────────────────────────────────────────────────
 
+/**
+ * Wortschatz der Trefferarten. Jeder Eintrag im Index traegt genau eines
+ * dieser Woerter — so kann keine neue Art die Grammatik der Liste unterlaufen.
+ */
+export type SearchArt =
+  | "Seite"
+  | "Kostenblock"
+  | "Thema"
+  | "Einzelplan"
+  | "Bereich"
+  | "Einrichtung"
+  | "Posten";
+
 export interface SearchItem {
   label: string;
-  sub: string;
+  /** immer gesetzt: was der Treffer ist */
+  art: SearchArt;
+  /** wo er sitzt: die naechsthoehere Ebene mit Namen. Leer nur, wo es keine gibt. */
+  ort?: string;
   route: string;
   /** numbers that find this item by prefix (Einzelplan, Gliederung, Haushaltsstelle) */
   keys?: string[];
@@ -1264,20 +1281,17 @@ const cleanText = (s: string) => s.replace(/\s+/g, " ").trim();
 export function searchIndex(data: Data): SearchItem[] {
   const items: SearchItem[] = [];
   for (const s of SEITEN) {
-    items.push({
-      label: s.label,
-      sub: s.stichworte ? `Seite · ${s.stichworte.slice(0, 3).join(", ")} …` : "Seite",
-      route: s.route,
-      stichworte: s.stichworte,
-      icon: s.icon,
-    });
+    // Die Stichworte bleiben Suchhilfe, sie sind kein Ort und stehen nicht mehr
+    // in der Zeile.
+    items.push({ label: s.label, art: "Seite", ort: s.ort, route: s.route, stichworte: s.stichworte, icon: s.icon });
   }
   for (const key of ORDER) {
     const agg = data.aggregatoren?.[key];
     if (!agg) continue;
     items.push({
       label: agg.title,
-      sub: "Querschnitt",
+      art: "Kostenblock",
+      ort: "Querschnitt",
       route: `/erkunden/querschnitte/${key}`,
       icon: ICON[key],
       farbe: COLOR[key],
@@ -1286,14 +1300,14 @@ export function searchIndex(data: Data): SearchItem[] {
   // Themen zeigen auf die Übersicht, solange die Zuordnung gesperrt ist
   // (/themen/:id leitet dorthin um).
   for (const t of Object.values(data.themes.themes)) {
-    items.push({ label: t.label, sub: "Thema", route: "/themen" });
+    items.push({ label: t.label, art: "Thema", route: "/themen", icon: SquaresFour, farbe: t.color });
   }
   const eps = new Map<string, string>();
   for (const p of Object.values(data.budget.posten)) if (!eps.has(p.einzelplan)) eps.set(p.einzelplan, p.einzelplan_name);
   for (const [ep, name] of [...eps].sort()) {
     items.push({
       label: `${ep} · ${name}`,
-      sub: "Einzelplan",
+      art: "Einzelplan",
       route: `/einzelplan/${ep}`,
       keys: [ep],
       ...kategorie(ep),
@@ -1308,7 +1322,8 @@ export function searchIndex(data: Data): SearchItem[] {
   for (const [ab, epName] of [...bereiche].sort()) {
     items.push({
       label: abschnittName(data.labels, ab),
-      sub: `Bereich ${ab}xx · ${epName}`,
+      art: "Bereich",
+      ort: epName,
       route: `/bereich/${ab}`,
       keys: [ab],
       ...kategorie(ab[0]),
@@ -1321,7 +1336,8 @@ export function searchIndex(data: Data): SearchItem[] {
       seen.add(p.glz);
       items.push({
         label: cleanText(p.glz_text),
-        sub: `Einrichtung ${p.glz}`,
+        art: "Einrichtung",
+        ort: abschnittName(data.labels, p.glz.slice(0, 2)),
         route: `/einrichtung/${p.glz}`,
         keys: [p.glz],
         ...kategorie(p.einzelplan),
@@ -1331,9 +1347,15 @@ export function searchIndex(data: Data): SearchItem[] {
   }
   for (const p of Object.values(data.budget.posten)) {
     if (isInternal(p)) continue;
+    // Derselbe Name steht in vielen Einrichtungen, und ein Bad hat Gebuehren,
+    // Betriebskosten und Hochbaumassnahmen nebeneinander: beides muss die
+    // zweite Zeile auseinanderhalten.
+    const seite = p.ea === "E" ? "Einnahme" : p.haushalt === "vermoegen" ? "Investition" : null;
+    const wo = cleanText(p.glz_text ?? "") || abschnittName(data.labels, p.glz.slice(0, 2));
     items.push({
       label: cleanText(p.grz_text ?? p.hhst_id),
-      sub: `${cleanText(p.glz_text ?? p.glz)} · ${p.hhst_id}`,
+      art: "Posten",
+      ort: seite ? `${wo} · ${seite}` : wo,
       route: `/posten/${p.hhst_id}`,
       keys: [p.hhst_id],
       rank: 1,
