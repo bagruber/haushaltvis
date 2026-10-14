@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useData, searchIndex, searchRank } from "@/lib/data";
 import { cn } from "@/lib/cn";
+import { kategorieTon } from "@/lib/kategorien";
+import { Nummerngeruest } from "@/lib/nummern";
 
 /** One search field for header and mobile panel; fixed width, no jump on focus. */
 export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: () => void }) {
@@ -64,11 +66,13 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
           aria-label="Suchergebnisse"
           className={cn(
             "absolute top-full z-30 mt-1 max-h-80 overflow-auto rounded-lg border border-ink-line bg-white py-1 shadow-lift",
-            mobil ? "inset-x-0" : "right-0 w-80",
+            mobil ? "inset-x-0" : "right-0 w-96",
           )}
           onMouseDown={() => { if (blurTimer.current) window.clearTimeout(blurTimer.current); }}
         >
-          {results.map((r, i) => (
+          {results.map((r, i) => {
+            const Icon = r.icon;
+            return (
             <li
               key={r.route + r.label}
               id={`such-option-${i}`}
@@ -77,14 +81,28 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
               onMouseEnter={() => setActive(i)}
               onClick={() => go(r.route)}
               className={
-                "cursor-pointer px-3 py-1.5 text-sm " +
+                "flex cursor-pointer items-center gap-2.5 px-3 py-1.5 text-sm " +
                 (i === active ? "bg-cream-dark" : "")
               }
             >
-              <span className="block truncate">{r.label}</span>
-              <span className="block truncate text-xs text-ink-muted">{r.sub}</span>
+              {/* Farbig heißt „Teil des Haushalts", grau „Seite der App". Die Art
+                  steht als Text in der sub-Zeile; das Icon ist nur die Abkürzung. */}
+              {Icon && (
+                <Icon
+                  size={18}
+                  aria-hidden
+                  className={cn("shrink-0", !r.farbe && "text-ink-muted")}
+                  style={r.farbe ? { color: kategorieTon(r.farbe).text } : undefined}
+                />
+              )}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">{r.label}</span>
+                <span className="block truncate text-xs text-ink-muted">{r.sub}</span>
+              </span>
+              {r.nummer && <Nummerngeruest wert={r.nummer} className="shrink-0 text-xs text-ink-soft" />}
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>

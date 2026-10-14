@@ -7,7 +7,7 @@ import { useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { Timeline, TimelineControls } from "@/components/Timeline";
 import { CaretRight } from "@phosphor-icons/react";
 import { AbschnittLink, Klecks, Loading, Teilen } from "@/components/ui";
-import { Nummer, doppelte, useNummern } from "@/lib/nummern";
+import { Nummer, Nummerngeruest, doppelte, useNummern } from "@/lib/nummern";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { fmtEur, fmtEurFine, fmtEurShort, fmtPct } from "@/lib/format";
@@ -96,9 +96,7 @@ export function EinzelplanDetail() {
               <h2 className="flex min-w-0 items-baseline gap-2 font-display text-lg font-bold">
                 {/* Auf dieser Ebene ist die Nummer Orientierung, nicht Detail:
                     sie steht immer, unabhängig vom Nummern-Schalter. */}
-                <span className="shrink-0 text-sm font-normal text-ink-soft tabular-nums">
-                  {s.code}<span className="text-ink-muted">xx</span>
-                </span>
+                <Nummerngeruest wert={`${s.code}xx`} className="shrink-0 text-sm font-normal text-ink-soft" />
                 <span className="truncate">{s.label}</span>
                 <AbschnittLink pfad={`/bereich/${s.code}`} titel={s.label} />
               </h2>

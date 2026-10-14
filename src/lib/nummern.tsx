@@ -61,3 +61,21 @@ export function Nummer({ wert, sichtbar }: { wert: string; sichtbar: boolean }) 
   if (!sichtbar) return null;
   return <span className="mr-2 shrink-0 text-xs text-ink-muted tabular-nums">{wert}</span>;
 }
+
+/**
+ * The number as a frame: 2 · 21xx · 2110 · 2110.4107. Its length shows the
+ * depth in the budget, and it is at the same time the official reference. A
+ * trailing "xx" stands for the digits this level leaves open and is dimmed.
+ *
+ * Unlike `Nummer` this is always visible: where it stands it is orientation,
+ * not detail.
+ */
+export function Nummerngeruest({ wert, className }: { wert: string; className?: string }) {
+  const offen = wert.endsWith("xx");
+  return (
+    <span className={`tabular-nums ${className ?? ""}`}>
+      {offen ? wert.slice(0, -2) : wert}
+      {offen && <span className="text-ink-muted">xx</span>}
+    </span>
+  );
+}

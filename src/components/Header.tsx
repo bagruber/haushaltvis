@@ -1,28 +1,26 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import {
-  ArrowSquareOut,
-  BookOpen,
-  CaretDown,
-  Envelope,
-  FlowArrow,
-  House,
-  Info,
-  MagnifyingGlass,
-  Scroll,
-  SquaresFour,
-  Wallet,
-  X,
-} from "@phosphor-icons/react";
+import { ArrowSquareOut, CaretDown, Info, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
+import { seite } from "@/lib/seiten";
 import { Search } from "./Search";
 import { Rose, Stripe } from "./ui";
 
+/**
+ * Name and icon of every page live in lib/seiten.ts, where the search reads
+ * them too. Here only what is local to the navigation: the shorter label of a
+ * hub ("Erkunden" for the Geldfluss page it starts on) and `end`.
+ */
+const eintrag = (route: string, label?: string, end?: boolean) => {
+  const s = seite(route);
+  return { to: route, label: label ?? s.label, icon: s.icon, end };
+};
+
 const links = [
-  { to: "/", label: "Überblick", icon: House, end: true },
-  { to: "/erkunden", label: "Erkunden", icon: FlowArrow },
-  { to: "/themen", label: "Themen", icon: SquaresFour },
-  { to: "/wofuer-zahle-ich", label: "Wofür zahle ich?", icon: Wallet },
+  eintrag("/", undefined, true),
+  eintrag("/erkunden", "Erkunden"),
+  eintrag("/themen"),
+  eintrag("/wofuer-zahle-ich"),
 ];
 
 // Active state is ink, not red: in a finance UI red reads as "deficit",
@@ -124,10 +122,10 @@ export function TabLeiste() {
 }
 
 const PROJEKT_LINKS = [
-  { to: "/info", label: "Über das Projekt", icon: Info },
-  { to: "/methodik", label: "Methodik und Daten", icon: Scroll },
-  { to: "/glossar", label: "Glossar", icon: BookOpen },
-  { to: "/impressum", label: "Impressum und Kontakt", icon: Envelope },
+  eintrag("/info"),
+  eintrag("/methodik"),
+  eintrag("/glossar"),
+  eintrag("/impressum", "Impressum und Kontakt"),
 ];
 
 /**

@@ -36,7 +36,7 @@ const data: Data = {
   context: read("context.json"),
   einleitungen: {},
   glossar: {},
-  aggregatoren: {},
+  aggregatoren: read("aggregatoren.json"),
 };
 const year = latestYear(budget);
 
@@ -250,6 +250,39 @@ describe("searchRank", () => {
       const key = `${it.label}|${it.sub}`;
       expect(seen.has(key), `doppelt: ${key}`).toBe(false);
       seen.add(key);
+    }
+  });
+  it("zweistellige Nummer findet zuerst den Bereich, nicht seine Posten", () => {
+    expect(searchRank(index, "21")[0].route).toBe("/bereich/21");
+  });
+  it("Seiten der App sind zu finden", () => {
+    expect(searchRank(index, "querschnitt")[0].route).toBe("/erkunden/querschnitte");
+  });
+  it("der Kostenblock steht vor jedem Einzelposten", () => {
+    const hits = searchRank(index, "strom");
+    const block = hits.findIndex((h) => h.route === "/erkunden/querschnitte/strom");
+    const posten = hits.findIndex((h) => h.route.startsWith("/posten/"));
+    expect(block).toBeGreaterThanOrEqual(0);
+    expect(posten === -1 || block < posten).toBe(true);
+  });
+  it("jeder Bereich mit Posten steht genau einmal im Index", () => {
+    const erwartet = new Set(Object.values(budget.posten).map((p) => p.glz.slice(0, 2)));
+    const imIndex = index.filter((it) => it.route.startsWith("/bereich/")).map((it) => it.route.slice(9));
+    expect(imIndex.sort()).toEqual([...erwartet].sort());
+    expect(new Set(imIndex).size).toBe(imIndex.length);
+  });
+  it("jede Ebene des Haushalts traegt das Icon ihres Einzelplans", () => {
+    for (const art of ["/einzelplan/", "/bereich/", "/einrichtung/", "/posten/"]) {
+      const treffer = index.find((it) => it.route.startsWith(art))!;
+      expect(treffer.icon, art).toBeTruthy();
+      expect(treffer.farbe, art).toMatch(/^#/);
+      expect(treffer.nummer, art).toBeTruthy();
+    }
+  });
+  it("Seiten bleiben farblos, damit farbig 'Teil des Haushalts' heisst", () => {
+    for (const it of index.filter((x) => x.sub.startsWith("Seite"))) {
+      expect(it.farbe, it.label).toBeUndefined();
+      expect(it.icon, it.label).toBeTruthy();
     }
   });
 });

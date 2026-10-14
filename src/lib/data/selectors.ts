@@ -1,4 +1,8 @@
 import type { Budget, Data, Posten, EA, Haushalt, ThemeTag, BudgetEvent, EventScope, Context } from "./types";
+import type { Icon } from "@phosphor-icons/react";
+import { einzelplanKategorie } from "../kategorien";
+import { COLOR, ICON, ORDER } from "../kostenblock";
+import { SEITEN } from "../seiten";
 import { abschnittName, groupLabel, factsOfYear, factsOfHhst, postenOfGlz } from "./core";
 import { shades, GOLD_BASE, ZUSCHUSS_RED, EINZELPLAN_COLORS } from "../colors";
 
@@ -1242,30 +1246,96 @@ export interface SearchItem {
   keys?: string[];
   /** 0 = overview entities, 1 = single Posten; Posten rank below at equal match quality */
   rank?: number;
+  /** further words that find the item, ranked behind the label like a synonym */
+  stichworte?: string[];
+  /**
+   * Icon of the result row. With `farbe` it says where in the budget the hit
+   * sits (Einzelplan icon and colour, on every level below it); without, it is
+   * a page of the app and stays grey.
+   */
+  icon?: Icon;
+  farbe?: string;
+  /** official number, right-aligned: 2 · 21xx · 2110 · 2110.4107 */
+  nummer?: string;
 }
 
 const cleanText = (s: string) => s.replace(/\s+/g, " ").trim();
 
 /**
- * Searchable entities: Themen, Einzelpläne, Einrichtungen and single Posten.
- * Many Posten share a name across Einrichtungen (the same Gruppierung in 143
- * facilities), so a Posten's sub line always names its Einrichtung and number.
+ * Searchable entities: pages of the app, Themen, cost blocks and every level of
+ * the budget down to the single Posten. Many Posten share a name across
+ * Einrichtungen (the same Gruppierung in 143 facilities), so a Posten's sub
+ * line always names its Einrichtung and number.
+ *
+ * Who wins at equal match quality is `rank`: everything that gives an overview
+ * stands before the 4.306 single Posten.
  */
 export function searchIndex(data: Data): SearchItem[] {
   const items: SearchItem[] = [];
-  for (const [id, t] of Object.entries(data.themes.themes)) {
-    items.push({ label: t.label, sub: "Thema", route: `/themen/${id}` });
+  for (const s of SEITEN) {
+    items.push({
+      label: s.label,
+      sub: s.stichworte ? `Seite · ${s.stichworte.slice(0, 3).join(", ")} …` : "Seite",
+      route: s.route,
+      stichworte: s.stichworte,
+      icon: s.icon,
+    });
+  }
+  for (const key of ORDER) {
+    const agg = data.aggregatoren?.[key];
+    if (!agg) continue;
+    items.push({
+      label: agg.title,
+      sub: "Querschnitt",
+      route: `/erkunden/querschnitte/${key}`,
+      icon: ICON[key],
+      farbe: COLOR[key],
+    });
+  }
+  // Themen zeigen auf die Übersicht, solange die Zuordnung gesperrt ist
+  // (/themen/:id leitet dorthin um).
+  for (const t of Object.values(data.themes.themes)) {
+    items.push({ label: t.label, sub: "Thema", route: "/themen" });
   }
   const eps = new Map<string, string>();
   for (const p of Object.values(data.budget.posten)) if (!eps.has(p.einzelplan)) eps.set(p.einzelplan, p.einzelplan_name);
   for (const [ep, name] of [...eps].sort()) {
-    items.push({ label: `${ep} · ${name}`, sub: "Einzelplan", route: `/einzelplan/${ep}`, keys: [ep] });
+    items.push({
+      label: `${ep} · ${name}`,
+      sub: "Einzelplan",
+      route: `/einzelplan/${ep}`,
+      keys: [ep],
+      ...kategorie(ep),
+      nummer: ep,
+    });
+  }
+  const bereiche = new Map<string, string>();
+  for (const p of Object.values(data.budget.posten)) {
+    const ab = p.glz.slice(0, 2);
+    if (!bereiche.has(ab)) bereiche.set(ab, p.einzelplan_name);
+  }
+  for (const [ab, epName] of [...bereiche].sort()) {
+    items.push({
+      label: abschnittName(data.labels, ab),
+      sub: `Bereich ${ab}xx · ${epName}`,
+      route: `/bereich/${ab}`,
+      keys: [ab],
+      ...kategorie(ab[0]),
+      nummer: `${ab}xx`,
+    });
   }
   const seen = new Set<string>();
   for (const p of Object.values(data.budget.posten)) {
     if (p.glz_text && !seen.has(p.glz)) {
       seen.add(p.glz);
-      items.push({ label: cleanText(p.glz_text), sub: `Einrichtung ${p.glz}`, route: `/einrichtung/${p.glz}`, keys: [p.glz] });
+      items.push({
+        label: cleanText(p.glz_text),
+        sub: `Einrichtung ${p.glz}`,
+        route: `/einrichtung/${p.glz}`,
+        keys: [p.glz],
+        ...kategorie(p.einzelplan),
+        nummer: p.glz,
+      });
     }
   }
   for (const p of Object.values(data.budget.posten)) {
@@ -1276,9 +1346,17 @@ export function searchIndex(data: Data): SearchItem[] {
       route: `/posten/${p.hhst_id}`,
       keys: [p.hhst_id],
       rank: 1,
+      ...kategorie(p.einzelplan),
+      nummer: p.hhst_id,
     });
   }
   return items;
+}
+
+/** Icon and colour of the Einzelplan a hit belongs to — the same on every level. */
+function kategorie(ep: string): { icon: Icon; farbe: string } {
+  const k = einzelplanKategorie(ep);
+  return { icon: k.icon, farbe: k.farbe };
 }
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -1315,11 +1393,14 @@ function suchbegriffe(q: string): string[] {
   return [q, ...new Set(extra)];
 }
 
+/** Penalty for a hit that is not in the label itself: synonym or Stichwort. */
+const UMWEG = 50;
+
 /**
  * Rank search items for a query. Numbers match the item keys by prefix, the
  * shortest key first. Words match the label: prefix before substring, shortest
- * first, synonym hits after direct hits. Single Posten come after overview
- * entities of the same match quality.
+ * first, synonym hits after direct hits; a page's Stichworte rank like a
+ * synonym. Single Posten come after overview entities of the same match quality.
  */
 export function searchRank(items: SearchItem[], query: string, limit = 10): SearchItem[] {
   const q = norm(query.trim());
@@ -1332,11 +1413,16 @@ export function searchRank(items: SearchItem[], query: string, limit = 10): Sear
     if (zahl) {
       for (const k of it.keys ?? []) if (k.startsWith(q)) best = Math.min(best, k.length);
     } else {
-      const l = norm(it.label);
-      begriffe.forEach((t, n) => {
-        const i = l.indexOf(t);
-        if (i >= 0) best = Math.min(best, (i === 0 ? 0 : 100) + i + l.length * 0.01 + (n > 0 ? 50 : 0));
-      });
+      const texte: [string, number][] = [
+        [norm(it.label), 0],
+        ...(it.stichworte ?? []).map((w): [string, number] => [norm(w), UMWEG]),
+      ];
+      for (const [l, malus] of texte) {
+        begriffe.forEach((t, n) => {
+          const i = l.indexOf(t);
+          if (i >= 0) best = Math.min(best, (i === 0 ? 0 : 100) + i + l.length * 0.01 + (n > 0 ? UMWEG : 0) + malus);
+        });
+      }
     }
     if (best < Infinity) scored.push({ it, score: best + (it.rank ?? 0) * 200 });
   }
