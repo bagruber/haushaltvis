@@ -5,10 +5,11 @@ import { ChartTable } from "./ChartTable";
 import { Term } from "./Term";
 import { adjustSeries, netSeries, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
 import { useBreit, type Notiz } from "@/lib/notiz";
+import { PLAN_COLOR } from "@/lib/marke.mjs";
 import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
 
 /** Plan is drawn in a neutral tone so it never competes with the Ist colour. */
-export const PLAN_COLOR = "#8a7a5c";
+export { PLAN_COLOR } from "@/lib/marke.mjs";
 const REFERENZ_COLOR = "#c4bcac";
 
 export interface TimelineMode extends TimeMode {

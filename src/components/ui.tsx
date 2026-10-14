@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { LinkSimple, ShareNetwork, type Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import { kategorieTon } from "@/lib/kategorien";
+import { KLECKS_DREHUNG, KLECKS_PFAD } from "@/lib/marke.mjs";
 import { teilUrl } from "@/lib/teilen";
 
 export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
@@ -115,11 +116,6 @@ export function Stripe({ className }: { className?: string }) {
     </div>
   );
 }
-
-const KLECKS_PFAD =
-  "M25 3.5c8.6.3 17.8 5.2 19.2 14.6 1.5 9.8-4 21.5-14.4 24.9C19.7 46.3 6.6 41.5 4.3 30.7 2 19.6 12.2 3 25 3.5z";
-// Neighbours vary by rotating the one path, never by drawing a new one.
-const KLECKS_DREHUNG = [undefined, "rotate(70deg)", "rotate(150deg) scaleX(-1)"];
 
 /** Colour blob with the category icon on it. Decorative; the text carries the meaning. */
 export function Klecks({ farbe, icon: Icon, dicht, variante = 0 }: {
