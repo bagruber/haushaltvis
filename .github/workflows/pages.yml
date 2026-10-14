@@ -47,7 +47,10 @@ jobs:
         working-directory: ${{ runner.temp }}/probe
         run: |
           pnpm install --frozen-lockfile
-          echo "playwright=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
+          # Kennt der Branch playwright-core noch nicht, bleibt der Schluessel leer
+          # und der Chromium-Schritt faellt unten ohnehin aus.
+          pw=$(node -p "require('playwright-core/package.json').version" 2>/dev/null || true)
+          echo "playwright=${pw:-keins}" >> "$GITHUB_OUTPUT"
 
       # Die Vorschaukarten werden in einem lokalen Chromium gerendert
       # (scripts/karten.mjs). Rund 150 MB, deshalb ueber die Playwright-Version
