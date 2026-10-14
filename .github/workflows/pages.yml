@@ -62,10 +62,16 @@ jobs:
       - name: Chromium bereitstellen
         if: steps.probe.outputs.da == 'true'
         working-directory: ${{ runner.temp }}/probe
-        run: pnpm exec playwright-core install --with-deps chromium
+        run: |
+          if [ -f scripts/karten.mjs ]; then
+            pnpm exec playwright-core install --with-deps chromium
+          else
+            echo "Der Branch kennt scripts/karten.mjs noch nicht — kein Chromium noetig."
+          fi
 
-      # Nicht `pnpm run build`: die angehaengten Argumente landeten sonst beim
-      # Kartenskript statt bei vite. Darum die drei Schritte einzeln.
+      # Nicht `pnpm run build`: der Branch haengt an sein build-Skript das
+      # Kartenskript an, und die Argumente landeten dann dort statt bei vite.
+      # Darum die Schritte einzeln.
       - name: Probe nach dist/v2 bauen
         if: steps.probe.outputs.da == 'true'
         working-directory: ${{ runner.temp }}/probe
@@ -74,7 +80,9 @@ jobs:
         run: |
           pnpm exec tsc -b
           pnpm exec vite build --base /haushaltvis/v2/ --outDir "$GITHUB_WORKSPACE/dist/v2" --emptyOutDir
-          node scripts/karten.mjs "$GITHUB_WORKSPACE/dist/v2"
+          if [ -f scripts/karten.mjs ]; then
+            node scripts/karten.mjs "$GITHUB_WORKSPACE/dist/v2"
+          fi
 
       - name: Sanity-check dist/
         run: |
