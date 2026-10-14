@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { ArrowRight, CaretRight, Coins, FlowArrow, SquaresFour } from "@phosphor-icons/react";
 import { EChart } from "@/components/EChart";
@@ -8,6 +8,7 @@ import { useData, budgetYearSeries, adjustSeries, latestYear, topMovers } from "
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import {
+  AbschnittLink,
   Kennzahl,
   KategorieZeile,
   Klecks,
@@ -22,6 +23,7 @@ import { Term } from "@/components/Term";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { useNummern } from "@/lib/nummern";
 import { useBreit } from "@/lib/notiz";
+import { useTeilScroll } from "@/lib/teilen";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
 const VERWALTUNG = "#8a7a5c";
@@ -31,6 +33,7 @@ const REAL_LINE = "#2f6f8f";
 
 export function Home() {
   usePageTitle();
+  const { teil } = useParams();
   const { data, error } = useData();
   const { year: selYear } = useYearCtx();
   const breit = useBreit();
@@ -192,6 +195,8 @@ export function Home() {
     return topMovers(data, y - 1, y, 4);
   }, [data]);
 
+  useTeilScroll(teil, !!view);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
@@ -265,9 +270,12 @@ export function Home() {
         </section>
       )}
 
-      <section className="space-y-3">
+      <section id="verlauf" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Der Haushalt über die Jahre</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Der Haushalt über die Jahre
+            <AbschnittLink pfad="/ueberblick/verlauf" titel="Der Haushalt über die Jahre" />
+          </h2>
           <span className="text-xs text-ink-muted">Ausgaben-Ansätze, ohne interne Verrechnungen</span>
         </div>
         <EChart
@@ -287,9 +295,12 @@ export function Home() {
         />
       </section>
 
-      <section className="space-y-3">
+      <section id="wachstum" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Was davon echtes Wachstum ist</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Was davon echtes Wachstum ist
+            <AbschnittLink pfad="/ueberblick/wachstum" titel="Was davon echtes Wachstum ist" />
+          </h2>
           <span className="text-xs text-ink-muted">{view.basis} = 100</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
@@ -339,9 +350,12 @@ export function Home() {
       </section>
 
       {movers.length > 0 && (
-        <section className="space-y-3">
+        <section id="auffaelliges" className="scroll-mt-28 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-            <h2 className="font-display text-2xl font-bold">Das fällt auf</h2>
+            <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+              Das fällt auf
+              <AbschnittLink pfad="/ueberblick/auffaelliges" titel="Das fällt auf" />
+            </h2>
             <span className="text-xs text-ink-muted">
               Größte Veränderungen {latestYear(data!.budget) - 1} → {latestYear(data!.budget)}
             </span>

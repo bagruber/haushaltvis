@@ -1,13 +1,14 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { TimelineControls } from "@/components/Timeline";
 import { useData, incomeByCategory, incomeCategorySeries, adjustSeries, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { ChartTable } from "@/components/ChartTable";
-import { Loading } from "@/components/ui";
+import { AbschnittLink, Loading } from "@/components/ui";
+import { kennung, useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { extremImFenster, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
@@ -25,8 +26,9 @@ export function Einnahmen() {
   usePageTitle("Einnahmen");
   const { data, error } = useData();
 
+  const { teil } = useParams();
   const { year: selYear } = useYearCtx();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
   const { zeigen } = useNummern();
   const breit = useBreit();
   const view = useMemo(() => {
@@ -113,6 +115,8 @@ export function Einnahmen() {
     return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext, notiz };
   }, [data, selYear, mode, breit]);
 
+  useTeilScroll(teil, !!view);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
@@ -129,9 +133,12 @@ export function Einnahmen() {
         </span>
       </header>
 
-      <section className="space-y-2">
+      <section id="verlauf" className="scroll-mt-28 space-y-2">
         <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-xl font-bold">Steuern & Zuweisungen im Zeitverlauf</h2>
+          <h2 className="flex items-baseline gap-2 font-display text-xl font-bold">
+            Steuern &amp; Zuweisungen im Zeitverlauf
+            <AbschnittLink pfad="/erkunden/einnahmen/verlauf" titel="Steuern &amp; Zuweisungen im Zeitverlauf" />
+          </h2>
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
@@ -143,9 +150,12 @@ export function Einnahmen() {
         {view.groups.map((g) => {
           const dup = doppelte(g.posten.slice(0, 8).map((p) => p.label));
           return (
-          <section key={g.key} className="border-t border-ink-line pt-3">
+          <section key={g.key} id={kennung(g.key)} className="scroll-mt-28 border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
-              <h2 className="font-display text-lg font-bold">{g.label}</h2>
+              <h2 className="flex min-w-0 items-baseline gap-2 font-display text-lg font-bold">
+                <span className="truncate">{g.label}</span>
+                <AbschnittLink pfad={`/erkunden/einnahmen/${kennung(g.key)}`} titel={g.label} />
+              </h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(g.value)}</span>
             </div>
             <ul className="space-y-1.5 text-sm">

@@ -1,20 +1,24 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear, totals } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { useAnsicht, useTeilScroll } from "@/lib/teilen";
+import { Timeline, TimelineControls } from "@/components/Timeline";
 import { CaretRight } from "@phosphor-icons/react";
-import { Klecks, Loading, Teilen } from "@/components/ui";
+import { AbschnittLink, Klecks, Loading, Teilen } from "@/components/ui";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { einzelplanKategorie } from "@/lib/kategorien";
 import { fmtEur, fmtEurFine, fmtEurShort, fmtPct } from "@/lib/format";
 
 export function EinzelplanDetail() {
-  const { ep = "" } = useParams();
+  // Zwei Adressen, eine Seite: /einzelplan/2 und /bereich/21 (dort führt die
+  // Bereichsnummer den Einzelplan in ihrer ersten Stelle mit).
+  const { ep: epParam = "", ab } = useParams();
+  const ep = ab ? ab[0] : epParam;
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
   const { year: selYear } = useYearCtx();
   const { zeigen } = useNummern();
 
@@ -49,6 +53,7 @@ export function EinzelplanDetail() {
   }, [data, ep, selYear]);
 
   usePageTitle(view ? `Einzelplan ${ep} · ${view.name}` : undefined);
+  useTeilScroll(ab, !!view);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
@@ -86,9 +91,17 @@ export function EinzelplanDetail() {
 
       <div className="space-y-4">
         {view.sections.map((s) => (
-          <section key={s.code} className="border-t border-ink-line pt-3">
+          <section key={s.code} id={s.code} className="scroll-mt-28 border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
-              <h2 className="font-display text-lg font-bold">{s.label}</h2>
+              <h2 className="flex min-w-0 items-baseline gap-2 font-display text-lg font-bold">
+                {/* Auf dieser Ebene ist die Nummer Orientierung, nicht Detail:
+                    sie steht immer, unabhängig vom Nummern-Schalter. */}
+                <span className="shrink-0 text-sm font-normal text-ink-soft tabular-nums">
+                  {s.code}<span className="text-ink-muted">xx</span>
+                </span>
+                <span className="truncate">{s.label}</span>
+                <AbschnittLink pfad={`/bereich/${s.code}`} titel={s.label} />
+              </h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(s.total)}</span>
             </div>
 

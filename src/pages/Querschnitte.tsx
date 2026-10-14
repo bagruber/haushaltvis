@@ -1,37 +1,19 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { useData, latestYear, adjustSeries, totals } from "@/lib/data";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { extremImFenster, useBreit } from "@/lib/notiz";
 import type { Aggregator, YearSeries } from "@/lib/data";
-import { TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { TimelineControls } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
-import type { Icon } from "@phosphor-icons/react";
-import { Buildings, Desktop, Drop, HandCoins, Lightning, Tag, TreeStructure, Users } from "@phosphor-icons/react";
-import { KategorieZeile, Kennzahl, Klecks, Loading } from "@/components/ui";
+import { Buildings, Tag, TreeStructure } from "@phosphor-icons/react";
+import { AbschnittLink, KategorieZeile, Kennzahl, Klecks, Loading } from "@/components/ui";
+import { COLOR, ICON, ORDER } from "@/lib/kostenblock";
+import { useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
-
-// Fixed display order + colour per aggregator (keys from etl/aggregatoren.yaml).
-const ORDER = ["personal", "zuschuesse", "gebaeude", "it", "strom", "wasser"] as const;
-const COLOR: Record<string, string> = {
-  personal: "#2f6f8f",
-  zuschuesse: "#6b3e7a",
-  gebaeude: "#c26a2c",
-  it: "#0a9e4c",
-  strom: "#d4a017",
-  wasser: "#3a8fb7",
-};
-const ICON: Record<string, Icon> = {
-  personal: Users,
-  zuschuesse: HandCoins,
-  gebaeude: Buildings,
-  it: Desktop,
-  strom: Lightning,
-  wasser: Drop,
-};
 
 /** How many single Posten to name inside each Gruppierung before summarising. */
 const POSTEN_JE_GRUPPE = 6;
@@ -83,8 +65,9 @@ function groupsOf(
 
 export function Querschnitte() {
   usePageTitle("Querschnitte");
+  const { teil } = useParams();
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
   const { zeigen } = useNummern();
   const breit = useBreit();
 
@@ -183,6 +166,8 @@ export function Querschnitte() {
     return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext, notiz };
   }, [data, mode, breit]);
 
+  useTeilScroll(teil, !!view);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
@@ -196,9 +181,12 @@ export function Querschnitte() {
         </p>
       </header>
 
-      <section className="space-y-2">
+      <section id="verlauf" className="scroll-mt-28 space-y-2">
         <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
+          <h2 className="flex items-baseline gap-2 font-display text-xl font-bold">
+            Entwicklung über die Jahre
+            <AbschnittLink pfad="/erkunden/querschnitte/verlauf" titel="Entwicklung über die Jahre" />
+          </h2>
           <span className="text-xs text-ink-muted">
             Ansätze (Plan) je Kostenblock
             {mode.real && `, in Preisen von ${view.latest}`}
@@ -223,7 +211,7 @@ export function Querschnitte() {
       </section>
 
       {view.cards.map((c, i) => (
-        <section key={c.key} className="space-y-4 rounded-lg border border-ink-line bg-white p-5">
+        <section key={c.key} id={c.key} className="scroll-mt-28 space-y-4 rounded-lg border border-ink-line bg-white p-5">
           <div className="flex items-center gap-3">
             <Klecks farbe={c.color} icon={ICON[c.key] ?? Buildings} variante={i} />
             <KategorieZeile farbe={c.color} icon={c.agg.art === "struktur" ? TreeStructure : Tag}>
@@ -231,7 +219,10 @@ export function Querschnitte() {
             </KategorieZeile>
           </div>
           <div className="space-y-1">
-            <h2 className="font-display text-2xl font-bold">{c.agg.title}</h2>
+            <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+              {c.agg.title}
+              <AbschnittLink pfad={`/erkunden/querschnitte/${c.key}`} titel={c.agg.title} />
+            </h2>
             <p className="max-w-2xl text-sm text-ink-soft">{c.agg.beschreibung}</p>
             <p className="text-xs text-ink-muted">Kriterium: {c.agg.kriterium}</p>
           </div>

@@ -29,18 +29,25 @@ const routes = [
       element: <Layout />,
       children: [
         { path: "/", element: <Home /> },
+        // Teilbare Abschnitte stehen im Pfad, nicht im Hash und nicht in der
+        // Query: nur so hat jeder Abschnitt eine eigene Adresse, unter der eine
+        // eigene HTML-Datei mit eigener Vorschaukarte liegen kann (scripts/karten.mjs).
+        { path: "/ueberblick/:teil", element: <Home /> },
         {
           path: "/erkunden",
           element: <ErkundenLayout />,
           children: [
             { index: true, element: <Erkunden /> },
-            { path: "einnahmen", element: <Einnahmen /> },
-            { path: "investitionen", element: <Investitionen /> },
-            { path: "querschnitte", element: <Querschnitte /> },
+            { path: "einnahmen/:teil?", element: <Einnahmen /> },
+            { path: "investitionen/:teil?", element: <Investitionen /> },
+            { path: "querschnitte/:teil?", element: <Querschnitte /> },
           ],
         },
         { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
+        // Der Bereich (2-stellige Gliederung) neben /einrichtung und /posten:
+        // jede Haushaltsebene hat damit ihre kurze Adresse.
+        { path: "/bereich/:ab", element: <EinzelplanDetail /> },
         { path: "/geldfluss", element: <Navigate to="/erkunden" replace /> },
         { path: "/einnahmen", element: <Navigate to="/erkunden/einnahmen" replace /> },
         { path: "/investitionen", element: <Navigate to="/erkunden/investitionen" replace /> },
@@ -51,7 +58,7 @@ const routes = [
         { path: "/einrichtung/:glz", element: <EinrichtungDetail /> },
         { path: "/info", element: <Info /> },
         { path: "/methodik", element: <Methodik /> },
-        { path: "/glossar", element: <Glossar /> },
+        { path: "/glossar/:teil?", element: <Glossar /> },
         { path: "/impressum", element: <Impressum /> },
         { path: "/datenschutz", element: <Datenschutz /> },
         { path: "/barrierefreiheit", element: <Barrierefreiheit /> },

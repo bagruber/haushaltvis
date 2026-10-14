@@ -1,15 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useData, postenSeries, postenCrumb, eventsFor } from "@/lib/data";
 import { usePageTitle } from "@/lib/title";
 import { CaretRight } from "@phosphor-icons/react";
 import { Chip, Loading, Teilen, ThemaPlatzhalter } from "@/components/ui";
-import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { Timeline, TimelineControls } from "@/components/Timeline";
+import { useAnsicht } from "@/lib/teilen";
 
 export function PostenDetail() {
   const { id = "" } = useParams();
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
 
   const view = useMemo(() => {
     if (!data) return null;

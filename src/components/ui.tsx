@@ -1,9 +1,10 @@
 // Small shared UI primitives, previously duplicated across pages.
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ShareNetwork, type Icon } from "@phosphor-icons/react";
+import { LinkSimple, ShareNetwork, type Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import { kategorieTon } from "@/lib/kategorien";
+import { teilUrl } from "@/lib/teilen";
 
 export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -260,15 +261,17 @@ export function SegmentedToggle<T extends string>({ value, onChange, options, la
 }
 
 /**
- * Share the current page: the system share sheet where there is one, otherwise
- * the link is copied. The URL already carries the Stichjahr and calculator input.
+ * The share action: system share sheet where there is one, otherwise the link
+ * is copied and the button reports it. With `pfad` the shared address is that
+ * section's instead of the current page's.
  */
-export function Teilen({ hell, label = "Teilen", className }: { hell?: boolean; label?: string; className?: string }) {
+function useTeilen(pfad?: string, titel?: string): [boolean, () => Promise<void>] {
   const [kopiert, setKopiert] = useState(false);
   const teilen = async () => {
-    const url = window.location.href;
+    const url = pfad ? teilUrl(window.location.href, pfad) : window.location.href;
+    const title = titel ? `${titel} · ${document.title}` : document.title;
     if (navigator.share) {
-      await navigator.share({ title: document.title, url }).catch(() => undefined);
+      await navigator.share({ title, url }).catch(() => undefined);
       return;
     }
     await navigator.clipboard.writeText(url).then(
@@ -279,6 +282,23 @@ export function Teilen({ hell, label = "Teilen", className }: { hell?: boolean; 
       () => undefined,
     );
   };
+  return [kopiert, teilen];
+}
+
+/**
+ * Share the current page, or with `pfad` the one section the button sits on.
+ * The URL already carries the Stichjahr, the view switches and calculator input.
+ */
+export function Teilen({ hell, label = "Teilen", className, pfad, titel }: {
+  hell?: boolean;
+  label?: string;
+  className?: string;
+  /** section address, e.g. "/bereich/21"; without it the current page is shared */
+  pfad?: string;
+  /** section heading, put in front of the page title */
+  titel?: string;
+}) {
+  const [kopiert, teilen] = useTeilen(pfad, titel);
   return (
     <button
       type="button"
@@ -291,6 +311,30 @@ export function Teilen({ hell, label = "Teilen", className }: { hell?: boolean; 
     >
       <ShareNetwork size={16} aria-hidden />
       <span aria-live="polite">{kopiert ? "Link kopiert" : label}</span>
+    </button>
+  );
+}
+
+/**
+ * Link to this section, next to its heading. Icon only and always visible:
+ * on touch there is no hover to reveal it. The feedback is text, so it also
+ * reaches screen readers.
+ */
+export function AbschnittLink({ pfad, titel, className }: { pfad: string; titel: string; className?: string }) {
+  const [kopiert, teilen] = useTeilen(pfad, titel);
+  return (
+    <button
+      type="button"
+      onClick={teilen}
+      aria-label="Link zu diesem Abschnitt teilen"
+      className={cn(
+        "inline-flex shrink-0 items-center gap-1.5 rounded-md p-1 text-ink-muted transition-colors hover:bg-cream-dark hover:text-ink",
+        className,
+      )}
+    >
+      <LinkSimple size={16} aria-hidden />
+      {kopiert && <span className="text-xs font-normal">Link kopiert</span>}
+      <span className="sr-only" aria-live="polite">{kopiert ? "Link kopiert" : ""}</span>
     </button>
   );
 }

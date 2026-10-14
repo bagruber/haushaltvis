@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { CaretRight } from "@phosphor-icons/react";
@@ -18,7 +18,8 @@ import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Card, Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
-import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { Timeline, TimelineControls } from "@/components/Timeline";
+import { useAnsicht } from "@/lib/teilen";
 import { sankeyTooltip } from "@/lib/charts";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -43,7 +44,7 @@ export function ThemeDetail() {
   const { data, error } = useData();
   const navigate = useNavigate();
   const { year } = useYearCtx();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
 
   const view = useMemo(() => {
     if (!data) return null;

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import {
@@ -14,7 +14,8 @@ import {
 } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Kennzahl, Loading } from "@/components/ui";
+import { AbschnittLink, Kennzahl, Loading } from "@/components/ui";
+import { useTeilScroll } from "@/lib/teilen";
 import { Term } from "@/components/Term";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { ChartTable } from "@/components/ChartTable";
@@ -53,6 +54,7 @@ function spanLabel(p: InvestProject): string {
 
 export function Investitionen() {
   usePageTitle("Investitionen");
+  const { teil } = useParams();
   const { data, error } = useData();
   const navigate = useNavigate();
   const { zeigen } = useNummern();
@@ -157,6 +159,8 @@ export function Investitionen() {
     [view, navigate],
   );
 
+  useTeilScroll(teil, !!view);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
@@ -189,9 +193,12 @@ export function Investitionen() {
         ))}
       </section>
 
-      <section className="space-y-3">
+      <section id="wer-bezahlt" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Wer {y} bezahlt</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Wer {y} bezahlt
+            <AbschnittLink pfad="/erkunden/investitionen/wer-bezahlt" titel={`Wer ${y} bezahlt`} />
+          </h2>
           <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
@@ -219,9 +226,12 @@ export function Investitionen() {
         />
       </section>
 
-      <section className="space-y-3">
+      <section id="vorhaben" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Vorhaben über ihre ganze Laufzeit</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Vorhaben über ihre ganze Laufzeit
+            <AbschnittLink pfad="/erkunden/investitionen/vorhaben" titel={"Vorhaben über ihre ganze Laufzeit"} />
+          </h2>
           <span className="text-xs text-ink-muted">Summe aller Jahre, größte zuerst</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
@@ -271,9 +281,12 @@ export function Investitionen() {
       </section>
 
       {view.dauer.length > 0 && (
-        <section className="space-y-3">
+        <section id="laufende-ansaetze" className="scroll-mt-28 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-            <h2 className="font-display text-2xl font-bold">Laufende Ansätze</h2>
+            <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+              Laufende Ansätze
+              <AbschnittLink pfad="/erkunden/investitionen/laufende-ansaetze" titel={"Laufende Ansätze"} />
+            </h2>
             <span className="text-xs text-ink-muted">kein einzelnes Vorhaben</span>
           </div>
           <p className="max-w-2xl text-ink-soft">
@@ -301,9 +314,12 @@ export function Investitionen() {
         </section>
       )}
 
-      <section className="space-y-3">
+      <section id="verlauf" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Investitionen über die Jahre</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Investitionen über die Jahre
+            <AbschnittLink pfad="/erkunden/investitionen/verlauf" titel={"Investitionen über die Jahre"} />
+          </h2>
           <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Einzelplan</span>
         </div>
         <EChart

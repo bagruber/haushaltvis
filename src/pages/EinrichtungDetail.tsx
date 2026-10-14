@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { Timeline, TimelineControls } from "@/components/Timeline";
+import { useAnsicht } from "@/lib/teilen";
 import { usePageTitle } from "@/lib/title";
 import { CaretRight } from "@phosphor-icons/react";
 import { Chip, Kennzahl, Loading, Teilen, ThemaPlatzhalter } from "@/components/ui";
@@ -18,7 +19,7 @@ import { fmtEur, fmtEurFine } from "@/lib/format";
 export function EinrichtungDetail() {
   const { glz = "" } = useParams();
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
 
   const view = useMemo(() => {
     if (!data) return null;
