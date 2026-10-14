@@ -1,16 +1,20 @@
-import { useMemo } from "react";
-import type { EChartsOption } from "echarts";
+import { useMemo, useState } from "react";
+import type { EChartsOption, SeriesOption } from "echarts";
 import { EChart } from "./EChart";
 import { ChartTable } from "./ChartTable";
+import { DiagrammLegende, type LegendenEintrag, type LegendenForm } from "./DiagrammLegende";
 import { Term } from "./Term";
 import { adjustSeries, netSeries, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
 import { useBreit, type Notiz } from "@/lib/notiz";
+import { SERIEN, useSerien, type SerieKey } from "@/lib/teilen";
 import { PLAN_COLOR } from "@/lib/marke.mjs";
 import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
 
 /** Plan is drawn in a neutral tone so it never competes with the Ist colour. */
 export { PLAN_COLOR } from "@/lib/marke.mjs";
 const REFERENZ_COLOR = "#c4bcac";
+/** Investitionen sind in der ganzen App ockerfarbene Balken. */
+export const INVEST_COLOR = "#b39f7a";
 
 export interface TimelineMode extends TimeMode {
   showInvest?: boolean;
@@ -34,6 +38,12 @@ interface Props {
   art?: EA;
   /** Handwritten note; only used where the chart has none of its own. */
   notiz?: Notiz;
+  /**
+   * Legende zeigen. Auf einer Seite mit vielen gleich gebauten Diagrammen
+   * (Einzelplan: ein Bereich je Diagramm) steht sie nur über dem ersten —
+   * sie gilt ohnehin für alle.
+   */
+  legende?: boolean;
 }
 
 /** "2026-10-01" → "1.10." — the day the figures were taken. */
@@ -80,15 +90,17 @@ function marken(zw: Zwischen, art: EA) {
  * Ansatz-vs-Ergebnis timeline. Laufende Kosten (VwHH) as lines; Investitionen
  * (VmHH) — lumpy year to year — as bars, only when explicitly enabled.
  */
-export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280, art = "A", notiz }: Props) {
+export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280, art = "A", notiz, legende = true }: Props) {
   const breit = useBreit();
-  const { option, table, hinweis, dieNotiz, stand } = useMemo(() => {
+  const { aus, an, setAn } = useSerien();
+  const [hervor, setHervor] = useState<string | null>(null);
+  const { option, table, hinweis, dieNotiz, stand, eintraege } = useMemo(() => {
     const perKopf = (v: number) => `${fmtEurFine(v)}/Kopf`;
     const fmt = (v: number | null) => (v == null ? "-" : mode.perCapita ? perKopf(v) : fmtEur(v));
     const netto = !!(mode.netto && einnahmen);
     const base = netto ? netSeries(laufend, einnahmen!) : laufend;
     const lf = adjustSeries(base, context, mode, baseYear);
-    const iv = invest && mode.showInvest ? adjustSeries(invest, context, mode, baseYear) : null;
+    const iv = invest ? adjustSeries(invest, context, mode, baseYear) : null;
     // Keep gross on screen while netted: the distance between the two lines is
     // exactly what fees and charges cover, and that is the point of the view.
     const brutto = netto ? adjustSeries(laufend, context, mode, baseYear) : null;
@@ -98,12 +110,33 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     const zw = netto ? undefined : lf.zwischen;
     const zwIndex = zw ? lf.years.indexOf(zw.jahr) : -1;
     const mark = zw ? marken(zw, art) : null;
+    const anteil = zwIndex >= 0 ? lf.ansatz[zwIndex] : null;
+    const nurHier = (v: number) => lf.years.map((_, i) => (i === zwIndex ? v : null));
+
+    /**
+     * Jede Serie einmal beschrieben: Name, Form, Farbe, Daten, Tabellenspalte.
+     * Tooltip, Legende und Tabelle lesen dieselbe Liste in derselben Folge —
+     * so kann keine der drei aus der Reihe tanzen.
+     */
+    const bausteine: {
+      key: SerieKey;
+      name: string;
+      form: LegendenForm;
+      farbe: string;
+      werte: (number | null)[];
+      serie: SeriesOption;
+    }[] = [];
 
     // Ist is the fact and carries the colour as a solid line; Plan is an
     // intention and is dashed in a muted tone. Dashing the Ist would signal
     // uncertainty about the one figure that is actually certain.
-    const series: NonNullable<EChartsOption["series"]> = [
-      {
+    bausteine.push({
+      key: "ist",
+      name: netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
+      form: "linie",
+      farbe: color,
+      werte: lf.ergebnis,
+      serie: {
         name: netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
         type: "line",
         data: lf.ergebnis,
@@ -113,7 +146,14 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         connectNulls: true,
         z: 3,
       },
-      {
+    });
+    bausteine.push({
+      key: "plan",
+      name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
+      form: "gestrichelt",
+      farbe: PLAN_COLOR,
+      werte: lf.ansatz,
+      serie: {
         name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
         type: "line",
         data: lf.ansatz,
@@ -124,30 +164,18 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         connectNulls: true,
         z: 2,
       },
-    ];
-    if (brutto) {
-      series.push({
-        name: "Ausgaben gesamt",
-        type: "line",
-        data: brutto.ansatz,
-        symbol: "none",
-        lineStyle: { width: 1.5, color: REFERENZ_COLOR },
-        itemStyle: { color: REFERENZ_COLOR },
-        connectNulls: true,
-        z: 1,
-      });
-    }
-    if (iv) {
-      series.push({ name: "Investitionen (Ansatz)", type: "bar", data: iv.ansatz, barWidth: "40%", itemStyle: { color: "#b39f7a", opacity: 0.85 } });
-    }
+    });
     if (zw && zwIndex >= 0 && mark) {
       // Kreis = ganzes Jahr, Raute = Teil des Jahres. Die Farbe trennt Plan von
       // Vollzug wie sonst, die Füllung bezahlt von gebucht. Keine Linie: die
       // Marke gehört zu keiner Reihe, sie ist ein Zwischenruf.
-      const anteil = lf.ansatz[zwIndex];
-      const nurHier = (v: number) => lf.years.map((_, i) => (i === zwIndex ? v : null));
-      series.push(
-        {
+      bausteine.push({
+        key: "gebucht",
+        name: mark.soll,
+        form: "raute-hohl",
+        farbe: color,
+        werte: nurHier(zw.soll),
+        serie: {
           name: mark.soll,
           type: "scatter",
           data: nurHier(zw.soll),
@@ -157,7 +185,14 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
           itemStyle: { color, borderColor: color, borderWidth: 2 },
           z: 4,
         },
-        {
+      });
+      bausteine.push({
+        key: "bezahlt",
+        name: mark.ist,
+        form: "raute-voll",
+        farbe: color,
+        werte: nurHier(zw.ist),
+        serie: {
           name: mark.ist,
           type: "scatter",
           data: nurHier(zw.ist),
@@ -167,12 +202,52 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
           itemStyle: { color },
           z: 5,
           tooltip: {
-            valueFormatter: (v) =>
+            valueFormatter: (v: unknown) =>
               anteil ? `${fmt(v as number)} · ${fmtPct((v as number) / anteil)} des Ansatzes` : fmt(v as number),
           },
         },
-      );
+      });
     }
+    if (brutto) {
+      bausteine.push({
+        key: "brutto",
+        name: "Ausgaben gesamt",
+        form: "linie-duenn",
+        farbe: REFERENZ_COLOR,
+        werte: brutto.ansatz,
+        serie: {
+          name: "Ausgaben gesamt",
+          type: "line",
+          data: brutto.ansatz,
+          symbol: "none",
+          lineStyle: { width: 1.5, color: REFERENZ_COLOR },
+          itemStyle: { color: REFERENZ_COLOR },
+          connectNulls: true,
+          z: 1,
+        },
+      });
+    }
+    if (iv) {
+      bausteine.push({
+        key: "invest",
+        name: "Investitionen",
+        form: "balken",
+        farbe: INVEST_COLOR,
+        werte: iv.ansatz,
+        serie: {
+          name: "Investitionen",
+          type: "bar",
+          data: iv.ansatz,
+          barWidth: "40%",
+          itemStyle: { color: INVEST_COLOR, opacity: 0.85 },
+        },
+      });
+    }
+
+    bausteine.sort((a, b) => SERIEN.indexOf(a.key) - SERIEN.indexOf(b.key));
+    const sichtbar = bausteine.filter((b) => (b.key === "invest" ? !!mode.showInvest : !aus.has(b.key)));
+    const eintraege: LegendenEintrag[] = bausteine.map(({ key, name, form, farbe }) => ({ key, name, form, farbe }));
+    const series = sichtbar.map((b) => b.serie);
 
     // Die größte Gefahr beim Zwischenstand: jede Raute liegt unter dem Ansatz,
     // und wer nicht weiß, dass nur neun Monate gezählt sind, liest überall
@@ -191,7 +266,9 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
 
     const option: EChartsOption = {
       tooltip: { trigger: "axis", valueFormatter: (v) => fmt(v as number | null) },
-      legend: { bottom: 0 },
+      // Legende abgeschaltet: DiagrammLegende macht dasselbe per Tastatur,
+      // mit den echten Symbolen und sichtbar ausgeschalteten Eintraegen.
+      legend: { show: false },
       // Eine Notiz braucht Luft über der Grafik (siehe lib/notiz.ts).
       grid: { left: 8, right: 16, top: dieNotiz ? 56 : 12, bottom: 44, containLabel: true },
       xAxis: {
@@ -208,21 +285,11 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       series,
     };
 
-    const columns = [
-      "Jahr",
-      netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
-      netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
-      ...(brutto ? ["Ausgaben gesamt"] : []),
-      ...(iv ? ["Investitionen (Ansatz)"] : []),
-      ...(mark ? [mark.soll, mark.ist] : []),
-    ];
+    // Die Tabelle zeigt, was auch im Bild steht, in derselben Folge.
+    const columns = ["Jahr", ...sichtbar.map((b) => b.name)];
     const rows = lf.years.map((y, i) => [
       `${y}${lf.provisional.has(y) ? (zw && y === zw.jahr ? ` (Stand ${standTag(zw.stichtag)})` : " (nur Plan)") : ""}`,
-      fmt(lf.ergebnis[i]),
-      fmt(lf.ansatz[i]),
-      ...(brutto ? [fmt(brutto.ansatz[i])] : []),
-      ...(iv ? [fmt(iv.ansatz[i])] : []),
-      ...(zw && mark ? (i === zwIndex ? [fmt(zw.soll), fmt(zw.ist)] : ["", ""]) : []),
+      ...sichtbar.map((b) => (b.werte[i] == null ? "" : fmt(b.werte[i]))),
     ]);
 
     return {
@@ -232,14 +299,19 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       hinweis: !!(netto && laufend.zwischen),
       dieNotiz,
       stand: zw && zwIndex >= 0 ? standTag(zw.stichtag) : undefined,
+      eintraege,
     };
-  }, [laufend, invest, einnahmen, mode, context, baseYear, color, art, notiz, breit]);
+  }, [laufend, invest, einnahmen, mode, context, baseYear, color, art, notiz, breit, aus]);
 
   return (
     <div>
+      {legende && (
+        <DiagrammLegende eintraege={eintraege} an={an} setAn={setAn} onHervor={setHervor} />
+      )}
       <EChart
         option={option}
         notiz={dieNotiz}
+        hervor={hervor}
         ariaLabel="Zeitverlauf von Ansatz (Plan) und Ergebnis (Ist), Zahlen in der Tabelle darunter"
         style={{ height }}
       />
@@ -262,23 +334,26 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
   );
 }
 
-/** Re-usable checkbox row for timeline options. */
+/**
+ * Die Schalterzeile trägt nur noch Umrechnungen: **wie** gerechnet wird.
+ * **Was** zu sehen ist, steht in der Legende — Investitionen sind eine Serie,
+ * keine Rechenart.
+ */
 export function TimelineControls({
   mode,
   setMode,
   hasContext,
-  hasInvest,
   hasEinnahmen,
 }: {
   mode: TimelineMode;
   setMode: (fn: (m: TimelineMode) => TimelineMode) => void;
   hasContext: boolean;
-  hasInvest: boolean;
   hasEinnahmen?: boolean;
 }) {
-  if (!hasContext && !hasInvest && !hasEinnahmen) return null;
+  if (!hasContext && !hasEinnahmen) return null;
   return (
-    <div className="flex flex-wrap gap-4 text-xs mb-1">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs mb-1">
+      <span className="text-ink-muted">Rechnen</span>
       {hasContext && (
         <>
           <label className="flex items-center gap-1.5 cursor-pointer">
@@ -298,12 +373,6 @@ export function TimelineControls({
           <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
             mit Einnahmen verrechnet
           </span>
-        </label>
-      )}
-      {hasInvest && (
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input type="checkbox" checked={!!mode.showInvest} onChange={(e) => setMode((m) => ({ ...m, showInvest: e.target.checked }))} />
-          <span>Investitionen zeigen</span>
         </label>
       )}
     </div>

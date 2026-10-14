@@ -193,7 +193,7 @@ export function Querschnitte() {
             {mode.perCapita && ", je Einwohner"}
           </span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} />
         <EChart
           option={view.overview}
           notiz={view.notiz}

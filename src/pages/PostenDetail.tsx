@@ -65,7 +65,7 @@ export function PostenDetail() {
           <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
           <span className="text-xs text-ink-muted">Plan (Ansatz) gegen Ergebnis (Ist). Für {baseYear} nur der Plan.</span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} />
         <Timeline laufend={series} mode={mode} context={data!.context} baseYear={baseYear} height={320} art={p.ea} />
       </section>
 

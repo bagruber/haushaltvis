@@ -46,6 +46,52 @@ export function kennung(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
+// ── Sichtbare Serien im Link ────────────────────────────────────────────────
+
+/**
+ * Die Serien eines Timeline-Diagramms, in der Reihenfolge, die überall gilt:
+ * Tooltip, Legende und Tabelle zeigen sie in genau dieser Folge.
+ */
+export const SERIEN = ["ist", "plan", "gebucht", "bezahlt", "brutto", "invest"] as const;
+export type SerieKey = (typeof SERIEN)[number];
+
+/**
+ * Welche Serien sichtbar sind. `?aus=` listet die ausgeblendeten — alle Serien
+ * sind also an, bis jemand sie abwählt. Die Investitionen sind der umgekehrte
+ * Fall: sie sind aus, bis `?ansicht=invest` sie einschaltet. Dieses Wort gab es
+ * schon als Schalter, und alte Links sollen gültig bleiben.
+ */
+export function useSerien() {
+  const [params, setParams] = useSearchParams();
+  const [mode, setMode] = useAnsicht();
+  const roh = params.get("aus");
+  const aus = useMemo(
+    () => new Set((roh ?? "").split(",").filter((k) => (SERIEN as readonly string[]).includes(k)) as SerieKey[]),
+    [roh],
+  );
+  const an = (key: string) => (key === "invest" ? !!mode.showInvest : !aus.has(key as SerieKey));
+  const setAn = (key: string, wert: boolean) => {
+    if (key === "invest") {
+      setMode((m) => ({ ...m, showInvest: wert }));
+      return;
+    }
+    const naechste = new Set(aus);
+    if (wert) naechste.delete(key as SerieKey);
+    else naechste.add(key as SerieKey);
+    const wort = SERIEN.filter((k) => naechste.has(k)).join(",");
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (wort) next.set("aus", wort);
+        else next.delete("aus");
+        return next;
+      },
+      { replace: true, preventScrollReset: true },
+    );
+  };
+  return { aus, an, setAn };
+}
+
 // ── Ansichts-Schalter im Link ───────────────────────────────────────────────
 
 /** `?ansicht=` → the timeline switches. Unknown words are ignored. */

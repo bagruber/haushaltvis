@@ -24,6 +24,12 @@ interface Props {
   ariaLabel?: string;
   /** Handwritten note; pass a memoised object, a new one on every render redraws the chart. */
   notiz?: Notiz;
+  /**
+   * Name der Serie, die gerade hervorgehoben wird (Zeiger oder Fokus auf der
+   * Legende). Die uebrigen verblassen — was die ECharts-Legende von sich aus
+   * tat und unsere eigene nun ausloest.
+   */
+  hervor?: string | null;
 }
 
 const NOTIZ_TINTE = "#6e5a30"; // gold-700
@@ -97,7 +103,7 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
 }
 
 /** Thin React wrapper around an ECharts instance — no peer-dep baggage. */
-export function EChart({ option, className, style, onEvents, ariaLabel, notiz }: Props) {
+export function EChart({ option, className, style, onEvents, ariaLabel, notiz, hervor }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const inst = useRef<Chart | null>(null);
   const notizRef = useRef(notiz);
@@ -145,6 +151,13 @@ export function EChart({ option, className, style, onEvents, ariaLabel, notiz }:
     );
     zeichneNotiz(chart, notiz);
   }, [option, fontsReady, notiz]);
+
+  useEffect(() => {
+    const chart = inst.current;
+    if (!chart || !fontsReady) return;
+    chart.dispatchAction({ type: "downplay" });
+    if (hervor) chart.dispatchAction({ type: "highlight", seriesName: hervor });
+  }, [hervor, fontsReady, option]);
 
   useEffect(() => {
     const chart = inst.current;

@@ -141,7 +141,7 @@ export function Einnahmen() {
           </h2>
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} />
         <EChart option={view.steuerOpt} notiz={view.notiz} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter" style={{ height: 300 }} />
         <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>

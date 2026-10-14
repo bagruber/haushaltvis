@@ -98,7 +98,7 @@ export function EinrichtungDetail() {
           <h2 className="font-display text-xl font-bold">Laufende Ausgaben über die Jahre</h2>
           <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. Für {y} nur der Plan.</span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={hasInvest} hasEinnahmen={hasEinnahmen} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasEinnahmen={hasEinnahmen} />
         <Timeline laufend={laufend} invest={invest} einnahmen={einnahmen} mode={mode} context={data!.context} baseYear={y} height={300} />
         {hasEinnahmen && (
           <p className="text-xs text-ink-muted">

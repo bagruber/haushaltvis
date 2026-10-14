@@ -86,11 +86,11 @@ export function EinzelplanDetail() {
           {view.gesamt > 0 && <span className="text-ink-muted"> · {fmtPct(view.total / view.gesamt)} aller Ausgaben</span>}
           {view.pop && <span className="text-ink-muted"> · {fmtEurFine(view.total / view.pop)} je Einwohner</span>}
         </span>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={view.hasInvest} hasEinnahmen={view.hasEinnahmen} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasEinnahmen={view.hasEinnahmen} />
       </div>
 
       <div className="space-y-4">
-        {view.sections.map((s) => (
+        {view.sections.map((s, i) => (
           <section key={s.code} id={s.code} className="scroll-mt-28 border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
               <h2 className="flex min-w-0 items-baseline gap-2 font-display text-lg font-bold">
@@ -103,7 +103,9 @@ export function EinzelplanDetail() {
               <span className="tabular-nums text-ink-soft">{fmtEur(s.total)}</span>
             </div>
 
-            <Timeline laufend={s.laufend} invest={s.invest} einnahmen={s.einnahmen} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} />
+            {/* Die Legende gilt fuer alle Bereichsdiagramme der Seite und
+                steht deshalb nur ueber dem ersten. */}
+            <Timeline laufend={s.laufend} invest={s.invest} einnahmen={s.einnahmen} mode={mode} context={data!.context} baseYear={view.y} color={color} height={220} legende={i === 0} />
 
             <ul className="space-y-1.5 text-sm mt-3">
               {s.einrichtungen.map((e, _, alle) => (
