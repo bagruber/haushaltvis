@@ -28,8 +28,25 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "haushaltsplaene/Official Data/Auswertung 2016 - 2026 Haushaltstellen.xlsx"
+AKDB = ROOT / "haushaltsplaene/akdb"
 OUT = ROOT / "data/processed/budget.json"
+
+
+def quelle() -> Path:
+    """Der Langexport in haushaltsplaene/akdb/ — bei mehreren der mit dem
+    jüngsten Endjahr im Namen. Nicht fest verdrahtet, damit ein neuer Export
+    nur abgelegt und nicht eingetragen werden muss."""
+    treffer = list(AKDB.glob("Auswertung * Haushaltstellen.xlsx"))
+    if not treffer:
+        raise SystemExit(
+            f"Kein Langexport in {AKDB.relative_to(ROOT)} gefunden "
+            "(erwartet: 'Auswertung <Jahre> Haushaltstellen.xlsx')."
+        )
+    treffer.sort(key=lambda f: max((int(j) for j in re.findall(r"\b\d{4}\b", f.name)), default=0))
+    if len(treffer) > 1:
+        print(f"{len(treffer)} Langexporte gefunden, genommen: {treffer[-1].name}")
+    return treffer[-1]
+
 
 EINZELPLAN_NAME = {
     "0": "Allgemeine Verwaltung",
@@ -123,8 +140,8 @@ def find(idx: dict, *names: str) -> int:
     raise KeyError(f"Spalte nicht gefunden (eine von {names}). Vorhanden: {sorted(idx)[:12]}…")
 
 
-def ingest(posten: dict, facts: list):
-    wb = openpyxl.load_workbook(SRC, read_only=True, data_only=True)
+def ingest(posten: dict, facts: list, src: Path):
+    wb = openpyxl.load_workbook(src, read_only=True, data_only=True)
     ws = wb.active
     it = ws.iter_rows(values_only=True)
     idx = header_map(next(it))
@@ -242,7 +259,8 @@ def apply_crosswalk(posten: dict, facts: list, cw: dict) -> int:
 def main():
     posten: dict = {}
     facts: list = []
-    n, years, maxy = ingest(posten, facts)
+    src = quelle()
+    n, years, maxy = ingest(posten, facts, src)
     crosswalk = build_crosswalk(posten)
     n_remap = apply_crosswalk(posten, facts, crosswalk)
 
@@ -250,7 +268,7 @@ def main():
         "meta": {
             "generated": dt.datetime.now().isoformat(timespec="seconds"),
             "years": sorted({f["year"] for f in facts}),
-            "source": SRC.name,
+            "source": src.name,
             "counts": {"posten": len(posten), "facts": len(facts),
                        "crosswalk_codes": len(crosswalk), "facts_remapped": n_remap,
                        "freiwillig": sum(1 for p in posten.values() if p["freiwillig"])},

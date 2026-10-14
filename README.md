@@ -93,6 +93,9 @@ Standard-Zuordnung). Schema und Ablauf: **[DATENFORMAT.md](DATENFORMAT.md)**.
 ```
 etl/             Python-Daten-Pipeline + editierbare YAMLs
 haushaltsplaene/ AKDB-Quell-Exporte (Excel/PDF) — lokal, NICHT im Repo
+  akdb/          Langexporte, liest etl/ingest.py (jüngstes Endjahr gewinnt)
+  zwischenstand/ Stichtags-Auswertungen, liest etl/zwischenstand.py (jüngste Datei)
+  archiv/        frühere Entwürfe und Einzelauswertungen
 public/data/     fertige JSONs für die Web-App
 src/lib/         Daten-Laden, Typen, Selektoren, Farben
 src/components/  Charts, Layout, Suche, Timeline, Glossar
