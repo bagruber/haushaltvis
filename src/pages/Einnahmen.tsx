@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import { TimelineControls } from "@/components/Timeline";
@@ -13,7 +13,7 @@ import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { extremImFenster, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
 
-const STEUERN: [string, string][] = [
+export const STEUERN: [string, string][] = [
   ["Einkommensteuer-Anteil", "#c8102e"],
   ["Gewerbesteuer", "#b8964e"],
   ["Schlüsselzuweisungen & Finanzausgleich", "#6b3e7a"],
@@ -27,6 +27,7 @@ export function Einnahmen() {
   const { data, error } = useData();
 
   const { teil } = useParams();
+  const navigate = useNavigate();
   const { year: selYear } = useYearCtx();
   const [mode, setMode] = useAnsicht();
   const { zeigen } = useNummern();
@@ -151,7 +152,23 @@ export function Einnahmen() {
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} />
-        <EChart option={view.steuerOpt} notiz={view.notiz} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter" style={{ height: 300 }} />
+        <EChart
+          option={view.steuerOpt}
+          notiz={view.notiz}
+          // Ein Klick auf eine Linie (Ist oder Plan-Ende) öffnet ihre Einnahmeart.
+          onEvents={{
+            click: (p) => {
+              const name = (p as { seriesName?: string }).seriesName?.replace(/ \(Plan\)$/, "");
+              if (name) navigate(`/erkunden/einnahmen/${kennung(name)}`);
+            },
+          }}
+          ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter"
+          style={{ height: 300 }}
+        />
+        <p className="text-xs text-ink-muted">
+          Ein Klick auf eine Linie öffnet die Einnahmeart mit eigenem Verlauf und dem Stand zum 01. Oktober,
+          ebenso jede Überschrift in der Liste unten.
+        </p>
         <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>
 
@@ -162,7 +179,7 @@ export function Einnahmen() {
           <section key={g.key} id={kennung(g.key)} className="scroll-mt-28 border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
               <h2 className="flex min-w-0 items-baseline gap-2 font-display text-lg font-bold">
-                <span className="truncate">{g.label}</span>
+                <Link to={`/erkunden/einnahmen/${kennung(g.key)}`} className="truncate hover:text-red-600">{g.label}</Link>
                 <AbschnittLink pfad={`/erkunden/einnahmen/${kennung(g.key)}`} titel={g.label} />
               </h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(g.value)}</span>

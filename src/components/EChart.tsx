@@ -57,23 +57,30 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined, deckkraft = 1, sic
   const strich = { stroke: NOTIZ_PFEIL, lineWidth: 1.6, fill: "none", lineCap: "round" as const, lineJoin: "round" as const };
 
   if (notiz.form === "kurz") {
-    // Kurze Form: der Punkt liegt am rechten Rand, der Text links daneben,
-    // möglichst auf gleicher Höhe. Liegt dort ein Punkt, den er nicht verdecken
-    // darf, rückt er nach oben oder unten; der Strich wird dann schräg.
+    // Kurze Form: der Punkt liegt am rechten Rand. Der Text steht darunter,
+    // bündig mit dem rechten Rand der Grafik, ein kurzer Strich führt schräg
+    // hinauf zum Punkt. Unter dem letzten Jahr ist fast immer frei — die Linien
+    // enden darüber —, so legt sich die Notiz nicht über die Daten. Liegt dort
+    // ein Punkt, den sie nicht verdecken darf, rückt sie weiter nach unten;
+    // nur wenn unten kein Platz mehr ist, weicht sie nach oben aus.
     const font = `26px ${script}`;
     const mass = document.createElement("canvas").getContext("2d");
     if (mass) mass.font = font;
     const breite = mass?.measureText(notiz.text).width ?? notiz.text.length * 9;
-    const ende = [px - 14, py];
+    const rechts = rect.x + rect.width;
     const meiden = (notiz.meiden ?? []).map((m) => chart.convertToPixel({ gridIndex: 0 }, [m.x, m.y]) as number[]);
-    const frei = (y: number) => {
-      const rechts = ende[0] - 24 - 2;
-      const links = rechts - breite - 6;
-      return meiden.every(([mx, my]) => mx < links - 8 || mx > rechts + 8 || my < y - 21 || my > y + 21);
-    };
-    const imBild = (y: number) => y > rect.y + 14 && y < rect.y + rect.height - 14;
-    const textY = [py, py - 32, py + 32].find((y) => imBild(y) && frei(y)) ?? py;
-    const start = [ende[0] - 24, textY];
+    const frei = (y: number) =>
+      meiden.every(([mx, my]) => mx < rechts - breite - 8 || mx > rechts + 8 || my < y - 21 || my > y + 21);
+    // In niedrigen Diagrammen ist unter den Rauten wenig Platz: dann rückt der
+    // Text bis knapp über die Achse, solange er die Rauten nicht berührt.
+    const tiefst = rect.y + rect.height - 13;
+    const unter = [py + 36, py + 62].map((y) => Math.min(y, tiefst)).filter((y) => y >= py + 22);
+    const imBild = (y: number) => y > rect.y + 14 && y <= tiefst;
+    const textY = [...unter, py - 36].find((y) => imBild(y) && frei(y)) ?? unter[0] ?? py - 36;
+    const unten = textY > py;
+    // Der Strich endet knapp neben der rechten Raute (bezahlt, 6 px versetzt).
+    const ende = [px + 9, unten ? py + 8 : py - 8];
+    const start = [Math.min(rechts - 6, ende[0] + 22), unten ? textY - 14 : textY + 14];
     const winkel = Math.atan2(ende[1] - start[1], ende[0] - start[0]);
     const spitze = (d: number) => [ende[0] - 8 * Math.cos(winkel + d), ende[1] - 8 * Math.sin(winkel + d)];
     chart.setOption({
@@ -82,7 +89,7 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined, deckkraft = 1, sic
           {
             id: "notiz-text",
             type: "text",
-            x: start[0] - 8,
+            x: rechts,
             y: textY,
             rotation: 0.03,
             silent: true,

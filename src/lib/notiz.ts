@@ -26,8 +26,9 @@ export interface Notiz {
   /**
    * `bogen` (Standard): Text im freien Rand über der Grafik, geschwungener
    * Pfeil hinunter zum Punkt — für Notizen zu einem Ereignis, das irgendwo in
-   * der Fläche liegt. `kurz`: Text direkt neben dem Punkt, gerader Strich —
-   * für eine Marke am Rand, die keinen weiten Weg braucht.
+   * der Fläche liegt. `kurz`: Text unter dem Punkt, bündig mit dem rechten
+   * Rand, kurzer Strich schräg hinauf — für eine Marke am rechten Rand, die
+   * keinen weiten Weg braucht und die Daten nicht überdecken soll.
    */
   form?: "bogen" | "kurz";
   /**
@@ -38,8 +39,8 @@ export interface Notiz {
   serien?: string[];
   /**
    * Nur für `kurz`: Punkte, auf die der Text nicht fallen darf (die Rauten des
-   * Vorjahres liegen genau dort, wo er sonst stünde). Der Text weicht dann
-   * nach oben oder unten aus.
+   * Vorjahres können darunter liegen). Der Text rückt dann weiter nach unten,
+   * und nur wenn dort kein Platz ist, über den Punkt.
    */
   meiden?: { x: string; y: number }[];
 }
