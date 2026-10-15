@@ -111,24 +111,37 @@ nach `data/` legen → fertig (kein Build).
   {ansatz, ergebnis, prov} } }`. Wird von `build_web.py` aus `etl/aggregatoren.yaml`
   berechnet — dort lassen sich Kriterien und Stichwortlisten pflegen.
 - **`data/events.json`** — `{ "events": [ { scope, id, year, title, text } ] }`.
-- **`data/zwischenstand.json`** — der Vollzug des laufenden Jahres zu einem
-  Stichtag:
+- **`data/zwischenstand.json`** — der Vollzug zu einem Stichtag, je Jahr ein
+  Eintrag, nach Jahr aufsteigend. Das laufende Jahr und derselbe Stichtag im
+  Vorjahr stehen so nebeneinander:
 
   ```jsonc
   {
-    "jahr": 2026,
-    "stichtag": "2026-10-01",
-    "quelle": "Haushalt 2026 Stand 01.10.2026 - mit Haushaltssperre.xlsx",
-    "werte": { "0000.4100": [100868.84, 100868.84] }   // [gebucht, bezahlt]
+    "staende": [
+      {
+        "jahr": 2025,
+        "stichtag": "2025-10-01",
+        "quelle": "Haushalt 2025 Stand 30.09.2025.xlsx",
+        "werte": { "0000.4100": [103028.23, 92676.56] }    // [gebucht, bezahlt]
+      },
+      {
+        "jahr": 2026,
+        "stichtag": "2026-10-01",
+        "quelle": "Haushalt 2026 Stand 01.10.2026 - mit Haushaltssperre.xlsx",
+        "werte": { "0000.4100": [100868.84, 100868.84] }
+      }
+    ]
   }
   ```
 
   `gebucht` ist das Anordnungs-Soll (AKDB-Spalte `Soll_HS`), `bezahlt` der
   Abfluss (`Ist_HS`). Die Haushaltsstellen sind dieselben wie in `budget.json`;
-  was dort nicht vorkommt, wird nicht übernommen. Bewusst eine eigene Datei:
-  `budget.json` bleibt unverändert, ein neuer Stichtag ersetzt nur diese, und
-  ihr Löschen nimmt das Feature in der App zurück. Erzeugt von
-  `etl/zwischenstand.py` aus `haushaltsplaene/zwischenstand/`.
+  was dort nicht vorkommt, wird nicht übernommen. Ein Stand zum Monatsletzten
+  gilt als Stand zum Ersten des Folgemonats (30.09. → 01.10.), damit beide
+  Jahre denselben Stichtag tragen. Bewusst eine eigene Datei: `budget.json`
+  bleibt unverändert, und ihr Löschen nimmt das Feature in der App zurück.
+  Erzeugt von `etl/zwischenstand.py` aus `haushaltsplaene/zwischenstand/`, je
+  Jahr die Auswertung mit dem jüngsten Stichtag.
 
 Alle diese Dateien lassen sich einzeln austauschen; die App lädt sie tolerant
 (fehlt eine, läuft die App ohne das jeweilige Extra weiter).

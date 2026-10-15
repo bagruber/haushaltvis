@@ -66,9 +66,10 @@ export interface Context {
 }
 
 /**
- * Vollzug des laufenden Jahres zu einem Stichtag (etl/zwischenstand.py), je
- * Haushaltsstelle [Soll, Ist] — gebucht und bezahlt. Eigene Datei: fehlt sie,
- * ist die Marke in der App weg.
+ * Vollzug eines Jahres zu einem Stichtag (etl/zwischenstand.py), je
+ * Haushaltsstelle [Soll, Ist] — gebucht und bezahlt. Die Datei trägt mehrere
+ * Jahre zum selben Stichtag, damit sich das laufende Jahr mit dem Vorjahr
+ * vergleichen lässt. Eigene Datei: fehlt sie, sind die Marken in der App weg.
  */
 export interface Zwischenstand {
   jahr: number;
@@ -108,6 +109,6 @@ export interface Data {
   glossar: Record<string, GlossarEntry>;
   /** cross-cutting cost blocks, keyed by aggregator id */
   aggregatoren: Record<string, Aggregator>;
-  /** Vollzug des laufenden Jahres zum Stichtag — null, solange es keinen gibt */
-  zwischenstand: Zwischenstand | null;
+  /** Vollzug zum Stichtag, je Jahr einer, nach Jahr aufsteigend — leer, solange es keinen gibt */
+  zwischenstand: Zwischenstand[];
 }

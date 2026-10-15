@@ -49,10 +49,10 @@ const data: Data = {
   einleitungen: {},
   glossar: {},
   aggregatoren: read("aggregatoren.json"),
-  zwischenstand: readOptional<Zwischenstand>("zwischenstand.json"),
+  zwischenstand: readOptional<{ staende: Zwischenstand[] }>("zwischenstand.json")?.staende ?? [],
 };
 /** Wie die App ohne Stichtagsdatei aussieht — der Rückweg ist ein Löschen. */
-const ohneZwischenstand: Data = { ...data, zwischenstand: null };
+const ohneZwischenstand: Data = { ...data, zwischenstand: [] };
 const year = latestYear(budget);
 
 describe("Datenintegrität", () => {
@@ -331,10 +331,14 @@ describe("searchRank", () => {
 });
 
 // Ohne die Datei gibt es nichts zu prüfen — genau das ist der Rückweg.
-describe.skipIf(!data.zwischenstand)("Zwischenstand (Stichtag des laufenden Jahres)", () => {
-  const zs = data.zwischenstand!;
+describe.skipIf(!data.zwischenstand.length)("Zwischenstand (Stichtag, laufendes Jahr und Vorjahr)", () => {
+  const staende = data.zwischenstand;
+  /** Der Stand des laufenden Jahres: der jüngste. */
+  const zs = staende.at(-1)!;
+  const marke = (s: { zwischen?: { jahr: number; soll: number; ist: number }[] }, jahr = zs.jahr) =>
+    s.zwischen?.find((z) => z.jahr === jahr);
 
-  it("der Stichtag liegt im Jahr, das nur einen Plan hat", () => {
+  it("der jüngste Stichtag liegt im Jahr, das nur einen Plan hat", () => {
     expect(zs.jahr).toBe(latestYear(budget));
     expect(zs.stichtag.startsWith(String(zs.jahr))).toBe(true);
     for (const f of budget.facts.filter((x) => x.year === zs.jahr)) {
@@ -342,33 +346,56 @@ describe.skipIf(!data.zwischenstand)("Zwischenstand (Stichtag des laufenden Jahr
     }
   });
 
-  it("jede Stichtagszahl verweist auf einen bekannten Posten", () => {
-    for (const hhst of Object.keys(zs.werte)) {
-      expect(budget.posten[hhst], `unbekannte Haushaltsstelle ${hhst}`).toBeTruthy();
+  // Der Vergleich trägt nur, wenn derselbe Schnitt im Jahr gemeint ist.
+  it("die früheren Stichtage liegen in abgerechneten Jahren, am selben Tag im Jahr", () => {
+    const jahre = staende.map((s) => s.jahr);
+    expect([...jahre].sort()).toEqual(jahre);
+    expect(new Set(jahre).size).toBe(jahre.length);
+    for (const s of staende.slice(0, -1)) {
+      expect(s.stichtag.slice(5), `${s.jahr}`).toBe(zs.stichtag.slice(5));
+      expect(budget.facts.some((f) => f.year === s.jahr && f.ergebnis != null), `${s.jahr} ohne Ergebnis`).toBe(true);
     }
   });
 
-  it("die Einrichtung summiert genau ihre Posten", () => {
-    const glz = Object.values(budget.posten).find(
-      (p) => p.ea === "A" && p.haushalt === "verwaltung" && zs.werte[p.hhst_id]?.[0] > 0,
-    )!.glz;
-    const s = einrichtungSeries(data, glz, "A", "verwaltung");
-    let soll = 0;
-    let ist = 0;
-    for (const p of Object.values(budget.posten)) {
-      if (p.glz !== glz || p.ea !== "A" || p.haushalt !== "verwaltung") continue;
-      soll += zs.werte[p.hhst_id]?.[0] ?? 0;
-      ist += zs.werte[p.hhst_id]?.[1] ?? 0;
+  it("jede Stichtagszahl verweist auf einen bekannten Posten", () => {
+    for (const s of staende) {
+      for (const hhst of Object.keys(s.werte)) {
+        expect(budget.posten[hhst], `unbekannte Haushaltsstelle ${hhst} (${s.jahr})`).toBeTruthy();
+      }
     }
-    expect(s.zwischen!.soll).toBeCloseTo(soll, 2);
-    expect(s.zwischen!.ist).toBeCloseTo(ist, 2);
+  });
+
+  it("je Stichtag eine Marke, nach Jahr aufsteigend", () => {
+    const s = bereichSeries(data, "46", "A", "verwaltung");
+    expect(s.zwischen!.map((z) => z.jahr)).toEqual(staende.map((x) => x.jahr));
+    for (const z of s.zwischen!) {
+      expect(z.stichtag).toBe(staende.find((x) => x.jahr === z.jahr)!.stichtag);
+    }
+  });
+
+  it("die Einrichtung summiert genau ihre Posten, in jedem Jahr", () => {
+    for (const stand of staende) {
+      const glz = Object.values(budget.posten).find(
+        (p) => p.ea === "A" && p.haushalt === "verwaltung" && stand.werte[p.hhst_id]?.[0] > 0,
+      )!.glz;
+      const s = einrichtungSeries(data, glz, "A", "verwaltung");
+      let soll = 0;
+      let ist = 0;
+      for (const p of Object.values(budget.posten)) {
+        if (p.glz !== glz || p.ea !== "A" || p.haushalt !== "verwaltung") continue;
+        soll += stand.werte[p.hhst_id]?.[0] ?? 0;
+        ist += stand.werte[p.hhst_id]?.[1] ?? 0;
+      }
+      expect(marke(s, stand.jahr)!.soll).toBeCloseTo(soll, 2);
+      expect(marke(s, stand.jahr)!.ist).toBeCloseTo(ist, 2);
+    }
   });
 
   it("der Bereich ist die Summe seiner Einrichtungen", () => {
     const ab = "46";
     const glzs = [...new Set(Object.values(budget.posten).filter((p) => p.glz.startsWith(ab)).map((p) => p.glz))];
-    const teile = glzs.map((g) => einrichtungSeries(data, g, "A", "verwaltung").zwischen?.soll ?? 0);
-    const ganz = bereichSeries(data, ab, "A", "verwaltung").zwischen!;
+    const teile = glzs.map((g) => marke(einrichtungSeries(data, g, "A", "verwaltung"))?.soll ?? 0);
+    const ganz = marke(bereichSeries(data, ab, "A", "verwaltung"))!;
     expect(ganz.soll).toBeCloseTo(teile.reduce((x, y) => x + y, 0), 2);
   });
 
@@ -386,22 +413,18 @@ describe.skipIf(!data.zwischenstand)("Zwischenstand (Stichtag des laufenden Jahr
     expect(Object.values(zs.werte).some(([soll, ist]) => ist > soll)).toBe(true);
   });
 
-  it("je Einwohner und inflationsbereinigt rechnen die Marken mit", () => {
+  it("je Einwohner rechnen die Marken mit den Einwohnern ihres eigenen Jahres", () => {
     const s = bereichSeries(data, "46", "A", "verwaltung");
-    const pop = read<{ population: Record<string, number> }>("context.json").population[String(zs.jahr)];
+    const population = read<{ population: Record<string, number> }>("context.json").population;
     const kopf = adjustSeries(s, data.context, { perCapita: true }, zs.jahr);
-    expect(kopf.zwischen!.soll).toBeCloseTo(s.zwischen!.soll / pop, 6);
+    for (const stand of staende) {
+      expect(marke(kopf, stand.jahr)!.soll).toBeCloseTo(marke(s, stand.jahr)!.soll / population[String(stand.jahr)], 6);
+    }
   });
 
   it("ohne Datendatei ist die Marke weg, nicht null oder 0", () => {
     expect(bereichSeries(ohneZwischenstand, "46", "A", "verwaltung").zwischen).toBeUndefined();
     expect(postenSeries(ohneZwischenstand, Object.keys(zs.werte)[0]).zwischen).toBeUndefined();
-  });
-
-  it("der Stichtag gilt fuer alle Marken derselben Datei", () => {
-    const s = bereichSeries(data, "46", "A", "verwaltung").zwischen!;
-    expect(s.stichtag).toBe(zs.stichtag);
-    expect(s.jahr).toBe(zs.jahr);
   });
 });
 

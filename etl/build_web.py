@@ -178,7 +178,8 @@ def main():
             json.dumps(doc, ensure_ascii=False, separators=(",", ":")),
             encoding="utf-8",
         )
-        print(f"zwischenstand.json -> {len(doc['werte'])} Haushaltsstellen, Stichtag {doc['stichtag']}")
+        for s in doc["staende"]:
+            print(f"zwischenstand.json -> {len(s['werte'])} Haushaltsstellen, Stichtag {s['stichtag']}")
     else:
         (DST / "zwischenstand.json").unlink(missing_ok=True)
         print("zwischenstand.json -> keine Stichtagsdaten, Marke bleibt aus")

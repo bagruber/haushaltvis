@@ -45,7 +45,7 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined, deckkraft = 1, sic
   if (!notiz) return;
   // The plot rectangle is not in the public API; the grid model exposes it.
   const modell = chart as unknown as {
-    getModel(): { getComponent(t: string, i: number): { coordinateSystem: { getRect(): { x: number; y: number; width: number } } } } | undefined;
+    getModel(): { getComponent(t: string, i: number): { coordinateSystem: { getRect(): { x: number; y: number; width: number; height: number } } } } | undefined;
   };
   // A resize can fire before the first setOption — there is no grid to measure
   // yet, and the note is drawn again right after the option arrives.
@@ -57,11 +57,25 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined, deckkraft = 1, sic
   const strich = { stroke: NOTIZ_PFEIL, lineWidth: 1.6, fill: "none", lineCap: "round" as const, lineJoin: "round" as const };
 
   if (notiz.form === "kurz") {
-    // Kurze Form: der Punkt liegt am rechten Rand, der Text daneben auf
-    // gleicher Höhe. Ein Bogen vom oberen Rand wäre hier ein Umweg.
+    // Kurze Form: der Punkt liegt am rechten Rand, der Text links daneben,
+    // möglichst auf gleicher Höhe. Liegt dort ein Punkt, den er nicht verdecken
+    // darf, rückt er nach oben oder unten; der Strich wird dann schräg.
+    const font = `26px ${script}`;
+    const mass = document.createElement("canvas").getContext("2d");
+    if (mass) mass.font = font;
+    const breite = mass?.measureText(notiz.text).width ?? notiz.text.length * 9;
     const ende = [px - 14, py];
-    const start = [ende[0] - 24, py];
-    const spitze = (d: number) => [ende[0] - 8 * Math.cos(d), ende[1] - 8 * Math.sin(d)];
+    const meiden = (notiz.meiden ?? []).map((m) => chart.convertToPixel({ gridIndex: 0 }, [m.x, m.y]) as number[]);
+    const frei = (y: number) => {
+      const rechts = ende[0] - 24 - 2;
+      const links = rechts - breite - 6;
+      return meiden.every(([mx, my]) => mx < links - 8 || mx > rechts + 8 || my < y - 21 || my > y + 21);
+    };
+    const imBild = (y: number) => y > rect.y + 14 && y < rect.y + rect.height - 14;
+    const textY = [py, py - 32, py + 32].find((y) => imBild(y) && frei(y)) ?? py;
+    const start = [ende[0] - 24, textY];
+    const winkel = Math.atan2(ende[1] - start[1], ende[0] - start[0]);
+    const spitze = (d: number) => [ende[0] - 8 * Math.cos(winkel + d), ende[1] - 8 * Math.sin(winkel + d)];
     chart.setOption({
       graphic: {
         elements: [
@@ -69,12 +83,12 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined, deckkraft = 1, sic
             id: "notiz-text",
             type: "text",
             x: start[0] - 8,
-            y: py,
+            y: textY,
             rotation: 0.03,
             silent: true,
             z: 100,
             invisible: !sichtbar,
-            style: { text: notiz.text, font: `26px ${script}`, fill: NOTIZ_TINTE, align: "right", verticalAlign: "middle", opacity: deckkraft },
+            style: { text: notiz.text, font, fill: NOTIZ_TINTE, align: "right", verticalAlign: "middle", opacity: deckkraft },
           },
           {
             id: "notiz-bogen",

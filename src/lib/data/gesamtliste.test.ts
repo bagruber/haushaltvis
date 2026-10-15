@@ -27,7 +27,7 @@ const data: Data = {
   einleitungen: {},
   glossar: {},
   aggregatoren: {},
-  zwischenstand: readOptional<Zwischenstand>("zwischenstand.json"),
+  zwischenstand: readOptional<{ staende: Zwischenstand[] }>("zwischenstand.json")?.staende ?? [],
 };
 const jahr = latestYear(budget);
 const liste = gesamtliste(data, jahr);
@@ -53,41 +53,113 @@ describe("Gesamtliste", () => {
     expect(zeilen.length).toBe(Object.keys(budget.posten).length);
   });
 
-  it("die Reihenfolge ist streng aufsteigend: Einrichtungen, dann Haushaltsstellen", () => {
+  it("ordnet wie der amtliche Plan: erst A. Verwaltungs-, dann B. Vermögenshaushalt", () => {
+    expect(liste.haushalte.map((h) => h.titel)).toEqual(["A. Verwaltungshaushalt", "B. Vermögenshaushalt"]);
+    for (const h of liste.haushalte) {
+      for (const z of h.einzelplaene.flatMap((p) => p.kinder.flatMap((b) => b.kinder.flatMap((e) => e.zeilen)))) {
+        expect(z.haushalt, z.hhst).toBe(h.haushalt);
+      }
+    }
+  });
+
+  it("innerhalb eines Haushalts streng aufsteigend: Einzelpläne, Einrichtungen, Haushaltsstellen", () => {
     const ordnung = (glz: string) => glz.padEnd(5, "0");
-    for (const plan of liste.einzelplaene) {
-      for (const bereich of plan.kinder) {
-        const glzs = bereich.kinder.map((e) => e.id);
-        expect([...glzs].sort((a, b) => ordnung(a).localeCompare(ordnung(b)))).toEqual(glzs);
-        for (const e of bereich.kinder) {
-          const hhsts = e.zeilen.map((z) => z.hhst);
-          expect([...hhsts].sort()).toEqual(hhsts);
+    for (const h of liste.haushalte) {
+      const eps = h.einzelplaene.map((p) => p.nummer);
+      expect([...eps].sort()).toEqual(eps);
+      for (const plan of h.einzelplaene) {
+        for (const bereich of plan.kinder) {
+          const glzs = bereich.kinder.map((e) => e.nummer);
+          expect([...glzs].sort((a, b) => ordnung(a).localeCompare(ordnung(b)))).toEqual(glzs);
+          for (const e of bereich.kinder) {
+            const hhsts = e.zeilen.map((z) => z.hhst);
+            expect([...hhsts].sort()).toEqual(hhsts);
+          }
         }
       }
     }
   });
 
-  it("die Ebenen tragen die Summen ihrer Kinder", () => {
-    for (const plan of liste.einzelplaene) {
-      const kinder = plan.kinder.reduce((s, b) => s + b.ausgaben, 0);
-      expect(plan.ausgaben).toBeCloseTo(kinder, 2);
-      for (const bereich of plan.kinder) {
-        const enkel = bereich.kinder.reduce((s, e) => s + e.investitionen, 0);
-        expect(bereich.investitionen).toBeCloseTo(enkel, 2);
+  it("je Einrichtung erst alle Einnahmen, dann alle Ausgaben", () => {
+    for (const z of gesamtlisteZeilen(liste)) {
+      const hg = z.hhst.split(".")[1][0];
+      expect(z.gruppe, z.hhst).toBe(hg <= "3" ? "Einnahmen" : "Ausgaben");
+    }
+    for (const h of liste.haushalte) {
+      for (const e of h.einzelplaene.flatMap((p) => p.kinder.flatMap((b) => b.kinder))) {
+        const arten = e.zeilen.map((z) => z.ea).join("");
+        expect(arten, e.id).toMatch(/^E*A*$/);
       }
     }
   });
 
-  it("die Gruppe folgt der ersten Ziffer der Gruppierung", () => {
-    for (const z of gesamtlisteZeilen(liste)) {
-      const hg = z.hhst.split(".")[1][0];
-      const erwartet =
-        hg <= "2" ? "Einnahmen · Verwaltungshaushalt"
-        : hg === "3" ? "Einnahmen · Vermögenshaushalt"
-        : hg === "9" ? "Ausgaben · Vermögenshaushalt (Investitionen)"
-        : "Ausgaben · Verwaltungshaushalt";
-      expect(z.gruppe, z.hhst).toBe(erwartet);
+  it("jede Sprungmarke gibt es nur einmal; die kurze gehört dem Verwaltungshaushalt", () => {
+    const ids: string[] = [];
+    for (const h of liste.haushalte) {
+      for (const plan of h.einzelplaene) {
+        ids.push(plan.id);
+        for (const b of plan.kinder) {
+          ids.push(b.id);
+          for (const e of b.kinder) ids.push(e.id);
+        }
+      }
     }
+    expect(new Set(ids).size).toBe(ids.length);
+    const vw = liste.haushalte[0];
+    expect(vw.einzelplaene.every((p) => p.id === p.nummer)).toBe(true);
+  });
+
+  it("die Ebenen tragen die Summen ihrer Kinder", () => {
+    for (const h of liste.haushalte) {
+      for (const plan of h.einzelplaene) {
+        const kinder = plan.kinder.reduce((s, b) => s + b.ausgaben, 0);
+        expect(plan.ausgaben).toBeCloseTo(kinder, 2);
+        for (const bereich of plan.kinder) {
+          const enkel = bereich.kinder.reduce((s, e) => s + e.einnahmen, 0);
+          expect(bereich.einnahmen).toBeCloseTo(enkel, 2);
+        }
+      }
+    }
+  });
+
+  it("die Summenzeilen einer Einrichtung sind die Summen ihrer Zeilen, je Spalte", () => {
+    for (const h of liste.haushalte) {
+      for (const e of h.einzelplaene.flatMap((p) => p.kinder.flatMap((b) => b.kinder))) {
+        for (const ea of ["E", "A"] as const) {
+          const zeilen = e.zeilen.filter((z) => z.ea === ea);
+          for (const key of ["ansatz", "ansatzVor", "ergebnisVor"] as const) {
+            const erwartet = zeilen.reduce((s, z) => s + (z.werte[key] ?? 0), 0);
+            expect(e.summe![ea][key] ?? 0, `${e.id} ${ea} ${key}`).toBeCloseTo(erwartet, 2);
+          }
+        }
+      }
+    }
+  });
+
+  it("deckt sich mit dem Haushaltsplanentwurf 2025, Unterabschnitt 0000 (Seite 8)", () => {
+    const l2025 = gesamtliste(data, 2025);
+    const ua = l2025.haushalte[0].einzelplaene[0].kinder[0].kinder.find((e) => e.nummer === "0000")!;
+    expect(ua.summe!.E.ansatz).toBe(42000);
+    expect(ua.summe!.A.ansatz).toBe(566500);
+    expect(ua.summe!.E.ansatzVor).toBe(31000);
+    expect(ua.summe!.A.ansatzVor).toBe(536700);
+  });
+
+  it("das Folgejahr ist leer, bis sein Plan in den Daten steht", () => {
+    expect(gesamtlisteZeilen(liste).every((z) => z.werte.ansatzNach == null)).toBe(true);
+    // Ein Jahr früher ist das Folgejahr das jüngste Jahr — dort steht ein Plan.
+    const frueher = gesamtlisteZeilen(gesamtliste(data, jahr - 1));
+    const z = frueher.find((x) => x.werte.ansatzNach)!;
+    expect(z.werte.ansatzNach).toBe(gesamtlisteZeilen(liste).find((x) => x.hhst === z.hhst)!.werte.ansatz);
+  });
+
+  it.skipIf(data.zwischenstand.length < 2)("Stichtag zum Stichjahr und zum Vorjahr, je in eigenen Spalten", () => {
+    expect(liste.zwischenstand.map((z) => z.jahr)).toEqual([jahr - 1, jahr]);
+    const vor = data.zwischenstand.find((z) => z.jahr === jahr - 1)!;
+    const hhst = Object.keys(vor.werte).find((h) => vor.werte[h][1] > 0)!;
+    const z = gesamtlisteZeilen(liste).find((x) => x.hhst === hhst)!;
+    expect(z.werte.bezahltVor).toBe(vor.werte[hhst][1]);
+    expect(z.werte.gebuchtVor).toBe(vor.werte[hhst][0]);
   });
 
   it("ohne Vorjahr im Datenbestand fehlen dessen Spalten, statt leer dazustehen", () => {
@@ -107,7 +179,7 @@ describe("gesamtlisteCsv", () => {
       ea: "A",
       haushalt: "verwaltung",
       intern: false,
-      gruppe: "Ausgaben · Verwaltungshaushalt",
+      gruppe: "Ausgaben",
       werte: { ansatz: 80000, ansatzVor: 61079.56, ergebnisVor: null },
     },
     {
@@ -117,7 +189,7 @@ describe("gesamtlisteCsv", () => {
       ea: "E",
       haushalt: "verwaltung",
       intern: false,
-      gruppe: "Einnahmen · Verwaltungshaushalt",
+      gruppe: "Einnahmen",
       werte: { ansatz: 100000, ansatzVor: 95000, ergebnisVor: 99123.45 },
     },
   ];

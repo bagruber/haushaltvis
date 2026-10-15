@@ -270,6 +270,29 @@ beschrifteten Zeile unter dem Namen statt rechtsbündig über den Spalten.
 Wo der Abschnitt unten noch `/gesamtliste` oder die Hauptnavigation nennt, gilt
 diese Änderung.
 
+**Zweite Änderung (15.10.2026): Ordnung wie im Haushaltsplanentwurf 2025.**
+Ersetzt „Aufbau“ und „Spalten“ unten.
+
+- Oberste Ebene ist der Haushalt: **A. Verwaltungshaushalt** (Einzelplan 0–9),
+  dann **B. Vermögenshaushalt** (Einzelplan 0–9), wie im amtlichen Plan. Darin
+  Einzelplan → Bereich → Einrichtung. Die Bereiche kennt der amtliche Plan
+  nicht als Überschrift; sie bleiben, an der Reihenfolge ändern sie nichts.
+- Je Einrichtung (amtlich: Unterabschnitt): Einnahmen, **Summe Einnahmen**,
+  Ausgaben, **Summe Ausgaben**, **Abgleich** (Einnahmen − Ausgaben), als Zeilen
+  in den Spalten. Die Summen im Kopf gibt es nur noch bei Einzelplan und
+  Bereich. Bei aktivem Textfilter keine Summenzeilen (wären Teilsummen), bei
+  Filter auf eine Seite kein Abgleich.
+- Spalten in Zeitfolge wie im amtlichen Plan: **Ergebnis Vorjahr · Ansatz
+  Vorjahr · Ansatz Stichjahr**. Die letzte ist hervorgehoben wie die grau
+  hinterlegte Planjahr-Spalte im amtlichen Plan, hier als Band in
+  `cream-dark`; auf dem Telefon fett.
+- Sprungmarken: Eine Nummer kann in beiden Haushalten stehen. Die kurze
+  Kennung (`/erkunden/gesamtliste/5701`) gehört dem Verwaltungshaushalt, der
+  zuerst kommt; der Vermögenshaushalt hat dann `vm-5701`. Gibt es die Nummer
+  nur im Vermögenshaushalt, bleibt sie kurz.
+- Test gegen den Entwurf 2025: Unterabschnitt 0000, Seite 8, Einnahmen 42.000,
+  Ausgaben 566.500, Vorjahr 31.000 / 536.700.
+
 Eine Seite, die den Haushalt so zeigt wie die AKDB-Excel: alle
 Haushaltsstellen der Reihe nach, ohne Diagramme pro Bereich.
 

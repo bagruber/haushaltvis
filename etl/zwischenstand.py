@@ -1,14 +1,20 @@
 """
-Zwischenstand des laufenden Haushaltsjahres: was zu einem Stichtag gebucht
-(Anordnungs-Soll) und was bezahlt (Ist) ist.
+Zwischenstand zu einem Stichtag: was bis dahin gebucht (Anordnungs-Soll) und
+was bezahlt (Ist) ist. Mehrere Jahre, damit sich der Stand des laufenden
+Jahres mit demselben Stichtag des Vorjahres vergleichen lässt.
 
-Quelle: eine AKDB-Stichtagsauswertung in haushaltsplaene/zwischenstand/, bei
-mehreren die mit dem jüngsten Stichtag. Gleiche Spalten wie der Langexport,
-aber ohne Spalte HJ: Jahr und Stichtag stehen nur im Dateinamen, und die
-Kopfzeile ist Zeile 2 (Zeile 1 ist eine Summenzeile).
+Quelle: die AKDB-Stichtagsauswertungen in haushaltsplaene/zwischenstand/, je
+Jahr die mit dem jüngsten Stichtag. Gleiche Spalten wie der Langexport; Jahr
+und Stichtag stehen aber verlässlich nur im Dateinamen, und die Kopfzeile ist
+Zeile 2 (Zeile 1 ist eine Summenzeile).
+
+Ein Stand zum Monatsletzten gilt als Stand zum Ersten des Folgemonats:
+„Stand 30.09.2025“ und „Stand 01.10.2026“ meinen denselben Schnitt nach dem
+dritten Quartal, und so tragen beide Jahre denselben Stichtag 01.10.
 
 Output: data/processed/zwischenstand.json
-  { jahr, stichtag, quelle, werte: { <hhst_id>: [soll, ist] } }
+  { staende: [ { jahr, stichtag, quelle, werte: { <hhst_id>: [soll, ist] } }, … ] }
+  nach Jahr aufsteigend.
 
 Eigene Datei, nicht in budget.json: budget.json ist der dokumentierte Vertrag
 mit der Stadt (DATENFORMAT.md) und bleibt unverändert. Fehlt diese Datei, ist
@@ -18,6 +24,7 @@ Run:  python etl/zwischenstand.py
 """
 from __future__ import annotations
 
+import datetime as dt
 import json
 import re
 from collections import defaultdict
@@ -36,8 +43,16 @@ OUT = ROOT / "data/processed/zwischenstand.json"
 RE_NAME = re.compile(r"Haushalt (\d{4}) Stand (\d\d)\.(\d\d)\.(\d{4})")
 
 
-def quelle() -> tuple[Path, int, str]:
-    """Die Auswertung mit dem jüngsten Stichtag, plus Jahr und Stichtag."""
+def stichtag_von(tag: str, monat: str, jahr: str) -> str:
+    """ISO-Stichtag; ein Monatsletzter wird zum Ersten des Folgemonats."""
+    d = dt.date(int(jahr), int(monat), int(tag))
+    if (d + dt.timedelta(days=1)).day == 1:
+        d += dt.timedelta(days=1)
+    return d.isoformat()
+
+
+def quellen() -> list[tuple[Path, int, str]]:
+    """Je Jahr die Auswertung mit dem jüngsten Stichtag: (Datei, Jahr, Stichtag)."""
     kandidaten = []
     for f in SRC_DIR.glob("*.xlsx"):
         if f.name.startswith("~$"):
@@ -50,14 +65,15 @@ def quelle() -> tuple[Path, int, str]:
                 " — Jahr und Stichtag stehen nur im Namen und werden nicht geraten."
             )
         jahr, tag, monat, stichjahr = m.groups()
-        kandidaten.append((f"{stichjahr}-{monat}-{tag}", f, int(jahr)))
+        kandidaten.append((int(jahr), f"{stichjahr}-{monat}-{tag}", f, stichtag_von(tag, monat, stichjahr)))
     if not kandidaten:
         raise SystemExit(f"Keine Auswertung in {SRC_DIR.relative_to(ROOT)} gefunden.")
-    kandidaten.sort()
-    stichtag, datei, jahr = kandidaten[-1]
-    if len(kandidaten) > 1:
-        print(f"{len(kandidaten)} Auswertungen gefunden, genommen: {datei.name}")
-    return datei, jahr, stichtag
+    je_jahr: dict[int, tuple[Path, int, str]] = {}
+    for jahr, roh, datei, stichtag in sorted(kandidaten):
+        je_jahr[jahr] = (datei, jahr, stichtag)  # sortiert: der jüngste gewinnt
+        if roh != stichtag:
+            print(f"{datei.name}: Stand {roh} gilt als Stichtag {stichtag}")
+    return [je_jahr[j] for j in sorted(je_jahr)]
 
 
 def lesen(src: Path) -> dict[str, tuple[float, float, float, str]]:
@@ -92,10 +108,20 @@ def lesen(src: Path) -> dict[str, tuple[float, float, float, str]]:
 
 
 def main():
-    src, jahr, stichtag = quelle()
-    roh = lesen(src)
-
     budget = json.loads(BUDGET.read_text(encoding="utf-8"))
+    staende = [stand(src, jahr, stichtag, budget) for src, jahr, stichtag in quellen()]
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(
+        json.dumps({"staende": staende}, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    print(f"-> {OUT.relative_to(ROOT)}  ({OUT.stat().st_size / 1024:,.0f} KB, {len(staende)} Stichtage)")
+
+
+def stand(src: Path, jahr: int, stichtag: str, budget: dict) -> dict:
+    """Eine Auswertung lesen, auf die Haushaltsstellen von budget.json abbilden, prüfen."""
+    roh = lesen(src)
     crosswalk = budget.get("crosswalk", {})
     posten = budget["posten"]
 
@@ -108,16 +134,6 @@ def main():
             werte[ziel] = [round(soll, 2), round(ist, 2)]
         else:
             fremd.append((hhst, soll, text))
-
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(
-        json.dumps(
-            {"jahr": jahr, "stichtag": stichtag, "quelle": src.name, "werte": werte},
-            ensure_ascii=False,
-            separators=(",", ":"),
-        ),
-        encoding="utf-8",
-    )
 
     # Selbstkontrolle: dieselben drei Zeilen, die im Briefing gemessen wurden.
     summen: dict[tuple[str, str], list[float]] = defaultdict(lambda: [0.0, 0.0, 0.0])
@@ -139,7 +155,8 @@ def main():
         print(f"   {hhst}  Soll {soll:>10,.2f}  {text}")
     if fremd:
         print("   Ist darunter Relevantes, lieber den Langexport neu ziehen als hier Posten anlegen.")
-    print(f"-> {OUT.relative_to(ROOT)}  ({OUT.stat().st_size / 1024:,.0f} KB)")
+    print()
+    return {"jahr": jahr, "stichtag": stichtag, "quelle": src.name, "werte": werte}
 
 
 if __name__ == "__main__":

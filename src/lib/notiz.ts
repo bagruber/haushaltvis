@@ -36,6 +36,12 @@ export interface Notiz {
    * sichtbar, wird sie gar nicht gezeichnet. Ohne das Feld bleibt sie immer da.
    */
   serien?: string[];
+  /**
+   * Nur für `kurz`: Punkte, auf die der Text nicht fallen darf (die Rauten des
+   * Vorjahres liegen genau dort, wo er sonst stünde). Der Text weicht dann
+   * nach oben oder unten aus.
+   */
+  meiden?: { x: string; y: number }[];
 }
 
 /**

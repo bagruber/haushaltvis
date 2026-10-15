@@ -121,11 +121,15 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       ]
         .filter(Boolean)
         .join(", ") || null;
-    const zw = netto ? undefined : lf.zwischen;
+    // Alle Stichtage, die im Bild liegen: das laufende Jahr und zum Vergleich
+    // derselbe Stichtag im Vorjahr. Sie teilen sich eine Serie je Marke, also
+    // auch einen Legenden-Knopf, und bleiben Punkte ohne Linie dazwischen.
+    const zws = netto ? [] : (lf.zwischen ?? []).filter((z) => lf.years.includes(z.jahr));
+    const zw = zws.at(-1);
     const zwIndex = zw ? lf.years.indexOf(zw.jahr) : -1;
     const mark = zw ? marken(zw, art) : null;
-    const anteil = zwIndex >= 0 ? lf.ansatz[zwIndex] : null;
-    const nurHier = (v: number) => lf.years.map((_, i) => (i === zwIndex ? v : null));
+    const amJahr = (feld: "soll" | "ist") => lf.years.map((y) => zws.find((z) => z.jahr === y)?.[feld] ?? null);
+    const standJe = new Map(zws.map((z) => [String(z.jahr), standTag(z.stichtag)]));
 
     /**
      * Jede Serie einmal beschrieben: Name, Form, Farbe, Daten, Tabellenspalte.
@@ -188,11 +192,11 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         name: mark.soll,
         form: "raute-hohl",
         farbe: color,
-        werte: nurHier(zw.soll),
+        werte: amJahr("soll"),
         serie: {
           name: mark.soll,
           type: "scatter",
-          data: nurHier(zw.soll),
+          data: amJahr("soll"),
           symbol: "emptyDiamond",
           symbolSize: 10,
           symbolOffset: [-6, 0],
@@ -205,11 +209,11 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         name: mark.ist,
         form: "raute-voll",
         farbe: color,
-        werte: nurHier(zw.ist),
+        werte: amJahr("ist"),
         serie: {
           name: mark.ist,
           type: "scatter",
-          data: nurHier(zw.ist),
+          data: amJahr("ist"),
           symbol: "diamond",
           symbolSize: 10,
           symbolOffset: [6, 0],
@@ -274,7 +278,18 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     const dieNotiz: Notiz | undefined =
       notiz ??
       (zw && zwIndex >= 0 && breit && zwischenNotiz && rautenDa
-        ? { text: `Stand ${standLang(zw.stichtag)}`, x: String(zw.jahr), y: zw.ist, form: "kurz", serien: [mark!.soll, mark!.ist] }
+        ? {
+            text: `Stand ${standLang(zw.stichtag)}`,
+            x: String(zw.jahr),
+            y: zw.ist,
+            form: "kurz",
+            serien: [mark!.soll, mark!.ist],
+            // Die Rauten des Vorjahres stehen genau links daneben.
+            meiden: zws.slice(0, -1).flatMap((z) => [
+              { x: String(z.jahr), y: z.soll },
+              { x: String(z.jahr), y: z.ist },
+            ]),
+          }
         : undefined);
 
     const option: EChartsOption = {
@@ -291,6 +306,9 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
             .map((b) => {
               const marker = zeilen.find((z) => z.seriesName === b.name)?.marker ?? "";
               const wert = fmt(b.werte[i]);
+              // Je Jahr gegen dessen eigenen Ansatz: so stehen 2025 und 2026
+              // auf derselben Grundlage nebeneinander.
+              const anteil = lf.ansatz[i];
               const anteilText =
                 b.key === "bezahlt" && anteil ? ` · ${fmtPct(b.werte[i]! / anteil)} des Ansatzes` : "";
               return `<div style="display:flex;gap:12px;justify-content:space-between">
@@ -314,9 +332,9 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       xAxis: {
         type: "category",
         data: laufend.years.map(String),
-        axisLabel: zw
+        axisLabel: standJe.size
           ? {
-              formatter: (v: string) => (v === String(zw.jahr) ? `${v}\n{stand|Stand ${standTag(zw.stichtag)}}` : v),
+              formatter: (v: string) => (standJe.has(v) ? `${v}\n{stand|Stand ${standJe.get(v)}}` : v),
               rich: { stand: { fontSize: 10, lineHeight: 15, color: "#8a8170" } },
             }
           : undefined,
@@ -346,10 +364,13 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       option,
       table: { columns, rows },
       // Der Satz steht nur, wo wirklich etwas ausgeblendet wird.
-      hinweis: netto && laufend.zwischen ? standLang(laufend.zwischen.stichtag) : null,
+      hinweis: netto && laufend.zwischen ? standLang(laufend.zwischen.at(-1)!.stichtag) : null,
       dieNotiz,
       // Wie Legende und Notiz: der Satz steht auf einer Seite nur einmal.
-      stand: zw && zwIndex >= 0 && zwischenNotiz && rautenDa ? standTag(zw.stichtag) : undefined,
+      stand:
+        zw && zwIndex >= 0 && zwischenNotiz && rautenDa
+          ? { tag: standTag(zw.stichtag), jahre: zws.map((z) => z.jahr) }
+          : undefined,
       eintraege,
     };
   }, [laufend, invest, einnahmen, mode, context, baseYear, color, art, notiz, breit, aus, zwischenNotiz]);
@@ -376,8 +397,9 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
           640 px gibt es keine), und traegt den Begriff ins Glossar. */}
       {stand && (
         <p className="mt-1 text-xs text-ink-muted">
-          Die Rauten sind der <Term name="zwischenstand">Zwischenstand</Term> zum {stand}, also erst
-          ein Teil des Jahres.
+          Die Rauten sind der <Term name="zwischenstand">Zwischenstand</Term> zum {stand.tag}
+          {stand.jahre.length > 1 && <> des jeweiligen Jahres ({stand.jahre.join(" und ")})</>}, also
+          erst ein Teil des Jahres.
         </p>
       )}
       <ChartTable columns={table.columns} rows={table.rows} />

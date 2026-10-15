@@ -96,8 +96,11 @@ export interface YearSeries {
   ergebnis: (number | null)[];
   /** years for which ergebnis is provisional Ist (e.g. 2024) */
   provisional: Set<number>;
-  /** booked and paid up to the Stichtag of the running year, where measured */
-  zwischen?: Zwischen;
+  /**
+   * booked and paid up to the Stichtag, one entry per measured year, by year;
+   * undefined where nothing is measured
+   */
+  zwischen?: Zwischen[];
 }
 
 /** Part of a year: what is booked (Soll) and paid (Ist) up to the Stichtag. */
@@ -112,20 +115,22 @@ export interface Zwischen {
  * Sum the Stichtag figures over the same Posten the series aggregates, so a
  * Bereich, an Einrichtung and a single Posten are counted by one rule.
  */
-function zwischenOf(data: Data, pred: (p: Posten) => boolean): Zwischen | undefined {
-  const zs = data.zwischenstand;
-  if (!zs) return undefined;
-  let soll = 0;
-  let ist = 0;
-  let treffer = false;
-  for (const hhst in zs.werte) {
-    const p = data.budget.posten[hhst];
-    if (!p || !pred(p)) continue;
-    treffer = true;
-    soll += zs.werte[hhst][0];
-    ist += zs.werte[hhst][1];
+function zwischenOf(data: Data, pred: (p: Posten) => boolean): Zwischen[] | undefined {
+  const out: Zwischen[] = [];
+  for (const zs of data.zwischenstand) {
+    let soll = 0;
+    let ist = 0;
+    let treffer = false;
+    for (const hhst in zs.werte) {
+      const p = data.budget.posten[hhst];
+      if (!p || !pred(p)) continue;
+      treffer = true;
+      soll += zs.werte[hhst][0];
+      ist += zs.werte[hhst][1];
+    }
+    if (treffer) out.push({ jahr: zs.jahr, stichtag: zs.stichtag, soll, ist });
   }
-  return treffer ? { jahr: zs.jahr, stichtag: zs.stichtag, soll, ist } : undefined;
+  return out.length ? out : undefined;
 }
 
 /**
@@ -197,15 +202,17 @@ export function adjustSeries(
   // Die Marken des Zwischenstands tragen die Faktoren ihres eigenen Jahres.
   // Fehlt für dieses Jahr Einwohnerzahl oder VPI, fallen sie in dieser Ansicht
   // weg, statt falsch skaliert dazustehen.
-  const zwischen = series.zwischen;
-  const soll = zwischen && adj(zwischen.soll, zwischen.jahr);
-  const ist = zwischen && adj(zwischen.ist, zwischen.jahr);
+  const zwischen = (series.zwischen ?? []).flatMap((z) => {
+    const soll = adj(z.soll, z.jahr);
+    const ist = adj(z.ist, z.jahr);
+    return soll != null && ist != null ? [{ ...z, soll, ist }] : [];
+  });
   return {
     years: series.years,
     ansatz: series.years.map((y, i) => adj(series.ansatz[i], y)),
     ergebnis: series.years.map((y, i) => adj(series.ergebnis[i], y)),
     provisional: series.provisional,
-    zwischen: zwischen && soll != null && ist != null ? { ...zwischen, soll, ist } : undefined,
+    zwischen: zwischen.length ? zwischen : undefined,
   };
 }
 
