@@ -25,6 +25,7 @@ import {
 import { fmtEur, fmtEurShort, fmtEurFine } from "../format";
 import { doppelte } from "../nummern";
 import { extremImFenster } from "../notiz";
+import { kennung } from "../kennung.mjs";
 
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(resolve(__dirname, `../../../public/data/${name}`), "utf8")) as T;
@@ -270,7 +271,7 @@ describe("searchRank", () => {
 
   // R2.2: Die zweite Zeile folgt einer Regel statt dem Zufall der Datenquelle.
   it("jeder Treffer traegt ein Art-Wort aus dem Wortschatz", () => {
-    const wortschatz = new Set(["Seite", "Kostenblock", "Thema", "Einzelplan", "Bereich", "Einrichtung", "Posten"]);
+    const wortschatz = new Set(["Seite", "Kostenblock", "Einnahmeart", "Thema", "Einzelplan", "Bereich", "Einrichtung", "Posten"]);
     for (const it of index) expect(wortschatz.has(it.art), `${it.label}: ${it.art}`).toBe(true);
   });
 
@@ -307,6 +308,23 @@ describe("searchRank", () => {
     const posten = hits.findIndex((h) => h.route.startsWith("/posten/"));
     expect(block).toBeGreaterThanOrEqual(0);
     expect(posten === -1 || block < posten).toBe(true);
+  });
+  it("die Einnahmeart steht vor den Haushaltsstellen, aus denen sie besteht", () => {
+    const hits = searchRank(index, "gewerbesteuer");
+    expect(hits[0].art).toBe("Einnahmeart");
+    expect(hits[0].route).toBe("/erkunden/einnahmen/gewerbesteuer");
+    const art = searchRank(index, "einkommensteuer").findIndex((h) => h.art === "Einnahmeart");
+    const posten = searchRank(index, "einkommensteuer").findIndex((h) => h.art === "Posten");
+    expect(art).toBeGreaterThanOrEqual(0);
+    expect(posten === -1 || art < posten).toBe(true);
+  });
+  // Seite, Suche und Vorschaukarte bilden die Adresse mit derselben Regel
+  // (lib/kennung.mjs); zwei Arten dürfen dabei nicht zusammenfallen.
+  it("jede Einnahmeart hat eine eigene Adresse, und es ist die ihrer Seite", () => {
+    const arten = index.filter((it) => it.art === "Einnahmeart");
+    expect(arten.length).toBeGreaterThan(10);
+    expect(new Set(arten.map((a) => a.route)).size).toBe(arten.length);
+    for (const a of arten) expect(a.route).toBe(`/erkunden/einnahmen/${kennung(a.label)}`);
   });
   it("jeder Bereich mit Posten steht genau einmal im Index", () => {
     const erwartet = new Set(Object.values(budget.posten).map((p) => p.glz.slice(0, 2)));

@@ -15,7 +15,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { BREITE, HOEHE, esc, karteEbene, karteSeite } from './lib/vorlage.mjs'
 import { renderePngs } from './lib/rendern.mjs'
-import { EINZELPLAN_COLORS, KOSTENBLOCK_COLORS } from '../src/lib/marke.mjs'
+import { EINNAHMEART_COLOR, EINZELPLAN_COLORS, KOSTENBLOCK_COLORS } from '../src/lib/marke.mjs'
+import { kennung } from '../src/lib/kennung.mjs'
 import { incomeCategory, isInternal } from '../src/lib/kameral.mjs'
 
 const ordner = process.argv[2]
@@ -298,9 +299,6 @@ for (const [key, agg] of Object.entries(aggregatoren)) {
 }
 
 // Einnahmearten
-const kennung = (name) =>
-  name.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 for (const [name, eintrag] of [...stufen.art].sort()) {
   const r = reiheAus(eintrag)
   if (!r || r.planIndex < 0) continue
@@ -313,7 +311,7 @@ for (const [name, eintrag] of [...stufen.art].sort()) {
     pfad,
     karteEbene({
       ebene: 'Einnahmeart', nummer: '', oberzeile: 'Woher das Geld kommt', titel: name,
-      farbe: GOLD, iconName: 'TrayArrowDown', variante: r.planIndex,
+      farbe: EINNAHMEART_COLOR, iconName: 'TrayArrowDown', variante: r.planIndex,
       wert: fmtBetrag(k.wert), wertZeile: wertZeile('Einnahmen', k), werte: r, adresse: adresse(pfad),
     }),
   )

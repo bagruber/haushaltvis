@@ -41,6 +41,12 @@ export const KOSTENBLOCK_COLORS = {
   wasser: "#3a8fb7",
 };
 
+/**
+ * Eine Farbe für alle Einnahmearten, in der Suche wie auf der Vorschaukarte:
+ * Sie sagt „das ist eine Einnahmeart“, nicht welche.
+ */
+export const EINNAHMEART_COLOR = "#b8964e";
+
 /** Plan ist gedämpft, damit er der Ist-Farbe nie Konkurrenz macht. */
 export const PLAN_COLOR = "#8a7a5c";
 

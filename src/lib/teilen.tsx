@@ -30,21 +30,8 @@ export function teilUrl(
   return url.toString();
 }
 
-/**
- * Address-safe identifier for a section whose data key is a name, not a code
- * (the Einnahmen groups: "Schlüsselzuweisungen & Finanzausgleich"). Umlauts
- * are spelled out so the identifier survives file systems and copy-paste.
- */
-export function kennung(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+// Die Regel steht in lib/kennung.mjs, weil auch das Kartenskript sie braucht.
+export { kennung } from "./kennung.mjs";
 
 // ── Sichtbare Serien im Link ────────────────────────────────────────────────
 

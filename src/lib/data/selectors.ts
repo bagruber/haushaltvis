@@ -1,10 +1,12 @@
 import type { Budget, Data, Posten, EA, Haushalt, ThemeTag, BudgetEvent, EventScope, Context } from "./types";
 import type { Icon } from "@phosphor-icons/react";
-import { SquaresFour } from "@phosphor-icons/react";
+import { SquaresFour, TrayArrowDown } from "@phosphor-icons/react";
 import { einzelplanKategorie } from "../kategorien";
 import { COLOR, ICON, ORDER } from "../kostenblock";
 import { SEITEN } from "../seiten";
 import { incomeCategory, isInternal } from "../kameral.mjs";
+import { kennung } from "../kennung.mjs";
+import { EINNAHMEART_COLOR } from "../marke.mjs";
 import { abschnittName, groupLabel, factsOfYear, factsOfHhst, postenOfGlz } from "./core";
 import { shades, GOLD_BASE, ZUSCHUSS_RED, EINZELPLAN_COLORS } from "../colors";
 
@@ -1244,6 +1246,7 @@ export function investmentStacked(data: Data, topN = 12): InvestmentStacked {
 export type SearchArt =
   | "Seite"
   | "Kostenblock"
+  | "Einnahmeart"
   | "Thema"
   | "Einzelplan"
   | "Bereich"
@@ -1302,6 +1305,23 @@ export function searchIndex(data: Data): SearchItem[] {
       route: `/erkunden/querschnitte/${key}`,
       icon: ICON[key],
       farbe: COLOR[key],
+    });
+  }
+  // Einnahmearten haben eigene Seiten. Sie stehen wie die Kostenblöcke als
+  // Querschnitt neben der Gliederung: eine Farbe für alle, weil die Art zählt,
+  // nicht welche. Interne Verrechnungen sind keine Einnahme, die jemand sucht.
+  const arten = new Set<string>();
+  for (const p of Object.values(data.budget.posten)) {
+    if (p.ea === "E" && !isInternal(p)) arten.add(incomeCategory(p));
+  }
+  for (const name of [...arten].sort()) {
+    items.push({
+      label: name,
+      art: "Einnahmeart",
+      ort: "Einnahmen",
+      route: `/erkunden/einnahmen/${kennung(name)}`,
+      icon: TrayArrowDown,
+      farbe: EINNAHMEART_COLOR,
     });
   }
   // Themen zeigen auf die Übersicht, solange die Zuordnung gesperrt ist
