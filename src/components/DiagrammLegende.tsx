@@ -63,7 +63,12 @@ export function DiagrammLegende({ eintraege, an, setAn, onHervor }: {
             key={e.key}
             type="button"
             aria-pressed={sichtbar}
-            onClick={() => setAn(e.key, !sichtbar)}
+            onClick={() => {
+              setAn(e.key, !sichtbar);
+              // Beim Ausblenden die Hervorhebung mitnehmen, sonst bleibt alles
+              // andere blass, bis der Zeiger den Knopf verlaesst.
+              if (sichtbar) onHervor?.(null);
+            }}
             onMouseEnter={() => sichtbar && onHervor?.(e.name)}
             onMouseLeave={() => onHervor?.(null)}
             onFocus={() => sichtbar && onHervor?.(e.name)}

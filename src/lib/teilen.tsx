@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { TimelineMode } from "@/components/Timeline";
 
@@ -62,13 +62,7 @@ export type SerieKey = (typeof SERIEN)[number];
  * schon als Schalter, und alte Links sollen gültig bleiben.
  */
 export function useSerien() {
-  const [params, setParams] = useSearchParams();
-  const [mode, setMode] = useAnsicht();
-  const roh = params.get("aus");
-  const aus = useMemo(
-    () => new Set((roh ?? "").split(",").filter((k) => (SERIEN as readonly string[]).includes(k)) as SerieKey[]),
-    [roh],
-  );
+  const { mode, setMode, aus, setAus } = useContext(AnsichtCtx);
   const an = (key: string) => (key === "invest" ? !!mode.showInvest : !aus.has(key as SerieKey));
   const setAn = (key: string, wert: boolean) => {
     if (key === "invest") {
@@ -78,18 +72,20 @@ export function useSerien() {
     const naechste = new Set(aus);
     if (wert) naechste.delete(key as SerieKey);
     else naechste.add(key as SerieKey);
-    const wort = SERIEN.filter((k) => naechste.has(k)).join(",");
-    setParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (wort) next.set("aus", wort);
-        else next.delete("aus");
-        return next;
-      },
-      { replace: true, preventScrollReset: true },
-    );
+    setAus(naechste);
   };
   return { aus, an, setAn };
+}
+
+/** `?aus=` → die ausgeblendeten Serien. Unbekannte Wörter werden ignoriert. */
+export function ausLesen(wert: string | null): Set<SerieKey> {
+  const genannt = new Set((wert ?? "").split(",").filter(Boolean));
+  return new Set(SERIEN.filter((k) => genannt.has(k)));
+}
+
+export function ausSchreiben(aus: Set<SerieKey>): string | null {
+  const wort = SERIEN.filter((k) => aus.has(k)).join(",");
+  return wort || null;
 }
 
 // ── Ansichts-Schalter im Link ───────────────────────────────────────────────
@@ -116,30 +112,104 @@ export function ansichtSchreiben(mode: TimelineMode): string | null {
   return an.length ? an.join(",") : null;
 }
 
+// ── Die Ansicht, über Seitenwechsel hinweg ──────────────────────────────────
+
+interface AnsichtState {
+  mode: TimelineMode;
+  setMode: (fn: (m: TimelineMode) => TimelineMode) => void;
+  aus: Set<SerieKey>;
+  setAus: (s: Set<SerieKey>) => void;
+}
+
+const AnsichtCtx = createContext<AnsichtState>({
+  mode: {},
+  setMode: () => {},
+  aus: new Set(),
+  setAus: () => {},
+});
+
 /**
- * The timeline switches, kept in `?ansicht=` so a shared link shows the picture
- * the sender was looking at. Replaces the page-local useState: every flip
- * rewrites the URL in place (`replace`), so the back button leaves the page
- * instead of walking back through the switches.
+ * Schalter und Legendenauswahl halten, wie `YearProvider` das Stichjahr hält:
+ * im Kontext, nicht an der Adresse der aktuellen Seite. Sonst ist die Auswahl
+ * beim Klick auf einen Posten weg, weil der Link ohne Query gebaut ist.
+ *
+ * Was auf einer Seite nicht passt — verrechnet ohne Einnahmen, Investitionen
+ * ohne Vermögenshaushalt — bleibt gespeichert, wird dort aber weder angewendet
+ * noch angezeigt. Zurück auf einer passenden Seite ist es wieder da.
  */
-export function useAnsicht(): [TimelineMode, (fn: (m: TimelineMode) => TimelineMode) => void] {
+export function AnsichtProvider({ children }: { children: ReactNode }) {
+  const [mode, setModeState] = useState<TimelineMode>({});
+  const [aus, setAus] = useState<Set<SerieKey>>(() => new Set());
+  const setMode = (fn: (m: TimelineMode) => TimelineMode) => setModeState((m) => fn(m));
+  return <AnsichtCtx.Provider value={{ mode, setMode, aus, setAus }}>{children}</AnsichtCtx.Provider>;
+}
+
+export const useAnsicht = (): [TimelineMode, (fn: (m: TimelineMode) => TimelineMode) => void] => {
+  const { mode, setMode } = useContext(AnsichtCtx);
+  return [mode, setMode];
+};
+
+/** Ob überhaupt etwas vom Standard abweicht — nur dann gibt es ein Zurück. */
+export function useAnsichtAbweichung(): [boolean, () => void] {
+  const { mode, setMode, aus, setAus } = useContext(AnsichtCtx);
+  const abweichend = ansichtSchreiben(mode) != null || aus.size > 0;
+  return [
+    abweichend,
+    () => {
+      setMode(() => ({}));
+      setAus(new Set());
+    },
+  ];
+}
+
+/**
+ * Spiegelt Schalter und Legendenauswahl in `?ansicht=` und `?aus=`, wie
+ * `YearUrlSync` das Jahr. Der Kontext ist die Quelle, solange man blättert;
+ * ein Wert, den wir nicht selbst geschrieben haben (frischer Link, Zurück-
+ * Taste), gewinnt einmal.
+ */
+export function AnsichtUrlSync() {
+  const { mode, setMode, aus, setAus } = useContext(AnsichtCtx);
   const [params, setParams] = useSearchParams();
-  const roh = params.get("ansicht");
-  // Stable object per parameter value: the charts memoise on `mode`.
-  const mode = useMemo(() => ansichtLesen(roh), [roh]);
-  const setMode = (fn: (m: TimelineMode) => TimelineMode) => {
-    const wert = ansichtSchreiben(fn(mode));
+  const geschrieben = useRef<{ ansicht: string | null; aus: string | null }>({ ansicht: null, aus: null });
+  const pAnsicht = params.get("ansicht");
+  const pAus = params.get("aus");
+
+  useEffect(() => {
+    const willAnsicht = ansichtSchreiben(mode);
+    const willAus = ausSchreiben(aus);
+    // Nur ein vorhandener Parameter gewinnt. Eine Seite ohne `?ansicht=` ist
+    // kein Wunsch, die Ansicht zu loeschen — sonst ginge sie bei jedem Klick
+    // auf einen Posten verloren, und genau das soll sie ja nicht.
+    if (pAnsicht != null && pAnsicht !== willAnsicht && pAnsicht !== geschrieben.current.ansicht) {
+      geschrieben.current.ansicht = pAnsicht;
+      setMode(() => ansichtLesen(pAnsicht));
+      return;
+    }
+    if (pAus != null && pAus !== willAus && pAus !== geschrieben.current.aus) {
+      geschrieben.current.aus = pAus;
+      setAus(ausLesen(pAus));
+      return;
+    }
+    if (pAnsicht === willAnsicht && pAus === willAus) {
+      geschrieben.current = { ansicht: pAnsicht, aus: pAus };
+      return;
+    }
+    geschrieben.current = { ansicht: willAnsicht, aus: willAus };
     setParams(
       (prev) => {
         const next = new URLSearchParams(prev);
-        if (wert == null) next.delete("ansicht");
-        else next.set("ansicht", wert);
+        for (const [schluessel, wert] of [["ansicht", willAnsicht], ["aus", willAus]] as const) {
+          if (wert == null) next.delete(schluessel);
+          else next.set(schluessel, wert);
+        }
         return next;
       },
       { replace: true, preventScrollReset: true },
     );
-  };
-  return [mode, setMode];
+  }, [pAnsicht, pAus, mode, aus, setMode, setAus, setParams]);
+
+  return null;
 }
 
 /**

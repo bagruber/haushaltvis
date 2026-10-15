@@ -6,7 +6,7 @@ import { DiagrammLegende, type LegendenEintrag, type LegendenForm } from "./Diag
 import { Term } from "./Term";
 import { adjustSeries, netSeries, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
 import { useBreit, type Notiz } from "@/lib/notiz";
-import { SERIEN, useSerien, type SerieKey } from "@/lib/teilen";
+import { SERIEN, useAnsichtAbweichung, useSerien, type SerieKey } from "@/lib/teilen";
 import { PLAN_COLOR } from "@/lib/marke.mjs";
 import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
 
@@ -113,6 +113,14 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     // Einnahmen und Ausgaben fallen zu ganz verschiedenen Zeiten im Jahr an;
     // nach neun Monaten wäre ihre Differenz Rauschen. Darum in dieser Ansicht
     // keine Marken, sondern ein Satz, der sagt warum.
+    const rechenzeile =
+      [
+        mode.perCapita && "€ je Einwohner",
+        mode.real && `in Preisen von ${baseYear}`,
+        netto && "Eigenanteil nach Abzug der Einnahmen",
+      ]
+        .filter(Boolean)
+        .join(", ") || null;
     const zw = netto ? undefined : lf.zwischen;
     const zwIndex = zw ? lf.years.indexOf(zw.jahr) : -1;
     const mark = zw ? marken(zw, art) : null;
@@ -296,7 +304,13 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       // mit den echten Symbolen und sichtbar ausgeschalteten Eintraegen.
       legend: { show: false },
       // Eine Notiz braucht Luft über der Grafik (siehe lib/notiz.ts).
-      grid: { left: 8, right: 16, top: dieNotiz && dieNotiz.form !== "kurz" ? 56 : 12, bottom: 44, containLabel: true },
+      grid: {
+        left: 8,
+        right: 16,
+        top: dieNotiz && dieNotiz.form !== "kurz" ? 56 : rechenzeile ? 30 : 12,
+        bottom: 44,
+        containLabel: true,
+      },
       xAxis: {
         type: "category",
         data: laufend.years.map(String),
@@ -307,7 +321,17 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
             }
           : undefined,
       },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v)) } },
+      yAxis: {
+        type: "value",
+        axisLabel: { formatter: (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v)) },
+        // Steht ein Rechen-Schalter an, sagt das Bild es selbst: ein
+        // Screenshot erklärt sich dann, und niemand vergleicht versehentlich
+        // eine bereinigte Kurve mit einer unbereinigten.
+        name: rechenzeile ?? undefined,
+        nameLocation: "end",
+        nameGap: 14,
+        nameTextStyle: { color: "#6f6b63", fontSize: 11, align: "left" },
+      },
       series,
     };
 
@@ -377,6 +401,7 @@ export function TimelineControls({
   hasContext: boolean;
   hasEinnahmen?: boolean;
 }) {
+  const [abweichend, zuruecksetzen] = useAnsichtAbweichung();
   if (!hasContext && !hasEinnahmen) return null;
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs mb-1">
@@ -401,6 +426,12 @@ export function TimelineControls({
             mit Einnahmen verrechnet
           </span>
         </label>
+      )}
+      {/* Nur sichtbar, wenn es etwas zurückzusetzen gibt. */}
+      {abweichend && (
+        <button type="button" onClick={zuruecksetzen} className="text-red-600 hover:underline">
+          Ansicht zurücksetzen
+        </button>
       )}
     </div>
   );
