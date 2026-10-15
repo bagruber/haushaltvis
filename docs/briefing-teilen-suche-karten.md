@@ -261,8 +261,14 @@ erledigen sich R2.3 Punkt 4 und 6.
 
 ## R2.5 Gesamtliste: der ganze Haushalt auf einer Seite
 
-**Beschlossen** (15.10.2026): Name „Gesamtliste“, eigener Eintrag in der
-Hauptnavigation, keine Untergruppen-Ebene, CSV-Export nur vorbereitet.
+**Beschlossen** (15.10.2026): Name „Gesamtliste“, keine Untergruppen-Ebene,
+CSV-Export nur vorbereitet. **Nachträglich geändert:** kein eigener Eintrag in
+der Hauptnavigation, sondern ein abgesetzter Reiter unter Erkunden (Trennstrich
+und Icon), Route `/erkunden/gesamtliste`; `/gesamtliste` leitet dorthin um. Die
+Summen der Kopfzeilen stehen in einer eigenen, mit „Ansatz {Jahr}:“
+beschrifteten Zeile unter dem Namen statt rechtsbündig über den Spalten.
+Wo der Abschnitt unten noch `/gesamtliste` oder die Hauptnavigation nennt, gilt
+diese Änderung.
 
 Eine Seite, die den Haushalt so zeigt wie die AKDB-Excel: alle
 Haushaltsstellen der Reihe nach, ohne Diagramme pro Bereich.

@@ -56,7 +56,8 @@ Sitzung und die interne Arbeit, umgesetzt in der gemeinsamen `Timeline`
 
 ## Gesamtliste (seit 15.10.2026)
 
-Die Seite `/gesamtliste` zeigt alle 4.306 Haushaltsstellen in Nummernfolge.
+Die Seite `/erkunden/gesamtliste` (abgesetzter Reiter unter Erkunden) zeigt
+alle 4.306 Haushaltsstellen in Nummernfolge.
 Offen:
 
 - **CSV-Export ist vorbereitet, hat aber keinen Knopf.** `gesamtlisteCsv` in

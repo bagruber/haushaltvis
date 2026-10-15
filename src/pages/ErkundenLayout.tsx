@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { ListNumbers } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 
 const tabs = [
@@ -28,6 +29,13 @@ export function ErkundenLayout() {
               {t.label}
             </NavLink>
           ))}
+          {/* Abgesetzt: die vier Reiter davor fassen zusammen und zeichnen,
+              die Gesamtliste zeigt jede Haushaltsstelle als Tabelle. */}
+          <span aria-hidden className="mx-1 w-px self-stretch bg-ink-line" />
+          <NavLink to="/erkunden/gesamtliste" className={(s) => cn(tabClass(s), "inline-flex items-center gap-1.5")}>
+            <ListNumbers size={16} aria-hidden />
+            Gesamtliste
+          </NavLink>
         </div>
       </nav>
       <Outlet />

@@ -42,11 +42,12 @@ const routes = [
             { path: "einnahmen/:teil?", element: <Einnahmen /> },
             { path: "investitionen/:teil?", element: <Investitionen /> },
             { path: "querschnitte/:teil?", element: <Querschnitte /> },
+            // Die Stellenzahl der Kennung sagt die Ebene: 2, 21, 5701.
+            { path: "gesamtliste/:teil?", element: <Gesamtliste /> },
           ],
         },
         { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
-        // Die Stellenzahl der Kennung sagt die Ebene: 2, 21, 5701.
-        { path: "/gesamtliste/:teil?", element: <Gesamtliste /> },
+        { path: "/gesamtliste", element: <Navigate to="/erkunden/gesamtliste" replace /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
         // Der Bereich (2-stellige Gliederung) neben /einrichtung und /posten:
         // jede Haushaltsebene hat damit ihre kurze Adresse.

@@ -64,10 +64,11 @@ export const SEITEN: Seite[] = [
     ort: ERKUNDEN,
   },
   {
-    route: "/gesamtliste",
+    route: "/erkunden/gesamtliste",
     label: "Gesamtliste",
     icon: ListNumbers,
     stichworte: ["alle Haushaltsstellen", "Tabelle", "Excel", "Liste"],
+    ort: ERKUNDEN,
   },
   { route: "/wofuer-zahle-ich", label: "Wofür zahle ich?", icon: Wallet, stichworte: ["Rechner", "Steuerbeitrag", "je Einwohner"] },
   { route: "/themen", label: "Themen", icon: SquaresFour, stichworte: ["Bildung", "Mobilität", "Soziales", "Umwelt"] },

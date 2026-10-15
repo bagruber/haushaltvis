@@ -6,7 +6,7 @@ import { YearUrlSync } from "@/lib/year";
 import { AnsichtUrlSync } from "@/lib/teilen";
 
 // Routes whose main content reacts to the global Stichjahr.
-const YEAR_ROUTES = ["/", "/erkunden", "/einzelplan/", "/wofuer-zahle-ich", "/gesamtliste"];
+const YEAR_ROUTES = ["/", "/erkunden", "/einzelplan/", "/wofuer-zahle-ich"];
 // Of those, the routes with lists that can show official numbers. Nicht die
 // Gesamtliste: dort stehen die Nummern immer, ein Schalter waere sinnlos.
 const NUMMERN_ROUTES = ["/", "/einzelplan/", "/erkunden/einnahmen", "/erkunden/investitionen", "/erkunden/querschnitte"];

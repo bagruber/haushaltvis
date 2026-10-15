@@ -169,16 +169,17 @@ export function Gesamtliste() {
 
       {gefiltert.baum.map((plan) => (
         <section key={plan.id} id={plan.id} className="scroll-mt-28 [content-visibility:auto] [contain-intrinsic-size:auto_900px]">
-          <KnotenKopf knoten={plan} art="Einzelplan" pfad={`/gesamtliste/${plan.id}`} farbe={EINZELPLAN_COLORS[plan.id]} gross />
+          <KnotenKopf knoten={plan} art="Einzelplan" jahr={jahr} pfad={`/erkunden/gesamtliste/${plan.id}`} farbe={EINZELPLAN_COLORS[plan.id]} gross />
           {plan.kinder.map((bereich) => (
             <div key={bereich.id} id={bereich.id} className="scroll-mt-28">
-              <KnotenKopf knoten={bereich} art="Bereich" pfad={`/gesamtliste/${bereich.id}`} />
+              <KnotenKopf knoten={bereich} art="Bereich" jahr={jahr} pfad={`/erkunden/gesamtliste/${bereich.id}`} />
               {bereich.kinder.map((einrichtung) => (
                 <div key={einrichtung.id} id={einrichtung.id} className="scroll-mt-28">
                   <KnotenKopf
                     knoten={einrichtung}
                     art="Einrichtung"
-                    pfad={`/gesamtliste/${einrichtung.id}`}
+                    jahr={jahr}
+                    pfad={`/erkunden/gesamtliste/${einrichtung.id}`}
                     ziel={`/einrichtung/${einrichtung.id}`}
                   />
                   <Zeilen
@@ -203,9 +204,10 @@ export function Gesamtliste() {
 }
 
 /** Kopfzeile einer Ebene: Nummer, Name, und was sie zusammen ausmacht. */
-function KnotenKopf({ knoten, art, pfad, ziel, farbe, gross }: {
+function KnotenKopf({ knoten, art, jahr, pfad, ziel, farbe, gross }: {
   knoten: GesamtKnoten;
   art: string;
+  jahr: number;
   pfad: string;
   ziel?: string;
   farbe?: string;
@@ -235,7 +237,12 @@ function KnotenKopf({ knoten, art, pfad, ziel, farbe, gross }: {
         <span className="flex items-baseline gap-2">{name}</span>
       )}
       <AbschnittLink pfad={pfad} titel={`${art} ${knoten.nummer} · ${knoten.name}`} />
-      <span className="ml-auto flex flex-wrap gap-x-4 font-sans text-xs text-ink-soft tabular-nums">
+      {/* Eigene Zeile unter dem Namen, nicht rechtsbündig: dort stehen die
+          Spalten Ansatz, Vorjahr, Ergebnis, und die Summen sind etwas anderes,
+          nämlich der Ansatz des Stichjahrs nach Einnahmen, Ausgaben und
+          Investitionen getrennt. */}
+      <span className="flex basis-full flex-wrap gap-x-4 font-sans text-xs text-ink-soft tabular-nums">
+        <span className="text-ink-muted">Ansatz {jahr}:</span>
         {knoten.einnahmen > 0 && <span>Einnahmen {fmtEurShort(knoten.einnahmen)}</span>}
         {knoten.ausgaben > 0 && <span>Ausgaben {fmtEurShort(knoten.ausgaben)}</span>}
         {knoten.investitionen > 0 && <span>Investitionen {fmtEurShort(knoten.investitionen)}</span>}
