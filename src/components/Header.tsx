@@ -19,9 +19,14 @@ const eintrag = (route: string, label?: string, end?: boolean) => {
 const links = [
   eintrag("/", undefined, true),
   eintrag("/erkunden", "Erkunden"),
+  eintrag("/gesamtliste"),
   eintrag("/themen"),
   eintrag("/wofuer-zahle-ich"),
 ];
+
+// Fuenf Eintraege in der unteren Leiste: unter 400 px wird aus der
+// "Gesamtliste" die "Liste", sonst bricht die Beschriftung um.
+const KURZ: Record<string, string> = { "/gesamtliste": "Liste", "/wofuer-zahle-ich": "Rechner" };
 
 // Active state is ink, not red: in a finance UI red reads as "deficit",
 // so it stays reserved for the brand wordmark and true warning cues.
@@ -96,7 +101,7 @@ export function TabLeiste() {
   return (
     <nav
       aria-label="Hauptnavigation"
-      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-ink-line bg-white px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-ink-line bg-white px-0.5 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden"
     >
       {links.map(({ to, label, icon: Icon, end }) => (
         <NavLink
@@ -104,15 +109,16 @@ export function TabLeiste() {
           to={to}
           end={end}
           className={({ isActive }) =>
-            cn("flex flex-col items-center gap-1 text-center text-xs leading-tight", isActive ? "font-semibold text-ink" : "text-ink-soft")
+            cn("flex flex-col items-center gap-1 px-0.5 text-center text-[11px] leading-tight sm:text-xs", isActive ? "font-semibold text-ink" : "text-ink-soft")
           }
         >
           {({ isActive }) => (
             <>
-              <span className={cn("grid h-[30px] w-14 place-items-center rounded-full", isActive && "bg-cream-dark")}>
+              <span className={cn("grid h-[30px] w-12 place-items-center rounded-full sm:w-14", isActive && "bg-cream-dark")}>
                 <Icon size={22} aria-hidden />
               </span>
-              {label}
+              <span className="sm:hidden">{KURZ[to] ?? label}</span>
+              <span className="hidden sm:inline">{label}</span>
             </>
           )}
         </NavLink>

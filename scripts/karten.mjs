@@ -336,6 +336,7 @@ const SEITEN = [
   ['/erkunden/investitionen/verlauf', 'Investitionen', 'Crane', 'Investitionen über die Jahre', 'Die Ansätze des Vermögenshaushalts, gestapelt nach Einzelplan.'],
   ['/erkunden/querschnitte', 'Seite', 'TreeStructure', 'Querschnitte', 'Personal steckt in fast jeder Einrichtung, Strom in jedem Gebäude. Kostenblöcke quer über den Haushalt.'],
   ['/erkunden/querschnitte/verlauf', 'Querschnitte', 'TreeStructure', 'Kostenblöcke über die Jahre', 'Personal, Zuschüsse, Gebäude, IT, Strom und Wasser im Vergleich.'],
+  ['/gesamtliste', 'Seite', 'ListNumbers', 'Der ganze Haushalt, Stelle für Stelle', 'Jede Haushaltsstelle in ihrer Nummernfolge, wie im amtlichen Plan: Einzelplan, Bereich, Einrichtung, dann die einzelnen Posten.'],
   ['/wofuer-zahle-ich', 'Rechner', 'Wallet', 'Wofür zahle ich?', 'Aus Einkommen- und Grundsteuer geschätzt: welcher Teil Ihres Beitrags in Schulen, Kitas, Straßen und Bäder fließt.'],
   ['/themen', 'Seite', 'SquaresFour', 'Themen', 'Der Haushalt quer zur Verwaltungsgliederung gelesen: Bildung, Mobilität, Soziales.'],
   ['/methodik', 'Seite', 'Scroll', 'Methodik und Daten', 'Woher die Zahlen kommen, wie sie aufbereitet sind und was sie nicht sagen.'],
@@ -348,6 +349,23 @@ const SEITEN = [
 for (const [pfad, art, iconName, titel, satz] of SEITEN) {
   const bild = pfad === '/' ? '/ueberblick' : pfad
   nimm(pfad, titel, satz, bild, karteSeite({ art, iconName, titel, satz, adresse: adresse(pfad) }))
+}
+
+// Die Gesamtliste zeigt denselben Haushalt in Nummernfolge. Jede Ebene ist
+// dort eine Sprungmarke und damit eine Adresse — das Bild hat sie schon.
+for (const [ebene, nummer, name] of [
+  ...[...epNamen].sort().map(([ep, name]) => ['/einzelplan/', ep, name]),
+  ...[...bereiche].sort().map(([ab, p]) => ['/bereich/', ab, labels.abschnitt?.[ab] ?? ab]),
+  ...[...einrichtungen].sort().map(([glz, p]) => ['/einrichtung/', glz, saeubere(p.glz_text)]),
+]) {
+  const pfad = `/gesamtliste/${nummer}`
+  nimm(
+    pfad,
+    `${name} · Gesamtliste`,
+    `Alle Haushaltsstellen zu ${nummer} in Nummernfolge, mit Ansatz, Vorjahr und Ergebnis.`,
+    bildOderOben(`${ebene}${nummer}`),
+    null,
+  )
 }
 
 // Glossarbegriffe: eigener Titel und eigener Text, aber das Bild der
@@ -412,7 +430,7 @@ const zahl = (art) => eintraege.filter((e) => e.pfad.startsWith(art)).length
 console.log(
   `  Einzelplaene ${zahl('/einzelplan/')}, Bereiche ${zahl('/bereich/')}, Einrichtungen ${zahl('/einrichtung/')}, ` +
   `Kostenbloecke ${zahl('/erkunden/querschnitte/') - 1}, Einnahmearten ${zahl('/erkunden/einnahmen/') - 1}, ` +
-  `Seiten ${SEITEN.length}, Glossar ${zahl('/glossar/')}, Posten ${zahl('/posten/')}`,
+  `Seiten ${SEITEN.length}, Gesamtliste ${zahl('/gesamtliste/')}, Glossar ${zahl('/glossar/')}, Posten ${zahl('/posten/')}`,
 )
 
 const start = Date.now()

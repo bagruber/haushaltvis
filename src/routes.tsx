@@ -15,6 +15,7 @@ import { Einnahmen } from "./pages/Einnahmen";
 import { Investitionen } from "./pages/Investitionen";
 import { Querschnitte } from "./pages/Querschnitte";
 import { WofuerZahleIch } from "./pages/WofuerZahleIch";
+import { Gesamtliste } from "./pages/Gesamtliste";
 import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
 import { PostenDetail } from "./pages/PostenDetail";
@@ -44,6 +45,8 @@ const routes = [
           ],
         },
         { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
+        // Die Stellenzahl der Kennung sagt die Ebene: 2, 21, 5701.
+        { path: "/gesamtliste/:teil?", element: <Gesamtliste /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
         // Der Bereich (2-stellige Gliederung) neben /einrichtung und /posten:
         // jede Haushaltsebene hat damit ihre kurze Adresse.

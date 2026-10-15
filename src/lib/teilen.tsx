@@ -224,5 +224,26 @@ export function useTeilScroll(teil: string | undefined, bereit: boolean) {
     if (!el) return;
     erledigt.current = teil;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // Nachfassen, solange das Ziel noch wandert: in einer langen Liste schätzt
+    // der Browser die Höhe dessen, was er noch nicht gezeichnet hat
+    // (`content-visibility`), und beim Sprung rückt alles darüber nach. Ohne
+    // das landet ein tiefer Link mehrere Bildschirme daneben.
+    let frames = 0;
+    let laeuft = true;
+    const nachfassen = () => {
+      if (!laeuft || frames++ > 60) return;
+      // "instant", nicht "auto": `scroll-behavior: smooth` steht global im CSS,
+      // und zwei laufende Animationen brechen einander ab.
+      if (Math.abs(el.getBoundingClientRect().top) > 4) {
+        el.scrollIntoView({ behavior: "instant", block: "start" });
+      }
+      requestAnimationFrame(nachfassen);
+    };
+    const start = window.setTimeout(() => requestAnimationFrame(nachfassen), 400);
+    return () => {
+      laeuft = false;
+      window.clearTimeout(start);
+    };
   }, [teil, bereit]);
 }
