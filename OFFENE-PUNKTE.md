@@ -25,6 +25,20 @@ Noch offen:
   Schriftpakete in `hausbasis/baseline.json` eintragen, den Vorschau-Schritt in
   `pages.yml` und `probe-vorschau.yml` wieder entfernen.
 
+## Diagramm-Bedienung (seit 15.10.2026)
+
+Legende und Schalterzeile trennen jetzt, **was** zu sehen ist (Legende) von
+**wie** gerechnet wird (Schalter). Offen:
+
+- **Die eigene Legende haben bisher nur die Timeline-Diagramme**
+  (Posten, Einrichtung, Einzelplan, Thema). Home, Einnahmen, Investitionen und
+  Querschnitte benutzen weiter die eingebaute von ECharts: nicht per Tastatur
+  erreichbar und mit der breitgezogenen Raute. Sie koennen folgen, wenn die
+  Form traegt.
+- **Abweichung vom Entwurf:** die Legende steht unter der Schalterzeile, nicht
+  darueber. Dort sitzt sie direkt ueber dem Diagramm, das sie erklaert; die
+  Schalterzeile gehoert auf der Einzelplan-Seite zur ganzen Seite.
+
 ## Zwischenstand 2026 (seit 14.10.2026)
 
 Die Marken „gebucht/bezahlt bis 30.09." sind ein **Versuch** fuer die kommende
@@ -39,6 +53,22 @@ Sitzung und die interne Arbeit, umgesetzt in der gemeinsamen `Timeline`
 - **Aussagekraeftig wird er erst im Vergleich** („bis 30.09.2025 waren 68 %
   bezahlt, dieses Jahr 59 %"). Die Kaemmerei fragen, ob AKDB dieselbe
   Auswertung zum 01.10. der Vorjahre rueckwirkend ausgibt.
+
+## Gesamtliste (seit 15.10.2026)
+
+Die Seite `/gesamtliste` zeigt alle 4.306 Haushaltsstellen in Nummernfolge.
+Offen:
+
+- **CSV-Export ist vorbereitet, hat aber keinen Knopf.** `gesamtlisteCsv` in
+  `src/lib/data/gesamtliste.ts` gibt die sichtbaren Zeilen mit den sichtbaren
+  Spalten fuer deutsches Excel aus. Knopf und Download kommen nach
+  Rueckmeldung; die Seite haelt den gefilterten Zeilenstand schon so, dass nur
+  noch der Aufruf fehlt.
+- **Scroll-Leistung auf einem mittleren Telefon pruefen.** Gemessen ist nur der
+  Aufbau: alle 4.306 Zeilen stehen in 257 ms (Desktop-Chromium). Beim Scrollen
+  hilft `content-visibility: auto` je Einzelplan.
+- **Untergruppen-Ebene (3-stellig)** fehlt bewusst. Die Namen stehen schon in
+  `labels.json` (`unterabschnitt`), falls sie spaeter dazukommen soll.
 
 ## Vorschaukarten (seit 14.10.2026)
 
