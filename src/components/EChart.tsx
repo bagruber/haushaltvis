@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as echarts from "echarts/core";
 import { BarChart, LineChart, SankeyChart, ScatterChart, SunburstChart, TreemapChart } from "echarts/charts";
 import { TooltipComponent, LegendComponent, GridComponent, AriaComponent, GraphicComponent } from "echarts/components";
@@ -41,7 +41,7 @@ const NOTIZ_PFEIL = "#b8964e"; // gold-500
  * positions exist only after layout, so this runs after every setOption and
  * resize. The option needs a grid top of about 56 px to leave room.
  */
-function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
+function zeichneNotiz(chart: Chart, notiz: Notiz | undefined, deckkraft = 1, sichtbar = true) {
   if (!notiz) return;
   // The plot rectangle is not in the public API; the grid model exposes it.
   const modell = chart as unknown as {
@@ -73,7 +73,8 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
             rotation: 0.03,
             silent: true,
             z: 100,
-            style: { text: notiz.text, font: `26px ${script}`, fill: NOTIZ_TINTE, align: "right", verticalAlign: "middle" },
+            invisible: !sichtbar,
+            style: { text: notiz.text, font: `26px ${script}`, fill: NOTIZ_TINTE, align: "right", verticalAlign: "middle", opacity: deckkraft },
           },
           {
             id: "notiz-bogen",
@@ -81,7 +82,8 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
             silent: true,
             z: 100,
             shape: { x1: start[0], y1: start[1], x2: ende[0], y2: ende[1] },
-            style: strich,
+            invisible: !sichtbar,
+            style: { ...strich, opacity: deckkraft },
           },
           {
             id: "notiz-spitze",
@@ -89,7 +91,8 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
             silent: true,
             z: 100,
             shape: { points: [spitze(0.5), ende, spitze(-0.5)] },
-            style: strich,
+            invisible: !sichtbar,
+            style: { ...strich, opacity: deckkraft },
           },
         ],
       },
@@ -120,7 +123,8 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
           rotation: 0.05,
           silent: true,
           z: 100,
-          style: { text: notiz.text, font: `28px ${script}`, fill: NOTIZ_TINTE, align: "center", verticalAlign: "middle" },
+          invisible: !sichtbar,
+          style: { text: notiz.text, font: `28px ${script}`, fill: NOTIZ_TINTE, align: "center", verticalAlign: "middle", opacity: deckkraft },
         },
         {
           id: "notiz-bogen",
@@ -128,7 +132,8 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
           silent: true,
           z: 100,
           shape: { x1: start[0], y1: start[1], cpx1: cp1[0], cpy1: cp1[1], cpx2: cp2[0], cpy2: cp2[1], x2: ende[0], y2: ende[1] },
-          style: strich,
+          invisible: !sichtbar,
+          style: { ...strich, opacity: deckkraft },
         },
         {
           id: "notiz-spitze",
@@ -136,7 +141,8 @@ function zeichneNotiz(chart: Chart, notiz: Notiz | undefined) {
           silent: true,
           z: 100,
           shape: { points: [spitze(0.45), ende, spitze(-0.45)] },
-          style: strich,
+          invisible: !sichtbar,
+          style: { ...strich, opacity: deckkraft },
         },
       ],
     },
@@ -149,6 +155,22 @@ export function EChart({ option, className, style, onEvents, ariaLabel, notiz, h
   const inst = useRef<Chart | null>(null);
   const notizRef = useRef(notiz);
   notizRef.current = notiz;
+  // Welche Serie gerade hervorgehoben ist und welche die Legende ausgeblendet
+  // hat. Beides kommt aus Ereignissen des Diagramms, nicht aus React — darum
+  // Refs und ein imperatives Nachzeichnen statt eines Rerenders.
+  const betont = useRef<string | null>(null);
+  const versteckt = useRef<Set<string>>(new Set());
+
+  /** Die Notiz verblasst mit ihrer Linie und verschwindet mit ihr. */
+  const notizNachziehen = useCallback(() => {
+    const chart = inst.current;
+    const n = notizRef.current;
+    if (!chart || !n) return;
+    const meine = n.serien;
+    const sichtbar = !meine || meine.some((s) => !versteckt.current.has(s));
+    const andere = !!betont.current && !!meine && !meine.includes(betont.current);
+    zeichneNotiz(chart, n, andere ? 0.2 : 1, sichtbar);
+  }, []);
 
   useEffect(() => {
     if (!el.current) return;
@@ -156,15 +178,36 @@ export function EChart({ option, className, style, onEvents, ariaLabel, notiz, h
     inst.current = chart;
     const ro = new ResizeObserver(() => {
       chart.resize();
-      zeichneNotiz(chart, notizRef.current);
+      notizNachziehen();
     });
     ro.observe(el.current);
+
+    // Hover auf der Linie, Hover auf der Legende (die 'highlight' auslöst) und
+    // das Ab- und Anwählen in der Legende.
+    const merke = (name: string | null) => {
+      betont.current = name;
+      notizNachziehen();
+    };
+    const nameAus = (p: unknown) => {
+      const e = p as { seriesName?: string; batch?: { seriesName?: string }[] };
+      return e?.seriesName ?? e?.batch?.[0]?.seriesName ?? null;
+    };
+    chart.on("mouseover", (p) => merke(nameAus(p)));
+    chart.on("mouseout", () => merke(null));
+    chart.on("highlight", (p) => merke(nameAus(p)));
+    chart.on("downplay", () => merke(null));
+    chart.on("legendselectchanged", (p) => {
+      const e = p as { selected?: Record<string, boolean> };
+      versteckt.current = new Set(Object.entries(e.selected ?? {}).filter(([, an]) => !an).map(([k]) => k));
+      notizNachziehen();
+    });
+
     return () => {
       ro.disconnect();
       chart.dispose();
       inst.current = null;
     };
-  }, []);
+  }, [notizNachziehen]);
 
   // Canvas text does not inherit CSS fonts, and a font that is not loaded yet
   // falls back to the system font for good. So wait for the fonts, including
@@ -190,8 +233,8 @@ export function EChart({ option, className, style, onEvents, ariaLabel, notiz, h
       { aria: { enabled: true }, ...option, textStyle: { fontFamily, ...(option.textStyle as object) } },
       true,
     );
-    zeichneNotiz(chart, notiz);
-  }, [option, fontsReady, notiz]);
+    notizNachziehen();
+  }, [option, fontsReady, notiz, notizNachziehen]);
 
   useEffect(() => {
     const chart = inst.current;

@@ -30,6 +30,12 @@ export interface Notiz {
    * für eine Marke am Rand, die keinen weiten Weg braucht.
    */
   form?: "bogen" | "kurz";
+  /**
+   * Namen der Serien, zu denen die Notiz gehört. Wird eine andere Serie
+   * hervorgehoben, verblasst die Notiz mit ihrer Linie; ist keine ihrer Serien
+   * sichtbar, wird sie gar nicht gezeichnet. Ohne das Feld bleibt sie immer da.
+   */
+  serien?: string[];
 }
 
 /**

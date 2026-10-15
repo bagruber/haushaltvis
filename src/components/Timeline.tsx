@@ -266,7 +266,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     const dieNotiz: Notiz | undefined =
       notiz ??
       (zw && zwIndex >= 0 && breit && zwischenNotiz && rautenDa
-        ? { text: `Stand ${standLang(zw.stichtag)}`, x: String(zw.jahr), y: zw.ist, form: "kurz" }
+        ? { text: `Stand ${standLang(zw.stichtag)}`, x: String(zw.jahr), y: zw.ist, form: "kurz", serien: [mark!.soll, mark!.ist] }
         : undefined);
 
     const option: EChartsOption = {

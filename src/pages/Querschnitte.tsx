@@ -161,7 +161,7 @@ export function Querschnitte() {
     const hasContext = !!(ctx.cpi || ctx.population);
     const notiz =
       gaskrise != null
-        ? { text: "Ukrainekrieg, Gaskrise", x: String(years[gaskrise]), y: adjusted.strom.ansatz[gaskrise]! }
+        ? { text: "Ukrainekrieg, Gaskrise", x: String(years[gaskrise]), y: adjusted.strom.ansatz[gaskrise]!, serien: [aggs.strom.title] }
         : undefined;
     return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext, notiz };
   }, [data, mode, breit]);

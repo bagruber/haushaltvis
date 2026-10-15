@@ -91,6 +91,9 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color },
           itemStyle: { color },
           connectNulls: true,
+          // Wie in den Querschnitten: beim Hover verblassen die anderen, und
+          // die handschriftliche Notiz verblasst mit ihrer Linie.
+          emphasis: { focus: "series" as const },
         })),
         // Plan tail: same colour, dashed, kept out of the legend so it reads as a
         // continuation rather than a second series. The tooltip above covers it.
@@ -103,6 +106,7 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color, type: "dashed" as const },
           itemStyle: { color },
           connectNulls: true,
+          emphasis: { focus: "series" as const },
         })),
       ],
     };
@@ -110,7 +114,12 @@ export function Einnahmen() {
     const hasContext = !!(data.context.cpi || data.context.population);
     const notiz =
       pandemie != null
-        ? { text: "Corona-Pandemie", x: String(years[pandemie]), y: steuerSeries[GEWERBE].ist[pandemie]! }
+        ? {
+            text: "Corona-Pandemie",
+            x: String(years[pandemie]),
+            y: steuerSeries[GEWERBE].ist[pandemie]!,
+            serien: [STEUERN[GEWERBE][0], `${STEUERN[GEWERBE][0]} (Plan)`],
+          }
         : undefined;
     return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext, notiz };
   }, [data, selYear, mode, breit]);
