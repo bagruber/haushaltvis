@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   useData,
@@ -48,13 +48,23 @@ export function Gesamtliste() {
   const [suche, setSuche] = useState("");
   const [leere, setLeere] = useState(false);
   const [stichtag, setStichtag] = useState(false);
+  // Die Bedienelemente folgen sofort, die Liste rechnet im Hintergrund nach:
+  // React baut sie mit den zurückgestellten Werten und bricht ab, wenn schon
+  // die nächste Taste kommt. Solange sie hinterherhinkt, ist sie ausgegraut.
+  const dHaushalt = useDeferredValue(haushalt);
+  const dArt = useDeferredValue(artFilter);
+  const dSuche = useDeferredValue(suche);
+  const dLeere = useDeferredValue(leere);
+  const dStichtag = useDeferredValue(stichtag);
+  const veraltet =
+    dHaushalt !== haushalt || dArt !== artFilter || dSuche !== suche || dLeere !== leere || dStichtag !== stichtag;
 
   const view = useMemo(() => {
     if (!data) return null;
     const jahr = selYear ?? latestYear(data.budget);
     const liste = gesamtliste(data, jahr);
     const vorjahr = data.budget.meta.years.includes(jahr - 1) ? jahr - 1 : null;
-    const stand = (j: number) => stichtag && liste.zwischenstand.some((z) => z.jahr === j);
+    const stand = (j: number) => dStichtag && liste.zwischenstand.some((z) => z.jahr === j);
     // Von links nach rechts in der Zeit wie im amtlichen Plan: Ergebnis des
     // Vorjahres, Plan des Stichjahrs (hervorgehoben), Plan des Folgejahres. Der
     // Stand zum 01.10. steht, wenn gewählt, gleich hinter der Zahl seines Jahres.
@@ -74,21 +84,21 @@ export function Gesamtliste() {
     const nachLeer = !gesamtlisteZeilen(liste).some((z) => z.werte.ansatzNach != null);
     spalten.push({ key: "ansatzNach", kopf: `Ansatz ${jahr + 1}`, leer: nachLeer });
     return { jahr, liste, spalten };
-  }, [data, selYear, stichtag]);
+  }, [data, selYear, dStichtag]);
 
   // Filtern erst nach dem Baum: der Baum haengt nur am Jahr, die Filter am Tippen.
   const gefiltert = useMemo(() => {
     if (!view) return null;
-    const q = norm(suche.trim());
+    const q = norm(dSuche.trim());
     const passt = (z: GesamtZeile) => {
-      if (artFilter !== "beide" && z.ea !== artFilter) return false;
-      if (!leere && !view.spalten.some((s) => z.werte[s.key])) return false;
+      if (dArt !== "beide" && z.ea !== dArt) return false;
+      if (!dLeere && !view.spalten.some((s) => z.werte[s.key])) return false;
       if (q && !norm(z.name).includes(q) && !z.hhst.includes(q) && !norm(z.kontotext ?? "").includes(q)) return false;
       return true;
     };
     const sichtbar: GesamtZeile[] = [];
     const baum = view.liste.haushalte
-      .filter((h) => haushalt === "beide" || h.haushalt === haushalt)
+      .filter((h) => dHaushalt === "beide" || h.haushalt === dHaushalt)
       .map((h) => ({
         ...h,
         einzelplaene: h.einzelplaene
@@ -111,7 +121,7 @@ export function Gesamtliste() {
     // große Geld liegt, statt in jeder Einrichtung von vorne zu beginnen.
     const groesste = sichtbar.reduce((m, z) => Math.max(m, Math.abs(z.werte.ansatz ?? 0)), 0);
     return { baum, sichtbar, groesste };
-  }, [view, haushalt, artFilter, suche, leere]);
+  }, [view, dHaushalt, dArt, dSuche, dLeere]);
 
   useTeilScroll(teil, !!gefiltert);
 
@@ -125,7 +135,7 @@ export function Gesamtliste() {
     s.leer ? "minmax(4.5rem, 5.5rem)" : /^(gebucht|bezahlt)/.test(s.key) ? "minmax(5rem, 6.5rem)" : "minmax(5.5rem, 8rem)";
   const breiteSpalten = `minmax(0,1fr) ${spalten.map(breite).join(" ")}`;
   // Gefiltert nach Text, wären Summen nur Teilsummen. Dann lieber keine.
-  const summenZeigen = !suche.trim();
+  const summenZeigen = !dSuche.trim();
 
   return (
     <div className="space-y-6">
@@ -180,7 +190,7 @@ export function Gesamtliste() {
 
       <nav aria-label="Zu einem Einzelplan springen" className="space-y-1 text-xs">
         {liste.haushalte
-          .filter((h) => haushalt === "beide" || h.haushalt === haushalt)
+          .filter((h) => dHaushalt === "beide" || h.haushalt === dHaushalt)
           .map((h) => (
             <div key={h.haushalt} className="flex flex-wrap items-center gap-1">
               <a href={`#${h.haushalt}`} className="mr-1 w-36 text-ink-muted hover:text-ink">{h.titel}</a>
@@ -212,6 +222,7 @@ export function Gesamtliste() {
         ))}
       </div>
 
+      <div className={cn("transition-opacity", veraltet && "opacity-50")} aria-busy={veraltet}>
       {gefiltert.baum.map((h) => (
         <section key={h.haushalt} id={h.haushalt} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
           <header className="mt-10 border-b-2 border-ink pb-2">
@@ -223,6 +234,10 @@ export function Gesamtliste() {
               <KnotenKopf knoten={plan} art="Einzelplan" jahr={jahr} pfad={`/erkunden/gesamtliste/${plan.id}`} farbe={EINZELPLAN_COLORS[plan.nummer]} gross summen />
               {plan.kinder.map((bereich) => (
                 <div key={bereich.id} id={bereich.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
+                  <Aufschub
+                    sofort={teil === bereich.id || bereich.kinder.some((e) => e.id === teil)}
+                    hoehe={geschaetzteHoehe(bereich)}
+                  >
                   <KnotenKopf knoten={bereich} art="Bereich" jahr={jahr} pfad={`/erkunden/gesamtliste/${bereich.id}`} summen />
                   {bereich.kinder.map((einrichtung) => (
                     <div key={einrichtung.id} id={einrichtung.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
@@ -240,22 +255,66 @@ export function Gesamtliste() {
                         groesste={gefiltert.groesste}
                         farbe={EINZELPLAN_COLORS[plan.nummer] ?? "#8a8170"}
                         summen={summenZeigen}
-                        abgleich={summenZeigen && artFilter === "beide"}
+                        abgleich={summenZeigen && dArt === "beide"}
                       />
                     </div>
                   ))}
+                  </Aufschub>
                 </div>
               ))}
             </section>
           ))}
         </section>
       ))}
+      </div>
 
       {!gefiltert.sichtbar.length && (
         <p className="text-ink-muted">Kein Treffer. Andere Filter oder ein kürzeres Wort probieren.</p>
       )}
     </div>
   );
+}
+
+/**
+ * Baut seinen Inhalt erst, wenn er in die Nähe des Bildschirms kommt; bis dahin
+ * hält ein leerer Block in geschätzter Höhe den Platz, damit die Scrollleiste
+ * schon stimmt. Einmal gebaut, bleibt er stehen. Rund 2.400 Zeilen auf einmal
+ * blockierten auf einem Mittelklasse-Telefon die Seite für Sekunden; so wird
+ * nur gebaut, was jemand ansieht. `sofort` für das Ziel eines Sprunglinks.
+ */
+function Aufschub({ sofort, hoehe, children }: { sofort: boolean; hoehe: number; children: ReactNode }) {
+  const [da, setDa] = useState(sofort);
+  const platz = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (sofort) setDa(true);
+  }, [sofort]);
+  useEffect(() => {
+    if (da || !platz.current) return;
+    // Anderthalb Bildschirme Vorlauf: beim normalen Scrollen ist der Block
+    // fertig, bevor er auftaucht.
+    const beobachter = new IntersectionObserver(
+      (e) => {
+        if (e.some((x) => x.isIntersecting)) {
+          setDa(true);
+          beobachter.disconnect();
+        }
+      },
+      { rootMargin: "1500px 0px" },
+    );
+    beobachter.observe(platz.current);
+    return () => beobachter.disconnect();
+  }, [da]);
+  return da ? <>{children}</> : <div ref={platz} style={{ height: hoehe }} aria-hidden />;
+}
+
+/**
+ * Ungefähre Höhe eines Bereichs: Kopf, je Einrichtung Kopf und Summenzeilen,
+ * je Stelle eine Zeile. Gemessen am 16.10.2026 über alle 88 Bereiche
+ * (133.000 px bei 2.378 Stellen in 279 Einrichtungen); bei Desktop-Breite
+ * trifft die Summe auf etwa ein Prozent.
+ */
+function geschaetzteHoehe(bereich: GesamtKnoten): number {
+  return 70 + bereich.kinder.reduce((s, e) => s + 175 + e.zeilen.length * 33, 0);
 }
 
 /** Kopfzeile einer Ebene: Nummer, Name, und bei Einzelplan und Bereich, was sie zusammen ausmachen. */

@@ -92,6 +92,9 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color },
           itemStyle: { color },
           connectNulls: true,
+          // Klickbar ist die ganze Linie, nicht nur ihre Punkte: sie führt zur
+          // Seite der Einnahmeart.
+          triggerLineEvent: true,
           // Wie in den Querschnitten: beim Hover verblassen die anderen, und
           // die handschriftliche Notiz verblasst mit ihrer Linie.
           emphasis: { focus: "series" as const },
@@ -107,6 +110,7 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color, type: "dashed" as const },
           itemStyle: { color },
           connectNulls: true,
+          triggerLineEvent: true,
           emphasis: { focus: "series" as const },
         })),
       ],
