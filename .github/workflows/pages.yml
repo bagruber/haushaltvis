@@ -18,11 +18,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
           version: 11
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -57,7 +57,7 @@ jobs:
       # gecacht statt in jedem Lauf neu geladen.
       - name: Chromium aus dem Cache
         if: steps.probe.outputs.da == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: chromium-${{ runner.os }}-${{ steps.probedeps.outputs.playwright }}
@@ -98,7 +98,7 @@ jobs:
             echo "$(find dist/v2/karten -name '*.png' | wc -l) Bilder, $(find dist/v2 -name 'index.html' | wc -l) HTML-Dateien"
           fi
 
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
@@ -110,4 +110,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
