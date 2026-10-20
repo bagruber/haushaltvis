@@ -14,30 +14,30 @@
   },
   "dependencies": {
     "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
-    "@fontsource-variable/source-serif-4": "^5.3.0",
+    "@fontsource-variable/source-serif-4": "^5.3.1",
     "@phosphor-icons/react": "^2.1.10",
     "@types/d3-hierarchy": "^3.1.7",
     "clsx": "^2.1.1",
     "d3-format": "^3.1.0",
     "d3-hierarchy": "^3.1.2",
     "echarts": "^5.5.1",
-    "moosburg-design": "github:bagruber/moosburg-design",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.14.2",
-    "tailwind-merge": "^2.6.0"
+    "moosburg-design": "github:bagruber/moosburg-design#v0.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
     "@types/d3-format": "^3.0.4",
-    "@types/node": "^26.3.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^6.1.0",
-    "playwright-core": "^1.61.1",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "playwright-core": "^1.64.1",
     "tailwindcss": "^4.0.0",
     "typescript": "~7.0.2",
-    "vite": "^8.2.2",
-    "vitest": "^4.1.9"
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
   }
 }
