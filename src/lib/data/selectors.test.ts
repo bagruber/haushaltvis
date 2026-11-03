@@ -4,10 +4,11 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Budget, Data, Themes } from "./types";
-import { factsOfYear, factsOfHhst, postenOfGlz, latestYear } from "./core";
+import { abschnittName, factsOfYear, factsOfHhst, postenOfGlz, latestYear } from "./core";
 import {
   totals,
   expenseShareByPrimaryTheme,
+  netBurdenByEinzelplan,
   themeSankey,
   kameralBothSidesTree,
   adjustSeries,
@@ -99,6 +100,108 @@ describe("expenseShareByPrimaryTheme (Wofür zahle ich?)", () => {
       const childSum = s.children.reduce((x, c) => x + c.amount, 0);
       // Rundung: ±1 € pro Kind
       expect(Math.abs(childSum - s.amount)).toBeLessThanOrEqual(s.children.length);
+    }
+  });
+});
+
+describe("netBurdenByEinzelplan (Wofür zahle ich?)", () => {
+  const anteile = netBurdenByEinzelplan(data, year);
+  const kreisumlage = anteile.find((s) => /Kreisumlage/.test(s.label))!;
+
+  /** Ausgaben und Einnahmen eines Bereichs, unabhängig vom Selektor gezählt. */
+  const bereich = (ab: string) => {
+    let a = 0;
+    let e = 0;
+    for (const f of factsOfYear(budget, year)) {
+      const p = budget.posten[f.hhst_id];
+      if (f.ansatz == null || !p || isInternal(p) || p.glz.slice(0, 2) !== ab) continue;
+      if (p.ea === "A") a += f.ansatz;
+      else e += f.ansatz;
+    }
+    return { a, e };
+  };
+
+  it("die Anteile ergeben zusammen 100 %", () => {
+    expect(anteile.reduce((s, x) => s + x.share, 0)).toBeCloseTo(1, 6);
+  });
+
+  // Bilanziert wurde je Einzelplan: Einzelplan 8 stand bei 8,10 €, sein Bereich
+  // Strom & Wasser darin bei 50,90 €, weil Grundstücksüberschüsse ihn minderten.
+  it("die Bereiche gehen im Einzelplan auf, in Euro und in Prozent", () => {
+    for (const s of anteile.filter((x) => x.children.length)) {
+      const betrag = s.children.reduce((x, c) => x + c.amount, 0);
+      expect(Math.abs(betrag - s.amount), s.label).toBeLessThanOrEqual(s.children.length);
+      expect(s.children.reduce((x, c) => x + c.share, 0), s.label).toBeCloseTo(s.share, 6);
+    }
+  });
+
+  it("ein Überschuss mindert den Nachbarbereich nicht", () => {
+    const { a, e } = bereich("88");
+    expect(e, "Bereich 88 muss im Stichjahr Überschuss haben").toBeGreaterThan(a);
+    const ep8 = anteile.find((s) => s.ep === "8")!;
+    expect(ep8.children.some((c) => c.label === abschnittName(data.labels, "88"))).toBe(false);
+    const wasser = bereich("81");
+    expect(ep8.children.find((c) => c.label === abschnittName(data.labels, "81"))!.amount).toBe(Math.round(wasser.a - wasser.e));
+  });
+
+  it("ein weitgehend refinanzierter Bereich zählt nur mit seinem Rest", () => {
+    const { a, e } = bereich("70");
+    expect(e / a, "Abwasser ist weitgehend über Gebühren gedeckt").toBeGreaterThan(0.5);
+    const ep7 = anteile.find((s) => s.ep === "7")!;
+    const abwasser = ep7.children.find((c) => c.label === abschnittName(data.labels, "70"))!;
+    expect(abwasser.amount).toBe(Math.round(a - e));
+  });
+
+  it("gedeckt ist, was von den Ausgaben nicht übrig bleibt", () => {
+    for (const s of anteile) expect(s.ausgaben - s.einnahmen, s.label).toBe(s.amount);
+  });
+
+  it("die Kreisumlage steht mit ihrem vollen Ansatz als eigener Eintrag", () => {
+    const ansatz = factsOfHhst(budget, "9000.8321").find((f) => f.year === year)!.ansatz!;
+    expect(kreisumlage.amount).toBe(Math.round(ansatz));
+    expect(kreisumlage.einnahmen).toBe(0);
+    expect(kreisumlage.sonder).toBe("kreisumlage");
+  });
+
+  /** Summe der Einzelplan-9-Buchungen einer Seite, deren Gruppierung so beginnt. */
+  const ep9 = (jahr: number, ea: "A" | "E", gruppe: string) => {
+    let summe = 0;
+    for (const f of factsOfYear(budget, jahr)) {
+      const p = budget.posten[f.hhst_id];
+      if (f.ansatz != null && p?.einzelplan === "9" && p.ea === ea && p.grz.startsWith(gruppe)) summe += f.ansatz;
+    }
+    return summe;
+  };
+
+  // Die Investition zählt schon voll, im Jahr ihrer Ausgabe. Die Tilgung zahlt nur
+  // den Kredit zurück, mit dem sie bezahlt wurde, und stünde sonst doppelt darin.
+  it("die Zinsen zählen, die Tilgung nicht", () => {
+    expect(ep9(year, "A", "97"), "es muss eine Tilgung geben, die fehlen kann").toBeGreaterThan(0);
+    const zinsen = anteile.find((s) => s.sonder === "zinsen")!;
+    expect(zinsen.amount).toBe(Math.round(ep9(year, "A", "80") - ep9(year, "E", "20")));
+    expect(anteile.some((s) => /Tilgung/.test(s.label))).toBe(false);
+  });
+
+  it("Zinseinnahmen mindern die Zinsen", () => {
+    const einnahmen = ep9(2024, "E", "20");
+    expect(einnahmen, "2024 gab es Zinseinnahmen").toBeGreaterThan(0);
+    const zinsen = netBurdenByEinzelplan(data, 2024).find((s) => s.sonder === "zinsen")!;
+    expect(zinsen.amount).toBe(Math.round(ep9(2024, "A", "80") - einnahmen));
+  });
+
+  it("sonst fehlt die Finanzwirtschaft: ihre Einnahmen sind das Steuergeld selbst", () => {
+    expect(anteile.filter((s) => s.ep === "9").map((s) => s.sonder).sort()).toEqual(["kreisumlage", "zinsen"]);
+  });
+
+  it("jeder Eintrag hat einen eigenen Namen, die Liste schlüsselt danach", () => {
+    expect(new Set(anteile.map((s) => s.label)).size).toBe(anteile.length);
+  });
+
+  it("in jedem Jahr geht die Rechnung auf", () => {
+    for (const y of budget.meta.years) {
+      const liste = netBurdenByEinzelplan(data, y);
+      expect(liste.reduce((s, x) => s + x.share, 0), String(y)).toBeCloseTo(1, 6);
+      expect(liste.some((s) => /Kreisumlage/.test(s.label)), String(y)).toBe(true);
     }
   });
 });

@@ -1290,55 +1290,96 @@ export interface ThemeShare extends ShareNode {
 export interface EinzelplanShare extends ShareNode {
   ep: string;
   color: string;
-  /** gross expenses and the income that offsets them */
+  /**
+   * gross expenses and the part of them covered by own income; a surplus is not
+   * counted, so ausgaben − einnahmen is exactly `amount`
+   */
   ausgaben: number;
   einnahmen: number;
-  /** one level deeper: Bereiche (Abschnitte) inside the Einzelplan, also net */
+  /** one level deeper: the Bereiche (Abschnitte) that add up to `amount` */
   children: ShareNode[];
+  /** set where the entry is a use of general funds from Einzelplan 9, not an Einzelplan */
+  sonder?: "kreisumlage" | "zinsen";
 }
 
+const KREISUMLAGE = "9000.8321";
+
 /**
- * Net burden (Zuschussbedarf = Ausgaben − Einnahmen) per Einzelplan, as a share
- * of the total net burden. Areas that cover their own cost through fees drop
- * out; Einzelplan 9 (taxes, Schlüsselzuweisungen) is strongly negative — it is
- * the source that funds the rest, not a use of money — and is therefore not
- * listed. Purely kameral. Drives the "Wofür zahle ich?" calculator.
+ * Was allgemeine Mittel tragen müssen, als Anteil am Ganzen. Drives the
+ * "Wofür zahle ich?" calculator.
+ *
+ * Bilanziert wird je Bereich (Abschnitt, z. B. Obdachlosenhilfe): Gebühren und
+ * Förderung mindern nur den Bereich, in dem sie anfallen. Ein Überschuss zählt
+ * mit 0 und mindert keinen Nachbarn — ein Grundstücksverkauf refinanziert nicht
+ * die Wasserversorgung. Darum gehen die Bereiche genau im Einzelplan auf.
+ *
+ * Einzelplan 9 fällt heraus: Seine Einnahmen sind die Steuern und Zuweisungen
+ * selbst, also die Quelle und keine Refinanzierung. Zwei seiner Ausgaben stehen
+ * aber als eigene Einträge darin: die Kreisumlage, die größte Verwendung dieser
+ * Mittel, und die Zinsen, der Preis der Kredite. Die Tilgung nicht: Investitionen
+ * zählen schon voll im Jahr ihrer Ausgabe, und die Tilgung zahlt nur den Kredit
+ * zurück, mit dem sie bezahlt wurden. Kreditaufnahmen mindern darum auch nichts.
  */
 export function netBurdenByEinzelplan(data: Data, year: number): EinzelplanShare[] {
-  const acc = new Map<string, { a: number; e: number; bereiche: Map<string, number> }>();
+  const acc = new Map<string, { a: number; bereiche: Map<string, number> }>();
+  let zinsen = 0;
   for (const f of factsOfYear(data.budget, year)) {
     if (f.ansatz == null) continue;
     const p = data.budget.posten[f.hhst_id];
     if (!p || isInternal(p)) continue;
-    const t = acc.get(p.einzelplan) ?? { a: 0, e: 0, bereiche: new Map() };
-    const signed = p.ea === "A" ? f.ansatz : -f.ansatz;
+    if (p.einzelplan === "9") {
+      // Gruppierung 80 sind Zinsausgaben, 20 Zinseinnahmen.
+      if (p.ea === "A" && p.grz.startsWith("80")) zinsen += f.ansatz;
+      if (p.ea === "E" && p.grz.startsWith("20")) zinsen -= f.ansatz;
+      continue;
+    }
+    const t = acc.get(p.einzelplan) ?? { a: 0, bereiche: new Map() };
     if (p.ea === "A") t.a += f.ansatz;
-    else t.e += f.ansatz;
     const ab = p.glz.slice(0, 2);
-    t.bereiche.set(ab, (t.bereiche.get(ab) ?? 0) + signed);
+    t.bereiche.set(ab, (t.bereiche.get(ab) ?? 0) + (p.ea === "A" ? f.ansatz : -f.ansatz));
     acc.set(p.einzelplan, t);
   }
 
-  const nets = [...acc.entries()]
-    .map(([ep, t]) => ({ ep, t, net: t.a - t.e }))
+  const plaene = [...acc.entries()]
+    .map(([ep, t]) => {
+      const bereiche = [...t.bereiche.entries()].filter(([, v]) => v > 0);
+      return { ep, a: t.a, bereiche, net: bereiche.reduce((s, [, v]) => s + v, 0) };
+    })
     .filter((x) => x.net > 0);
-  const total = nets.reduce((s, x) => s + x.net, 0);
+  const kreisumlage = factsOfHhst(data.budget, KREISUMLAGE).find((f) => f.year === year)?.ansatz ?? 0;
+  const total = plaene.reduce((s, x) => s + x.net, 0) + kreisumlage + Math.max(0, zinsen);
 
-  return nets
-    .map(({ ep, t, net }) => ({
-      ep,
-      label: einzelplanName(data, ep),
-      color: EINZELPLAN_COLORS[ep] ?? "#999",
-      amount: Math.round(net),
-      share: total ? net / total : 0,
-      ausgaben: Math.round(t.a),
-      einnahmen: Math.round(t.e),
-      children: [...t.bereiche.entries()]
-        .map(([ab, v]) => ({ label: abschnittName(data.labels, ab), amount: Math.round(v), share: total ? v / total : 0 }))
-        .filter((c) => c.amount > 0)
-        .sort((a, b) => b.amount - a.amount),
-    }))
-    .sort((a, b) => b.amount - a.amount);
+  const zeilen: EinzelplanShare[] = plaene.map(({ ep, a, bereiche, net }) => ({
+    ep,
+    label: einzelplanName(data, ep),
+    color: EINZELPLAN_COLORS[ep] ?? "#999",
+    amount: Math.round(net),
+    share: total ? net / total : 0,
+    ausgaben: Math.round(a),
+    einnahmen: Math.round(a) - Math.round(net),
+    children: bereiche
+      .map(([ab, v]) => ({ label: abschnittName(data.labels, ab), amount: Math.round(v), share: total ? v / total : 0 }))
+      .filter((c) => c.amount > 0)
+      .sort((x, y) => y.amount - x.amount),
+  }));
+  for (const [sonder, label, betrag] of [
+    ["kreisumlage", "Kreisumlage", kreisumlage],
+    ["zinsen", "Zinsen", zinsen],
+  ] as const) {
+    if (betrag <= 0) continue;
+    zeilen.push({
+      ep: "9",
+      label,
+      color: EINZELPLAN_COLORS["9"],
+      amount: Math.round(betrag),
+      share: betrag / total,
+      ausgaben: Math.round(betrag),
+      einnahmen: 0,
+      children: [],
+      sonder,
+    });
+  }
+  return zeilen.sort((x, y) => y.amount - x.amount);
 }
 
 /**

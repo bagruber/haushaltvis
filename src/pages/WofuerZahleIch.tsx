@@ -18,6 +18,20 @@ const PRESETS: { label: string; est: number; grund: number }[] = [
   { label: "Rente, Eigentumswohnung", est: 800, grund: 300 },
 ];
 
+// Die Einträge aus der Finanzwirtschaft: was sie sind, und wohin es weitergeht.
+const SONDER = {
+  kreisumlage: {
+    satz: <>Die Stadt gibt diesen Betrag als <Term name="kreisumlage">Kreisumlage</Term> an den Landkreis weiter.</>,
+    ziel: "/posten/9000.8321",
+    link: "Haushaltsstelle öffnen →",
+  },
+  zinsen: {
+    satz: <>Der Preis der Kredite der Stadt. Die Tilgung zählt nicht mit: Investitionen zählen schon voll, die Tilgung zahlt nur den Kredit dafür zurück.</>,
+    ziel: "/einzelplan/9",
+    link: "Aufgabenbereich öffnen →",
+  },
+};
+
 function NumberField({ id, label, hint, value, onChange }: {
   id: string; label: React.ReactNode; hint: string; value: number; onChange: (v: number) => void;
 }) {
@@ -134,11 +148,12 @@ export function WofuerZahleIch() {
         <p className="text-xs text-ink-muted">Auf einen Bereich tippen, um ihn aufzuklappen.</p>
         <ul className="space-y-2">
           {view.shares.map((s) => {
-            const isOpen = open.has(s.ep);
+            const isOpen = open.has(s.label);
+            const sonder = s.sonder && SONDER[s.sonder];
             return (
-              <li key={s.ep}>
+              <li key={s.label}>
                 <button
-                  onClick={() => setOpen((o) => { const n = new Set(o); n.has(s.ep) ? n.delete(s.ep) : n.add(s.ep); return n; })}
+                  onClick={() => setOpen((o) => { const n = new Set(o); n.has(s.label) ? n.delete(s.label) : n.add(s.label); return n; })}
                   aria-expanded={isOpen}
                   className="w-full grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-left"
                 >
@@ -164,6 +179,7 @@ export function WofuerZahleIch() {
                         Einnahmen gedeckt ({Math.round((s.einnahmen / s.ausgaben) * 100)} %).
                       </li>
                     )}
+                    {sonder && <li className="pb-1 text-xs text-ink-muted">{sonder.satz}</li>}
                     {s.children.map((c) => (
                       <li key={c.label} className="flex items-center justify-between gap-3 text-sm">
                         <span className="truncate text-ink-soft">{c.label}</span>
@@ -171,7 +187,9 @@ export function WofuerZahleIch() {
                       </li>
                     ))}
                     <li className="pt-0.5">
-                      <Link to={`/einzelplan/${s.ep}`} className="text-xs text-red-600 hover:underline">Aufgabenbereich öffnen →</Link>
+                      <Link to={sonder ? sonder.ziel : `/einzelplan/${s.ep}`} className="text-xs text-red-600 hover:underline">
+                        {sonder ? sonder.link : "Aufgabenbereich öffnen →"}
+                      </Link>
                     </li>
                   </ul>
                 )}
@@ -186,9 +204,11 @@ export function WofuerZahleIch() {
         Grundsteuer B (100 %). Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich nicht
         sinnvoll einzelnen Personen zuordnen und sind nicht enthalten. Die Stadt finanziert sich
         zudem aus Zuweisungen, Gebühren und weiteren Quellen. Verteilt wird nach dem
-        Zuschussbedarf je <Term name="einzelplan">Einzelplan</Term> (Ausgaben abzüglich eigener
-        Einnahmen); die Finanzwirtschaft, aus der die Steuern selbst stammen, ist keine Ausgabe
-        und daher nicht aufgeführt. Siehe{" "}
+        Zuschussbedarf je Bereich (Ausgaben abzüglich eigener Einnahmen wie Gebühren und Förderung).
+        Ein Bereich mit Überschuss zählt mit 0 € und mindert keinen anderen. Von der
+        Finanzwirtschaft, aus der sonst die Steuern selbst stammen, zählen nur Kreisumlage und
+        Zinsen. Außen vor bleiben die Tilgung, weil Investitionen schon voll zählen, und die
+        Gewerbesteuerumlage, die an der Gewerbesteuer hängt. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
     </div>
