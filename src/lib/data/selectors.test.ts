@@ -179,11 +179,41 @@ describe("netBurdenByEinzelplan (Wofür zahle ich?)", () => {
     const ansatz = factsOfHhst(budget, "9000.8321").find((f) => f.year === year)!.ansatz!;
     expect(kreisumlage.amount).toBe(Math.round(ansatz));
     expect(kreisumlage.einnahmen).toBe(0);
-    expect(kreisumlage.posten).toBe("9000.8321");
+    expect(kreisumlage.sonder).toBe("kreisumlage");
+  });
+
+  /** Summe der Einzelplan-9-Buchungen einer Seite, deren Gruppierung so beginnt. */
+  const ep9 = (jahr: number, ea: "A" | "E", gruppe: string) => {
+    let summe = 0;
+    for (const f of factsOfYear(budget, jahr)) {
+      const p = budget.posten[f.hhst_id];
+      if (f.ansatz != null && p?.einzelplan === "9" && p.ea === ea && p.grz.startsWith(gruppe)) summe += f.ansatz;
+    }
+    return summe;
+  };
+
+  // Die Investition zählt schon voll, im Jahr ihrer Ausgabe. Die Tilgung zahlt nur
+  // den Kredit zurück, mit dem sie bezahlt wurde, und stünde sonst doppelt darin.
+  it("die Zinsen zählen, die Tilgung nicht", () => {
+    expect(ep9(year, "A", "97"), "es muss eine Tilgung geben, die fehlen kann").toBeGreaterThan(0);
+    const zinsen = anteile.find((s) => s.sonder === "zinsen")!;
+    expect(zinsen.amount).toBe(Math.round(ep9(year, "A", "80") - ep9(year, "E", "20")));
+    expect(anteile.some((s) => /Tilgung/.test(s.label))).toBe(false);
+  });
+
+  it("Zinseinnahmen mindern die Zinsen", () => {
+    const einnahmen = ep9(2024, "E", "20");
+    expect(einnahmen, "2024 gab es Zinseinnahmen").toBeGreaterThan(0);
+    const zinsen = netBurdenByEinzelplan(data, 2024).find((s) => s.sonder === "zinsen")!;
+    expect(zinsen.amount).toBe(Math.round(ep9(2024, "A", "80") - einnahmen));
   });
 
   it("sonst fehlt die Finanzwirtschaft: ihre Einnahmen sind das Steuergeld selbst", () => {
-    expect(anteile.filter((s) => s.ep === "9")).toEqual([kreisumlage]);
+    expect(anteile.filter((s) => s.ep === "9").map((s) => s.sonder).sort()).toEqual(["kreisumlage", "zinsen"]);
+  });
+
+  it("jeder Eintrag hat einen eigenen Namen, die Liste schlüsselt danach", () => {
+    expect(new Set(anteile.map((s) => s.label)).size).toBe(anteile.length);
   });
 
   it("in jedem Jahr geht die Rechnung auf", () => {

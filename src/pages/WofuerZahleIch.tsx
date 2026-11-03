@@ -21,6 +21,20 @@ const PRESETS: { label: string; est: number; grund: number }[] = [
   { label: "Rente, Eigentumswohnung", est: 800, grund: 300 },
 ];
 
+// Die Einträge aus der Finanzwirtschaft: was sie sind, und wohin es weitergeht.
+const SONDER = {
+  kreisumlage: {
+    satz: <>Die Stadt gibt diesen Betrag als <Term name="kreisumlage">Kreisumlage</Term> an den Landkreis weiter.</>,
+    ziel: "/posten/9000.8321",
+    link: "Haushaltsstelle öffnen",
+  },
+  zinsen: {
+    satz: <>Der Preis der Kredite der Stadt. Die Tilgung zählt nicht mit: Investitionen zählen schon voll, die Tilgung zahlt nur den Kredit dafür zurück.</>,
+    ziel: "/bereich/91",
+    link: "Bereich öffnen",
+  },
+};
+
 function NumberField({ id, label, hint, value, onChange }: {
   id: string; label: React.ReactNode; hint: string; value: number; onChange: (v: number) => void;
 }) {
@@ -152,11 +166,12 @@ export function WofuerZahleIch() {
         <p className="text-xs text-ink-muted">Auf einen Bereich tippen, um ihn aufzuklappen.</p>
         <ul className="space-y-2">
           {view.shares.map((s, i) => {
-            const isOpen = open.has(s.ep);
+            const isOpen = open.has(s.label);
+            const sonder = s.sonder && SONDER[s.sonder];
             return (
-              <li key={s.ep}>
+              <li key={s.label}>
                 <button
-                  onClick={() => setOpen((o) => { const n = new Set(o); n.has(s.ep) ? n.delete(s.ep) : n.add(s.ep); return n; })}
+                  onClick={() => setOpen((o) => { const n = new Set(o); n.has(s.label) ? n.delete(s.label) : n.add(s.label); return n; })}
                   aria-expanded={isOpen}
                   className="w-full grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-left"
                 >
@@ -184,12 +199,7 @@ export function WofuerZahleIch() {
                         Einnahmen gedeckt ({Math.round((s.einnahmen / s.ausgaben) * 100)} %).
                       </li>
                     )}
-                    {s.posten && (
-                      <li className="pb-1 text-xs text-ink-muted">
-                        Die Stadt gibt diesen Betrag als <Term name="kreisumlage">Kreisumlage</Term> an den
-                        Landkreis weiter.
-                      </li>
-                    )}
+                    {sonder && <li className="pb-1 text-xs text-ink-muted">{sonder.satz}</li>}
                     {s.children.map((c) => (
                       <li key={c.label} className="flex items-center justify-between gap-3 text-sm">
                         <span className="truncate text-ink-soft">{c.label}</span>
@@ -198,10 +208,10 @@ export function WofuerZahleIch() {
                     ))}
                     <li className="pt-0.5">
                       <Link
-                        to={s.posten ? `/posten/${s.posten}` : `/einzelplan/${s.ep}`}
+                        to={sonder ? sonder.ziel : `/einzelplan/${s.ep}`}
                         className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
                       >
-                        {s.posten ? "Haushaltsstelle öffnen" : "Aufgabenbereich öffnen"} <ArrowRight size={12} aria-hidden />
+                        {sonder ? sonder.link : "Aufgabenbereich öffnen"} <ArrowRight size={12} aria-hidden />
                       </Link>
                     </li>
                   </ul>
@@ -217,9 +227,10 @@ export function WofuerZahleIch() {
         Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich keiner Person zuordnen. Verteilt
         wird nach dem <Term name="zuschuss-aus-allg-haushalt">Eigenanteil der Stadt</Term> je
         Bereich, also Ausgaben minus eigene Einnahmen wie Gebühren und Förderung. Ein Bereich mit
-        Überschuss zählt mit 0 € und mindert keinen anderen. Von der Finanzwirtschaft zählt nur die
-        Kreisumlage, weil aus ihr sonst die Steuern selbst stammen; Zinsen, Tilgung und
-        Gewerbesteuerumlage bleiben außen vor. Siehe{" "}
+        Überschuss zählt mit 0 € und mindert keinen anderen. Von der Finanzwirtschaft, aus der sonst
+        die Steuern selbst stammen, zählen nur Kreisumlage und Zinsen. Außen vor bleiben die Tilgung,
+        weil Investitionen schon voll zählen, und die Gewerbesteuerumlage, die an der Gewerbesteuer
+        hängt. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
       </div>
