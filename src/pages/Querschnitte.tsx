@@ -125,8 +125,8 @@ export function Querschnitte() {
         valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)),
         order: "valueDesc",
       },
-      legend: { bottom: 0 },
-      grid: { left: 66, right: 16, top: 12, bottom: 44 },
+      legend: { bottom: 0, type: "scroll" },
+      grid: { left: 8, right: 16, top: 12, bottom: 44, containLabel: true },
       xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({

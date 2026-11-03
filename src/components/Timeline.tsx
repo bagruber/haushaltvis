@@ -89,8 +89,10 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
 
     const option: EChartsOption = {
       tooltip: { trigger: "axis", valueFormatter: (v) => fmt(v as number | null) },
-      legend: { bottom: 0 },
-      grid: { left: 64, right: 16, top: 12, bottom: 44 },
+      // Scroll statt Umbruch: auf dem Telefon lag die zweite Legendenzeile über
+      // den Jahreszahlen. containLabel, weil feste 64 px "800 Tsd." abschnitten.
+      legend: { bottom: 0, type: "scroll" },
+      grid: { left: 8, right: 16, top: 12, bottom: 44, containLabel: true },
       xAxis: { type: "category", data: laufend.years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v)) } },
       series,
