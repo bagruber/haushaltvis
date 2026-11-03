@@ -184,6 +184,12 @@ export function WofuerZahleIch() {
                         Einnahmen gedeckt ({Math.round((s.einnahmen / s.ausgaben) * 100)} %).
                       </li>
                     )}
+                    {s.posten && (
+                      <li className="pb-1 text-xs text-ink-muted">
+                        Die Stadt gibt diesen Betrag als <Term name="kreisumlage">Kreisumlage</Term> an den
+                        Landkreis weiter.
+                      </li>
+                    )}
                     {s.children.map((c) => (
                       <li key={c.label} className="flex items-center justify-between gap-3 text-sm">
                         <span className="truncate text-ink-soft">{c.label}</span>
@@ -191,8 +197,11 @@ export function WofuerZahleIch() {
                       </li>
                     ))}
                     <li className="pt-0.5">
-                      <Link to={`/einzelplan/${s.ep}`} className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline">
-                        Aufgabenbereich öffnen <ArrowRight size={12} aria-hidden />
+                      <Link
+                        to={s.posten ? `/posten/${s.posten}` : `/einzelplan/${s.ep}`}
+                        className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
+                      >
+                        {s.posten ? "Haushaltsstelle öffnen" : "Aufgabenbereich öffnen"} <ArrowRight size={12} aria-hidden />
                       </Link>
                     </li>
                   </ul>
@@ -206,10 +215,11 @@ export function WofuerZahleIch() {
       <p className="text-xs text-ink-muted">
         Vereinfachtes Modell mit Einkommensteuer (15 % Gemeindeanteil) und Grundsteuer B (100 %).
         Gewerbe-, Umsatz- und Kapitalertragsteuer lassen sich keiner Person zuordnen. Verteilt
-        wird nach dem <Term name="zuschuss-aus-allg-haushalt">Eigenanteil der Stadt</Term> je{" "}
-        <Term name="einzelplan">Einzelplan</Term>, also Ausgaben
-        minus eigene Einnahmen. Die Finanzwirtschaft fehlt, weil aus ihr die Steuern selbst
-        stammen. Siehe{" "}
+        wird nach dem <Term name="zuschuss-aus-allg-haushalt">Eigenanteil der Stadt</Term> je
+        Bereich, also Ausgaben minus eigene Einnahmen wie Gebühren und Förderung. Ein Bereich mit
+        Überschuss zählt mit 0 € und mindert keinen anderen. Von der Finanzwirtschaft zählt nur die
+        Kreisumlage, weil aus ihr sonst die Steuern selbst stammen; Zinsen, Tilgung und
+        Gewerbesteuerumlage bleiben außen vor. Siehe{" "}
         <Link to="/methodik" className="underline hover:text-ink">Methodik</Link>.
       </p>
       </div>
