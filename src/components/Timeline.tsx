@@ -332,12 +332,16 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       xAxis: {
         type: "category",
         data: laufend.years.map(String),
-        axisLabel: standJe.size
+        // Nur setzen, wenn es einen Stichtag gibt: ein ausdrückliches `undefined`
+        // löscht in ECharts die Standardwerte, und die Jahreszahlen verschwinden.
+        ...(standJe.size
           ? {
-              formatter: (v: string) => (standJe.has(v) ? `${v}\n{stand|Stand ${standJe.get(v)}}` : v),
-              rich: { stand: { fontSize: 10, lineHeight: 15, color: "#8a8170" } },
+              axisLabel: {
+                formatter: (v: string) => (standJe.has(v) ? `${v}\n{stand|Stand ${standJe.get(v)}}` : v),
+                rich: { stand: { fontSize: 10, lineHeight: 15, color: "#8a8170" } },
+              },
             }
-          : undefined,
+          : {}),
       },
       yAxis: {
         type: "value",

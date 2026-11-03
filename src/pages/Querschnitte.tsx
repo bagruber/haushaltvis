@@ -128,7 +128,9 @@ export function Querschnitte() {
         order: "valueDesc",
       },
       legend: { bottom: 0 },
-      grid: { left: 8, right: 16, top: gaskrise != null ? 56 : 12, bottom: 44, containLabel: true },
+      // Auf dem Telefon bricht die Legende in drei Zeilen um und braucht den Platz,
+      // sonst liegt sie über den Jahreszahlen.
+      grid: { left: 8, right: 16, top: gaskrise != null ? 56 : 12, bottom: breit ? 44 : 84, containLabel: true },
       xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
       yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({
