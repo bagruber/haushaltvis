@@ -108,11 +108,10 @@ export interface Gesamtliste {
   nach: "ansatz" | "finanzplan" | null;
 }
 
-export type IstQuelle = { art: "ergebnis" } | { art: "stand"; stichtag: string; text?: string };
+export type IstQuelle = { art: "ergebnis" } | { art: "stand"; stichtag: string };
 
-/** „November 2026“ oder „01.10.2026“ */
-export function standText(q: { stichtag: string; text?: string }): string {
-  if (q.text) return q.text;
+/** „01.10.2026“ */
+export function standText(q: { stichtag: string }): string {
   const [j, m, t] = q.stichtag.split("-");
   return `${t}.${m}.${j}`;
 }
@@ -185,7 +184,7 @@ export function gesamtliste(data: Data, jahr: number): Gesamtliste {
     if (j == null) return { quelle: null };
     if (erg.size) return { quelle: { art: "ergebnis" } };
     const stand = neuesterStand(data.zwischenstand, j);
-    return stand ? { quelle: { art: "stand", stichtag: stand.stichtag, text: stand.text }, stand } : { quelle: null };
+    return stand ? { quelle: { art: "stand", stichtag: stand.stichtag }, stand } : { quelle: null };
   };
   const istJahr = istVon(ergebnis, jahr);
   const istVor = istVon(ergebnisVor, vorjahr);

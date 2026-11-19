@@ -8,16 +8,14 @@ alle. Gleiche Spalten wie der Langexport; Jahr und Stichtag stehen aber
 verlässlich nur im Dateinamen, und die Kopfzeile ist Zeile 2 (Zeile 1 ist eine
 Summenzeile). Dazu aus dem jüngsten Arbeitsplan (haushaltsplaene/arbeitsplan/)
 das Blatt des laufenden Jahres, eine Auswertung derselben Form. Es trägt kein
-Datum; der Name der Datei nennt den Stand des Arbeitsplans, das Blatt kann in
-den Tagen danach noch einmal gezogen worden sein. Es gilt deshalb nur der
-Monat, als `text` („November 2026“).
+eigenes Datum; es gilt der Stand im Namen der Datei.
 
 Ein Stand zum Monatsletzten gilt als Stand zum Ersten des Folgemonats:
 „Stand 30.09.2025“ und „Stand 01.10.2026“ meinen denselben Schnitt nach dem
 dritten Quartal, und so tragen beide Jahre denselben Stichtag 01.10.
 
 Output: data/processed/zwischenstand.json
-  { staende: [ { jahr, stichtag, text?, quelle, werte: { <hhst_id>: [soll, ist] } }, … ] }
+  { staende: [ { jahr, stichtag, quelle, werte: { <hhst_id>: [soll, ist] } }, … ] }
   nach Jahr und Stichtag aufsteigend; ein Jahr kann mehrere Stände haben.
 
 Eigene Datei, nicht in budget.json: budget.json ist der dokumentierte Vertrag
@@ -58,12 +56,8 @@ def stichtag_von(tag: str, monat: str, jahr: str) -> str:
     return d.isoformat()
 
 
-MONAT = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August",
-         "September", "Oktober", "November", "Dezember"]
-
-
 def quellen() -> list[dict]:
-    """Alle Auswertungen, nach Jahr und Stichtag: {datei, jahr, stichtag, blatt?, text?}."""
+    """Alle Auswertungen, nach Jahr und Stichtag: {datei, jahr, stichtag, blatt?}."""
     kandidaten = []
     for f in SRC_DIR.glob("*.xlsx"):
         if f.name.startswith("~$"):
@@ -92,7 +86,6 @@ def quellen() -> list[dict]:
             "jahr": jahr,
             "stichtag": f"{stichjahr}-{monat}-{tag}",
             "blatt": str(jahr),
-            "text": f"{MONAT[int(monat) - 1]} {stichjahr}",
         })
 
     kandidaten.sort(key=lambda k: (k["jahr"], k["stichtag"]))
@@ -176,7 +169,7 @@ def stand(q: dict, budget: dict) -> dict:
         s[1] += soll
         s[2] += ist
     blatt = f", Blatt {q['blatt']}" if q.get("blatt") else ""
-    print(f"{src.name}{blatt}  (Stichtag {stichtag}{', gilt als ' + q['text'] if q.get('text') else ''}, {len(roh)} Zeilen)")
+    print(f"{src.name}{blatt}  (Stichtag {stichtag}, {len(roh)} Zeilen)")
     print(f"{'':24}{'Ansatz':>14}{'Soll (gebucht)':>18}{'Ist (bezahlt)':>16}")
     for (haushalt, ea), (a, soll, ist) in sorted(summen.items()):
         name = {"verwaltung": "VwH", "vermoegen": "VmH"}[haushalt]
@@ -189,10 +182,7 @@ def stand(q: dict, budget: dict) -> dict:
     if fremd:
         print("   Ist darunter Relevantes, lieber den Langexport neu ziehen als hier Posten anlegen.")
     print()
-    out = {"jahr": jahr, "stichtag": stichtag, "quelle": src.name + blatt, "werte": werte}
-    if q.get("text"):
-        out["text"] = q["text"]
-    return out
+    return {"jahr": jahr, "stichtag": stichtag, "quelle": src.name + blatt, "werte": werte}
 
 
 if __name__ == "__main__":

@@ -182,7 +182,7 @@ describe("Gesamtliste", () => {
     // Das laufende Jahr als Vorjahr des Entwurfs: der jüngste Stand.
     const neuester = data.zwischenstand.filter((z) => z.jahr === jahr).at(-1)!;
     const l = gesamtliste(data, jahr + 1);
-    expect(l.ist.vor).toEqual({ art: "stand", stichtag: neuester.stichtag, text: neuester.text });
+    expect(l.ist.vor).toEqual({ art: "stand", stichtag: neuester.stichtag });
     const hhst = Object.keys(neuester.werte).find((h) => neuester.werte[h][0] !== neuester.werte[h][1])!;
     const zeile = gesamtlisteZeilen(l).find((x) => x.hhst === hhst)!;
     expect(zeile.werte.gebuchtVor).toBe(neuester.werte[hhst][0]);

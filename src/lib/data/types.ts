@@ -117,8 +117,6 @@ export interface Zwischenstand {
   jahr: number;
   /** ISO-Datum des Stichtags, z. B. "2026-10-01" */
   stichtag: string;
-  /** Statt des Datums anzuzeigen, wenn nur der Monat sicher ist („November 2026“) */
-  text?: string;
   quelle: string;
   werte: Record<string, [number, number]>;
 }

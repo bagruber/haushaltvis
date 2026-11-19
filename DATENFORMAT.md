@@ -135,7 +135,6 @@ nach `data/` legen → fertig (kein Build).
       {
         "jahr": 2026,
         "stichtag": "2026-11-13",
-        "text": "November 2026",                          // statt des Datums anzeigen
         "quelle": "Arbeitsplan 2027 Stand 13.11.2026.xlsx, Blatt 2026",
         "werte": { "0000.4100": [121892.92, 121892.92] }
       }
@@ -149,7 +148,7 @@ nach `data/` legen → fertig (kein Build).
   gilt als Stand zum Ersten des Folgemonats (30.09. → 01.10.), damit beide
   Jahre denselben Stichtag tragen. Ein Jahr kann mehrere Stände haben: Die
   Zeitreihen nehmen je Jahr den Stand an dem Tag, den die meisten Jahre teilen,
-  die Gesamtliste den jüngsten. `text` steht, wo nur der Monat sicher ist.
+  die Gesamtliste den jüngsten.
   Bewusst eine eigene Datei: `budget.json` bleibt unverändert, und ihr Löschen
   nimmt das Feature in der App zurück. Erzeugt von `etl/zwischenstand.py` aus
   allen Auswertungen in `haushaltsplaene/zwischenstand/` und dem Blatt des

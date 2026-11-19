@@ -601,7 +601,7 @@ describe.skipIf(!data.zwischenstand.length)("Zwischenstand (Stichtag, laufendes 
     const tage = (xs: Zwischenstand[]) => xs.map((z) => `${z.jahr} ${z.stichtag.slice(5)}`);
     const okt25 = { jahr: 2025, stichtag: "2025-10-01", quelle: "", werte: {} };
     const okt26 = { ...okt25, jahr: 2026, stichtag: "2026-10-01" };
-    const nov26 = { ...okt25, jahr: 2026, stichtag: "2026-11-13", text: "November 2026" };
+    const nov26 = { ...okt25, jahr: 2026, stichtag: "2026-11-13" };
     expect(tage(vergleichsStaende([okt25, okt26, nov26]))).toEqual(["2025 10-01", "2026 10-01"]);
     // Gleichstand: der spätere Tag, damit ein neuer Stand die alten ablöst, sobald er zwei Jahre hat.
     expect(tage(vergleichsStaende([okt25, nov26]))).toEqual(["2026 11-13"]);
