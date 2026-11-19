@@ -166,7 +166,8 @@ nach `data/` legen → fertig (kein Build).
 - **`data/erlaeuterungen.json`** — die Erläuterungen der Kämmerei aus dem
   Arbeitsplan, so weit gesichtet: `{ jahr, stand, quelle, stellen: { <hhst_id>:
   { text?: [ … ], such?: [ … ] } } }`. `text` steht wörtlich und nur, wo er
-  gezeigt wird; `such` sind Suchwörter. Die Sichtung steht in
+  gezeigt wird, Namen von Firmen und Fachsoftware durch ihre Art in eckigen
+  Klammern ersetzt; `such` sind Suchwörter. Die Sichtung steht in
   `etl/erlaeuterungen.yaml`, erzeugt von `etl/erlaeuterungen.py`. Ohne die Datei
   gibt es keine Erläuterungen und keine Suchwörter.
 

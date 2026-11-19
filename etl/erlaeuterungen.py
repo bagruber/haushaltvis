@@ -4,9 +4,11 @@ je Haushaltsstelle aus dem Arbeitsplan, so weit sie gesichtet sind.
 
 Gesichtet heißt: etl/erlaeuterungen.yaml entscheidet je Stelle, ob der Text
 gezeigt wird (`zeigen`: true, kurz für nur den kurzen Text, false), und nennt
-Suchwörter, unter denen die Stelle gefunden wird. Gezeigt wird immer der Text
-aus dem Arbeitsplan, wörtlich. Die YAML trägt nur einen Prüfwert des Textes,
-nicht den Text: Das Repository ist öffentlich. Passt der Prüfwert nicht mehr,
+Suchwörter, unter denen die Stelle gefunden wird. Gezeigt wird der Text aus
+dem Arbeitsplan, wörtlich. Nennt er Firmen oder Fachsoftware, steht in der
+YAML unter `text` derselbe Text, die Namen durch ihre Art in eckigen Klammern
+ersetzt, und gezeigt wird dieser. Sonst trägt die YAML nur einen Prüfwert des
+Textes, nicht den Text: Das Repository ist öffentlich. Passt der Prüfwert nicht mehr,
 hat die Kämmerei die Erläuterung geändert, und die alte Entscheidung gilt
 nicht: Die Stelle fällt heraus, bis sie neu gesichtet ist.
 
@@ -57,7 +59,9 @@ def main():
             print(f"   veraltet {hhst}: Text im Arbeitsplan geändert, neu sichten")
             continue
         eintrag: dict = {}
-        if s.get("zeigen") is True:
+        if s.get("zeigen") is True and s.get("text"):
+            eintrag["text"] = s["text"]
+        elif s.get("zeigen") is True:
             eintrag["text"] = [x for x in (t["kurz"], t["lang"]) if x]
         elif s.get("zeigen") == "kurz" and t["kurz"]:
             eintrag["text"] = [t["kurz"]]

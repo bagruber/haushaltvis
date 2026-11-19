@@ -46,7 +46,8 @@ export function Methodik() {
             {fmtDatum(entwurf.stand)}. Er ist noch nicht beschlossen und überall als Entwurf
             gekennzeichnet. Wo die Kämmerei dort einen Ansatz erläutert, steht die Erläuterung
             wörtlich bei der Haushaltsstelle. Ausgelassen sind Vermerke, die ohne Vorwissen
-            missverständlich wären, interne Arbeitsnotizen und Angaben zu Personen.
+            missverständlich wären, interne Arbeitsnotizen und Angaben zu Personen. Statt der
+            Namen von Firmen und Fachsoftware steht in eckigen Klammern, was sie sind.
           </p>
         )}
         <p className="text-ink-soft">
