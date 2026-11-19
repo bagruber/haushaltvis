@@ -16,6 +16,7 @@ import type { Context, Data, EA, Haushalt, Posten, Zwischenstand } from "./types
 import { abschnittName } from "./core";
 import { neuesterStand, wechsel, type Wechsel } from "./selectors";
 import { isInternal } from "../kameral.mjs";
+import { MONATE } from "../format";
 
 /** Die Spalten, die eine Zeile tragen kann. Welche davon stehen, wählt die Seite. */
 export type SpaltenKey =
@@ -337,8 +338,6 @@ export interface Bereinigung {
   preisVon: string;
   preisBis: string;
 }
-
-const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 /**
  * Preisindex zum Beginn eines Jahres, also der Dezemberwert des Vorjahres:

@@ -94,6 +94,12 @@ export function Methodik() {
             Zeile, gibt es sie nicht. Eine Stelle mit 0 € ist eine ganz normale Stelle.
           </li>
           <li>
+            <b>Inflationsbereinigt</b> heißt: umgerechnet in die Preise eines Jahres, mit dem
+            Verbraucherpreisindex im Jahresdurchschnitt. Für das laufende Jahr gibt es den noch
+            nicht, dort zählt das Mittel der Monate bisher
+            {entwurf && `, und der Entwurf ${entwurf.jahr} rechnet mit dem jüngsten Monat, also mit den Preisen von heute`}.
+          </li>
+          <li>
             <b>Pfeile in der Gesamtliste:</b> Sie vergleichen den Ansatz mit dem des Vorjahres,
             einmal in Euro, einmal nach Abzug der Teuerung und je Einwohner. Unter 2 % in beide
             Richtungen gilt als gleich geblieben. Die Teuerung ist der Verbraucherpreisindex zum

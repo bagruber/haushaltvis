@@ -100,9 +100,12 @@ nach `data/` legen → fertig (kein Build).
 - **`data/themes.json`** — `{ themes: { <id>: {label, color, description} }, assignment: { … } }`.
   Enthält die Themen-Definitionen (Name, Farbe) und eine Standard-Zuordnung.
 - **`data/context.json`** — `{ population: { "2024": 19908, … }, cpi: { "2024": 119.3, … },
-  vpi_monat: { "2025-12": 122.7, … } }` für Pro-Kopf- und Inflations-Ansichten. `vpi_monat`
-  ist der Verbraucherpreisindex je Monat; die Pfeile der Gesamtliste rechnen mit dem Stand
-  zum Jahresbeginn (Dezember des Vorjahres), solange der fehlt, mit dem jüngsten Monat.
+  vpi_monat: { "2025-12": 122.7, … } }` für Pro-Kopf- und Inflations-Ansichten. `cpi` ist
+  der Jahresdurchschnitt des Verbraucherpreisindex, `vpi_monat` der Index je Monat. Fehlt
+  einem Jahr der Durchschnitt, rechnet die App mit dem Mittel seiner Monate bisher, und für
+  das Entwurfsjahr, das noch keinen Monat hat, mit dem jüngsten Monat. Die Pfeile der
+  Gesamtliste rechnen mit dem Stand zum Jahresbeginn (Dezember des Vorjahres), solange der
+  fehlt, mit dem jüngsten Monat.
 - **`data/labels.json`** — `{ abschnitt: { "21": "Schulen" }, unterabschnitt: { … } }`
   saubere Namen für Bereiche.
 - **`data/einleitungen.json`** — `{ "ep:2": "Einleitungstext …" }` je Einzelplan.

@@ -4,7 +4,7 @@ import { EChart } from "./EChart";
 import { ChartTable } from "./ChartTable";
 import { DiagrammLegende, type LegendenEintrag, type LegendenForm } from "./DiagrammLegende";
 import { Term } from "./Term";
-import { adjustSeries, netSeries, preisBasis, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
+import { adjustSeries, netSeries, preisText, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
 import { useBreit, type Notiz } from "@/lib/notiz";
 import { SERIEN, useAnsichtAbweichung, useSerien, type SerieKey } from "@/lib/teilen";
 import { PLAN_COLOR } from "@/lib/marke.mjs";
@@ -117,7 +117,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     const rechenzeile =
       [
         mode.perCapita && "€ je Einwohner",
-        mode.real && `in Preisen von ${preisBasis(context, baseYear)}`,
+        mode.real && preisText(context, baseYear, lf.entwurf),
         netto && "Eigenanteil nach Abzug der Einnahmen",
       ]
         .filter(Boolean)

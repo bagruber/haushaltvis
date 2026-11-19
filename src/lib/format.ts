@@ -28,6 +28,8 @@ export function fmtEurFine(v: number): string {
   return `${v.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d })} €`;
 }
 
+export const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
 /** "2026-11-13" → "13.11.2026" */
 export function fmtDatum(iso: string): string {
   const [j, m, t] = iso.split("-");

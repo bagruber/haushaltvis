@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { useData, latestYear, adjustSeries, totals } from "@/lib/data";
+import { useData, latestYear, adjustSeries, preisstand, totals } from "@/lib/data";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { extremImFenster, useBreit } from "@/lib/notiz";
 import type { Aggregator, YearSeries } from "@/lib/data";
@@ -100,9 +100,9 @@ export function Querschnitte() {
     // deflate to the base year's prices, then divide by that year's population.
     const factorFor = (y: number) => {
       let f = 1;
-      if (mode.real && ctx.cpi?.[String(y)] && ctx.cpi?.[String(latest)]) {
-        f *= ctx.cpi[String(latest)] / ctx.cpi[String(y)];
-      }
+      const preis = preisstand(ctx, y)?.wert;
+      const basis = preisstand(ctx, latest)?.wert;
+      if (mode.real && preis && basis) f *= basis / preis;
       if (mode.perCapita && ctx.population?.[String(y)]) f /= ctx.population[String(y)];
       return f;
     };

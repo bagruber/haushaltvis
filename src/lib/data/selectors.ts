@@ -9,6 +9,7 @@ import { kennung } from "../kennung.mjs";
 import { EINNAHMEART_COLOR } from "../marke.mjs";
 import { abschnittName, groupLabel, factsOfYear, factsOfHhst, postenOfGlz } from "./core";
 import { shades, GOLD_BASE, ZUSCHUSS_RED, EINZELPLAN_COLORS } from "../colors";
+import { MONATE } from "../format";
 
 
 export interface TreeNode {
@@ -287,13 +288,54 @@ export interface TimeMode {
   real?: boolean;
 }
 
+export interface Preisstand {
+  wert: number;
+  /** wofür der Wert steht, wo er kein Jahresdurchschnitt ist: „Januar bis Oktober“, „Oktober 2026“ */
+  monate?: string;
+  /** ein Jahr ohne eigenen Monat, das mit dem jüngsten Monat davor rechnet */
+  ersatz?: boolean;
+}
+
+/**
+ * Preisniveau eines Jahres für die inflationsbereinigte Ansicht: der
+ * Jahresdurchschnitt. Fehlt der, im laufenden Jahr (dem des jüngsten Monats)
+ * das Mittel seiner Monate bisher, denn auch das Ist sammelt sich über diese
+ * Monate an. Im Jahr danach, dem Entwurf, der jüngste Monat: Preise wie heute.
+ */
+export function preisstand(ctx: Context, jahr: number): Preisstand | null {
+  const amtlich = ctx.cpi?.[String(jahr)];
+  if (amtlich) return { wert: amtlich };
+  const vpi = ctx.vpi_monat ?? {};
+  const letzter = Object.keys(vpi).sort().at(-1);
+  if (!letzter) return null;
+  const name = (k: string) => MONATE[Number(k.slice(5)) - 1];
+  const laufend = Number(letzter.slice(0, 4));
+  if (jahr === laufend) {
+    const eigene = Object.keys(vpi).filter((k) => k.startsWith(`${jahr}-`)).sort();
+    const wert = eigene.reduce((s, k) => s + vpi[k], 0) / eigene.length;
+    return { wert, monate: eigene.length === 1 ? name(eigene[0]) : `${name(eigene[0])} bis ${name(letzter)}` };
+  }
+  if (jahr === laufend + 1) return { wert: vpi[letzter], monate: `${name(letzter)} ${laufend}`, ersatz: true };
+  return null;
+}
+
 /**
  * The year whose prices a real view is expressed in: the requested one, or,
- * for a year without a price index yet (a draft year), the newest before it.
+ * for a draft year that only borrows the newest month, the year before it.
  */
 export function preisBasis(ctx: Context, jahr: number): number {
+  const p = preisstand(ctx, jahr);
+  if (p) return p.ersatz ? jahr - 1 : jahr;
   const jahre = Object.keys(ctx.cpi ?? {}).map(Number).filter((j) => j <= jahr);
-  return ctx.cpi?.[String(jahr)] || !jahre.length ? jahr : Math.max(...jahre);
+  return jahre.length ? Math.max(...jahre) : jahr;
+}
+
+/** „in Preisen von 2026 (Januar bis Oktober)“, dazu, womit das Entwurfsjahr rechnet. */
+export function preisText(ctx: Context, jahr: number, entwurf?: number): string {
+  const b = preisBasis(ctx, jahr);
+  const p = preisstand(ctx, b);
+  const e = entwurf != null ? preisstand(ctx, entwurf) : null;
+  return `in Preisen von ${b}` + (p?.monate ? ` (${p.monate})` : "") + (e?.ersatz ? `, ${entwurf} zu Preisen vom ${e.monate}` : "");
 }
 
 /**
@@ -306,12 +348,12 @@ export function adjustSeries(
   mode: TimeMode,
   baseYear: number,
 ): YearSeries {
-  const cpiBase = ctx.cpi?.[String(preisBasis(ctx, baseYear))];
+  const cpiBase = preisstand(ctx, preisBasis(ctx, baseYear))?.wert;
   const adj = (v: number | null, year: number): number | null => {
     if (v == null) return null;
     let x = v;
-    if (mode.real && ctx.cpi && cpiBase) {
-      const c = ctx.cpi[String(year)];
+    if (mode.real && cpiBase) {
+      const c = preisstand(ctx, year)?.wert;
       if (!c) return null;
       x = (x * cpiBase) / c;
     }

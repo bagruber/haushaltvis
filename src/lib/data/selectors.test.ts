@@ -15,6 +15,9 @@ import {
   themeSankey,
   kameralBothSidesTree,
   adjustSeries,
+  preisstand,
+  preisBasis,
+  preisText,
   incomeCategory,
   isInternal,
   investmentsAll,
@@ -313,6 +316,48 @@ describe("adjustSeries", () => {
   it("fehlender CPI eines Jahres ergibt null statt falscher Zahl", () => {
     const r = adjustSeries(series, { cpi: { "2021": 110 } }, { real: true }, 2021);
     expect(r.ansatz[0]).toBeNull();
+  });
+});
+
+describe("preisstand: Preisniveau auch für das laufende Jahr und den Entwurf", () => {
+  // 2025 abgeschlossen, 2026 läuft bis Oktober, 2027 ist der Entwurf.
+  const ctx = {
+    cpi: { "2025": 121.9 },
+    vpi_monat: { "2024-12": 120.5, "2025-12": 122.7, "2026-01": 122.8, "2026-02": 123.1, "2026-10": 126.5 },
+  };
+
+  it("ein abgeschlossenes Jahr hat seinen Jahresdurchschnitt", () => {
+    expect(preisstand(ctx, 2025)).toEqual({ wert: 121.9 });
+  });
+
+  it("das laufende Jahr rechnet mit dem Mittel seiner Monate bisher", () => {
+    const p = preisstand(ctx, 2026)!;
+    expect(p.wert).toBeCloseTo((122.8 + 123.1 + 126.5) / 3);
+    expect(p.monate).toBe("Januar bis Oktober");
+    expect(p.ersatz).toBeUndefined();
+  });
+
+  it("der Entwurf rechnet mit dem jüngsten Monat, und nur ein Jahr voraus", () => {
+    expect(preisstand(ctx, 2027)).toEqual({ wert: 126.5, monate: "Oktober 2026", ersatz: true });
+    expect(preisstand(ctx, 2028)).toBeNull();
+  });
+
+  it("ein Dezember allein macht keinen Jahresdurchschnitt", () => {
+    expect(preisstand(ctx, 2024)).toBeNull();
+  });
+
+  it("die Ansicht steht in Preisen eines Jahres mit eigenen Monaten, nie des Entwurfs", () => {
+    expect(preisBasis(ctx, 2027)).toBe(2026);
+    expect(preisBasis(ctx, 2026)).toBe(2026);
+    expect(preisText(ctx, 2027, 2027)).toBe("in Preisen von 2026 (Januar bis Oktober), 2027 zu Preisen vom Oktober 2026");
+    expect(preisText(ctx, 2025)).toBe("in Preisen von 2025");
+  });
+
+  it("der Entwurf bekommt in der bereinigten Ansicht einen Wert", () => {
+    const s: YearSeries = { years: [2025, 2026, 2027], ansatz: [100, 100, 100], ergebnis: [null, null, null], provisional: new Set() };
+    const r = adjustSeries(s, ctx, { real: true }, 2026);
+    expect(r.ansatz[1]).toBeCloseTo(100);
+    expect(r.ansatz[2]).toBeCloseTo((100 * (122.8 + 123.1 + 126.5)) / 3 / 126.5);
   });
 });
 
