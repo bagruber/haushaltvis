@@ -1,5 +1,5 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { Link, useLocation, useNavigationType, useParams } from "react-router-dom";
 import { ArrowDown, ArrowRight, ArrowUp } from "@phosphor-icons/react";
 import {
   useData,
@@ -131,7 +131,20 @@ export function Gesamtliste() {
     return { baum, sichtbar, groesste };
   }, [view, dHaushalt, dArt, dSuche, dLeere]);
 
-  useTeilScroll(teil, !!gefiltert);
+  const listeRef = useRef<HTMLDivElement>(null);
+  const anker = useRueckkehr(listeRef, !!gefiltert);
+  // Die Zeile, zu der es zurückgeht, muss wirklich gezeichnet sein: ihr
+  // Bereich wird sofort gebaut, ihr Einzelplan nie übersprungen. Sonst hat sie
+  // nur eine Lage im Platzhalter, und man landet woanders.
+  const ankerOrt = useMemo(() => {
+    if (!anker || !gefiltert) return null;
+    for (const h of gefiltert.baum) for (const p of h.einzelplaene) for (const b of p.kinder) {
+      if (b.kinder.some((e) => e.zeilen.some((z) => z.hhst === anker.stelle))) return { plan: p.id, bereich: b.id };
+    }
+    return null;
+  }, [anker, gefiltert]);
+
+  useTeilScroll(teil, !!gefiltert && !anker);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view || !gefiltert) return <Loading />;
@@ -254,7 +267,7 @@ export function Gesamtliste() {
         ))}
       </div>
 
-      <div className={cn("transition-opacity", veraltet && "opacity-50")} aria-busy={veraltet}>
+      <div ref={listeRef} className={cn("transition-opacity", veraltet && "opacity-50")} aria-busy={veraltet}>
       {gefiltert.baum.map((h) => (
         <section key={h.haushalt} id={h.haushalt} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
           <header className="mt-10 border-b-2 border-ink pb-2">
@@ -262,12 +275,19 @@ export function Gesamtliste() {
             <p className="mt-1 text-sm text-ink-soft">{UNTERTITEL[h.haushalt]}</p>
           </header>
           {h.einzelplaene.map((plan) => (
-            <section key={plan.id} id={plan.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)] [content-visibility:auto] [contain-intrinsic-size:auto_900px]">
+            <section
+              key={plan.id}
+              id={plan.id}
+              className={cn(
+                "scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]",
+                plan.id !== ankerOrt?.plan && "[content-visibility:auto] [contain-intrinsic-size:auto_900px]",
+              )}
+            >
               <KnotenKopf knoten={plan} art="Einzelplan" jahr={jahr} entwurf={!!entwurf} pfad={`/erkunden/gesamtliste/${plan.id}`} farbe={EINZELPLAN_COLORS[plan.nummer]} gross summen />
               {plan.kinder.map((bereich) => (
                 <div key={bereich.id} id={bereich.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
                   <Aufschub
-                    sofort={teil === bereich.id || bereich.kinder.some((e) => e.id === teil)}
+                    sofort={teil === bereich.id || bereich.id === ankerOrt?.bereich || bereich.kinder.some((e) => e.id === teil)}
                     hoehe={geschaetzteHoehe(bereich)}
                   >
                   <KnotenKopf knoten={bereich} art="Bereich" jahr={jahr} entwurf={!!entwurf} pfad={`/erkunden/gesamtliste/${bereich.id}`} summen />
@@ -306,6 +326,106 @@ export function Gesamtliste() {
       )}
     </div>
   );
+}
+
+interface Anker {
+  stelle: string;
+  abstand: number;
+}
+
+// Ob die Liste in diesem Dokument schon einmal zu sehen war.
+let ersteAnzeige = true;
+
+/**
+ * Zurück aus einem Posten an dieselbe Stelle der Liste. Der Browser merkt sich
+ * nur die Scrollhöhe, und die trifft hier nicht mehr: Beim Wiederkommen ist die
+ * Liste frisch, nicht Gebautes hat nur eine geschätzte Höhe, ein Einzelplan
+ * außer Sicht 900 px. Also merkt sich die Seite je Eintrag im Verlauf eine
+ * Zeile und ihren Abstand zum oberen Bildschirmrand und stellt beim Zurück
+ * genau diese Zeile wieder dorthin. Gibt beim Zurück den Anker, sonst null.
+ */
+function useRueckkehr(liste: RefObject<HTMLDivElement | null>, bereit: boolean): Anker | null {
+  const { key } = useLocation();
+  const zurueck = useNavigationType() === "POP";
+  const speicher = `gesamtliste:${key}`;
+  const [anker] = useState<Anker | null>(() => {
+    if (!zurueck) return null;
+    // React Router meldet auch den ersten Aufruf als POP, und der erste
+    // Eintrag eines Tabs heißt immer "default". Ein frisch aufgerufener Link
+    // ist aber kein Zurück, auch wenn derselbe Tab die Liste schon kannte.
+    const art = (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined)?.type;
+    if (ersteAnzeige && art === "navigate") return null;
+    try {
+      return JSON.parse(sessionStorage.getItem(speicher) ?? "null");
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    ersteAnzeige = false;
+  }, []);
+
+  // Merken, sobald das Scrollen ruht: die Zeile in der Mitte des Bildschirms.
+  // Nur was zu sehen ist, liegt sicher richtig; die Zeilen eines Einzelplans
+  // außer Sicht haben keine echte Lage, solange er nicht gezeichnet ist.
+  useEffect(() => {
+    if (!bereit) return;
+    const merken = () => {
+      if (!liste.current) return;
+      const x = liste.current.getBoundingClientRect().left + 8;
+      try {
+        for (let y = innerHeight / 2; y < innerHeight; y += 40) {
+          const z = document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-stelle]");
+          if (z) {
+            sessionStorage.setItem(speicher, JSON.stringify({ stelle: z.dataset.stelle, abstand: z.getBoundingClientRect().top }));
+            return;
+          }
+        }
+        // Oben über der Liste: dann stimmt das Zurück des Browsers.
+        sessionStorage.removeItem(speicher);
+      } catch {
+        // Ohne Speicher bleibt es beim Verhalten des Browsers.
+      }
+    };
+    let warte = 0;
+    const beimScrollen = () => {
+      window.clearTimeout(warte);
+      warte = window.setTimeout(merken, 150);
+    };
+    window.addEventListener("scroll", beimScrollen, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", beimScrollen);
+      window.clearTimeout(warte);
+    };
+  }, [bereit, liste, speicher]);
+
+  // Zurückstellen und nachführen, solange sich darüber noch etwas aufbaut.
+  // Wer selbst scrollt oder tippt, hat sofort Vorrang.
+  useEffect(() => {
+    if (!bereit || !anker) return;
+    let laeuft = true;
+    const ende = performance.now() + 2500;
+    const nachfuehren = () => {
+      if (!laeuft || performance.now() > ende) return;
+      const z = liste.current?.querySelector<HTMLElement>(`[data-stelle="${anker.stelle}"]`);
+      const d = z ? z.getBoundingClientRect().top - anker.abstand : 0;
+      // "instant": `scroll-behavior: smooth` steht global im CSS.
+      if (Math.abs(d) > 1) window.scrollBy({ top: d, behavior: "instant" });
+      requestAnimationFrame(nachfuehren);
+    };
+    nachfuehren();
+    const halt = () => {
+      laeuft = false;
+    };
+    const eingaben = ["wheel", "touchstart", "keydown", "mousedown"];
+    for (const e of eingaben) window.addEventListener(e, halt, { passive: true });
+    return () => {
+      laeuft = false;
+      for (const e of eingaben) window.removeEventListener(e, halt);
+    };
+  }, [bereit, anker, liste]);
+
+  return anker;
 }
 
 /**
@@ -605,7 +725,7 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, vergleich, farb
               // ihre Zahl steht ja daneben.
               const anteil = groesste ? Math.min(1, Math.abs(betrag) / groesste) : 0;
               return (
-                <li key={z.hhst}>
+                <li key={z.hhst} data-stelle={z.hhst}>
                   <Link
                     to={`/posten/${z.hhst}`}
                     aria-label={[
