@@ -24,7 +24,8 @@
 # Namen von Firmen, Personen und Fachsoftware stehen in keinem gezeigten Text.
 # Wo der Text ohne sie trägt, steht an ihrer Stelle in eckigen Klammern, was
 # sie sind („[Bibliothekssoftware]“), sonst wird er nicht gezeigt. Allgemein
-# bekannte Namen wie iPad oder Windows Server bleiben.
+# bekannte Namen wie iPad oder Windows Server bleiben, ebenso städtische und
+# öffentliche Gesellschaften wie die Kläranlage Moosburg GmbH oder die Sparkasse.
 #
 # Ändert die Kämmerei einen Text, passt der Prüfwert nicht mehr, und das Skript
 # lässt die Stelle weg, bis sie neu gesichtet ist.
@@ -206,7 +207,7 @@
 "2110.6322": {pruef: 31c4ff35162ef8ad, zeigen: true, text: ["Wartung [Schulsoftware], Virenscanner, Firewall usw."], suchwoerter: ["Schulsoftware", "Virenscanner", "Firewall"]}
 "2110.6370": {pruef: a8554069d6b9e7e4, zeigen: true, suchwoerter: ["Toner", "Drucker", "Monitor", "Smartphone", "Kabel"]}
 "2110.9340": {pruef: da363b695c11e135, zeigen: false, suchwoerter: ["Apps", "iPad", "Tablet"]}
-"2110.9341": {pruef: 4339619802d751ab, zeigen: true, text: ["Kanalbefahrung durch [die Kläranlagen-Gesellschaft] geplant"], suchwoerter: ["Kläranlage", "Abwasserkanal"]}
+"2110.9341": {pruef: 4339619802d751ab, zeigen: true, suchwoerter: ["Kläranlage", "Abwasserkanal"]}
 "2110.9356": {pruef: cb2ffc16b37540ad, zeigen: true, suchwoerter: ["iPad", "Tablet", "Lautsprecher", "Klassenzimmer", "Netzwerktechnik"]}
 "2110.9451": {pruef: 48d8d80f06149c15, zeigen: true, suchwoerter: ["LED", "Beleuchtung", "Klassenzimmer", "Dachsanierung", "Torschließer"]}
 "2111.1710": {pruef: aa5378f4c160db32, zeigen: true, suchwoerter: ["Schüler", "Schülerpauschale"]}
@@ -430,9 +431,9 @@
 "7000.1111": {pruef: de0a7d8c2976fa03, zeigen: true, suchwoerter: ["Gebührenkalkulation", "Abwassergebühr", "Rockermaierareal", "Rockermaier"]}
 "7000.1112": {pruef: 3d1c66995ac0d4a8, zeigen: false, suchwoerter: []}
 "7000.1118": {pruef: a53671875be7e5ac, zeigen: true, suchwoerter: ["Kanalanschluss", "Schacht", "Grundstücksgrenze"]}
-"7000.6495": {pruef: 0969f810017cfe8b, zeigen: true, text: ["Zahlen von [der Kläranlagen-Gesellschaft] geliefert"], suchwoerter: []}
+"7000.6495": {pruef: 0969f810017cfe8b, zeigen: true, suchwoerter: []}
 "7000.6550": {pruef: 78a579d7f3fde84c, zeigen: true, suchwoerter: ["BKPV", "Prüfungsverband", "Gebührenkalkulation", "Klageverfahren", "Gutachten"]}
-"7000.7150": {pruef: 036659719394cb4e, zeigen: true, text: ["Betreiberentgelt lt. Wirtschaftsplan [der Kläranlagen-Gesellschaft]"], suchwoerter: ["Betreiberentgelt", "Wirtschaftsplan"]}
+"7000.7150": {pruef: 036659719394cb4e, zeigen: true, suchwoerter: ["Betreiberentgelt", "Wirtschaftsplan"]}
 "7191.4140": {pruef: 9c8fa3e95f9429a0, zeigen: true, suchwoerter: ["Reinigung", "Schließdienst", "Toilette", "Toilettenreinigung"]}
 "7191.5431": {pruef: 34555fe9adbaa708, zeigen: false, suchwoerter: ["Papiertücher", "Müllbeutel"]}
 "7192.1119": {pruef: 12a46da25ee1321b, zeigen: true, suchwoerter: ["Benutzungsordnung"]}
@@ -444,7 +445,7 @@
 "7621.5400": {pruef: 158f0d13fec0ef0f, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Kaminkehrer", "Feuerstättenbescheid", "Dunstabzug", "Müllentsorgung"]}
 "7621.6500": {pruef: 940283a8cab207bd, zeigen: true, suchwoerter: ["Tinte", "Toner"]}
 "7621.6790": {pruef: a4d2e9f0a77f36e2, zeigen: false, suchwoerter: []}
-"7621.9341": {pruef: 4339619802d751ab, zeigen: true, text: ["Kanalbefahrung durch [die Kläranlagen-Gesellschaft] geplant"], suchwoerter: ["Kläranlage", "Abwasserkanal"]}
+"7621.9341": {pruef: 4339619802d751ab, zeigen: true, suchwoerter: ["Kläranlage", "Abwasserkanal"]}
 "7621.9450": {pruef: aac82cf9f339fb61, zeigen: false, suchwoerter: ["Lüftung", "Lüftungsanlage"]}
 "7691.5400": {pruef: 4f0b2a0df4bd111e, zeigen: true, suchwoerter: ["Müllentsorgung", "Gebäudeversicherung", "Versicherung"]}
 "7692.5045": {pruef: 44c4deb90cf5c38e, zeigen: true, suchwoerter: ["Brandmeldeanlage", "Brandmelder", "Aufzug"]}
@@ -461,9 +462,9 @@
 "7711.9400": {pruef: 4346cb31eeb92523, zeigen: false, suchwoerter: ["Hoftor", "Tor", "Ölabscheider"]}
 "7900.6369": {pruef: 84759ab89d7e349b, zeigen: false, suchwoerter: ["Fahrgastinformation"]}
 "7900.6620": {pruef: c90f69d76319ae8d, zeigen: true, suchwoerter: ["Innenstadt", "Innenstadtprojekt"]}
-"7900.6790": {pruef: 880bd0e5a654a30b, zeigen: true, text: ["Öffentlichkeitswirksame Arbeiten wie Werbeschilder, Weihnachtsbeleuchtung usw. (abseits von [der Stadtmarketing-Genossenschaft])"], suchwoerter: ["Werbeschild", "Weihnachtsbeleuchtung"]}
-"7910.7180": {pruef: 424245a4f6df784d, zeigen: true, text: ["Jahreszuschuss [an die Stadtmarketing-Genossenschaft]"], suchwoerter: ["Stadtmarketing", "Jahreszuschuss"]}
-"7910.7181": {pruef: 4a522fe5b2c4d3c3, zeigen: true, text: ["verrechnete Bauhofstunden für [die Stadtmarketing-Genossenschaft] (lt. Beschluss 475 Stunden werden als Zuschuss verrechnet)"], suchwoerter: ["Stadtmarketing", "Bauhof", "Bauhofstunden"]}
+"7900.6790": {pruef: 880bd0e5a654a30b, zeigen: true, suchwoerter: ["Werbeschild", "Weihnachtsbeleuchtung"]}
+"7910.7180": {pruef: 424245a4f6df784d, zeigen: true, suchwoerter: ["Moosburg Marketing", "Stadtmarketing", "Jahreszuschuss"]}
+"7910.7181": {pruef: 4a522fe5b2c4d3c3, zeigen: true, suchwoerter: ["Moosburg Marketing", "Stadtmarketing", "Bauhof", "Bauhofstunden"]}
 "8100.6329": {pruef: 4eef94ce29d9c43e, zeigen: false, suchwoerter: []}
 "8100.9400": {pruef: f55fca4578fab153, zeigen: false, suchwoerter: []}
 "8101.2200": {pruef: 4382a96ef58a0a5b, zeigen: true, suchwoerter: ["Strombedarf", "E-Mobilität", "Elektromobilität", "Wärmepumpe"]}
@@ -487,7 +488,7 @@
 "8151.9504": {pruef: 8c1e6c9de1fc4346, zeigen: false, suchwoerter: []}
 "8551.6329": {pruef: a6049d3e4dcdc5c9, zeigen: true, suchwoerter: ["Breitenberg", "Waldumbau", "Baumfällung", "Betriebsbegehung"]}
 "8700.1400": {pruef: 1243e6e5e7403e03, zeigen: false, suchwoerter: []}
-"8700.3303": {pruef: c9fe36bb8cc63113, zeigen: true, text: ["Anteile [Wohnungsbaugesellschaft] im Landkreis Freising"], suchwoerter: ["Wohnungsbaugesellschaft"]}
+"8700.3303": {pruef: c9fe36bb8cc63113, zeigen: true, suchwoerter: ["Wohnungsbau GmbH", "Wohnungsbaugesellschaft"]}
 "8700.6320": {pruef: 3b3e0b654ba63a6c, zeigen: false, suchwoerter: ["E-Ladesäule", "Ladesäule"]}
 "8801.5400": {pruef: dbc8dc6c14db8618, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Mähen"]}
 "8801.9450": {pruef: 83693af55fb73bb0, zeigen: false, suchwoerter: ["Dach", "Dacherneuerung", "Böhmerwaldstraße"]}
