@@ -384,7 +384,7 @@ function KnotenKopf({ knoten, art, jahr, entwurf, pfad, ziel, farbe, gross, summ
 }) {
   const name = (
     <>
-      <span className="shrink-0 tabular-nums text-ink-muted">{knoten.nummer}</span>
+      <span className="shrink-0 tabular-nums lining-nums text-ink-soft">{knoten.nummer}</span>
       <span className={gross ? "font-bold" : "font-semibold"}>{knoten.name}</span>
     </>
   );
@@ -622,18 +622,22 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, vergleich, farb
                       werte={z.werte}
                       vergleich={vergleich}
                       links={
-                        <>
-                          <span className="mr-2 shrink-0 text-xs text-ink-muted tabular-nums">{z.hhst}</span>
-                          {z.name}
-                          {z.intern && <span className="ml-2 text-xs">intern</span>}
-                          <WechselMarke wechsel={z.wechsel} />
-                          {z.kontotext && <span className="block truncate text-xs text-ink-muted">{z.kontotext}</span>}
-                          {/* Wörtlich aus dem Arbeitsplan; in Anführungszeichen, damit
-                              es nicht für einen Teil des Namens gehalten wird. */}
-                          {z.erlaeuterung?.map((t) => (
-                            <span key={t} className="mt-0.5 line-clamp-2 text-xs italic text-ink-soft">„{t}“</span>
-                          ))}
-                        </>
+                        // Die Nummer steht in eigener Spalte, kräftig und bündig untereinander:
+                        // Danach suchen Stadträte die Liste ab. Der Name bricht daneben um.
+                        <span className="flex gap-x-3">
+                          <span className="w-[10ch] shrink-0 whitespace-nowrap font-semibold tabular-nums [overflow-wrap:normal]">{z.hhst}</span>
+                          <span className="min-w-0">
+                            {z.name}
+                            {z.intern && <span className="ml-2 text-xs">intern</span>}
+                            <WechselMarke wechsel={z.wechsel} />
+                            {z.kontotext && <span className="block truncate text-xs text-ink-muted">{z.kontotext}</span>}
+                            {/* Wörtlich aus dem Arbeitsplan; in Anführungszeichen, damit
+                                es nicht für einen Teil des Namens gehalten wird. */}
+                            {z.erlaeuterung?.map((t) => (
+                              <span key={t} className="mt-0.5 line-clamp-2 text-xs italic text-ink-soft">„{t}“</span>
+                            ))}
+                          </span>
+                        </span>
                       }
                       balken={
                         // Der Datenbalken steht unter der Zahl des Planjahrs: ein
