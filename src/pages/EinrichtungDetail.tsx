@@ -167,13 +167,16 @@ function PostenList({
                 <Nummer wert={p.hhst_id} sichtbar={zeigen || dup.has(p.grz_text ?? p.grz)} />
                 <span>
                   {p.grz_text ?? p.grz}
-                  <WechselMarke wechsel={p.wechsel} />
+                  {/* Weggefallene sagen es im Feld des Betrags. */}
+                  <WechselMarke wechsel={p.wechsel === "neu" ? "neu" : null} />
                   {p.erlaeuterung?.map((t) => (
                     <span key={t} className="mt-0.5 line-clamp-2 text-xs italic text-ink-muted">„{t}“</span>
                   ))}
                 </span>
               </span>
-              <span className="tabular-nums shrink-0 font-medium">{p.wechsel === "weg" || v == null ? "" : fmtEur(v)}</span>
+              <span className="tabular-nums shrink-0 font-medium">
+                {p.wechsel === "weg" ? <span className="font-normal">entfällt</span> : v == null ? "" : fmtEur(v)}
+              </span>
             </Link>
           </li>
         ))}

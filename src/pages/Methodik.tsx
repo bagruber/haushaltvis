@@ -91,7 +91,8 @@ export function Methodik() {
           <li>
             <b>Neu und nicht mehr vorhanden:</b> Eine Haushaltsstelle gibt es in einem Jahr, wenn
             sie dort eine Zeile hat, im Plan, im Entwurf oder in einem Zwischenstand. Fehlt die
-            Zeile, gibt es sie nicht. Eine Stelle mit 0 € ist eine ganz normale Stelle.
+            Zeile, gibt es sie nicht. Eine Stelle mit 0 € ist eine ganz normale Stelle. In den
+            Listen steht dann im leeren Feld „neu“ oder „entfällt“.
           </li>
           <li>
             <b>Inflationsbereinigt</b> heißt: umgerechnet in die Preise eines Jahres, mit dem

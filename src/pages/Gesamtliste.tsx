@@ -1,5 +1,5 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { ArrowDown, ArrowRight, ArrowUp } from "@phosphor-icons/react";
 import {
   useData,
@@ -15,11 +15,12 @@ import {
   type IstQuelle,
   type SpaltenKey,
   type Veraenderung,
+  type Wechsel,
 } from "@/lib/data";
 import { standardJahr, useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { useTeilScroll } from "@/lib/teilen";
-import { AbschnittLink, Kennzahl, Loading, SegmentedToggle, SeitenKopf, WechselMarke } from "@/components/ui";
+import { AbschnittLink, Kennzahl, Loading, SegmentedToggle, SeitenKopf } from "@/components/ui";
 import { INVEST_COLOR } from "@/components/Timeline";
 import { EINZELPLAN_COLORS, kategorieTon } from "@/lib/marke.mjs";
 import { cn } from "@/lib/cn";
@@ -53,10 +54,6 @@ export function Gesamtliste() {
   const [artFilter, setArt] = useState<ArtFilter>("beide");
   const [suche, setSuche] = useState("");
   const [leere, setLeere] = useState(false);
-  // Von der Übersicht kommt man mit ?nur=wechsel direkt zu den neuen und den
-  // weggefallenen Stellen.
-  const [params] = useSearchParams();
-  const [nurWechsel, setNurWechsel] = useState(params.get("nur") === "wechsel");
   // Die Bedienelemente folgen sofort, die Liste rechnet im Hintergrund nach:
   // React baut sie mit den zurückgestellten Werten und bricht ab, wenn schon
   // die nächste Taste kommt. Solange sie hinterherhinkt, ist sie ausgegraut.
@@ -64,9 +61,7 @@ export function Gesamtliste() {
   const dArt = useDeferredValue(artFilter);
   const dSuche = useDeferredValue(suche);
   const dLeere = useDeferredValue(leere);
-  const dWechsel = useDeferredValue(nurWechsel);
-  const veraltet =
-    dHaushalt !== haushalt || dArt !== artFilter || dSuche !== suche || dLeere !== leere || dWechsel !== nurWechsel;
+  const veraltet = dHaushalt !== haushalt || dArt !== artFilter || dSuche !== suche || dLeere !== leere;
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -105,9 +100,7 @@ export function Gesamtliste() {
     const q = norm(dSuche.trim());
     const passt = (z: GesamtZeile) => {
       if (dArt !== "beide" && z.ea !== dArt) return false;
-      if (dWechsel && !z.wechsel) return false;
-      // Wer nach Neuem und Weggefallenem fragt, bekommt alle, auch die mit 0 €.
-      if (!dLeere && !dWechsel && !view.spalten.some((s) => z.werte[s.key] || s.unter?.keys.some((k) => z.werte[k]))) return false;
+      if (!dLeere && !view.spalten.some((s) => z.werte[s.key] || s.unter?.keys.some((k) => z.werte[k]))) return false;
       if (q && ![z.name, z.hhst, z.kontotext ?? "", ...(z.erlaeuterung ?? []), ...(z.such ?? [])].some((t) => norm(t).includes(q))) return false;
       return true;
     };
@@ -136,14 +129,7 @@ export function Gesamtliste() {
     // große Geld liegt, statt in jeder Einrichtung von vorne zu beginnen.
     const groesste = sichtbar.reduce((m, z) => Math.max(m, Math.abs(z.werte.ansatz ?? 0)), 0);
     return { baum, sichtbar, groesste };
-  }, [view, dHaushalt, dArt, dSuche, dLeere, dWechsel]);
-
-  // Wie viele Stellen gegenüber dem Vorjahr neu sind oder fehlen, über die ganze Liste.
-  const wechselZahl = useMemo(() => {
-    const z = { neu: 0, weg: 0 };
-    if (view) for (const h of view.liste.haushalte) for (const p of h.einzelplaene) for (const b of p.kinder) for (const e of b.kinder) for (const r of e.zeilen) if (r.wechsel) z[r.wechsel]++;
-    return z;
-  }, [view]);
+  }, [view, dHaushalt, dArt, dSuche, dLeere]);
 
   useTeilScroll(teil, !!gefiltert);
 
@@ -157,8 +143,8 @@ export function Gesamtliste() {
     s.leer ? "minmax(4.5rem, 5.5rem)" : s.unter || s.markiert ? "minmax(7.5rem, 10rem)" : "minmax(6rem, 8.5rem)";
   const breiteSpalten = `minmax(0,1fr) ${spalten.map(breite).join(" ")}`;
   const vergleich = { vorjahr, jahr, bereinigt };
-  // Gefiltert nach Text oder Wechsel, wären Summen nur Teilsummen. Dann lieber keine.
-  const summenZeigen = !dSuche.trim() && !dWechsel;
+  // Gefiltert nach Text, wären Summen nur Teilsummen. Dann lieber keine.
+  const summenZeigen = !dSuche.trim();
 
   return (
     <div className="space-y-6">
@@ -229,12 +215,6 @@ export function Gesamtliste() {
           <input type="checkbox" checked={leere} onChange={(e) => setLeere(e.target.checked)} />
           auch leere Stellen
         </label>
-        {vorjahr != null && wechselZahl.neu + wechselZahl.weg > 0 && (
-          <label className="flex cursor-pointer items-center gap-1.5">
-            <input type="checkbox" checked={nurWechsel} onChange={(e) => setNurWechsel(e.target.checked)} />
-            nur neue ({wechselZahl.neu}) und nicht mehr vorhandene ({wechselZahl.weg}) gegenüber {vorjahr}
-          </label>
-        )}
         <span className="text-ink-muted">{gefiltert.sichtbar.length.toLocaleString("de-DE")} Stellen</span>
       </div>
 
@@ -423,6 +403,17 @@ function KnotenKopf({ knoten, art, jahr, entwurf, pfad, ziel, farbe, gross, summ
 
 const fmtWert = (v: number | null | undefined) => (v == null ? "" : fmtEur(v));
 
+/**
+ * Warum ein Feld leer ist, wo es eine Stelle im Vorjahr oder im Jahr nicht
+ * gibt: „neu“ beim Vorjahr, „entfällt“ beim Jahr. Eine Stelle mit 0 € ist
+ * dagegen eine ganz normale Stelle und hat ihren Betrag.
+ */
+function feldMarke(wechsel: Wechsel | null | undefined, s: GesamtSpalte): string | null {
+  if (wechsel === "neu" && s.key === "ansatzVor") return "neu";
+  if (wechsel === "weg" && s.markiert) return "entfällt";
+  return null;
+}
+
 /** Was klein unter einem Ansatz steht: das Ergebnis oder gebucht und bezahlt zum jüngsten Stand. */
 function unter(q: IstQuelle | null, endung: "" | "Vor"): GesamtSpalte["unter"] {
   if (!q) return undefined;
@@ -495,11 +486,12 @@ function Pfeil({ v, titel }: { v: Veraenderung; titel: string }) {
 }
 
 /** Eine Zeile im Spaltenraster: Bezeichnung links, Beträge rechts, das Planjahr hinterlegt. */
-function Raster({ spalten, spaltenBreite, links, werte, className, balken, vergleich }: {
+function Raster({ spalten, spaltenBreite, links, werte, wechsel, className, balken, vergleich }: {
   spalten: GesamtSpalte[];
   spaltenBreite: string;
   links: ReactNode;
   werte?: GesamtWerte;
+  wechsel?: Wechsel | null;
   className?: string;
   balken?: ReactNode;
   /** Pfeile zeigen; aus beim Abgleich, wo ein Prozentwert nichts sagt. */
@@ -521,7 +513,13 @@ function Raster({ spalten, spaltenBreite, links, werte, className, balken, vergl
         return (
           <span key={s.key} className={cn("hidden py-1 text-right tabular-nums sm:block", s.markiert && MARKIERT)}>
             <span className="relative block">
-              {werte ? fmtWert(werte[s.key]) : ""}
+              {werte && werte[s.key] == null && feldMarke(wechsel, s) ? (
+                <span className="text-ink-muted">{feldMarke(wechsel, s)}</span>
+              ) : werte ? (
+                fmtWert(werte[s.key])
+              ) : (
+                ""
+              )}
               {s.markiert && balken}
             </span>
             {(pfeil || klein.some((v) => v != null)) && (
@@ -545,7 +543,7 @@ function Raster({ spalten, spaltenBreite, links, werte, className, balken, vergl
               return (
                 <span key={s.key} className={cn(s.markiert ? "col-start-2 text-right text-ink" : "text-ink-soft")}>
                   <span className={s.markiert ? "font-semibold" : undefined}>
-                    {s.kopf}: {werte[s.key] == null ? "–" : fmtEur(werte[s.key]!)}
+                    {s.kopf}: {werte[s.key] == null ? feldMarke(wechsel, s) ?? "–" : fmtEur(werte[s.key]!)}
                   </span>
                   {vergleich && s.vergleich && (
                     <span className="mt-0.5 block">
@@ -612,7 +610,7 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, vergleich, farb
                     to={`/posten/${z.hhst}`}
                     aria-label={[
                       `${z.name}, Haushaltsstelle ${z.hhst}`,
-                      ...spalten.map((s) => `${s.kopf}: ${z.werte[s.key] == null ? "keine Angabe" : fmtEur(z.werte[s.key]!)}`),
+                      ...spalten.map((s) => `${s.kopf}: ${z.werte[s.key] == null ? feldMarke(z.wechsel, s) ?? "keine Angabe" : fmtEur(z.werte[s.key]!)}`),
                     ].join(", ")}
                     className={cn("block border-b border-ink-line/40 hover:bg-cream-dark/60", (z.intern || z.wechsel === "weg") && "text-ink-muted")}
                   >
@@ -620,6 +618,7 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, vergleich, farb
                       spalten={spalten}
                       spaltenBreite={spaltenBreite}
                       werte={z.werte}
+                      wechsel={z.wechsel}
                       vergleich={vergleich}
                       links={
                         // Die Nummer steht in eigener Spalte, kräftig und bündig untereinander:
@@ -629,7 +628,6 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, vergleich, farb
                           <span className="min-w-0">
                             {z.name}
                             {z.intern && <span className="ml-2 text-xs">intern</span>}
-                            <WechselMarke wechsel={z.wechsel} />
                             {z.kontotext && <span className="block truncate text-xs text-ink-muted">{z.kontotext}</span>}
                             {/* Wörtlich aus dem Arbeitsplan; in Anführungszeichen, damit
                                 es nicht für einen Teil des Namens gehalten wird. */}
