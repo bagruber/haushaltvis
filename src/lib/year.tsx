@@ -23,6 +23,13 @@ export function useSnapshotYear(budget: Budget): number {
   return year ?? latestYear(budget);
 }
 
+// Routes whose main content reacts to the global Stichjahr. /ueberblick/ and
+// /bereich/ are the section addresses of the start page and the Einzelplan.
+const JAHR_ROUTEN = ["/", "/ueberblick/", "/erkunden", "/einzelplan/", "/bereich/", "/einrichtung/", "/wofuer-zahle-ich"];
+
+export const zeigtJahr = (pfad: string) =>
+  JAHR_ROUTEN.some((r) => (r === "/" ? pfad === "/" : pfad.startsWith(r)));
+
 /**
  * The year a page shows while none is chosen: the newest decided one. Only the
  * Gesamtliste opens on the draft, because that is the list the Kämmerei and the

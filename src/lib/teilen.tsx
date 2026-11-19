@@ -30,6 +30,25 @@ export function teilUrl(
   return url.toString();
 }
 
+/**
+ * The shown year into a shared link that has none yet. Without it the link
+ * would open on whatever year is the default when someone clicks it, after a
+ * decision possibly a different one than the sender saw. Appended as text:
+ * URLSearchParams would re-encode the commas in `?ansicht=real,kopf`.
+ */
+export function mitJahr(href: string, jahr: number, { hash = hashModus() }: { hash?: boolean } = {}): string {
+  const url = new URL(href);
+  const anhaengen = (query: string) =>
+    new URLSearchParams(query).has("jahr") ? query : `${query ? `${query}&` : ""}jahr=${jahr}`;
+  if (hash) {
+    const [pfad, query = ""] = url.hash.slice(1).split("?");
+    url.hash = `#${pfad}?${anhaengen(query)}`;
+  } else {
+    url.search = anhaengen(url.search.slice(1));
+  }
+  return url.toString();
+}
+
 // Die Regel steht in lib/kennung.mjs, weil auch das Kartenskript sie braucht.
 export { kennung } from "./kennung.mjs";
 

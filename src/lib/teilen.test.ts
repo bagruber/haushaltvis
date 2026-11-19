@@ -1,7 +1,7 @@
 // Die Adresse eines geteilten Abschnitts: sie landet in Messengern und bleibt
 // dort lange liegen, also wird jede Form hier festgehalten.
 import { describe, it, expect } from "vitest";
-import { ansichtLesen, ansichtSchreiben, kennung, teilUrl } from "./teilen";
+import { ansichtLesen, ansichtSchreiben, kennung, mitJahr, teilUrl } from "./teilen";
 
 describe("teilUrl", () => {
   const browser = { hash: false, basis: "/haushaltvis/" };
@@ -34,6 +34,30 @@ describe("teilUrl", () => {
   it("behaelt im Hash-Modus die Query hinter dem Pfad", () => {
     expect(teilUrl("https://x.de/demo/#/erkunden/querschnitte?jahr=2024", "/erkunden/querschnitte/strom", { hash: true }))
       .toBe("https://x.de/demo/#/erkunden/querschnitte/strom?jahr=2024");
+  });
+});
+
+describe("mitJahr: das angezeigte Jahr im geteilten Link", () => {
+  it("setzt das Jahr, wenn der Link keins trägt", () => {
+    expect(mitJahr("https://x.de/haushaltvis/erkunden/gesamtliste/1311", 2027, { hash: false }))
+      .toBe("https://x.de/haushaltvis/erkunden/gesamtliste/1311?jahr=2027");
+  });
+
+  it("lässt ein gewähltes Jahr stehen", () => {
+    expect(mitJahr("https://x.de/haushaltvis/einzelplan/2?jahr=2025&ansicht=kopf", 2026, { hash: false }))
+      .toBe("https://x.de/haushaltvis/einzelplan/2?jahr=2025&ansicht=kopf");
+  });
+
+  it("hängt sich hinten an, ohne die Kommas der Ansicht zu kodieren", () => {
+    expect(mitJahr("https://x.de/haushaltvis/einzelplan/2?ansicht=real,kopf", 2026, { hash: false }))
+      .toBe("https://x.de/haushaltvis/einzelplan/2?ansicht=real,kopf&jahr=2026");
+  });
+
+  it("schreibt im Hash-Modus hinter den Pfad im #", () => {
+    expect(mitJahr("https://x.de/demo/#/erkunden/querschnitte", 2026, { hash: true }))
+      .toBe("https://x.de/demo/#/erkunden/querschnitte?jahr=2026");
+    expect(mitJahr("https://x.de/demo/#/einzelplan/2?ansicht=kopf", 2026, { hash: true }))
+      .toBe("https://x.de/demo/#/einzelplan/2?ansicht=kopf&jahr=2026");
   });
 });
 

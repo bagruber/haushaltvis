@@ -4,6 +4,10 @@ import type { Budget, Data, EntwurfDatei, Erlaeuterungen, Fact, Labels, Posten, 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
 const base = import.meta.env.BASE_URL;
 let cache: Promise<Data> | null = null;
+let geladen: Data | null = null;
+
+/** The data once loaded, without waiting: for click handlers that must stay synchronous. */
+export const geladeneDaten = () => geladen;
 
 /** Required file: a missing/broken response is a real error, not an empty default. */
 function required<T>(path: string): Promise<T> {
@@ -97,7 +101,7 @@ export function loadData(): Promise<Data> {
         zuordnungHasContent(zuordnung)
           ? { ...themes, assignment: resolveAssignment(budget, zuordnung) }
           : themes;
-      return {
+      return (geladen = {
         budget,
         themes: merged,
         events: ev.events ?? [],
@@ -110,7 +114,7 @@ export function loadData(): Promise<Data> {
         finanzplan: budget.meta.entwurf ? entwurf?.finanzplan : undefined,
         // Die Erläuterungen gehören zum Entwurf: ohne ihn, oder zu einem anderen Jahr, nicht.
         erlaeuterungen: erlaeuterungen && erlaeuterungen.jahr === budget.meta.entwurf?.jahr ? erlaeuterungen : undefined,
-      };
+      });
     });
   }
   return cache;

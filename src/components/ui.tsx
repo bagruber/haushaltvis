@@ -1,12 +1,14 @@
 // Small shared UI primitives, previously duplicated across pages.
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Check, Copy, LinkSimple, ShareNetwork, X, type Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
+import { geladeneDaten } from "@/lib/data";
 import { kategorieTon } from "@/lib/kategorien";
 import { KLECKS_DREHUNG, KLECKS_PFAD } from "@/lib/marke.mjs";
-import { teilUrl } from "@/lib/teilen";
+import { mitJahr, teilUrl } from "@/lib/teilen";
+import { standardJahr, useYearCtx, zeigtJahr } from "@/lib/year";
 
 export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -274,13 +276,17 @@ export function SegmentedToggle<T extends string>({ value, onChange, options, la
  * The share action. On touch devices the system share sheet, where the
  * messengers are. Elsewhere a dialog with the link to copy: desktop browsers
  * differ too much there, some have no share sheet at all, and Windows opens
- * one of its own. With `pfad` the shared address is that section's instead of
- * the current page's.
+ * one of its own. `ziel` is the app path the link opens; with `abschnitt` the
+ * shared address is that section's instead of the current page's. Where the
+ * page depends on the year, the link always carries the one shown.
  */
-function useTeilen(pfad?: string, titel?: string): [() => void, ReactNode] {
+function useTeilen(ziel: string, abschnitt: boolean, titel?: string): [() => void, ReactNode] {
   const [link, setLink] = useState<{ url: string; title: string } | null>(null);
+  const { year } = useYearCtx();
   const teilen = () => {
-    const url = pfad ? teilUrl(window.location.href, pfad) : window.location.href;
+    let url = abschnitt ? teilUrl(window.location.href, ziel) : window.location.href;
+    const daten = geladeneDaten();
+    if (daten && zeigtJahr(ziel)) url = mitJahr(url, year ?? standardJahr(daten.budget, ziel));
     const title = titel ? `${titel} · ${document.title}` : document.title;
     if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
       navigator.share({ title, url }).catch(() => undefined);
@@ -385,7 +391,8 @@ export function Teilen({ hell, label = "Teilen", className, pfad, titel }: {
   /** section heading, put in front of the page title */
   titel?: string;
 }) {
-  const [teilen, dialog] = useTeilen(pfad, titel);
+  const { pathname } = useLocation();
+  const [teilen, dialog] = useTeilen(pfad ?? pathname, pfad != null, titel);
   return (
     <>
       <button
@@ -410,7 +417,7 @@ export function Teilen({ hell, label = "Teilen", className, pfad, titel }: {
  * on touch there is no hover to reveal it.
  */
 export function AbschnittLink({ pfad, titel, className }: { pfad: string; titel: string; className?: string }) {
-  const [teilen, dialog] = useTeilen(pfad, titel);
+  const [teilen, dialog] = useTeilen(pfad, true, titel);
   return (
     <>
       <button

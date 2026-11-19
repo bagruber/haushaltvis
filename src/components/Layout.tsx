@@ -2,21 +2,19 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Header, TabLeiste } from "./Header";
 import { Footer } from "./Footer";
 import { YearBar } from "./YearBar";
-import { YearUrlSync } from "@/lib/year";
+import { YearUrlSync, zeigtJahr } from "@/lib/year";
 import { AnsichtUrlSync } from "@/lib/teilen";
 
-// Routes whose main content reacts to the global Stichjahr.
-const YEAR_ROUTES = ["/", "/erkunden", "/einzelplan/", "/einrichtung/", "/wofuer-zahle-ich"];
-// Of those, the routes with lists that can show official numbers. Nicht die
+// Of the year routes, those with lists that can show official numbers. Nicht die
 // Gesamtliste: dort stehen die Nummern immer, ein Schalter waere sinnlos.
-const NUMMERN_ROUTES = ["/", "/einzelplan/", "/erkunden/einnahmen", "/erkunden/investitionen", "/erkunden/querschnitte"];
+const NUMMERN_ROUTES = ["/", "/ueberblick/", "/einzelplan/", "/bereich/", "/erkunden/einnahmen", "/erkunden/investitionen", "/erkunden/querschnitte"];
 
 const passt = (routes: string[], pathname: string) =>
   routes.some((r) => (r === "/" ? pathname === "/" : pathname.startsWith(r)));
 
 export function Layout() {
   const { pathname } = useLocation();
-  const showYear = passt(YEAR_ROUTES, pathname);
+  const showYear = zeigtJahr(pathname);
   return (
     // Bottom padding below lg keeps the footer clear of the fixed tab bar.
     // overflow-x-clip: a long script word may run past a narrow screen; clip
