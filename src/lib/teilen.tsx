@@ -39,7 +39,7 @@ export { kennung } from "./kennung.mjs";
  * Die Serien eines Timeline-Diagramms, in der Reihenfolge, die überall gilt:
  * Tooltip, Legende und Tabelle zeigen sie in genau dieser Folge.
  */
-export const SERIEN = ["ist", "plan", "gebucht", "bezahlt", "brutto", "invest"] as const;
+export const SERIEN = ["ist", "plan", "entwurf", "gebucht", "bezahlt", "brutto", "invest"] as const;
 export type SerieKey = (typeof SERIEN)[number];
 
 /**

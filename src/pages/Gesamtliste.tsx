@@ -1,24 +1,29 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { ArrowDown, ArrowRight, ArrowUp } from "@phosphor-icons/react";
 import {
   useData,
+  bereinigung,
   gesamtliste,
-  gesamtlisteZeilen,
-  latestYear,
+  pfeile,
+  standText,
+  type Bereinigung,
   type GesamtKnoten,
   type GesamtSpalte,
   type GesamtWerte,
   type GesamtZeile,
+  type IstQuelle,
   type SpaltenKey,
+  type Veraenderung,
 } from "@/lib/data";
-import { useYearCtx } from "@/lib/year";
+import { standardJahr, useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { useTeilScroll } from "@/lib/teilen";
-import { AbschnittLink, Kennzahl, Loading, SegmentedToggle, SeitenKopf } from "@/components/ui";
+import { AbschnittLink, Kennzahl, Loading, SegmentedToggle, SeitenKopf, WechselMarke } from "@/components/ui";
 import { INVEST_COLOR } from "@/components/Timeline";
 import { EINZELPLAN_COLORS, kategorieTon } from "@/lib/marke.mjs";
 import { cn } from "@/lib/cn";
-import { fmtEur, fmtEurShort } from "@/lib/format";
+import { fmtDatum, fmtEur, fmtEurShort } from "@/lib/format";
 
 type HaushaltFilter = "beide" | "verwaltung" | "vermoegen";
 type ArtFilter = "beide" | "E" | "A";
@@ -41,13 +46,17 @@ const MARKIERT = "bg-cream-dark px-2";
 export function Gesamtliste() {
   usePageTitle("Der ganze Haushalt, Stelle für Stelle");
   const { teil } = useParams();
+  const { pathname } = useLocation();
   const { data, error } = useData();
   const { year: selYear } = useYearCtx();
   const [haushalt, setHaushalt] = useState<HaushaltFilter>("beide");
   const [artFilter, setArt] = useState<ArtFilter>("beide");
   const [suche, setSuche] = useState("");
   const [leere, setLeere] = useState(false);
-  const [stichtag, setStichtag] = useState(false);
+  // Von der Übersicht kommt man mit ?nur=wechsel direkt zu den neuen und den
+  // weggefallenen Stellen.
+  const [params] = useSearchParams();
+  const [nurWechsel, setNurWechsel] = useState(params.get("nur") === "wechsel");
   // Die Bedienelemente folgen sofort, die Liste rechnet im Hintergrund nach:
   // React baut sie mit den zurückgestellten Werten und bricht ab, wenn schon
   // die nächste Taste kommt. Solange sie hinterherhinkt, ist sie ausgegraut.
@@ -55,36 +64,40 @@ export function Gesamtliste() {
   const dArt = useDeferredValue(artFilter);
   const dSuche = useDeferredValue(suche);
   const dLeere = useDeferredValue(leere);
-  const dStichtag = useDeferredValue(stichtag);
+  const dWechsel = useDeferredValue(nurWechsel);
   const veraltet =
-    dHaushalt !== haushalt || dArt !== artFilter || dSuche !== suche || dLeere !== leere || dStichtag !== stichtag;
+    dHaushalt !== haushalt || dArt !== artFilter || dSuche !== suche || dLeere !== leere || dWechsel !== nurWechsel;
 
   const view = useMemo(() => {
     if (!data) return null;
-    const jahr = selYear ?? latestYear(data.budget);
+    const jahr = selYear ?? standardJahr(data.budget, pathname);
     const liste = gesamtliste(data, jahr);
+    const entwurf = data.budget.meta.entwurf;
     const vorjahr = data.budget.meta.years.includes(jahr - 1) ? jahr - 1 : null;
-    const stand = (j: number) => dStichtag && liste.zwischenstand.some((z) => z.jahr === j);
-    // Von links nach rechts in der Zeit wie im amtlichen Plan: Ergebnis des
-    // Vorjahres, Plan des Stichjahrs (hervorgehoben), Plan des Folgejahres. Der
-    // Stand zum 01.10. steht, wenn gewählt, gleich hinter der Zahl seines Jahres.
+    const istJahr = (j: number) => (j === entwurf?.jahr ? `Entwurf, Stand ${fmtDatum(entwurf.stand)}` : undefined);
+    // Von links nach rechts in der Zeit wie im amtlichen Plan: Vorjahr, Planjahr
+    // (hervorgehoben), Folgejahr. Unter jedem Ansatz klein, was daraus wurde:
+    // das Ergebnis oder, solange das Jahr läuft, der jüngste Stand.
     const spalten: GesamtSpalte[] = [];
     if (vorjahr != null) {
-      spalten.push({ key: "ergebnisVor", kopf: `Ergebnis ${vorjahr}` });
-      if (stand(vorjahr)) {
-        spalten.push({ key: "gebuchtVor", kopf: `gebucht bis 30.09.${vorjahr}` });
-        spalten.push({ key: "bezahltVor", kopf: `bezahlt bis 30.09.${vorjahr}` });
-      }
+      spalten.push({ key: "ansatzVor", kopf: `Ansatz ${vorjahr}`, zusatz: istJahr(vorjahr), unter: unter(liste.ist.vor, "Vor") });
     }
-    spalten.push({ key: "ansatz", kopf: `Ansatz ${jahr}`, markiert: true });
-    if (stand(jahr)) {
-      spalten.push({ key: "gebucht", kopf: `gebucht bis 30.09.${jahr}` });
-      spalten.push({ key: "bezahlt", kopf: `bezahlt bis 30.09.${jahr}` });
-    }
-    const nachLeer = !gesamtlisteZeilen(liste).some((z) => z.werte.ansatzNach != null);
-    spalten.push({ key: "ansatzNach", kopf: `Ansatz ${jahr + 1}`, leer: nachLeer });
-    return { jahr, liste, spalten };
-  }, [data, selYear, dStichtag]);
+    spalten.push({
+      key: "ansatz",
+      kopf: `Ansatz ${jahr}`,
+      zusatz: istJahr(jahr),
+      markiert: true,
+      unter: unter(liste.ist.jahr, ""),
+      vergleich: vorjahr != null ? "ansatzVor" : undefined,
+    });
+    spalten.push({
+      key: "ansatzNach",
+      kopf: `${liste.nach === "finanzplan" ? "Finanzplan" : "Ansatz"} ${jahr + 1}`,
+      zusatz: istJahr(jahr + 1),
+      leer: liste.nach == null,
+    });
+    return { jahr, vorjahr, liste, spalten, entwurf: jahr === entwurf?.jahr ? entwurf : null, bereinigt: bereinigung(data.context, jahr) };
+  }, [data, selYear, pathname]);
 
   // Filtern erst nach dem Baum: der Baum haengt nur am Jahr, die Filter am Tippen.
   const gefiltert = useMemo(() => {
@@ -92,8 +105,10 @@ export function Gesamtliste() {
     const q = norm(dSuche.trim());
     const passt = (z: GesamtZeile) => {
       if (dArt !== "beide" && z.ea !== dArt) return false;
-      if (!dLeere && !view.spalten.some((s) => z.werte[s.key])) return false;
-      if (q && !norm(z.name).includes(q) && !z.hhst.includes(q) && !norm(z.kontotext ?? "").includes(q)) return false;
+      if (dWechsel && !z.wechsel) return false;
+      // Wer nach Neuem und Weggefallenem fragt, bekommt alle, auch die mit 0 €.
+      if (!dLeere && !dWechsel && !view.spalten.some((s) => z.werte[s.key] || s.unter?.keys.some((k) => z.werte[k]))) return false;
+      if (q && ![z.name, z.hhst, z.kontotext ?? "", ...(z.erlaeuterung ?? []), ...(z.such ?? [])].some((t) => norm(t).includes(q))) return false;
       return true;
     };
     const sichtbar: GesamtZeile[] = [];
@@ -121,21 +136,29 @@ export function Gesamtliste() {
     // große Geld liegt, statt in jeder Einrichtung von vorne zu beginnen.
     const groesste = sichtbar.reduce((m, z) => Math.max(m, Math.abs(z.werte.ansatz ?? 0)), 0);
     return { baum, sichtbar, groesste };
-  }, [view, dHaushalt, dArt, dSuche, dLeere]);
+  }, [view, dHaushalt, dArt, dSuche, dLeere, dWechsel]);
+
+  // Wie viele Stellen gegenüber dem Vorjahr neu sind oder fehlen, über die ganze Liste.
+  const wechselZahl = useMemo(() => {
+    const z = { neu: 0, weg: 0 };
+    if (view) for (const h of view.liste.haushalte) for (const p of h.einzelplaene) for (const b of p.kinder) for (const e of b.kinder) for (const r of e.zeilen) if (r.wechsel) z[r.wechsel]++;
+    return z;
+  }, [view]);
 
   useTeilScroll(teil, !!gefiltert);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view || !gefiltert) return <Loading />;
 
-  const { liste, spalten, jahr } = view;
-  // Die Stichtagsspalten und die leere Folgejahr-Spalte sind schmaler als die
-  // Jahreszahlen, sonst bleibt der Bezeichnung bei sieben Spalten kaum Platz.
+  const { liste, spalten, jahr, vorjahr, entwurf, bereinigt } = view;
+  // Die leere Folgejahr-Spalte ist schmaler; die übrigen tragen unter dem
+  // Betrag zwei Zahlen nebeneinander und brauchen die Breite.
   const breite = (s: GesamtSpalte) =>
-    s.leer ? "minmax(4.5rem, 5.5rem)" : /^(gebucht|bezahlt)/.test(s.key) ? "minmax(5rem, 6.5rem)" : "minmax(5.5rem, 8rem)";
+    s.leer ? "minmax(4.5rem, 5.5rem)" : s.unter || s.markiert ? "minmax(7.5rem, 10rem)" : "minmax(6rem, 8.5rem)";
   const breiteSpalten = `minmax(0,1fr) ${spalten.map(breite).join(" ")}`;
-  // Gefiltert nach Text, wären Summen nur Teilsummen. Dann lieber keine.
-  const summenZeigen = !dSuche.trim();
+  const vergleich = { vorjahr, jahr, bereinigt };
+  // Gefiltert nach Text oder Wechsel, wären Summen nur Teilsummen. Dann lieber keine.
+  const summenZeigen = !dSuche.trim() && !dWechsel;
 
   return (
     <div className="space-y-6">
@@ -153,6 +176,33 @@ export function Gesamtliste() {
         <Kennzahl wert={fmtEurShort(liste.summen.vermoegen.einnahmen)} label={`Einnahmen ${jahr}, Vermögenshaushalt`} className="text-2xl" />
         <Kennzahl wert={fmtEurShort(liste.summen.vermoegen.ausgaben)} label={`Ausgaben ${jahr}, Vermögenshaushalt`} className="text-2xl" />
       </section>
+
+      <div className="max-w-prose space-y-2 text-sm text-ink-soft">
+        {entwurf && (
+          <p>
+            <strong className="font-semibold text-ink">{jahr} ist ein Entwurf.</strong> Die Zahlen stammen aus dem
+            Arbeitsplan der Kämmerei, Stand {fmtDatum(entwurf.stand)}, und sind noch nicht beschlossen.
+          </p>
+        )}
+        {vorjahr != null && (
+          <p>
+            Die Pfeile am Ansatz {jahr} vergleichen mit dem Ansatz {vorjahr}
+            {bereinigt ? (
+              <>
+                , der linke in Euro, der rechte nach Abzug der Teuerung und je Einwohner{" "}
+                <span className="inline-flex items-center gap-1 rounded-full border border-ink-line bg-white/70 px-1.5 align-[-2px] leading-[1.1rem]">
+                  <PfeilBild r="auf" />
+                  <PfeilBild r="gleich" />
+                </span>
+                .
+              </>
+            ) : (
+              " in Euro; bereinigt erst, wenn für beide Jahre Preis- und Einwohnerzahlen vorliegen."
+            )}{" "}
+            Waagrecht heißt: weniger als 2 % Veränderung. Die genaue Zahl steht beim Darüberfahren.
+          </p>
+        )}
+      </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
         <SegmentedToggle
@@ -179,10 +229,10 @@ export function Gesamtliste() {
           <input type="checkbox" checked={leere} onChange={(e) => setLeere(e.target.checked)} />
           auch leere Stellen
         </label>
-        {liste.zwischenstand.length > 0 && (
+        {vorjahr != null && wechselZahl.neu + wechselZahl.weg > 0 && (
           <label className="flex cursor-pointer items-center gap-1.5">
-            <input type="checkbox" checked={stichtag} onChange={(e) => setStichtag(e.target.checked)} />
-            Stand 01. Oktober zeigen ({liste.zwischenstand.map((z) => z.jahr).join(" und ")})
+            <input type="checkbox" checked={nurWechsel} onChange={(e) => setNurWechsel(e.target.checked)} />
+            nur neue ({wechselZahl.neu}) und nicht mehr vorhandene ({wechselZahl.weg}) gegenüber {vorjahr}
           </label>
         )}
         <span className="text-ink-muted">{gefiltert.sichtbar.length.toLocaleString("de-DE")} Stellen</span>
@@ -215,8 +265,10 @@ export function Gesamtliste() {
       >
         <span className="py-1">Haushaltsstelle</span>
         {spalten.map((s) => (
-          <span key={s.key} className={cn("py-1 text-right", s.markiert && cn(MARKIERT, "font-semibold text-ink"))}>
-            {s.kopf}
+          <span key={s.key} className={cn("py-1 text-right", s.markiert && MARKIERT)}>
+            <span className={s.markiert ? "font-semibold text-ink" : undefined}>{s.kopf}</span>
+            {s.zusatz && <span className="block text-[11px]">{s.zusatz}</span>}
+            {s.unter && <span className="block text-[11px] leading-tight">{s.unter.kopf}</span>}
             {s.leer && <span className="block text-[11px]">noch keine Zahlen</span>}
           </span>
         ))}
@@ -231,14 +283,14 @@ export function Gesamtliste() {
           </header>
           {h.einzelplaene.map((plan) => (
             <section key={plan.id} id={plan.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)] [content-visibility:auto] [contain-intrinsic-size:auto_900px]">
-              <KnotenKopf knoten={plan} art="Einzelplan" jahr={jahr} pfad={`/erkunden/gesamtliste/${plan.id}`} farbe={EINZELPLAN_COLORS[plan.nummer]} gross summen />
+              <KnotenKopf knoten={plan} art="Einzelplan" jahr={jahr} entwurf={!!entwurf} pfad={`/erkunden/gesamtliste/${plan.id}`} farbe={EINZELPLAN_COLORS[plan.nummer]} gross summen />
               {plan.kinder.map((bereich) => (
                 <div key={bereich.id} id={bereich.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
                   <Aufschub
                     sofort={teil === bereich.id || bereich.kinder.some((e) => e.id === teil)}
                     hoehe={geschaetzteHoehe(bereich)}
                   >
-                  <KnotenKopf knoten={bereich} art="Bereich" jahr={jahr} pfad={`/erkunden/gesamtliste/${bereich.id}`} summen />
+                  <KnotenKopf knoten={bereich} art="Bereich" jahr={jahr} entwurf={!!entwurf} pfad={`/erkunden/gesamtliste/${bereich.id}`} summen />
                   {bereich.kinder.map((einrichtung) => (
                     <div key={einrichtung.id} id={einrichtung.id} className="scroll-mt-[calc(var(--kopf-hoehe)+6.5rem)]">
                       <KnotenKopf
@@ -253,6 +305,7 @@ export function Gesamtliste() {
                         spalten={spalten}
                         spaltenBreite={breiteSpalten}
                         groesste={gefiltert.groesste}
+                        vergleich={vergleich}
                         farbe={EINZELPLAN_COLORS[plan.nummer] ?? "#8a8170"}
                         summen={summenZeigen}
                         abgleich={summenZeigen && dArt === "beide"}
@@ -318,10 +371,11 @@ function geschaetzteHoehe(bereich: GesamtKnoten): number {
 }
 
 /** Kopfzeile einer Ebene: Nummer, Name, und bei Einzelplan und Bereich, was sie zusammen ausmachen. */
-function KnotenKopf({ knoten, art, jahr, pfad, ziel, farbe, gross, summen }: {
+function KnotenKopf({ knoten, art, jahr, entwurf, pfad, ziel, farbe, gross, summen }: {
   knoten: GesamtKnoten;
   art: string;
   jahr: number;
+  entwurf?: boolean;
   pfad: string;
   ziel?: string;
   farbe?: string;
@@ -358,7 +412,7 @@ function KnotenKopf({ knoten, art, jahr, pfad, ziel, farbe, gross, summen }: {
           wie im amtlichen Plan. */}
       {summen && (
         <span className="flex basis-full flex-wrap gap-x-4 font-sans text-xs text-ink-soft tabular-nums">
-          <span className="text-ink-muted">Ansatz {jahr}:</span>
+          <span className="text-ink-muted">Ansatz {jahr}{entwurf && " (Entwurf)"}:</span>
           {knoten.einnahmen > 0 && <span>Einnahmen {fmtEurShort(knoten.einnahmen)}</span>}
           {knoten.ausgaben > 0 && <span>Ausgaben {fmtEurShort(knoten.ausgaben)}</span>}
         </span>
@@ -369,37 +423,147 @@ function KnotenKopf({ knoten, art, jahr, pfad, ziel, farbe, gross, summen }: {
 
 const fmtWert = (v: number | null | undefined) => (v == null ? "" : fmtEur(v));
 
+/** Was klein unter einem Ansatz steht: das Ergebnis oder gebucht und bezahlt zum jüngsten Stand. */
+function unter(q: IstQuelle | null, endung: "" | "Vor"): GesamtSpalte["unter"] {
+  if (!q) return undefined;
+  if (q.art === "ergebnis") return { keys: [`ergebnis${endung}`], kopf: "darunter das Ergebnis" };
+  return { keys: [`gebucht${endung}`, `bezahlt${endung}`], kopf: `darunter gebucht · bezahlt, Stand ${standText(q)}` };
+}
+
+interface Vergleich {
+  vorjahr: number | null;
+  jahr: number;
+  bereinigt: Bereinigung | null;
+}
+
+const prozent = (anteil: number) =>
+  `${anteil >= 0 ? "+" : "−"}${Math.abs(anteil * 100).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %`;
+
+const PFEIL = { auf: ArrowUp, ab: ArrowDown, gleich: ArrowRight };
+
+/** Am Telefon fehlt der Spaltenkopf; die kleinen Zahlen sagen selbst, was sie sind. */
+const KURZ_MOBIL: Partial<Record<SpaltenKey, string>> = {
+  ergebnis: "Ergebnis",
+  ergebnisVor: "Ergebnis",
+  gebucht: "gebucht",
+  bezahlt: "bezahlt",
+  gebuchtVor: "gebucht",
+  bezahltVor: "bezahlt",
+};
+
+/** Ein Pfeil wie in der Liste, für den erklärenden Satz darüber. */
+function PfeilBild({ r }: { r: keyof typeof PFEIL }) {
+  const Icon = PFEIL[r];
+  return <Icon size={12} weight="bold" className="inline align-[-1px]" aria-hidden />;
+}
+
+/**
+ * Zwei Pfeile: der Ansatz gegen den des Vorjahres, einmal in Euro, einmal ohne
+ * Teuerung und je Einwohner. Richtung statt Farbe: Ob mehr gut oder schlecht
+ * ist, hängt am Posten, nicht an der Zahl.
+ */
+function Pfeile({ jetzt, vorher, v }: { jetzt: number | null | undefined; vorher: number | null | undefined; v: Vergleich }) {
+  const p = pfeile(jetzt, vorher, v.bereinigt);
+  if (!p || v.vorjahr == null) return null;
+  const nominal =
+    p.nominal.anteil == null
+      ? `In Euro: von 0 € auf ${fmtEur(jetzt!)}`
+      : `In Euro: ${prozent(p.nominal.anteil)} gegenüber dem Ansatz ${v.vorjahr}`;
+  const b = v.bereinigt;
+  const real =
+    p.real && b
+      ? p.real.anteil == null
+        ? "Bereinigt: von 0 € aus, ohne Prozentzahl"
+        : `Nach Abzug der Teuerung und je Einwohner: ${prozent(p.real.anteil)} (Preise ${prozent(b.preis - 1)}, ${b.preisVon} bis ${b.preisBis}; Einwohner ${prozent(b.einwohner - 1)})`
+      : null;
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-ink-line bg-white/70 px-1.5 leading-[1.1rem]">
+      <Pfeil v={p.nominal} titel={nominal} />
+      {p.real && real && <Pfeil v={p.real} titel={real} />}
+    </span>
+  );
+}
+
+function Pfeil({ v, titel }: { v: Veraenderung; titel: string }) {
+  const Icon = PFEIL[v.richtung];
+  return (
+    <span title={titel} className={v.richtung === "gleich" ? "text-ink-muted" : "text-ink-soft"}>
+      <Icon size={11} weight="bold" aria-hidden />
+      <span className="sr-only">{titel}</span>
+    </span>
+  );
+}
+
 /** Eine Zeile im Spaltenraster: Bezeichnung links, Beträge rechts, das Planjahr hinterlegt. */
-function Raster({ spalten, spaltenBreite, links, werte, className, balken }: {
+function Raster({ spalten, spaltenBreite, links, werte, className, balken, vergleich }: {
   spalten: GesamtSpalte[];
   spaltenBreite: string;
   links: ReactNode;
   werte?: GesamtWerte;
   className?: string;
   balken?: ReactNode;
+  /** Pfeile zeigen; aus beim Abgleich, wo ein Prozentwert nichts sagt. */
+  vergleich?: Vergleich;
 }) {
   return (
-    <div className={cn("grid items-stretch gap-x-3", className)} style={{ gridTemplateColumns: spaltenBreite }}>
+    // Das Spaltenraster erst ab 640 px: darunter sind die Spalten versteckt,
+    // ihre Mindestbreiten würden die Zeile trotzdem über den Rand schieben.
+    <div
+      className={cn("grid items-stretch gap-x-3 sm:[grid-template-columns:var(--spalten)]", className)}
+      style={{ "--spalten": spaltenBreite } as CSSProperties}
+    >
       {/* Lange AKDB-Wörter („Beihilfen,Unterstützungen“) dürfen umbrechen,
           statt in die Nachbarspalte zu laufen. */}
       <span className="col-span-full min-w-0 py-1 hyphens-auto [overflow-wrap:anywhere] sm:col-span-1">{links}</span>
-      {spalten.map((s) => (
-        <span key={s.key} className={cn("hidden py-1 text-right tabular-nums sm:block", s.markiert && MARKIERT)}>
-          <span className="relative block">
-            {werte ? fmtWert(werte[s.key]) : ""}
-            {s.markiert && balken}
-          </span>
-        </span>
-      ))}
-      {/* Unter 640 px steht alles zweizeilig: Bezeichnung, darunter die Beträge. */}
-      {werte && (
-        <span className="col-span-full flex flex-wrap gap-x-3 pb-1 text-xs text-ink-soft tabular-nums sm:hidden">
-          {/* Eine leere Platzhalterspalte wäre hier in jeder Zeile ein „–". */}
-          {spalten.filter((s) => !s.leer).map((s) => (
-            <span key={s.key} className={s.markiert ? "font-semibold text-ink" : undefined}>
-              {s.kopf}: {werte[s.key] == null ? "–" : fmtEur(werte[s.key]!)}
+      {spalten.map((s) => {
+        const klein = werte && s.unter ? s.unter.keys.map((k) => werte[k]) : [];
+        const pfeil = werte && vergleich && s.vergleich && <Pfeile jetzt={werte[s.key]} vorher={werte[s.vergleich]} v={vergleich} />;
+        return (
+          <span key={s.key} className={cn("hidden py-1 text-right tabular-nums sm:block", s.markiert && MARKIERT)}>
+            <span className="relative block">
+              {werte ? fmtWert(werte[s.key]) : ""}
+              {s.markiert && balken}
             </span>
-          ))}
+            {(pfeil || klein.some((v) => v != null)) && (
+              <span className="mt-0.5 flex items-center justify-end gap-2 text-[11px] leading-tight text-ink-muted">
+                {pfeil && <span className="mr-auto">{pfeil}</span>}
+                {klein.some((v) => v != null) && <span>{klein.map((v) => (v == null ? "–" : fmtEur(v))).join(" · ")}</span>}
+              </span>
+            )}
+          </span>
+        );
+      })}
+      {/* Unter 640 px: Bezeichnung, darunter zwei Spalten. Links klein das
+          Vorjahr mit dem, was daraus wurde, rechts das Planjahr mit den Pfeilen.
+          Das Folgejahr fehlt hier; dafür ist am Telefon kein Platz. */}
+      {werte && (
+        <span className="col-span-full grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 pb-1 text-xs tabular-nums sm:hidden">
+          {spalten
+            .filter((s) => s.key !== "ansatzNach")
+            .map((s) => {
+              const klein = s.unter ? s.unter.keys.map((k) => werte[k]) : [];
+              return (
+                <span key={s.key} className={cn(s.markiert ? "col-start-2 text-right text-ink" : "text-ink-soft")}>
+                  <span className={s.markiert ? "font-semibold" : undefined}>
+                    {s.kopf}: {werte[s.key] == null ? "–" : fmtEur(werte[s.key]!)}
+                  </span>
+                  {vergleich && s.vergleich && (
+                    <span className="mt-0.5 block">
+                      <Pfeile jetzt={werte[s.key]} vorher={werte[s.vergleich]} v={vergleich} />
+                    </span>
+                  )}
+                  {klein.some((v) => v != null) && (
+                    <span className="flex flex-wrap gap-x-2 text-[11px] text-ink-muted">
+                      {s.unter!.keys.map((k, i) => (
+                        <span key={k} className="whitespace-nowrap">
+                          {KURZ_MOBIL[k]} {klein[i] == null ? "–" : fmtEur(klein[i]!)}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </span>
+              );
+            })}
         </span>
       )}
     </div>
@@ -410,11 +574,12 @@ function Raster({ spalten, spaltenBreite, links, werte, className, balken }: {
  * Die Posten einer Einrichtung in der Folge des amtlichen Plans: Einnahmen,
  * ihre Summe, Ausgaben, ihre Summe, dann der Abgleich.
  */
-function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, farbe, summen, abgleich }: {
+function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, vergleich, farbe, summen, abgleich }: {
   einrichtung: GesamtKnoten;
   spalten: GesamtSpalte[];
   spaltenBreite: string;
   groesste: number;
+  vergleich: Vergleich;
   farbe: string;
   summen: boolean;
   abgleich: boolean;
@@ -449,18 +614,25 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, farbe, summen, 
                       `${z.name}, Haushaltsstelle ${z.hhst}`,
                       ...spalten.map((s) => `${s.kopf}: ${z.werte[s.key] == null ? "keine Angabe" : fmtEur(z.werte[s.key]!)}`),
                     ].join(", ")}
-                    className={cn("block border-b border-ink-line/40 hover:bg-cream-dark/60", z.intern && "text-ink-muted")}
+                    className={cn("block border-b border-ink-line/40 hover:bg-cream-dark/60", (z.intern || z.wechsel === "weg") && "text-ink-muted")}
                   >
                     <Raster
                       spalten={spalten}
                       spaltenBreite={spaltenBreite}
                       werte={z.werte}
+                      vergleich={vergleich}
                       links={
                         <>
                           <span className="mr-2 shrink-0 text-xs text-ink-muted tabular-nums">{z.hhst}</span>
                           {z.name}
                           {z.intern && <span className="ml-2 text-xs">intern</span>}
+                          <WechselMarke wechsel={z.wechsel} />
                           {z.kontotext && <span className="block truncate text-xs text-ink-muted">{z.kontotext}</span>}
+                          {/* Wörtlich aus dem Arbeitsplan; in Anführungszeichen, damit
+                              es nicht für einen Teil des Namens gehalten wird. */}
+                          {z.erlaeuterung?.map((t) => (
+                            <span key={t} className="mt-0.5 line-clamp-2 text-xs italic text-ink-soft">„{t}“</span>
+                          ))}
                         </>
                       }
                       balken={
@@ -490,6 +662,7 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, farbe, summen, 
               spalten={spalten}
               spaltenBreite={spaltenBreite}
               werte={summe[ea]}
+              vergleich={vergleich}
               links={`Summe ${zeilen[0].gruppe}`}
               className="border-t border-ink-soft/50 font-semibold"
             />
@@ -500,7 +673,7 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, farbe, summen, 
         <Raster
           spalten={spalten}
           spaltenBreite={spaltenBreite}
-          werte={differenz(summe.E, summe.A, spalten)}
+          werte={differenz(summe.E, summe.A)}
           links={
             <>
               Abgleich <span className="text-xs font-normal text-ink-muted">Einnahmen − Ausgaben</span>
@@ -514,9 +687,9 @@ function Zeilen({ einrichtung, spalten, spaltenBreite, groesste, farbe, summen, 
 }
 
 /** Einnahmen minus Ausgaben je Spalte; leer nur, wo beide Seiten leer sind. */
-function differenz(e: GesamtWerte, a: GesamtWerte, spalten: GesamtSpalte[]): GesamtWerte {
+function differenz(e: GesamtWerte, a: GesamtWerte): GesamtWerte {
   const out: GesamtWerte = {};
-  for (const { key } of spalten) {
+  for (const key of new Set([...Object.keys(e), ...Object.keys(a)]) as Set<SpaltenKey>) {
     const ev = e[key];
     const av = a[key];
     out[key] = ev == null && av == null ? null : (ev ?? 0) - (av ?? 0);

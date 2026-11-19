@@ -103,6 +103,9 @@ export function Search({ mobil, onNavigate }: { mobil?: boolean; onNavigate?: ()
                   <span className="font-semibold text-ink-soft">{r.art}</span>
                   {r.ort && <span className="text-ink-muted"> · {r.ort}</span>}
                 </span>
+                {/* Gefunden über die Erläuterung oder ein Suchwort: das steht
+                    dann darunter, sonst wüsste niemand, warum die Zeile passt. */}
+                {r.grund && <span className="block truncate text-xs italic text-ink-muted">{r.grund}</span>}
               </span>
               {r.nummer && <Nummerngeruest wert={r.nummer} className="shrink-0 text-xs text-ink-soft" />}
             </li>

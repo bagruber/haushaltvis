@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { latestYear, useData } from "@/lib/data";
+import { fmtDatum } from "@/lib/format";
 
 export function Footer() {
+  const { data } = useData();
+  const b = data?.budget;
+  const e = b?.meta.entwurf;
   return (
     <footer className="border-t border-ink-line mt-16">
       <div className="mx-auto max-w-6xl px-5 py-8 text-sm text-ink-muted space-y-2">
@@ -19,7 +24,9 @@ export function Footer() {
           Beträge stammen unverändert aus den Haushaltsdaten der Stadt.
         </p>
         <p>
-          Datengrundlage: Haushaltspläne (Kameralistik), Jahre 2016–2026. Für das laufende Jahr nur der Plan.
+          Datengrundlage: Haushaltspläne (Kameralistik), Jahre {b ? `${b.meta.years[0]}–${latestYear(b)}` : "ab 2016"}. Für
+          das laufende Jahr nur der Plan.
+          {e && ` Dazu ${e.jahr} als Entwurf aus dem Arbeitsplan der Kämmerei, Stand ${fmtDatum(e.stand)}.`}
         </p>
       </div>
     </footer>

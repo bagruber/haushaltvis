@@ -14,6 +14,7 @@ import { COLOR, ICON, ORDER } from "@/lib/kostenblock";
 import { useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
+import { jahresAchse, jahrText } from "@/lib/charts";
 
 /** How many single Posten to name inside each Gruppierung before summarising. */
 const POSTEN_JE_GRUPPE = 6;
@@ -131,7 +132,7 @@ export function Querschnitte() {
       // Auf dem Telefon bricht die Legende in drei Zeilen um und braucht den Platz,
       // sonst liegt sie über den Jahreszahlen.
       grid: { left: 8, right: 16, top: gaskrise != null ? 56 : 12, bottom: breit ? 44 : 84, containLabel: true },
-      xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
+      xAxis: jahresAchse(years, data.budget.meta.entwurf?.jahr, breit, { boundaryGap: false }),
       yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({
         name: aggs[k].title,
@@ -206,7 +207,7 @@ export function Querschnitte() {
           summary="Jahreswerte (Ansatz) als Tabelle"
           columns={["Jahr", ...view.keys.map((k) => view.aggs[k].title)]}
           rows={view.years.map((y, i) => [
-            String(y),
+            jahrText(y, data!.budget.meta.entwurf?.jahr),
             ...view.keys.map((k) => view.fmtV(view.adjusted[k].ansatz[i])),
           ])}
         />

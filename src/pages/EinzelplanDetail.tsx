@@ -1,12 +1,21 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useData, einzelplanName, einzelplanSections, bereichSeries, latestYear, totals } from "@/lib/data";
+import {
+  useData,
+  einzelplanName,
+  einzelplanSections,
+  bereichSeries,
+  einrichtungWechsel,
+  latestYear,
+  totals,
+  weggefalleneEinrichtungen,
+} from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { Timeline, TimelineControls } from "@/components/Timeline";
 import { CaretRight } from "@phosphor-icons/react";
-import { AbschnittLink, Klecks, Loading, Teilen } from "@/components/ui";
+import { AbschnittLink, Klecks, Loading, Teilen, WechselMarke } from "@/components/ui";
 import { Nummer, Nummerngeruest, doppelte, useNummern } from "@/lib/nummern";
 import { EINZELPLAN_COLORS } from "@/lib/colors";
 import { einzelplanKategorie } from "@/lib/kategorien";
@@ -29,6 +38,10 @@ export function EinzelplanDetail() {
       const einnahmen = bereichSeries(data, s.code, "E", "verwaltung");
       return {
         ...s,
+        // Gegenüber dem Vorjahr: neue Einrichtungen markiert, weggefallene
+        // ausgegraut darunter, statt still zu fehlen.
+        einrichtungen: s.einrichtungen.map((e) => ({ ...e, wechsel: einrichtungWechsel(data, e.glz, y) })),
+        weg: weggefalleneEinrichtungen(data, s.code, y),
         laufend: bereichSeries(data, s.code, "A", "verwaltung"),
         invest: bereichSeries(data, s.code, "A", "vermoegen"),
         einnahmen,
@@ -118,8 +131,20 @@ export function EinzelplanDetail() {
                     <span className="flex min-w-0 items-baseline">
                       <Nummer wert={e.glz} sichtbar={zeigen || doppelte(alle.map((x) => x.label)).has(e.label)} />
                       <span className="truncate">{e.label}</span>
+                      <WechselMarke wechsel={e.wechsel} className="shrink-0" />
                     </span>
                     <span className="tabular-nums shrink-0 font-medium">{fmtEur(e.value)}</span>
+                  </Link>
+                </li>
+              ))}
+              {s.weg.map((e) => (
+                <li key={e.glz} className="border-b border-ink-line/50 pb-1.5 last:border-0">
+                  <Link to={`/einrichtung/${e.glz}`} className="flex items-center gap-3 text-ink-muted hover:text-red-600 transition-colors">
+                    <span className="flex min-w-0 items-baseline">
+                      <Nummer wert={e.glz} sichtbar={zeigen} />
+                      <span className="truncate">{e.label}</span>
+                      <WechselMarke wechsel="weg" className="shrink-0" />
+                    </span>
                   </Link>
                 </li>
               ))}

@@ -4,7 +4,7 @@ import { Timeline, TimelineControls } from "@/components/Timeline";
 import { useAnsicht } from "@/lib/teilen";
 import { usePageTitle } from "@/lib/title";
 import { CaretRight } from "@phosphor-icons/react";
-import { Chip, Kennzahl, Loading, Teilen, ThemaPlatzhalter } from "@/components/ui";
+import { Chip, Kennzahl, Loading, Teilen, ThemaPlatzhalter, WechselMarke } from "@/components/ui";
 import { Nummer, NummernSchalter, doppelte, useNummern } from "@/lib/nummern";
 import {
   useData,
@@ -13,27 +13,39 @@ import {
   einrichtungSeries,
   factsOfYear,
   latestYear,
+  nurPlanSatz,
+  vorhanden,
+  wechsel,
+  type Wechsel,
 } from "@/lib/data";
+import { useYearCtx } from "@/lib/year";
 import { fmtEur, fmtEurFine } from "@/lib/format";
 
 export function EinrichtungDetail() {
   const { glz = "" } = useParams();
   const { data, error } = useData();
   const [mode, setMode] = useAnsicht();
+  const { year: selYear } = useYearCtx();
 
   const view = useMemo(() => {
     if (!data) return null;
     const info = einrichtungInfo(data, glz);
     if (!info) return { info: null } as const;
-    const y = latestYear(data.budget);
+    const y = selYear ?? latestYear(data.budget);
+    const entwurf = data.budget.meta.entwurf?.jahr === y;
     const laufend = einrichtungSeries(data, glz, "A", "verwaltung");
     const invest = einrichtungSeries(data, glz, "A", "vermoegen");
     const einnahmen = einrichtungSeries(data, glz, "E", "verwaltung");
     const hasInvest = invest.ansatz.some((v) => v) || invest.ergebnis.some((v) => v);
     const hasEinnahmen = einnahmen.ansatz.some((v) => v) || einnahmen.ergebnis.some((v) => v);
-    const posten = einrichtungPosten(data, glz);
+    // Die Stellen des Stichjahrs, dazu ausgegraut die, die es im Vorjahr noch
+    // gab. Was schon länger fehlt oder erst später kommt, steht nicht da: Eine
+    // „0 €“ wäre dort falsch, es gibt die Stelle in dem Jahr nicht.
+    const erl = data.erlaeuterungen?.jahr === y ? data.erlaeuterungen : undefined;
+    const posten = einrichtungPosten(data, glz)
+      .map((p) => ({ ...p, wechsel: wechsel(data, p.hhst_id, y), erlaeuterung: erl?.stellen[p.hhst_id]?.text }))
+      .filter((p) => vorhanden(data, p.hhst_id, y) || p.wechsel === "weg");
 
-    // latest Ansatz per Posten for the list
     const latest = new Map<string, number>();
     for (const f of factsOfYear(data.budget, y)) {
       if (f.ansatz != null) latest.set(f.hhst_id, f.ansatz);
@@ -47,8 +59,8 @@ export function EinrichtungDetail() {
     const ein = einnahmen.ansatz[i] ?? 0;
     const deckung = aus > 0 ? ein / aus : null;
     const pop = data.context.population?.[String(y)];
-    return { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, hasContext, aus, ein, deckung, pop };
-  }, [data, glz]);
+    return { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, entwurf, hasContext, aus, ein, deckung, pop };
+  }, [data, glz, selYear]);
 
   usePageTitle(view && view.info ? view.info.label : undefined);
 
@@ -61,7 +73,7 @@ export function EinrichtungDetail() {
       </p>
     );
 
-  const { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, hasContext, aus, ein, deckung, pop } = view;
+  const { info, laufend, invest, einnahmen, hasInvest, hasEinnahmen, posten, latest, y, entwurf, hasContext, aus, ein, deckung, pop } = view;
   const jeKopf = (v: number) => (pop ? `, ${fmtEurFine(v / pop)} je Einwohner` : "");
   const ausgabenPosten = posten.filter((p) => p.ea === "A");
   const einnahmenPosten = posten.filter((p) => p.ea === "E");
@@ -96,7 +108,7 @@ export function EinrichtungDetail() {
       <section className="space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
           <h2 className="font-display text-xl font-bold">Laufende Ausgaben über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. Für {y} nur der Plan.</span>
+          <span className="text-xs text-ink-muted">Verwaltungshaushalt; Plan gegen Ergebnis. {nurPlanSatz(data!.budget)}</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasEinnahmen={hasEinnahmen} />
         <Timeline laufend={laufend} invest={invest} einnahmen={einnahmen} mode={mode} context={data!.context} baseYear={y} height={300} />
@@ -115,9 +127,9 @@ export function EinrichtungDetail() {
 
       <NummernSchalter />
       <section className="grid lg:grid-cols-2 gap-4">
-        <PostenList title={`Ausgaben-Posten ${y}`} posten={ausgabenPosten} latest={latest} />
+        <PostenList title={`Ausgaben-Posten ${y}${entwurf ? " (Entwurf)" : ""}`} posten={ausgabenPosten} latest={latest} />
         {einnahmenPosten.length > 0 && (
-          <PostenList title={`Einnahme-Posten ${y}`} posten={einnahmenPosten} latest={latest} />
+          <PostenList title={`Einnahme-Posten ${y}${entwurf ? " (Entwurf)" : ""}`} posten={einnahmenPosten} latest={latest} />
         )}
       </section>
     </div>
@@ -130,13 +142,15 @@ function PostenList({
   latest,
 }: {
   title: string;
-  posten: { hhst_id: string; grz_text: string | null; grz: string }[];
+  posten: { hhst_id: string; grz_text: string | null; grz: string; wechsel: Wechsel | null; erlaeuterung?: string[] }[];
   latest: Map<string, number>;
 }) {
   const { zeigen } = useNummern();
+  // Weggefallene ans Ende; eine Stelle ohne Ansatzzeile, die es nur im
+  // Zwischenstand gibt, hat keinen Betrag, keine 0.
   const rows = posten
-    .map((p) => ({ p, v: latest.get(p.hhst_id) ?? 0 }))
-    .sort((a, b) => b.v - a.v);
+    .map((p) => ({ p, v: latest.get(p.hhst_id) ?? null }))
+    .sort((a, b) => Number(a.p.wechsel === "weg") - Number(b.p.wechsel === "weg") || (b.v ?? 0) - (a.v ?? 0));
   // The same Gruppierung can appear twice in one Einrichtung (both Haushalte).
   const dup = doppelte(rows.map(({ p }) => p.grz_text ?? p.grz));
   return (
@@ -145,12 +159,21 @@ function PostenList({
       <ol className="space-y-1.5 text-sm">
         {rows.map(({ p, v }) => (
           <li key={p.hhst_id} className="border-b border-ink-line/60 pb-1.5">
-            <Link to={`/posten/${p.hhst_id}`} className="flex justify-between gap-3 hover:text-red-600 transition-colors">
-              <span className="flex items-baseline text-ink-soft">
+            <Link
+              to={`/posten/${p.hhst_id}`}
+              className={`flex justify-between gap-3 hover:text-red-600 transition-colors ${p.wechsel === "weg" ? "text-ink-muted" : ""}`}
+            >
+              <span className={`flex items-baseline ${p.wechsel === "weg" ? "" : "text-ink-soft"}`}>
                 <Nummer wert={p.hhst_id} sichtbar={zeigen || dup.has(p.grz_text ?? p.grz)} />
-                <span>{p.grz_text ?? p.grz}</span>
+                <span>
+                  {p.grz_text ?? p.grz}
+                  <WechselMarke wechsel={p.wechsel} />
+                  {p.erlaeuterung?.map((t) => (
+                    <span key={t} className="mt-0.5 line-clamp-2 text-xs italic text-ink-muted">„{t}“</span>
+                  ))}
+                </span>
               </span>
-              <span className="tabular-nums shrink-0 font-medium">{fmtEur(v)}</span>
+              <span className="tabular-nums shrink-0 font-medium">{p.wechsel === "weg" || v == null ? "" : fmtEur(v)}</span>
             </Link>
           </li>
         ))}

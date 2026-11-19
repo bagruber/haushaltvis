@@ -25,6 +25,7 @@ import { useNummern } from "@/lib/nummern";
 import { useBreit } from "@/lib/notiz";
 import { useTeilScroll } from "@/lib/teilen";
 import { fmtEur, fmtEurShort } from "@/lib/format";
+import { entwurfBalken, jahresAchse, jahrText } from "@/lib/charts";
 
 const VERWALTUNG = "#8a7a5c";
 const VERMOEGEN = "#c8102e";
@@ -68,8 +69,10 @@ export function Home() {
     const popFirst = ctx.population?.[String(years[0])];
 
     // Handwritten note on the year with the highest Ansatz, computed, never fixed.
+    // A draft is not an Ansatz yet and does not compete.
+    const entwurf = data.budget.meta.entwurf?.jahr;
     const summen = years.map((_, k) => (vwh.ansatz[k] ?? 0) + (vmh.ansatz[k] ?? 0));
-    const hoechstes = summen.indexOf(Math.max(...summen));
+    const hoechstes = summen.indexOf(Math.max(...summen.filter((_, k) => years[k] !== entwurf)));
 
     // Chart 1 — the two budgets side by side over time.
     const haushalte: EChartsOption = {
@@ -80,21 +83,21 @@ export function Home() {
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
       grid: { left: 8, right: 16, top: breit ? 64 : 16, bottom: 48, containLabel: true },
-      xAxis: { type: "category", data: years.map(String) },
+      xAxis: jahresAchse(years, entwurf, breit),
       yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
       series: [
         {
           name: "Laufender Betrieb (Verwaltungshaushalt)",
           type: "bar",
           stack: "h",
-          data: vwh.ansatz,
+          data: entwurfBalken(vwh.ansatz, years, entwurf),
           itemStyle: { color: VERWALTUNG },
         },
         {
           name: "Investitionen (Vermögenshaushalt)",
           type: "bar",
           stack: "h",
-          data: vmh.ansatz,
+          data: entwurfBalken(vmh.ansatz, years, entwurf),
           itemStyle: { color: VERMOEGEN },
         },
       ],
@@ -131,7 +134,7 @@ export function Home() {
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
       grid: { left: 8, right: 16, top: 28, bottom: 64, containLabel: true },
-      xAxis: { type: "category", data: years.map(String) },
+      xAxis: jahresAchse(years, entwurf, breit),
       yAxis: {
         type: "value",
         name: `Index ${basis} = 100`,
@@ -288,7 +291,7 @@ export function Home() {
           summary="Jahreswerte als Tabelle"
           columns={["Jahr", "Laufender Betrieb", "Investitionen"]}
           rows={view.years.map((y, i) => [
-            String(y),
+            jahrText(y, data!.budget.meta.entwurf?.jahr),
             view.series.vwh.ansatz[i] ? fmtEur(view.series.vwh.ansatz[i]!) : "-",
             view.series.vmh.ansatz[i] ? fmtEur(view.series.vmh.ansatz[i]!) : "-",
           ])}
@@ -337,7 +340,7 @@ export function Home() {
           summary="Jahreswerte als Tabelle"
           columns={["Jahr", "Ausgaben insgesamt", "je Einwohner", "je Einwohner, real"]}
           rows={view.years.map((y, i) => [
-            String(y),
+            jahrText(y, data!.budget.meta.entwurf?.jahr),
             view.series.ausgaben.ansatz[i] ? fmtEur(view.series.ausgaben.ansatz[i]!) : "-",
             view.series.proKopf.ansatz[i] ? fmtEur(Math.round(view.series.proKopf.ansatz[i]!)) : "-",
             view.series.proKopfReal.ansatz[i] ? fmtEur(Math.round(view.series.proKopfReal.ansatz[i]!)) : "-",

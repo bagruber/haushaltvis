@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { CaretRight } from "@phosphor-icons/react";
 import { Timeline, TimelineControls } from "@/components/Timeline";
 import { Chip, Kennzahl, Loading, Teilen } from "@/components/ui";
-import { useData, incomeByCategory, incomeCategory, incomeCategorySeries, latestYear } from "@/lib/data";
+import { useData, incomeByCategory, incomeCategory, incomeCategorySeries, latestYear, nurPlanSatz } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { kennung, useAnsicht } from "@/lib/teilen";
@@ -121,7 +121,7 @@ export function Einnahmeart({ teil }: { teil: string }) {
       <section className="space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
           <h2 className="font-display text-xl font-bold">Über die Jahre</h2>
-          <span className="text-xs text-ink-muted">Plan gegen Ergebnis. Für {latestYear(data!.budget)} nur der Plan.</span>
+          <span className="text-xs text-ink-muted">Plan gegen Ergebnis. {nurPlanSatz(data!.budget)}</span>
         </div>
         <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} />
         <Timeline laufend={reihe} mode={mode} context={data!.context} baseYear={y} color={farbe} art="E" height={300} />

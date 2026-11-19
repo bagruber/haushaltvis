@@ -3,18 +3,22 @@ Zwischenstand zu einem Stichtag: was bis dahin gebucht (Anordnungs-Soll) und
 was bezahlt (Ist) ist. Mehrere Jahre, damit sich der Stand des laufenden
 Jahres mit demselben Stichtag des Vorjahres vergleichen lässt.
 
-Quelle: die AKDB-Stichtagsauswertungen in haushaltsplaene/zwischenstand/, je
-Jahr die mit dem jüngsten Stichtag. Gleiche Spalten wie der Langexport; Jahr
-und Stichtag stehen aber verlässlich nur im Dateinamen, und die Kopfzeile ist
-Zeile 2 (Zeile 1 ist eine Summenzeile).
+Quellen: die AKDB-Stichtagsauswertungen in haushaltsplaene/zwischenstand/,
+alle. Gleiche Spalten wie der Langexport; Jahr und Stichtag stehen aber
+verlässlich nur im Dateinamen, und die Kopfzeile ist Zeile 2 (Zeile 1 ist eine
+Summenzeile). Dazu aus dem jüngsten Arbeitsplan (haushaltsplaene/arbeitsplan/)
+das Blatt des laufenden Jahres, eine Auswertung derselben Form. Es trägt kein
+Datum; der Name der Datei nennt den Stand des Arbeitsplans, das Blatt kann in
+den Tagen danach noch einmal gezogen worden sein. Es gilt deshalb nur der
+Monat, als `text` („November 2026“).
 
 Ein Stand zum Monatsletzten gilt als Stand zum Ersten des Folgemonats:
 „Stand 30.09.2025“ und „Stand 01.10.2026“ meinen denselben Schnitt nach dem
 dritten Quartal, und so tragen beide Jahre denselben Stichtag 01.10.
 
 Output: data/processed/zwischenstand.json
-  { staende: [ { jahr, stichtag, quelle, werte: { <hhst_id>: [soll, ist] } }, … ] }
-  nach Jahr aufsteigend.
+  { staende: [ { jahr, stichtag, text?, quelle, werte: { <hhst_id>: [soll, ist] } }, … ] }
+  nach Jahr und Stichtag aufsteigend; ein Jahr kann mehrere Stände haben.
 
 Eigene Datei, nicht in budget.json: budget.json ist der dokumentierte Vertrag
 mit der Stadt (DATENFORMAT.md) und bleibt unverändert. Fehlt diese Datei, ist
@@ -37,10 +41,13 @@ from ingest import code, num, ea_of, haushalt_of, header_map, find
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "haushaltsplaene/zwischenstand"
 BUDGET = ROOT / "data/processed/budget.json"
+ENTWURF = ROOT / "data/processed/entwurf.json"  # optional, von etl/entwurf.py
 OUT = ROOT / "data/processed/zwischenstand.json"
 
 # „Haushalt 2026 Stand 01.10.2026" — Jahr und Stichtag tragen nur den Namen.
 RE_NAME = re.compile(r"Haushalt (\d{4}) Stand (\d\d)\.(\d\d)\.(\d{4})")
+AP_DIR = ROOT / "haushaltsplaene/arbeitsplan"
+RE_AP = re.compile(r"Arbeitsplan (\d{4}) Stand (\d\d)\.(\d\d)\.(\d{4})")
 
 
 def stichtag_von(tag: str, monat: str, jahr: str) -> str:
@@ -51,8 +58,12 @@ def stichtag_von(tag: str, monat: str, jahr: str) -> str:
     return d.isoformat()
 
 
-def quellen() -> list[tuple[Path, int, str]]:
-    """Je Jahr die Auswertung mit dem jüngsten Stichtag: (Datei, Jahr, Stichtag)."""
+MONAT = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August",
+         "September", "Oktober", "November", "Dezember"]
+
+
+def quellen() -> list[dict]:
+    """Alle Auswertungen, nach Jahr und Stichtag: {datei, jahr, stichtag, blatt?, text?}."""
     kandidaten = []
     for f in SRC_DIR.glob("*.xlsx"):
         if f.name.startswith("~$"):
@@ -65,21 +76,37 @@ def quellen() -> list[tuple[Path, int, str]]:
                 " — Jahr und Stichtag stehen nur im Namen und werden nicht geraten."
             )
         jahr, tag, monat, stichjahr = m.groups()
-        kandidaten.append((int(jahr), f"{stichjahr}-{monat}-{tag}", f, stichtag_von(tag, monat, stichjahr)))
+        stichtag = stichtag_von(tag, monat, stichjahr)
+        if f"{stichjahr}-{monat}-{tag}" != stichtag:
+            print(f"{f.name}: Stand {stichjahr}-{monat}-{tag} gilt als Stichtag {stichtag}")
+        kandidaten.append({"datei": f, "jahr": int(jahr), "stichtag": stichtag})
     if not kandidaten:
         raise SystemExit(f"Keine Auswertung in {SRC_DIR.relative_to(ROOT)} gefunden.")
-    je_jahr: dict[int, tuple[Path, int, str]] = {}
-    for jahr, roh, datei, stichtag in sorted(kandidaten):
-        je_jahr[jahr] = (datei, jahr, stichtag)  # sortiert: der jüngste gewinnt
-        if roh != stichtag:
-            print(f"{datei.name}: Stand {roh} gilt als Stichtag {stichtag}")
-    return [je_jahr[j] for j in sorted(je_jahr)]
+
+    plaene = sorted((m.groups(), f) for f in AP_DIR.glob("*.xlsx") if (m := RE_AP.search(f.name)))
+    if plaene:
+        (planjahr, tag, monat, stichjahr), f = max(plaene, key=lambda x: (x[0][3], x[0][2], x[0][1]))
+        jahr = int(planjahr) - 1
+        kandidaten.append({
+            "datei": f,
+            "jahr": jahr,
+            "stichtag": f"{stichjahr}-{monat}-{tag}",
+            "blatt": str(jahr),
+            "text": f"{MONAT[int(monat) - 1]} {stichjahr}",
+        })
+
+    kandidaten.sort(key=lambda k: (k["jahr"], k["stichtag"]))
+    doppelt = {(k["jahr"], k["stichtag"]) for k in kandidaten if sum(
+        (j["jahr"], j["stichtag"]) == (k["jahr"], k["stichtag"]) for j in kandidaten) > 1}
+    if doppelt:
+        raise SystemExit(f"Zwei Auswertungen zum selben Jahr und Stichtag: {sorted(doppelt)}")
+    return kandidaten
 
 
-def lesen(src: Path) -> dict[str, tuple[float, float, float, str]]:
+def lesen(src: Path, blatt: str | None = None) -> dict[str, tuple[float, float, float, str]]:
     """Haushaltsstelle -> (Ansatz, Soll, Ist, Text), wie in der Datei geschrieben."""
     wb = openpyxl.load_workbook(src, read_only=True, data_only=True)
-    ws = wb.active
+    ws = wb[blatt] if blatt else wb.active
     it = ws.iter_rows(values_only=True)
     next(it)  # Summenzeile
     idx = header_map(next(it))
@@ -109,7 +136,11 @@ def lesen(src: Path) -> dict[str, tuple[float, float, float, str]]:
 
 def main():
     budget = json.loads(BUDGET.read_text(encoding="utf-8"))
-    staende = [stand(src, jahr, stichtag, budget) for src, jahr, stichtag in quellen()]
+    # Im Lauf des Jahres angelegte Stellen fehlen im Langexport, stehen aber im
+    # Entwurf des Folgejahres; die App kennt sie von dort.
+    if ENTWURF.exists():
+        budget["posten"] = {**json.loads(ENTWURF.read_text(encoding="utf-8"))["posten"], **budget["posten"]}
+    staende = [stand(q, budget) for q in quellen()]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(
@@ -119,9 +150,10 @@ def main():
     print(f"-> {OUT.relative_to(ROOT)}  ({OUT.stat().st_size / 1024:,.0f} KB, {len(staende)} Stichtage)")
 
 
-def stand(src: Path, jahr: int, stichtag: str, budget: dict) -> dict:
-    """Eine Auswertung lesen, auf die Haushaltsstellen von budget.json abbilden, prüfen."""
-    roh = lesen(src)
+def stand(q: dict, budget: dict) -> dict:
+    """Eine Auswertung lesen, auf die bekannten Haushaltsstellen abbilden, prüfen."""
+    src, jahr, stichtag = q["datei"], q["jahr"], q["stichtag"]
+    roh = lesen(src, q.get("blatt"))
     crosswalk = budget.get("crosswalk", {})
     posten = budget["posten"]
 
@@ -143,7 +175,8 @@ def stand(src: Path, jahr: int, stichtag: str, budget: dict) -> dict:
         s[0] += ansatz
         s[1] += soll
         s[2] += ist
-    print(f"{src.name}  (Stichtag {stichtag}, {len(roh)} Zeilen)")
+    blatt = f", Blatt {q['blatt']}" if q.get("blatt") else ""
+    print(f"{src.name}{blatt}  (Stichtag {stichtag}{', gilt als ' + q['text'] if q.get('text') else ''}, {len(roh)} Zeilen)")
     print(f"{'':24}{'Ansatz':>14}{'Soll (gebucht)':>18}{'Ist (bezahlt)':>16}")
     for (haushalt, ea), (a, soll, ist) in sorted(summen.items()):
         name = {"verwaltung": "VwH", "vermoegen": "VmH"}[haushalt]
@@ -156,7 +189,10 @@ def stand(src: Path, jahr: int, stichtag: str, budget: dict) -> dict:
     if fremd:
         print("   Ist darunter Relevantes, lieber den Langexport neu ziehen als hier Posten anlegen.")
     print()
-    return {"jahr": jahr, "stichtag": stichtag, "quelle": src.name, "werte": werte}
+    out = {"jahr": jahr, "stichtag": stichtag, "quelle": src.name + blatt, "werte": werte}
+    if q.get("text"):
+        out["text"] = q["text"]
+    return out
 
 
 if __name__ == "__main__":

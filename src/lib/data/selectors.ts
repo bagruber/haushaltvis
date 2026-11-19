@@ -1,4 +1,4 @@
-import type { Budget, Data, Posten, EA, Haushalt, ThemeTag, BudgetEvent, EventScope, Context } from "./types";
+import type { Budget, Data, Posten, EA, Haushalt, ThemeTag, BudgetEvent, EventScope, Context, Zwischenstand } from "./types";
 import type { Icon } from "@phosphor-icons/react";
 import { SquaresFour, TrayArrowDown } from "@phosphor-icons/react";
 import { einzelplanKategorie } from "../kategorien";
@@ -98,6 +98,8 @@ export interface YearSeries {
   ergebnis: (number | null)[];
   /** years for which ergebnis is provisional Ist (e.g. 2024) */
   provisional: Set<number>;
+  /** the draft year among `years`, if any: its Ansatz is not decided yet */
+  entwurf?: number;
   /**
    * booked and paid up to the Stichtag, one entry per measured year, by year;
    * undefined where nothing is measured
@@ -114,12 +116,121 @@ export interface Zwischen {
 }
 
 /**
+ * One Stand per year, all on the same day of the year, so that the marks in a
+ * time series compare like with like: the day most years share, on a tie the
+ * later one. A later Stand of a single year (November next to two Octobers)
+ * stays out of the series; the Gesamtliste shows it.
+ */
+export function vergleichsStaende(staende: readonly Zwischenstand[]): Zwischenstand[] {
+  const jahre = new Map<string, Set<number>>();
+  for (const z of staende) {
+    const tag = z.stichtag.slice(5);
+    if (!jahre.has(tag)) jahre.set(tag, new Set());
+    jahre.get(tag)!.add(z.jahr);
+  }
+  let bester: string | null = null;
+  for (const [tag, j] of jahre) {
+    const b = bester == null ? 0 : jahre.get(bester)!.size;
+    if (j.size > b || (j.size === b && tag > bester!)) bester = tag;
+  }
+  return staende.filter((z) => z.stichtag.slice(5) === bester);
+}
+
+/** The newest Stand of one year, or undefined. */
+export function neuesterStand(staende: readonly Zwischenstand[], jahr: number): Zwischenstand | undefined {
+  return staende.filter((z) => z.jahr === jahr).sort((a, b) => a.stichtag.localeCompare(b.stichtag)).at(-1);
+}
+
+// ── Neu und nicht mehr vorhanden ────────────────────────────────────────────
+
+const vorhandenCache = new WeakMap<Data, Map<string, Set<number>>>();
+
+/**
+ * In welchen Jahren es eine Haushaltsstelle gibt: wo sie eine Zeile hat, im
+ * Langexport, im Entwurf oder in einem Zwischenstand. Allein das Fehlen der
+ * Zeile zählt; eine Stelle mit 0 € ist eine ganz normale Stelle. Der
+ * Zwischenstand zählt mit, weil er jünger ist als der Langexport: Was dort
+ * steht, gibt es im Jahr, so sieht es auch der Stellenvergleich der Kämmerei.
+ */
+export function vorhandenIn(data: Data): Map<string, Set<number>> {
+  let m = vorhandenCache.get(data);
+  if (!m) {
+    m = new Map();
+    const dazu = (h: string, j: number) => {
+      let s = m!.get(h);
+      if (!s) m!.set(h, (s = new Set()));
+      s.add(j);
+    };
+    for (const f of data.budget.facts) dazu(f.hhst_id, f.year);
+    for (const z of data.zwischenstand) for (const h in z.werte) dazu(h, z.jahr);
+    vorhandenCache.set(data, m);
+  }
+  return m;
+}
+
+export type Wechsel = "neu" | "weg";
+
+/**
+ * Gegenüber dem Vorjahr: „neu“, wenn es die Stelle im Jahr gibt und im Vorjahr
+ * nicht, „weg“ im umgekehrten Fall, sonst null. Im ersten Datenjahr gibt es
+ * kein Vorjahr, also auch keinen Wechsel.
+ */
+export function wechsel(data: Data, hhst: string, jahr: number): Wechsel | null {
+  if (!data.budget.meta.years.includes(jahr - 1)) return null;
+  const j = vorhandenIn(data).get(hhst);
+  const jetzt = !!j?.has(jahr);
+  const vorher = !!j?.has(jahr - 1);
+  return jetzt && !vorher ? "neu" : !jetzt && vorher ? "weg" : null;
+}
+
+/** Ob es die Stelle im Jahr gibt. */
+export function vorhanden(data: Data, hhst: string, jahr: number): boolean {
+  return !!vorhandenIn(data).get(hhst)?.has(jahr);
+}
+
+/** Dasselbe für eine Einrichtung: Es gibt sie, solange es eine ihrer Stellen gibt. */
+export function einrichtungWechsel(data: Data, glz: string, jahr: number): Wechsel | null {
+  if (!data.budget.meta.years.includes(jahr - 1)) return null;
+  const ps = postenOfGlz(data.budget, glz);
+  const jetzt = ps.some((p) => vorhanden(data, p.hhst_id, jahr));
+  const vorher = ps.some((p) => vorhanden(data, p.hhst_id, jahr - 1));
+  return jetzt && !vorher ? "neu" : !jetzt && vorher ? "weg" : null;
+}
+
+/** Die Einrichtungen eines Bereichs mit Ausgaben, die es im Vorjahr gab und im Jahr nicht mehr. */
+export function weggefalleneEinrichtungen(data: Data, ab: string, jahr: number): { glz: string; label: string }[] {
+  const glzs = new Set<string>();
+  for (const p of Object.values(data.budget.posten)) if (p.ea === "A" && p.glz.slice(0, 2) === ab) glzs.add(p.glz);
+  return [...glzs]
+    .filter((g) => einrichtungWechsel(data, g, jahr) === "weg")
+    .sort()
+    .map((g) => ({ glz: g, label: (postenOfGlz(data.budget, g)[0]?.glz_text ?? g).replace(/\s+/g, " ").trim() }));
+}
+
+/**
+ * Der Lebenslauf einer Stelle über alle Jahre: seit wann es sie gibt, wenn
+ * nicht seit dem ersten Datenjahr, und seit wann nicht mehr, wenn sie im
+ * jüngsten fehlt. Nach einer Lücke heißt der Anfang „wieder ab“.
+ */
+export function lebenslauf(data: Data, hhst: string): { neuAb?: number; wiederAb?: number; wegSeit?: number } {
+  const jahre = [...(vorhandenIn(data).get(hhst) ?? [])].sort((a, b) => a - b);
+  if (!jahre.length) return {};
+  const alle = data.budget.meta.years;
+  const out: { neuAb?: number; wiederAb?: number; wegSeit?: number } = {};
+  let start = jahre.at(-1)!;
+  while (jahre.includes(start - 1)) start--;
+  if (start > alle[0]) out[start === jahre[0] ? "neuAb" : "wiederAb"] = start;
+  if (jahre.at(-1)! < alle.at(-1)!) out.wegSeit = jahre.at(-1)! + 1;
+  return out;
+}
+
+/**
  * Sum the Stichtag figures over the same Posten the series aggregates, so a
  * Bereich, an Einrichtung and a single Posten are counted by one rule.
  */
 function zwischenOf(data: Data, pred: (p: Posten) => boolean): Zwischen[] | undefined {
   const out: Zwischen[] = [];
-  for (const zs of data.zwischenstand) {
+  for (const zs of vergleichsStaende(data.zwischenstand)) {
     let soll = 0;
     let ist = 0;
     let treffer = false;
@@ -167,6 +278,7 @@ export function themeYearSeries(
     ansatz: years.map((y) => (aMap.has(y) ? Math.round(aMap.get(y)!) : null)),
     ergebnis: years.map((y) => (eMap.has(y) ? Math.round(eMap.get(y)!) : null)),
     provisional,
+    entwurf: budget.meta.entwurf?.jahr,
   };
 }
 
@@ -176,7 +288,16 @@ export interface TimeMode {
 }
 
 /**
- * Re-express a YearSeries in real terms (deflated to `baseYear` € via CPI)
+ * The year whose prices a real view is expressed in: the requested one, or,
+ * for a year without a price index yet (a draft year), the newest before it.
+ */
+export function preisBasis(ctx: Context, jahr: number): number {
+  const jahre = Object.keys(ctx.cpi ?? {}).map(Number).filter((j) => j <= jahr);
+  return ctx.cpi?.[String(jahr)] || !jahre.length ? jahr : Math.max(...jahre);
+}
+
+/**
+ * Re-express a YearSeries in real terms (deflated to `preisBasis(baseYear)` € via CPI)
  * and/or per inhabitant. Missing context for a year yields null (gap).
  */
 export function adjustSeries(
@@ -185,7 +306,7 @@ export function adjustSeries(
   mode: TimeMode,
   baseYear: number,
 ): YearSeries {
-  const cpiBase = ctx.cpi?.[String(baseYear)];
+  const cpiBase = ctx.cpi?.[String(preisBasis(ctx, baseYear))];
   const adj = (v: number | null, year: number): number | null => {
     if (v == null) return null;
     let x = v;
@@ -214,6 +335,7 @@ export function adjustSeries(
     ansatz: series.years.map((y, i) => adj(series.ansatz[i], y)),
     ergebnis: series.years.map((y, i) => adj(series.ergebnis[i], y)),
     provisional: series.provisional,
+    entwurf: series.entwurf,
     zwischen: zwischen.length ? zwischen : undefined,
   };
 }
@@ -243,6 +365,7 @@ export function budgetYearSeries(data: Data, ea: EA, haushalt?: Haushalt): YearS
     ansatz: years.map((y) => (aMap.has(y) ? Math.round(aMap.get(y)!) : null)),
     ergebnis: years.map((y) => (eMap.has(y) ? Math.round(eMap.get(y)!) : null)),
     provisional,
+    entwurf: budget.meta.entwurf?.jahr,
   };
 }
 
@@ -255,6 +378,7 @@ export function netSeries(ausgaben: YearSeries, einnahmen: YearSeries): YearSeri
     ansatz: sub(ausgaben.ansatz, einnahmen.ansatz),
     ergebnis: sub(ausgaben.ergebnis, einnahmen.ergebnis),
     provisional: ausgaben.provisional,
+    entwurf: ausgaben.entwurf,
   };
 }
 
@@ -399,6 +523,7 @@ export function postenSeries(data: Data, hhst: string): YearSeries {
     ansatz: years.map((y) => (a.has(y) ? a.get(y)! : null)),
     ergebnis: years.map((y) => (e.has(y) ? e.get(y)! : null)),
     provisional,
+    entwurf: data.budget.meta.entwurf?.jahr,
     zwischen,
   };
 }
@@ -496,6 +621,7 @@ function aggSeries(data: Data, pred: (p: Posten) => boolean): YearSeries {
     ansatz: years.map((y) => (a.has(y) ? Math.round(a.get(y)!) : null)),
     ergebnis: years.map((y) => (e.has(y) ? Math.round(e.get(y)!) : null)),
     provisional,
+    entwurf: data.budget.meta.entwurf?.jahr,
     zwischen: zwischenOf(data, pred),
   };
 }
@@ -1275,6 +1401,13 @@ export interface SearchItem {
   farbe?: string;
   /** official number, right-aligned: 2 · 21xx · 2110 · 2110.4107 */
   nummer?: string;
+  /**
+   * Texte, die nur mitsuchen: Kontotext, Erläuterung der Kämmerei, Suchwörter.
+   * `zeigen` heißt, der Text darf als Grund des Treffers in der Zeile stehen.
+   */
+  kontext?: { text: string; zeigen?: "erlaeuterung" | "suchwort" }[];
+  /** gesetzt von searchRank: warum ein Treffer passt, wenn nicht schon am Namen sichtbar */
+  grund?: string;
 }
 
 const cleanText = (s: string) => s.replace(/\s+/g, " ").trim();
@@ -1379,6 +1512,12 @@ export function searchIndex(data: Data): SearchItem[] {
     // zweite Zeile auseinanderhalten.
     const seite = p.ea === "E" ? "Einnahme" : p.haushalt === "vermoegen" ? "Investition" : null;
     const wo = cleanText(p.glz_text ?? "") || abschnittName(data.labels, p.glz.slice(0, 2));
+    const erl = data.erlaeuterungen?.stellen[p.hhst_id];
+    const kontext: NonNullable<SearchItem["kontext"]> = [
+      ...(p.kontotext ? [{ text: cleanText(p.kontotext) }] : []),
+      ...(erl?.text ?? []).map((t) => ({ text: cleanText(t), zeigen: "erlaeuterung" as const })),
+      ...(erl?.such ?? []).map((t) => ({ text: t, zeigen: "suchwort" as const })),
+    ];
     items.push({
       label: cleanText(p.grz_text ?? p.hhst_id),
       art: "Posten",
@@ -1388,6 +1527,7 @@ export function searchIndex(data: Data): SearchItem[] {
       rank: 1,
       ...kategorie(p.einzelplan),
       nummer: p.hhst_id,
+      ...(kontext.length ? { kontext } : {}),
     });
   }
   return items;
@@ -1435,38 +1575,86 @@ function suchbegriffe(q: string): string[] {
 
 /** Penalty for a hit that is not in the label itself: synonym or Stichwort. */
 const UMWEG = 50;
+/** Penalty for a hit only in the texts that search along (Kontotext, Erläuterung). */
+const KONTEXT = 150;
+
+type Fund = { score: number; grund?: string };
+
+/** Best place of one search word in an item: label, Stichworte, then the texts that search along. */
+function fundstelle(it: SearchItem, begriffe: string[], mitOrt: boolean): Fund | null {
+  const texte: { l: string; malus: number; grund?: string }[] = [
+    { l: norm(it.label), malus: 0 },
+    ...(it.stichworte ?? []).map((w) => ({ l: norm(w), malus: UMWEG })),
+    ...(mitOrt && it.ort ? [{ l: norm(it.ort), malus: UMWEG }] : []),
+    ...(it.kontext ?? []).map((k) => ({
+      l: norm(k.text),
+      malus: KONTEXT,
+      grund: k.zeigen === "erlaeuterung" ? `„${k.text}“` : k.zeigen === "suchwort" ? `Suchwort: ${k.text}` : undefined,
+    })),
+  ];
+  let best: Fund | null = null;
+  let satz: string | undefined;
+  for (const { l, malus, grund } of texte) {
+    begriffe.forEach((t, n) => {
+      const i = l.indexOf(t);
+      if (i < 0) return;
+      const score = (i === 0 ? 0 : 100) + i + l.length * 0.01 + (n > 0 ? UMWEG : 0) + malus;
+      if (!best || score < best.score) best = { score, grund };
+      if (grund?.startsWith("„")) satz ??= grund;
+    });
+  }
+  // Passt auch die Erläuterung, sagt ihr Satz mehr als das Suchwort.
+  const b = best as Fund | null;
+  return b && satz && b.grund?.startsWith("Suchwort") ? { ...b, grund: satz } : b;
+}
 
 /**
  * Rank search items for a query. Numbers match the item keys by prefix, the
  * shortest key first. Words match the label: prefix before substring, shortest
  * first, synonym hits after direct hits; a page's Stichworte rank like a
- * synonym. Single Posten come after overview entities of the same match quality.
+ * synonym, the texts that search along (Kontotext, Erläuterung, Suchwörter)
+ * after that. Several words must all be found, each wherever it fits best,
+ * the place of the item (`ort`) included: „Zuschuss Kultur“ finds a Zuschuss
+ * in the Kulturpflege. Single Posten come after overview entities of the same
+ * match quality.
  */
 export function searchRank(items: SearchItem[], query: string, limit = 10): SearchItem[] {
   const q = norm(query.trim());
   if (!q) return [];
   const zahl = /^\d/.test(q);
-  const begriffe = zahl ? [] : suchbegriffe(q);
-  const scored: { it: SearchItem; score: number }[] = [];
+  // Die Synonyme einmal je Suche, nicht je Eintrag.
+  const ganzB = suchbegriffe(q);
+  const woerter = q.split(/\s+/).filter(Boolean).map(suchbegriffe);
+  const scored: { it: SearchItem; score: number; grund?: string }[] = [];
   for (const it of items) {
     let best = Infinity;
+    let grund: string | undefined;
     if (zahl) {
       for (const k of it.keys ?? []) if (k.startsWith(q)) best = Math.min(best, k.length);
     } else {
-      const texte: [string, number][] = [
-        [norm(it.label), 0],
-        ...(it.stichworte ?? []).map((w): [string, number] => [norm(w), UMWEG]),
-      ];
-      for (const [l, malus] of texte) {
-        begriffe.forEach((t, n) => {
-          const i = l.indexOf(t);
-          if (i >= 0) best = Math.min(best, (i === 0 ? 0 : 100) + i + l.length * 0.01 + (n > 0 ? UMWEG : 0) + malus);
-        });
+      // Erst die ganze Eingabe am Stück, wie bisher; mehrere Wörter dann einzeln.
+      const ganz = fundstelle(it, ganzB, false);
+      if (ganz) {
+        best = ganz.score;
+        grund = ganz.grund;
+      }
+      if (woerter.length > 1) {
+        const funde = woerter.map((w) => fundstelle(it, w, true));
+        if (funde.every((f) => f)) {
+          const score = UMWEG + funde.reduce((s, f) => s + f!.score, 0) / funde.length;
+          if (score < best) {
+            best = score;
+            grund = funde.find((f) => f!.grund)?.grund;
+          }
+        }
       }
     }
-    if (best < Infinity) scored.push({ it, score: best + (it.rank ?? 0) * 200 });
+    if (best < Infinity) scored.push({ it, score: best + (it.rank ?? 0) * 200, grund });
   }
-  return scored.sort((a, b) => a.score - b.score).slice(0, limit).map((x) => x.it);
+  return scored
+    .sort((a, b) => a.score - b.score)
+    .slice(0, limit)
+    .map((x) => (x.grund ? { ...x.it, grund: x.grund } : x.it));
 }
 
 // ── "Wofür zahle ich?" — expense share by primary theme ─────────────────────

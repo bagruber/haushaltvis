@@ -49,6 +49,19 @@ export function Chip({ children }: { children: React.ReactNode }) {
 }
 
 /**
+ * Kleine Marke in einer Liste: die Stelle ist gegenüber dem Vorjahr neu oder
+ * gibt es nicht mehr. Ohne Farbe, das Ausgrauen der Zeile trägt das Gewicht.
+ */
+export function WechselMarke({ wechsel, className }: { wechsel: "neu" | "weg" | null | undefined; className?: string }) {
+  if (!wechsel) return null;
+  return (
+    <span className={cn("ml-2 inline-block rounded border border-ink-line px-1 text-[11px] leading-4 text-ink-soft no-underline", className)}>
+      {wechsel === "neu" ? "neu" : "nicht mehr vorhanden"}
+    </span>
+  );
+}
+
+/**
  * Holds the place of the (unreleased) thematic tags. Deliberately colourless:
  * it marks a gap without implying a classification exists.
  */

@@ -393,6 +393,22 @@ for (const p of Object.values(posten)) {
   )
 }
 
+// Stellen, die erst der Entwurf kennt (data/entwurf.json). Nicht „neu“: Manche
+// sind schon im laufenden Jahr angelegt und bebucht, nur ohne Ansatz.
+const entwurf = (() => { try { return lies('entwurf.json') } catch { return null } })()
+for (const p of Object.values(entwurf?.posten ?? {})) {
+  if (posten[p.hhst_id]) continue
+  const a = entwurf.ansatz[p.hhst_id]
+  const was = p.ea === 'E' ? 'Einnahme' : 'Ausgabe'
+  nimm(
+    `/posten/${p.hhst_id}`,
+    `${saeubere(p.grz_text ?? p.hhst_id)}, ${saeubere(p.glz_text ?? p.glz)}`,
+    `Haushaltsstelle ${p.hhst_id} der Stadt Moosburg, ${was}. Ansatz im Entwurf ${entwurf.jahr}: ${fmtEur(a ?? 0)}.`,
+    bildOderOben(`/einrichtung/${p.glz}`, `/bereich/${p.glz.slice(0, 2)}`, `/einzelplan/${p.einzelplan}`),
+    null,
+  )
+}
+
 // ── Schreiben ───────────────────────────────────────────────────────────────
 /** Dieselbe Schale mit eigenen Metazeilen. Die App darin bleibt unveraendert. */
 function html({ pfad, titel, beschreibung, bild }) {

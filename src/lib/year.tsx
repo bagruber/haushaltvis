@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { Budget } from "./data";
+import { latestYear, type Budget } from "./data";
 
 interface YearState {
   /** explicitly selected year, or null = use latest */
@@ -17,10 +17,20 @@ export function YearProvider({ children }: { children: ReactNode }) {
 
 export const useYearCtx = () => useContext(YearCtx);
 
-/** Selected year for snapshot views, falling back to the latest available year. */
+/** Selected year for snapshot views, falling back to the latest decided year. */
 export function useSnapshotYear(budget: Budget): number {
   const { year } = useYearCtx();
-  return year ?? Math.max(...budget.meta.years);
+  return year ?? latestYear(budget);
+}
+
+/**
+ * The year a page shows while none is chosen: the newest decided one. Only the
+ * Gesamtliste opens on the draft, because that is the list the Kämmerei and the
+ * council work through while the draft is open.
+ */
+export function standardJahr(budget: Budget, pfad: string): number {
+  const entwurf = budget.meta.entwurf?.jahr;
+  return entwurf != null && pfad.startsWith("/erkunden/gesamtliste") ? entwurf : latestYear(budget);
 }
 
 /**

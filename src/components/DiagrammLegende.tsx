@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
  * nach, statt ein Allerweltskästchen zu zeigen: der gestrichelte Ansatz ist
  * gestrichelt, die Raute ist eine Raute.
  */
-export type LegendenForm = "linie" | "gestrichelt" | "raute-hohl" | "raute-voll" | "linie-duenn" | "balken";
+export type LegendenForm = "linie" | "gestrichelt" | "gepunktet" | "raute-hohl" | "raute-voll" | "linie-duenn" | "balken";
 
 export interface LegendenEintrag {
   /** Serien-Kennung für den geteilten Link (ist, plan, gebucht …) */
@@ -29,6 +29,12 @@ function Symbol({ form, farbe }: { form: LegendenForm; farbe: string }) {
         <>
           <line x1="1" y1="7" x2="25" y2="7" stroke={farbe} strokeWidth="2" strokeDasharray="5 3" />
           <circle cx="13" cy="7" r="3.5" fill="#faf7f2" stroke={farbe} strokeWidth="2" />
+        </>
+      )}
+      {form === "gepunktet" && (
+        <>
+          <line x1="2" y1="7" x2="24" y2="7" stroke={farbe} strokeWidth="2" strokeDasharray="0.1 4" strokeLinecap="round" />
+          <rect x="9.5" y="3.5" width="7" height="7" fill="#faf7f2" stroke={farbe} strokeWidth="1.8" />
         </>
       )}
       {form === "raute-hohl" && <path d={raute} fill="none" stroke={farbe} strokeWidth="2" />}

@@ -67,7 +67,10 @@ JSONs gebaut. Alles skriptbasiert und reproduzierbar:
 
 ```bash
 python etl/ingest.py     # Excel → kanonische Faktentabelle (data/processed/budget.json)
+python etl/entwurf.py    # Arbeitsplan → Entwurf des kommenden Jahres (entwurf.json)
+python etl/erlaeuterungen.py  # gesichtete Erläuterungen der Kämmerei (erlaeuterungen.json)
 python etl/classify.py   # Themen-Zuordnung laut etl/taxonomy.yaml
+python etl/zwischenstand.py   # Stichtags-Auswertungen (zwischenstand.json)
 python etl/build_web.py  # minifizierte JSONs nach public/data/
 # Hilfen:
 python etl/trace.py            # Posten → Frontend-Routen (data/processed/trace.csv)
@@ -94,7 +97,8 @@ Standard-Zuordnung). Schema und Ablauf: **[DATENFORMAT.md](DATENFORMAT.md)**.
 etl/             Python-Daten-Pipeline + editierbare YAMLs
 haushaltsplaene/ AKDB-Quell-Exporte (Excel/PDF) — lokal, NICHT im Repo
   akdb/          Langexporte, liest etl/ingest.py (jüngstes Endjahr gewinnt)
-  zwischenstand/ Stichtags-Auswertungen, liest etl/zwischenstand.py (jüngste Datei)
+  zwischenstand/ Stichtags-Auswertungen, liest etl/zwischenstand.py (alle)
+  arbeitsplan/   Arbeitsplan der Kämmerei, liest etl/entwurf.py (jüngster Stand)
   archiv/        frühere Entwürfe und Einzelauswertungen
 public/data/     fertige JSONs für die Web-App
 src/lib/         Daten-Laden, Typen, Selektoren, Farben

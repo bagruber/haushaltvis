@@ -12,6 +12,7 @@ import { kennung, useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { extremImFenster, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
+import { jahresAchse } from "@/lib/charts";
 
 export const STEUERN: [string, string][] = [
   ["Einkommensteuer-Anteil", "#c8102e"],
@@ -38,6 +39,8 @@ export function Einnahmen() {
     const groups = incomeByCategory(data, y);
 
     const years = data.budget.meta.years;
+    const entwurf = data.budget.meta.entwurf?.jahr;
+    const eIndex = entwurf == null ? -1 : years.indexOf(entwurf);
     const fmtY = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
     // Solid where an Ist exists, dashed for the trailing years that only carry
     // a Plan. Same colour, so the line reads as one series that turns uncertain
@@ -49,14 +52,15 @@ export function Einnahmen() {
       const ist = years.map((_, i) => s.ergebnis[i] ?? null);
       let lastIst = -1;
       for (let i = 0; i < years.length; i++) if (ist[i] != null) lastIst = i;
-      const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst ? values[i] : null));
-      return { name, values, ist, plan, lastIst };
+      const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst && i !== eIndex ? values[i] : null));
+      const entwurfTeil = years.map((_, i) => (eIndex >= 0 && (i === eIndex || i === eIndex - 1) ? values[i] : null));
+      return { name, values, ist, plan, entwurfTeil, lastIst };
     });
     // Note on the Gewerbesteuer dip: its lowest Ist in the first two pandemic years.
     const pandemie = breit ? extremImFenster(years, steuerSeries[GEWERBE].ist, [2020, 2021], "min") : null;
     const fmtCell = (v: number | null) => (v == null ? "-" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
     const steuerRows = years.map((yy, i) => [
-      `${yy}${steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
+      `${yy}${i === eIndex ? " (Entwurf)" : steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
       ...steuerSeries.map((s) => fmtCell(s.values[i])),
     ]);
     const steuerOpt: EChartsOption = {
@@ -73,14 +77,14 @@ export function Einnahmen() {
             const v = s.values[i];
             const wert = v == null ? "-" : `${fmtCell(v)}${mode.perCapita ? "/Kopf" : ""}`;
             return `<div style="display:flex;gap:12px;justify-content:space-between">
-              <span><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background:${color};margin-right:6px"></span>${name}${s.ist[i] == null && v != null ? " (Plan)" : ""}</span>
+              <span><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background:${color};margin-right:6px"></span>${name}${s.ist[i] == null && v != null ? (i === eIndex ? " (Entwurf)" : " (Plan)") : ""}</span>
               <b>${wert}</b></div>`;
           }).join("");
           return `<b>${years[i]}</b>${body}`;
         },
       },
       grid: { left: 8, right: 16, top: pandemie != null ? 56 : 12, bottom: 56, containLabel: true },
-      xAxis: { type: "category", data: years.map(String) },
+      xAxis: jahresAchse(years, entwurf, breit),
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
       legend: { bottom: 0, type: "scroll", data: STEUERN.map(([n]) => n) },
       series: [
@@ -113,6 +117,21 @@ export function Einnahmen() {
           triggerLineEvent: true,
           emphasis: { focus: "series" as const },
         })),
+        // Der Entwurf: gepunktet und mit eckigem Hohlpunkt, wie in der Timeline.
+        ...(eIndex >= 0
+          ? STEUERN.map(([name, color], si) => ({
+              name: `${name} (Entwurf)`,
+              type: "line" as const,
+              data: steuerSeries[si].entwurfTeil.map((v, i) => (i === eIndex - 1 && v != null ? { value: v, symbol: "none" } : v)),
+              symbol: "emptyRect",
+              symbolSize: 8,
+              lineStyle: { width: 2.5, color, type: "dotted" as const },
+              itemStyle: { color, borderWidth: 2 },
+              connectNulls: false,
+              triggerLineEvent: true,
+              emphasis: { focus: "series" as const },
+            }))
+          : []),
       ],
     };
 

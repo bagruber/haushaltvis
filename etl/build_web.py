@@ -184,6 +184,34 @@ def main():
         (DST / "zwischenstand.json").unlink(missing_ok=True)
         print("zwischenstand.json -> keine Stichtagsdaten, Marke bleibt aus")
 
+    # Entwurf des kommenden Jahres: optional, derselbe Schalter (etl/entwurf.py).
+    ent = SRC / "entwurf.json"
+    entwurf = json.loads(ent.read_text(encoding="utf-8")) if ent.exists() else None
+    if entwurf:
+        (DST / "entwurf.json").write_text(
+            json.dumps(entwurf, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        print(f"entwurf.json   -> Ansatz {entwurf['jahr']} für {len(entwurf['ansatz'])} Haushaltsstellen, "
+              f"Stand {entwurf['stand']}, Finanzplan {entwurf['finanzplan']['jahr']}")
+    else:
+        (DST / "entwurf.json").unlink(missing_ok=True)
+        print("entwurf.json   -> kein Entwurf, das Jahr bleibt aus")
+
+    # Erläuterungen der Kämmerei: optional, ohne Entwurf ohne Sinn (etl/erlaeuterungen.py).
+    erl = SRC / "erlaeuterungen.json"
+    if entwurf and erl.exists():
+        doc = json.loads(erl.read_text(encoding="utf-8"))
+        (DST / "erlaeuterungen.json").write_text(
+            json.dumps(doc, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        n = sum(1 for s in doc["stellen"].values() if "text" in s)
+        print(f"erlaeuterungen.json -> {n} gezeigt, {len(doc['stellen']) - n} nur als Suchwörter")
+    else:
+        (DST / "erlaeuterungen.json").unlink(missing_ok=True)
+        print("erlaeuterungen.json -> keine Erläuterungen")
+
     manual = load_manual_events()
     auto = derive_events(budget)
     events = {"events": manual + auto}
@@ -231,6 +259,17 @@ def main():
     )
     print(f"glossar.json   -> {len(glos)} Begriffe")
 
+    # Die Querschnitte reichen bis ins Entwurfsjahr, wie die übrigen Reihen der
+    # App; ohne Entwurf zeigt die App das Jahr nicht, die Summe stört dann nicht.
+    if entwurf:
+        budget = {
+            **budget,
+            "posten": {**entwurf["posten"], **budget["posten"]},
+            "facts": budget["facts"] + [
+                {"hhst_id": h, "year": entwurf["jahr"], "ansatz": a, "ergebnis": None, "provisional": True}
+                for h, a in entwurf["ansatz"].items()
+            ],
+        }
     agg = build_aggregatoren(budget)
     (DST / "aggregatoren.json").write_text(
         json.dumps(agg, ensure_ascii=False, separators=(",", ":")),

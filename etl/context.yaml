@@ -22,6 +22,7 @@ population:
   2024: 19882   # Stand 31.12.2023
   2025: 20012   # Stand 31.12.2024
   2026: 20107   # Stand 31.12.2025
+  2027: 20107   # noch kein Stand 31.12.2026: vorerst der Wert von 2026
 
 cpi:
   2016: 94.9
@@ -35,3 +36,16 @@ cpi:
   2024: 119.3
   2025: 121.9
   2026: 124.3   # Prognose
+
+# vpi_monat: Verbraucherpreisindex Deutschland je Monat, Basis 2020 = 100
+#   (Statistisches Bundesamt, Tabelle 61111-0002, abgerufen 17.11.2026).
+#   Für die Veränderung von Ansatz zu Ansatz in der Gesamtliste: ein Ansatz
+#   gilt ab Jahresbeginn, also zählt der Stand zum 1.1., der Dezemberwert des
+#   Vorjahres. Fehlt der noch, nimmt die App den jüngsten Monat davor.
+vpi_monat:
+  "2021-12": 104.7
+  "2022-12": 113.2
+  "2023-12": 117.4
+  "2024-12": 120.5
+  "2025-12": 122.7
+  "2026-10": 126.5

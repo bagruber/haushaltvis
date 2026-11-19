@@ -4,10 +4,11 @@ import { EChart } from "./EChart";
 import { ChartTable } from "./ChartTable";
 import { DiagrammLegende, type LegendenEintrag, type LegendenForm } from "./DiagrammLegende";
 import { Term } from "./Term";
-import { adjustSeries, netSeries, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
+import { adjustSeries, netSeries, preisBasis, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
 import { useBreit, type Notiz } from "@/lib/notiz";
 import { SERIEN, useAnsichtAbweichung, useSerien, type SerieKey } from "@/lib/teilen";
 import { PLAN_COLOR } from "@/lib/marke.mjs";
+import { entwurfBalken } from "@/lib/charts";
 import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
 
 /** Plan is drawn in a neutral tone so it never competes with the Ist colour. */
@@ -116,7 +117,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
     const rechenzeile =
       [
         mode.perCapita && "€ je Einwohner",
-        mode.real && `in Preisen von ${baseYear}`,
+        mode.real && `in Preisen von ${preisBasis(context, baseYear)}`,
         netto && "Eigenanteil nach Abzug der Einnahmen",
       ]
         .filter(Boolean)
@@ -165,16 +166,22 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         z: 3,
       },
     });
+    // Der Entwurf ist noch kein Plan: Er setzt die Linie fort, aber gepunktet
+    // und mit einem eckigen Hohlpunkt, damit er nicht als beschlossen gelesen
+    // wird. Eine eigene Serie, weil ECharts eine Linie nicht abschnittsweise
+    // anders strichelt.
+    const eIndex = lf.entwurf != null ? lf.years.indexOf(lf.entwurf) : -1;
+    const planWerte = lf.ansatz.map((v, i) => (i === eIndex ? null : v));
     bausteine.push({
       key: "plan",
       name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
       form: "gestrichelt",
       farbe: PLAN_COLOR,
-      werte: lf.ansatz,
+      werte: planWerte,
       serie: {
         name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
         type: "line",
-        data: lf.ansatz,
+        data: planWerte,
         symbol: "emptyCircle",
         symbolSize: 6,
         lineStyle: { width: 2, type: "dashed", color: PLAN_COLOR },
@@ -183,6 +190,32 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         z: 2,
       },
     });
+    if (eIndex >= 0 && lf.ansatz[eIndex] != null) {
+      const name = `${netto ? "Eigenanteil" : "Ansatz"} ${lf.entwurf} (Entwurf)`;
+      // Der Anschluss ans Vorjahr gehört zur Linie, nicht zum Entwurf: dort
+      // kein Punkt und kein Wert im Tooltip.
+      const anschluss = eIndex > 0 ? lf.ansatz[eIndex - 1] : null;
+      bausteine.push({
+        key: "entwurf",
+        name,
+        form: "gepunktet",
+        farbe: PLAN_COLOR,
+        werte: lf.ansatz.map((v, i) => (i === eIndex ? v : null)),
+        serie: {
+          name,
+          type: "line",
+          data: lf.ansatz.map((v, i) =>
+            i === eIndex ? v : i === eIndex - 1 && anschluss != null ? { value: anschluss, symbol: "none" } : null,
+          ),
+          symbol: "emptyRect",
+          symbolSize: 8,
+          lineStyle: { width: 2, type: "dotted", color: PLAN_COLOR },
+          itemStyle: { color: PLAN_COLOR, borderWidth: 2 },
+          connectNulls: false,
+          z: 2,
+        },
+      });
+    }
     if (zw && zwIndex >= 0 && mark) {
       // Kreis = ganzes Jahr, Raute = Teil des Jahres. Die Farbe trennt Plan von
       // Vollzug wie sonst, die Füllung bezahlt von gebucht. Keine Linie: die
@@ -251,7 +284,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         serie: {
           name: "Investitionen",
           type: "bar",
-          data: iv.ansatz,
+          data: entwurfBalken(iv.ansatz, lf.years, lf.entwurf),
           barWidth: "40%",
           itemStyle: { color: INVEST_COLOR, opacity: 0.85 },
         },
@@ -292,6 +325,9 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
           }
         : undefined);
 
+    const unterzeile = new Map([...standJe].map(([j, t]) => [j, `Stand ${t}`]));
+    if (eIndex >= 0) unterzeile.set(String(lf.entwurf), "Entwurf");
+
     const option: EChartsOption = {
       // Eigener Formatter, damit die Rauten-Zeilen nur im Jahr des
       // Zwischenstands erscheinen statt in jedem Jahr als "-".
@@ -315,7 +351,7 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
                 <span>${marker}${b.name}</span><b>${wert}${anteilText}</b></div>`;
             })
             .join("");
-          return `<b>${lf.years[i]}</b>${text}`;
+          return `<b>${lf.years[i]}${i === eIndex ? " (Entwurf)" : ""}</b>${text}`;
         },
       },
       // Legende abgeschaltet: DiagrammLegende macht dasselbe per Tastatur,
@@ -332,13 +368,25 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       xAxis: {
         type: "category",
         data: laufend.years.map(String),
-        // Nur setzen, wenn es einen Stichtag gibt: ein ausdrückliches `undefined`
-        // löscht in ECharts die Standardwerte, und die Jahreszahlen verschwinden.
-        ...(standJe.size
+        // Nur setzen, wenn es einen Stichtag oder Entwurf gibt: ein ausdrückliches
+        // `undefined` löscht in ECharts die Standardwerte, und die Jahreszahlen
+        // verschwinden.
+        ...(unterzeile.size
           ? {
               axisLabel: {
-                formatter: (v: string) => (standJe.has(v) ? `${v}\n{stand|Stand ${standJe.get(v)}}` : v),
+                formatter: (v: string) => (unterzeile.has(v) ? `${v}\n{stand|${unterzeile.get(v)}}` : v),
                 rich: { stand: { fontSize: 10, lineHeight: 15, color: "#8a8170" } },
+                // Jedes zweite Jahr wie sonst, dazu immer der Stand und der
+                // Entwurf: Sonst fällt gerade das letzte Jahr weg. Am Telefon
+                // reicht der Platz für jedes fünfte, gezählt vom Stand aus, denn
+                // dort trägt die Achse den Stichtag; den Entwurf sagen Legende
+                // und eckiger Punkt.
+                interval: breit
+                  ? (i: number) => i % 2 === 0 || i === zwIndex || i === eIndex
+                  : (i: number) => {
+                      const anker = zwIndex >= 0 ? zwIndex : eIndex;
+                      return i <= anker && (anker - i) % 5 === 0;
+                    },
               },
             }
           : {}),
@@ -357,11 +405,18 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
       series,
     };
 
-    // Die Tabelle zeigt, was auch im Bild steht, in derselben Folge.
-    const columns = ["Jahr", ...sichtbar.map((b) => b.name)];
+    // Die Tabelle zeigt, was auch im Bild steht, in derselben Folge. Der
+    // Entwurf steht dort in der Spalte des Ansatzes; die Zeile sagt, was er ist.
+    const planDa = sichtbar.some((b) => b.key === "plan");
+    const spalten = sichtbar.filter((b) => !(planDa && b.key === "entwurf"));
+    const entwurfWerte = sichtbar.find((b) => b.key === "entwurf")?.werte;
+    const columns = ["Jahr", ...spalten.map((b) => b.name)];
     const rows = lf.years.map((y, i) => [
-      `${y}${lf.provisional.has(y) ? (zw && y === zw.jahr ? ` (Stand ${standTag(zw.stichtag)})` : " (nur Plan)") : ""}`,
-      ...sichtbar.map((b) => (b.werte[i] == null ? "" : fmt(b.werte[i]))),
+      `${y}${i === eIndex ? " (Entwurf)" : lf.provisional.has(y) ? (zw && y === zw.jahr ? ` (Stand ${standTag(zw.stichtag)})` : " (nur Plan)") : ""}`,
+      ...spalten.map((b) => {
+        const v = b.werte[i] ?? (b.key === "plan" ? entwurfWerte?.[i] : null);
+        return v == null ? "" : fmt(v);
+      }),
     ]);
 
     return {

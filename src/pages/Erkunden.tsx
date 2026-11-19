@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { ArrowsLeftRight, ArrowsVertical, CursorClick } from "@phosphor-icons/react";
 import { EChart } from "@/components/EChart";
-import { useData, kameralBothSidesTree, totals, latestYear } from "@/lib/data";
+import { useData, kameralBothSidesTree, totals, latestYear, wechsel } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { sankeyTooltipMitAnteil } from "@/lib/charts";
@@ -46,7 +46,14 @@ export function Erkunden() {
         },
       ],
     };
-    return { option, tree, y, t };
+    // Wie viele Haushaltsstellen gegenüber dem Vorjahr neu sind oder fehlen;
+    // einzeln stehen sie in der Gesamtliste.
+    const w = { neu: 0, weg: 0 };
+    for (const h in data.budget.posten) {
+      const x = wechsel(data, h, y);
+      if (x) w[x]++;
+    }
+    return { option, tree, y, t, w, entwurf: data.budget.meta.entwurf?.jahr === y };
   }, [data, selYear]);
 
   const onEvents = useMemo(
@@ -84,6 +91,15 @@ export function Erkunden() {
           <span className="rounded-md bg-white border border-ink-line px-3 py-1.5">
             Ausgaben {view.y}: <b>{fmtEurShort(view.t.ausgaben)}</b>
           </span>
+          {view.w.neu + view.w.weg > 0 && (
+            <Link
+              to={`/erkunden/gesamtliste?jahr=${view.y}&nur=wechsel`}
+              className="rounded-md border border-ink-line bg-white px-3 py-1.5 hover:border-ink-soft"
+            >
+              {view.entwurf ? `Im Entwurf ${view.y}` : `${view.y}`} gegenüber {view.y - 1}: <b>{view.w.neu}</b> Haushaltsstellen neu,{" "}
+              <b>{view.w.weg}</b> nicht mehr vorhanden <span aria-hidden>→</span>
+            </Link>
+          )}
         </div>
       )}
 

@@ -20,6 +20,8 @@ import { Term } from "@/components/Term";
 import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
+import { jahresAchse, jahrText } from "@/lib/charts";
+import { useBreit } from "@/lib/notiz";
 
 const KINDS: FundingKind[] = ["foerderung", "beitraege", "verkauf"];
 const EIGEN_COLOR = "#c8102e";
@@ -60,6 +62,7 @@ export function Investitionen() {
   const { zeigen } = useNummern();
   const { year: selYear } = useYearCtx();
 
+  const breit = useBreit();
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
@@ -122,7 +125,7 @@ export function Investitionen() {
       tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "-"), order: "valueDesc" },
       legend: { type: "scroll", bottom: 0 },
       grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
-      xAxis: { type: "category", boundaryGap: false, data: stacked.years.map(String) },
+      xAxis: jahresAchse(stacked.years, data.budget.meta.entwurf?.jahr, breit, { boundaryGap: false }),
       yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
       series: stacked.series.map((s) => ({
         name: s.name,
@@ -146,7 +149,7 @@ export function Investitionen() {
       dupVorhaben: doppelte(vorhaben.map((p) => p.label)),
       dupDauer: doppelte(dauer.map((p) => p.label)),
     };
-  }, [data, selYear]);
+  }, [data, selYear, breit]);
 
   const onEvents = useMemo(
     () => ({
@@ -330,7 +333,7 @@ export function Investitionen() {
         <ChartTable
           summary="Jahressummen als Tabelle"
           columns={["Jahr", "Summe Investitionen (Ansatz)"]}
-          rows={view.stackedYears.map((yy, i) => [String(yy), fmtEur(view.stackedTotals[i])])}
+          rows={view.stackedYears.map((yy, i) => [jahrText(yy, data!.budget.meta.entwurf?.jahr), fmtEur(view.stackedTotals[i])])}
         />
       </section>
     </div>

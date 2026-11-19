@@ -1,5 +1,7 @@
-import { useData } from "@/lib/data";
-import { useYearCtx } from "@/lib/year";
+import { useLocation } from "react-router-dom";
+import { useData, latestYear } from "@/lib/data";
+import { standardJahr, useYearCtx } from "@/lib/year";
+import { fmtDatum } from "@/lib/format";
 import { NummernSchalter } from "@/lib/nummern";
 
 /**
@@ -10,11 +12,14 @@ import { NummernSchalter } from "@/lib/nummern";
 export function YearBar({ nummern }: { nummern?: boolean }) {
   const { data } = useData();
   const { year, setYear } = useYearCtx();
+  const { pathname } = useLocation();
   if (!data) return null;
   const years = data.budget.meta.years;
   const min = years[0];
   const max = years[years.length - 1];
-  const current = year ?? max;
+  const standard = standardJahr(data.budget, pathname);
+  const current = year ?? standard;
+  const entwurf = data.budget.meta.entwurf;
 
   return (
     <div className="border-b border-ink-line bg-cream-dark">
@@ -31,8 +36,12 @@ export function YearBar({ nummern }: { nummern?: boolean }) {
           aria-label="Stichjahr wählen"
         />
         <span className="font-display font-bold text-ink tabular-nums w-12">{current}</span>
-        {current === max && <span className="text-xs text-ink-muted">(nur Plan)</span>}
-        {year !== null && year !== max && (
+        {current === entwurf?.jahr ? (
+          <span className="text-xs text-ink-muted">(Entwurf, Stand {fmtDatum(entwurf.stand)})</span>
+        ) : (
+          current === latestYear(data.budget) && <span className="text-xs text-ink-muted">(nur Plan)</span>
+        )}
+        {year !== null && year !== standard && (
           <button onClick={() => setYear(null)} className="text-xs text-red-600 hover:underline">
             aktuellstes
           </button>

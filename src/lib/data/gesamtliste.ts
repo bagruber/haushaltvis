@@ -12,28 +12,36 @@
 // Die Bereiche (zweistellig) kennt der amtliche Plan nicht als Überschrift. Sie
 // bleiben hier, weil die App überall in dieser Ebene denkt; an der Reihenfolge
 // ändern sie nichts.
-import type { Data, EA, Haushalt, Posten } from "./types";
+import type { Context, Data, EA, Haushalt, Posten, Zwischenstand } from "./types";
 import { abschnittName } from "./core";
+import { neuesterStand, wechsel, type Wechsel } from "./selectors";
 import { isInternal } from "../kameral.mjs";
 
 /** Die Spalten, die eine Zeile tragen kann. Welche davon stehen, wählt die Seite. */
 export type SpaltenKey =
   | "ansatz"
-  | "ansatzVor"
-  | "ergebnisVor"
-  | "ansatzNach"
+  | "ergebnis"
   | "gebucht"
   | "bezahlt"
+  | "ansatzVor"
+  | "ergebnisVor"
   | "gebuchtVor"
-  | "bezahltVor";
+  | "bezahltVor"
+  | "ansatzNach";
 
 export interface GesamtSpalte {
   key: SpaltenKey;
   kopf: string;
+  /** Zweite, kleine Zeile im Kopf, etwa „Entwurf, Stand 13.11.2026“. */
+  zusatz?: string;
   /** Die hervorgehobene Spalte, wie das grau hinterlegte Planjahr im amtlichen Plan. */
   markiert?: boolean;
   /** Die Spalte steht als Platzhalter, hat aber noch keine Zahlen. */
   leer?: boolean;
+  /** Klein unter dem Betrag: was aus diesem Ansatz wurde, Ergebnis oder Stand. */
+  unter?: { keys: SpaltenKey[]; kopf: string };
+  /** Pfeile gegen den Betrag dieser Spalte. */
+  vergleich?: SpaltenKey;
 }
 
 export type GesamtWerte = Partial<Record<SpaltenKey, number | null>>;
@@ -49,6 +57,12 @@ export interface GesamtZeile {
   /** „Einnahmen" oder „Ausgaben" — wechselt mit der ersten Ziffer der GRZ. */
   gruppe: string;
   werte: GesamtWerte;
+  /** Gegenüber dem Vorjahr neu oder nicht mehr vorhanden; null, wenn beides nicht. */
+  wechsel: Wechsel | null;
+  /** Erläuterung der Kämmerei, wörtlich; nur im Jahr, zu dem sie geschrieben ist. */
+  erlaeuterung?: string[];
+  /** Suchwörter zur Erläuterung, nur für den Filter */
+  such?: string[];
 }
 
 export interface GesamtKnoten {
@@ -85,10 +99,22 @@ export interface Gesamtliste {
     vermoegen: { einnahmen: number; ausgaben: number };
   };
   /**
-   * Die Stichtage, die zu dieser Liste passen: zum Stichjahr und zu dessen
-   * Vorjahr, nach Jahr aufsteigend. Leer, wenn es keinen gibt.
+   * Was unter dem Ansatz des Vorjahres und des Stichjahrs klein steht: das
+   * Ergebnis, sobald es eines gibt, sonst der jüngste Zwischenstand, sonst
+   * nichts.
    */
-  zwischenstand: { jahr: number; stichtag: string }[];
+  ist: { vor: IstQuelle | null; jahr: IstQuelle | null };
+  /** Woher die Zahlen des Folgejahres kommen; null, solange es keine gibt. */
+  nach: "ansatz" | "finanzplan" | null;
+}
+
+export type IstQuelle = { art: "ergebnis" } | { art: "stand"; stichtag: string; text?: string };
+
+/** „November 2026“ oder „01.10.2026“ */
+export function standText(q: { stichtag: string; text?: string }): string {
+  if (q.text) return q.text;
+  const [j, m, t] = q.stichtag.split("-");
+  return `${t}.${m}.${j}`;
 }
 
 const sauber = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
@@ -132,21 +158,42 @@ function summiere(zeilen: GesamtZeile[]): GesamtWerte {
  */
 export function gesamtliste(data: Data, jahr: number): Gesamtliste {
   const vorjahr = data.budget.meta.years.includes(jahr - 1) ? jahr - 1 : null;
-  const zsJahr = data.zwischenstand.find((z) => z.jahr === jahr);
-  const zsVor = data.zwischenstand.find((z) => z.jahr === jahr - 1);
 
   const ansatz = new Map<string, number>();
+  const ergebnis = new Map<string, number>();
   const ansatzVor = new Map<string, number>();
   const ergebnisVor = new Map<string, number>();
-  const ansatzNach = new Map<string, number>();
+  let ansatzNach = new Map<string, number>();
   for (const f of data.budget.facts) {
-    if (f.year === jahr && f.ansatz != null) ansatz.set(f.hhst_id, f.ansatz);
+    if (f.year === jahr) {
+      if (f.ansatz != null) ansatz.set(f.hhst_id, f.ansatz);
+      if (f.ergebnis != null) ergebnis.set(f.hhst_id, f.ergebnis);
+    }
     if (f.year === jahr + 1 && f.ansatz != null) ansatzNach.set(f.hhst_id, f.ansatz);
     if (vorjahr != null && f.year === vorjahr) {
       if (f.ansatz != null) ansatzVor.set(f.hhst_id, f.ansatz);
       if (f.ergebnis != null) ergebnisVor.set(f.hhst_id, f.ergebnis);
     }
   }
+  let nach: Gesamtliste["nach"] = ansatzNach.size ? "ansatz" : null;
+  if (!nach && data.finanzplan?.jahr === jahr + 1) {
+    ansatzNach = new Map(Object.entries(data.finanzplan.ansatz));
+    nach = "finanzplan";
+  }
+  // Ein Ergebnis geht jedem Zwischenstand vor: Ist das Jahr abgerechnet, zählt nur noch das.
+  const istVon = (erg: Map<string, number>, j: number | null): { quelle: IstQuelle | null; stand?: Zwischenstand } => {
+    if (j == null) return { quelle: null };
+    if (erg.size) return { quelle: { art: "ergebnis" } };
+    const stand = neuesterStand(data.zwischenstand, j);
+    return stand ? { quelle: { art: "stand", stichtag: stand.stichtag, text: stand.text }, stand } : { quelle: null };
+  };
+  const istJahr = istVon(ergebnis, jahr);
+  const istVor = istVon(ergebnisVor, vorjahr);
+  const erl = data.erlaeuterungen?.jahr === jahr ? data.erlaeuterungen : undefined;
+  const erlaeuterung = (hhst: string) => {
+    const e = erl?.stellen[hhst];
+    return e ? { ...(e.text ? { erlaeuterung: e.text } : {}), ...(e.such ? { such: e.such } : {}) } : {};
+  };
 
   const summen = {
     verwaltung: { einnahmen: 0, ausgaben: 0 },
@@ -228,19 +275,12 @@ export function gesamtliste(data: Data, jahr: number): Gesamtliste {
         ansatz: ansatz.get(p.hhst_id) ?? null,
         ansatzNach: ansatzNach.get(p.hhst_id) ?? null,
       };
+      if (istJahr.quelle?.art === "ergebnis") werte.ergebnis = ergebnis.get(p.hhst_id) ?? null;
+      stand(werte, istJahr.stand, p.hhst_id, "gebucht", "bezahlt");
       if (vorjahr != null) {
         werte.ansatzVor = ansatzVor.get(p.hhst_id) ?? null;
         werte.ergebnisVor = ergebnisVor.get(p.hhst_id) ?? null;
-      }
-      const stich = zsJahr?.werte[p.hhst_id];
-      if (stich) {
-        werte.gebucht = stich[0];
-        werte.bezahlt = stich[1];
-      }
-      const stichVor = zsVor?.werte[p.hhst_id];
-      if (stichVor) {
-        werte.gebuchtVor = stichVor[0];
-        werte.bezahltVor = stichVor[1];
+        stand(werte, istVor.stand, p.hhst_id, "gebuchtVor", "bezahltVor");
       }
       knoten.zeilen.push({
         hhst: p.hhst_id,
@@ -251,6 +291,8 @@ export function gesamtliste(data: Data, jahr: number): Gesamtliste {
         intern: isInternal(p),
         gruppe: gruppeVon(p),
         werte,
+        wechsel: wechsel(data, p.hhst_id, jahr),
+        ...erlaeuterung(p.hhst_id),
       });
       const betrag = werte.ansatz ?? 0;
       if (p.ea === "E") knoten.einnahmen += betrag;
@@ -263,10 +305,92 @@ export function gesamtliste(data: Data, jahr: number): Gesamtliste {
     };
   }
 
+  return { haushalte, summen, ist: { vor: istVor.quelle, jahr: istJahr.quelle }, nach };
+}
+
+/** Gebucht und bezahlt aus einem Stand; eine Stelle, die er nicht kennt, hat dort nichts. */
+function stand(werte: GesamtWerte, z: Zwischenstand | undefined, hhst: string, g: SpaltenKey, b: SpaltenKey) {
+  if (!z) return;
+  const w = z.werte[hhst];
+  werte[g] = w ? w[0] : null;
+  werte[b] = w ? w[1] : null;
+}
+
+// ── Pfeile: Ansatz gegen Vorjahr ────────────────────────────────────────────
+
+/** Unter zwei Prozent in beide Richtungen gilt als gleich geblieben. */
+export const SCHWELLE = 0.02;
+
+export type Richtung = "auf" | "ab" | "gleich";
+
+export interface Veraenderung {
+  richtung: Richtung;
+  /** Veränderung als Anteil (0.042 = +4,2 %); null, wenn der Vorjahresbetrag 0 war */
+  anteil: number | null;
+}
+
+/** Wie sich Preise und Einwohnerzahl zwischen zwei Ansätzen verändert haben. */
+export interface Bereinigung {
+  /** Preisindex Jahresbeginn jetzt / Jahresbeginn Vorjahr */
+  preis: number;
+  einwohner: number;
+  /** die Monate des Preisindex, etwa „Dezember 2025“ und „Oktober 2026“ */
+  preisVon: string;
+  preisBis: string;
+}
+
+const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+/**
+ * Preisindex zum Beginn eines Jahres, also der Dezemberwert des Vorjahres:
+ * Ein Ansatz gilt ab dem 1. Januar. Fehlt der Dezember noch, der jüngste
+ * Monat davor im selben Jahr.
+ */
+function vpiZumJahresbeginn(ctx: Context, jahr: number): { wert: number; monat: string } | null {
+  const monate = Object.keys(ctx.vpi_monat ?? {})
+    .filter((k) => k.startsWith(`${jahr - 1}-`))
+    .sort();
+  const k = monate.at(-1);
+  if (!k) return null;
+  return { wert: ctx.vpi_monat![k], monat: `${MONATE[Number(k.slice(5)) - 1]} ${k.slice(0, 4)}` };
+}
+
+/** Preis- und Einwohnerfaktor von Vorjahr zu Jahr; null, wenn eines davon fehlt. */
+export function bereinigung(ctx: Context, jahr: number): Bereinigung | null {
+  const von = vpiZumJahresbeginn(ctx, jahr - 1);
+  const bis = vpiZumJahresbeginn(ctx, jahr);
+  const ew = ctx.population?.[String(jahr)];
+  const ewVor = ctx.population?.[String(jahr - 1)];
+  if (!von || !bis || !ew || !ewVor) return null;
+  return { preis: bis.wert / von.wert, einwohner: ew / ewVor, preisVon: von.monat, preisBis: bis.monat };
+}
+
+function richtung(anteil: number): Richtung {
+  return anteil >= SCHWELLE ? "auf" : anteil <= -SCHWELLE ? "ab" : "gleich";
+}
+
+/**
+ * Zwei Pfeile für einen Ansatz gegen den des Vorjahres: wie er sich in Euro
+ * verändert und wie, wenn man Preise und Einwohnerzahl herausrechnet. Keine
+ * Pfeile, wo einer der Beträge fehlt, beide null sind oder einer negativ ist:
+ * Dort sagt ein Prozentwert nichts.
+ */
+export function pfeile(
+  jetzt: number | null | undefined,
+  vorher: number | null | undefined,
+  b: Bereinigung | null,
+): { nominal: Veraenderung; real: Veraenderung | null } | null {
+  if (jetzt == null || vorher == null || jetzt < 0 || vorher < 0) return null;
+  if (jetzt === 0 && vorher === 0) return null;
+  if (vorher === 0) {
+    const neu: Veraenderung = { richtung: "auf", anteil: null };
+    return { nominal: neu, real: b ? neu : null };
+  }
+  const n = jetzt / vorher - 1;
+  const r = b ? jetzt / vorher / (b.preis * b.einwohner) - 1 : null;
   return {
-    haushalte,
-    summen,
-    zwischenstand: [zsVor, zsJahr].filter((z) => z != null).map((z) => ({ jahr: z.jahr, stichtag: z.stichtag })),
+    nominal: { richtung: richtung(n), anteil: n },
+    real: r == null ? null : { richtung: richtung(r), anteil: r },
   };
 }
 
@@ -287,6 +411,15 @@ export function gesamtlisteZeilen(liste: Gesamtliste): GesamtZeile[] {
 
 const feld = (s: string) => (/[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
 
+const KURZ: Partial<Record<SpaltenKey, string>> = {
+  ergebnis: "Ergebnis",
+  ergebnisVor: "Ergebnis",
+  gebucht: "gebucht",
+  bezahlt: "bezahlt",
+  gebuchtVor: "gebucht",
+  bezahltVor: "bezahlt",
+};
+
 /** Deutsches Excel: Dezimalkomma, keine Tausenderpunkte. */
 const zahl = (v: number | null | undefined) => (v == null ? "" : String(v).replace(".", ","));
 
@@ -298,7 +431,13 @@ const zahl = (v: number | null | undefined) => (v == null ? "" : String(v).repla
  *
  * Reine Funktion: der Knopf dazu kommt erst nach Rückmeldung.
  */
-export function gesamtlisteCsv(zeilen: GesamtZeile[], spalten: GesamtSpalte[]): string {
+export function gesamtlisteCsv(zeilen: GesamtZeile[], sichtbar: GesamtSpalte[]): string {
+  // In der Tabelle stehen Ergebnis und Stand klein unter dem Ansatz, hier je
+  // in eigener Spalte, sonst rechnet in Excel niemand damit.
+  const spalten = sichtbar.flatMap((s) => [
+    s,
+    ...(s.unter?.keys ?? []).map((key) => ({ key, kopf: `${s.kopf}, ${KURZ[key]}` })),
+  ]);
   const kopf = ["Haushaltsstelle", "Bezeichnung", "Art", "Haushalt", ...spalten.map((s) => s.kopf)];
   const reihen = zeilen.map((z) =>
     [

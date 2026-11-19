@@ -99,8 +99,10 @@ nach `data/` legen → fertig (kein Build).
 
 - **`data/themes.json`** — `{ themes: { <id>: {label, color, description} }, assignment: { … } }`.
   Enthält die Themen-Definitionen (Name, Farbe) und eine Standard-Zuordnung.
-- **`data/context.json`** — `{ population: { "2024": 19908, … }, cpi: { "2024": 119.3, … } }`
-  für Pro-Kopf- und Inflations-Ansichten.
+- **`data/context.json`** — `{ population: { "2024": 19908, … }, cpi: { "2024": 119.3, … },
+  vpi_monat: { "2025-12": 122.7, … } }` für Pro-Kopf- und Inflations-Ansichten. `vpi_monat`
+  ist der Verbraucherpreisindex je Monat; die Pfeile der Gesamtliste rechnen mit dem Stand
+  zum Jahresbeginn (Dezember des Vorjahres), solange der fehlt, mit dem jüngsten Monat.
 - **`data/labels.json`** — `{ abschnitt: { "21": "Schulen" }, unterabschnitt: { … } }`
   saubere Namen für Bereiche.
 - **`data/einleitungen.json`** — `{ "ep:2": "Einleitungstext …" }` je Einzelplan.
@@ -129,6 +131,13 @@ nach `data/` legen → fertig (kein Build).
         "stichtag": "2026-10-01",
         "quelle": "Haushalt 2026 Stand 01.10.2026 - mit Haushaltssperre.xlsx",
         "werte": { "0000.4100": [100868.84, 100868.84] }
+      },
+      {
+        "jahr": 2026,
+        "stichtag": "2026-11-13",
+        "text": "November 2026",                          // statt des Datums anzeigen
+        "quelle": "Arbeitsplan 2027 Stand 13.11.2026.xlsx, Blatt 2026",
+        "werte": { "0000.4100": [121892.92, 121892.92] }
       }
     ]
   }
@@ -138,10 +147,28 @@ nach `data/` legen → fertig (kein Build).
   Abfluss (`Ist_HS`). Die Haushaltsstellen sind dieselben wie in `budget.json`;
   was dort nicht vorkommt, wird nicht übernommen. Ein Stand zum Monatsletzten
   gilt als Stand zum Ersten des Folgemonats (30.09. → 01.10.), damit beide
-  Jahre denselben Stichtag tragen. Bewusst eine eigene Datei: `budget.json`
-  bleibt unverändert, und ihr Löschen nimmt das Feature in der App zurück.
-  Erzeugt von `etl/zwischenstand.py` aus `haushaltsplaene/zwischenstand/`, je
-  Jahr die Auswertung mit dem jüngsten Stichtag.
+  Jahre denselben Stichtag tragen. Ein Jahr kann mehrere Stände haben: Die
+  Zeitreihen nehmen je Jahr den Stand an dem Tag, den die meisten Jahre teilen,
+  die Gesamtliste den jüngsten. `text` steht, wo nur der Monat sicher ist.
+  Bewusst eine eigene Datei: `budget.json` bleibt unverändert, und ihr Löschen
+  nimmt das Feature in der App zurück. Erzeugt von `etl/zwischenstand.py` aus
+  allen Auswertungen in `haushaltsplaene/zwischenstand/` und dem Blatt des
+  laufenden Jahres im jüngsten Arbeitsplan.
+- **`data/entwurf.json`** — der Haushaltsentwurf des kommenden Jahres aus dem
+  Arbeitsplan der Kämmerei: `{ jahr, stand, quelle, ansatz: { <hhst_id>: € },
+  posten: { … }, finanzplan: { jahr, ansatz: { … } } }`. `ansatz` hat eine Zeile
+  je Haushaltsstelle des Arbeitsplans, auch mit 0 €; `posten` nur die Stellen,
+  die `budget.json` noch nicht kennt, im selben Schema. Die App hängt das Jahr
+  beim Laden an und kennzeichnet es überall als Entwurf, öffnet aber auf dem
+  letzten beschlossenen Jahr; nur die Gesamtliste beginnt mit dem Entwurf.
+  Steht das Jahr selbst in `budget.json`, gilt die Datei nicht mehr. Erzeugt von
+  `etl/entwurf.py` aus `haushaltsplaene/arbeitsplan/`.
+- **`data/erlaeuterungen.json`** — die Erläuterungen der Kämmerei aus dem
+  Arbeitsplan, so weit gesichtet: `{ jahr, stand, quelle, stellen: { <hhst_id>:
+  { text?: [ … ], such?: [ … ] } } }`. `text` steht wörtlich und nur, wo er
+  gezeigt wird; `such` sind Suchwörter. Die Sichtung steht in
+  `etl/erlaeuterungen.yaml`, erzeugt von `etl/erlaeuterungen.py`. Ohne die Datei
+  gibt es keine Erläuterungen und keine Suchwörter.
 
 Alle diese Dateien lassen sich einzeln austauschen; die App lädt sie tolerant
 (fehlt eine, läuft die App ohne das jeweilige Extra weiter).
