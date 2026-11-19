@@ -1,7 +1,8 @@
 // Small shared UI primitives, previously duplicated across pages.
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { LinkSimple, ShareNetwork, type Icon } from "@phosphor-icons/react";
+import { Check, Copy, LinkSimple, ShareNetwork, X, type Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import { kategorieTon } from "@/lib/kategorien";
 import { KLECKS_DREHUNG, KLECKS_PFAD } from "@/lib/marke.mjs";
@@ -270,28 +271,105 @@ export function SegmentedToggle<T extends string>({ value, onChange, options, la
 }
 
 /**
- * The share action: system share sheet where there is one, otherwise the link
- * is copied and the button reports it. With `pfad` the shared address is that
- * section's instead of the current page's.
+ * The share action. On touch devices the system share sheet, where the
+ * messengers are. Elsewhere a dialog with the link to copy: desktop browsers
+ * differ too much there, some have no share sheet at all, and Windows opens
+ * one of its own. With `pfad` the shared address is that section's instead of
+ * the current page's.
  */
-function useTeilen(pfad?: string, titel?: string): [boolean, () => Promise<void>] {
-  const [kopiert, setKopiert] = useState(false);
-  const teilen = async () => {
+function useTeilen(pfad?: string, titel?: string): [() => void, ReactNode] {
+  const [link, setLink] = useState<{ url: string; title: string } | null>(null);
+  const teilen = () => {
     const url = pfad ? teilUrl(window.location.href, pfad) : window.location.href;
     const title = titel ? `${titel} · ${document.title}` : document.title;
-    if (navigator.share) {
-      await navigator.share({ title, url }).catch(() => undefined);
+    if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+      navigator.share({ title, url }).catch(() => undefined);
       return;
     }
-    await navigator.clipboard.writeText(url).then(
-      () => {
-        setKopiert(true);
-        window.setTimeout(() => setKopiert(false), 2500);
-      },
-      () => undefined,
-    );
+    setLink({ url, title });
   };
-  return [kopiert, teilen];
+  const dialog = link && <TeilenDialog {...link} onClose={() => setLink(null)} />;
+  return [teilen, dialog];
+}
+
+/**
+ * Modal with the link in a field and a copy button. Native `<dialog>`: it
+ * keeps focus inside, closes on Esc and returns focus to the share button.
+ * Rendered into `body`, because the link icon sits inside headings.
+ */
+function TeilenDialog({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const feld = useRef<HTMLParagraphElement>(null);
+  const knopf = useRef<HTMLButtonElement>(null);
+  const [kopiert, setKopiert] = useState(false);
+  const titelId = useId();
+
+  useEffect(() => {
+    if (!dialog.current?.open) dialog.current?.showModal();
+    knopf.current?.focus();
+  }, []);
+
+  const kopieren = () =>
+    navigator.clipboard.writeText(url).then(
+      () => setKopiert(true),
+      // Without clipboard access the link gets selected, ready for Ctrl+C.
+      () => feld.current && window.getSelection()?.selectAllChildren(feld.current),
+    );
+
+  return createPortal(
+    <dialog
+      ref={dialog}
+      aria-labelledby={titelId}
+      onClose={onClose}
+      onClick={(e) => {
+        // The portal still bubbles through React to the button's ancestors.
+        e.stopPropagation();
+        // A click beside the box lands on the dialog itself, not its content.
+        if (e.target === e.currentTarget) e.currentTarget.close();
+      }}
+      className="m-auto w-[min(34rem,calc(100%-2rem))] rounded-lg border border-ink-line bg-white text-ink shadow-lift backdrop:bg-ink/20"
+    >
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 id={titelId} className="font-display text-lg font-semibold">Link teilen</h2>
+            <p className="mt-1 text-sm text-ink-soft">{title}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => dialog.current?.close()}
+            aria-label="Schließen"
+            className="-m-1 shrink-0 rounded-md p-1 text-ink-muted transition-colors hover:bg-cream-dark hover:text-ink"
+          >
+            <X size={18} aria-hidden />
+          </button>
+        </div>
+        <div className="mt-4 flex items-start gap-2">
+          {/* Whole and wrapped rather than a one-line field, which would cut
+              off the end: the number and the chosen view. It wraps only after
+              / ? &, so a number stays in one piece. One click selects it. */}
+          <p
+            ref={feld}
+            className="min-h-10 min-w-0 flex-1 select-all rounded-lg border border-ink-line bg-cream px-3 py-2 text-sm [overflow-wrap:anywhere]"
+          >
+            {url.split(/(?<=[/?&])/).map((teil, i) => (
+              <span key={i}>{teil}<wbr /></span>
+            ))}
+          </p>
+          <button
+            ref={knopf}
+            type="button"
+            onClick={kopieren}
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg bg-ink px-4 text-sm font-semibold text-cream transition-colors hover:bg-ink-soft"
+          >
+            {kopiert ? <Check size={16} aria-hidden /> : <Copy size={16} aria-hidden />}
+            <span aria-live="polite">{kopiert ? "Kopiert" : "Kopieren"}</span>
+          </button>
+        </div>
+      </div>
+    </dialog>,
+    document.body,
+  );
 }
 
 /**
@@ -307,44 +385,47 @@ export function Teilen({ hell, label = "Teilen", className, pfad, titel }: {
   /** section heading, put in front of the page title */
   titel?: string;
 }) {
-  const [kopiert, teilen] = useTeilen(pfad, titel);
+  const [teilen, dialog] = useTeilen(pfad, titel);
   return (
-    <button
-      type="button"
-      onClick={teilen}
-      className={cn(
-        "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition-colors",
-        hell ? "bg-cream/15 text-cream hover:bg-cream/25" : "bg-cream-dark text-ink hover:bg-ink-line",
-        className,
-      )}
-    >
-      <ShareNetwork size={16} aria-hidden />
-      <span aria-live="polite">{kopiert ? "Link kopiert" : label}</span>
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={teilen}
+        className={cn(
+          "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition-colors",
+          hell ? "bg-cream/15 text-cream hover:bg-cream/25" : "bg-cream-dark text-ink hover:bg-ink-line",
+          className,
+        )}
+      >
+        <ShareNetwork size={16} aria-hidden />
+        {label}
+      </button>
+      {dialog}
+    </>
   );
 }
 
 /**
  * Link to this section, next to its heading. Icon only and always visible:
- * on touch there is no hover to reveal it. The feedback is text, so it also
- * reaches screen readers.
+ * on touch there is no hover to reveal it.
  */
 export function AbschnittLink({ pfad, titel, className }: { pfad: string; titel: string; className?: string }) {
-  const [kopiert, teilen] = useTeilen(pfad, titel);
+  const [teilen, dialog] = useTeilen(pfad, titel);
   return (
-    <button
-      type="button"
-      onClick={teilen}
-      aria-label="Link zu diesem Abschnitt teilen"
-      className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-md p-1 text-ink-muted transition-colors hover:bg-cream-dark hover:text-ink",
-        className,
-      )}
-    >
-      <LinkSimple size={16} aria-hidden />
-      {kopiert && <span className="text-xs font-normal">Link kopiert</span>}
-      <span className="sr-only" aria-live="polite">{kopiert ? "Link kopiert" : ""}</span>
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={teilen}
+        aria-label="Link zu diesem Abschnitt teilen"
+        className={cn(
+          "inline-flex shrink-0 items-center gap-1.5 rounded-md p-1 text-ink-muted transition-colors hover:bg-cream-dark hover:text-ink",
+          className,
+        )}
+      >
+        <LinkSimple size={16} aria-hidden />
+      </button>
+      {dialog}
+    </>
   );
 }
 
