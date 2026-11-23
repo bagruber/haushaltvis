@@ -1,5 +1,7 @@
 name: Deploy to GitHub Pages
 
+# Die Ratsversion: alle Daten, auch Entwurf, Zwischenstände und Erläuterungen.
+# Die Bürgerversion für moosburg.eu baut moosburg-eu.yml aus demselben Stand.
 on:
   push:
     branches: [main]
@@ -26,66 +28,25 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
-
-      # Die Formsprache-Probe laeuft als Vorschau unter /haushaltvis/v2/, gebaut
-      # vom Branch probe/formsprache. Die Wurzel bleibt der Stand von main.
-      # Gebaut wird hier und nicht im Branch, weil die Umgebung github-pages nur
-      # Deploys von main zulaesst; der Branch stoesst diesen Workflow nur an.
-      - name: Branch probe/formsprache holen
-        id: probe
-        run: |
-          if git ls-remote --exit-code --heads origin probe/formsprache; then
-            git fetch --depth 1 origin probe/formsprache
-            git worktree add "$RUNNER_TEMP/probe" FETCH_HEAD
-            echo "da=true" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Abhaengigkeiten der Probe
-        id: probedeps
-        if: steps.probe.outputs.da == 'true'
-        working-directory: ${{ runner.temp }}/probe
+      - id: deps
         run: |
           pnpm install --frozen-lockfile
-          # Kennt der Branch playwright-core noch nicht, bleibt der Schluessel leer
-          # und der Chromium-Schritt faellt unten ohnehin aus.
-          pw=$(node -p "require('playwright-core/package.json').version" 2>/dev/null || true)
-          echo "playwright=${pw:-keins}" >> "$GITHUB_OUTPUT"
+          echo "playwright=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
 
       # Die Vorschaukarten werden in einem lokalen Chromium gerendert
-      # (scripts/karten.mjs). Rund 150 MB, deshalb ueber die Playwright-Version
-      # gecacht statt in jedem Lauf neu geladen.
+      # (scripts/karten.mjs, Teil von `pnpm run build`). Rund 150 MB, deshalb
+      # ueber die Playwright-Version gecacht statt in jedem Lauf neu geladen.
       - name: Chromium aus dem Cache
-        if: steps.probe.outputs.da == 'true'
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: chromium-${{ runner.os }}-${{ steps.probedeps.outputs.playwright }}
-
+          key: chromium-${{ runner.os }}-${{ steps.deps.outputs.playwright }}
       - name: Chromium bereitstellen
-        if: steps.probe.outputs.da == 'true'
-        working-directory: ${{ runner.temp }}/probe
-        run: |
-          if [ -f scripts/karten.mjs ]; then
-            pnpm exec playwright-core install --with-deps chromium
-          else
-            echo "Der Branch kennt scripts/karten.mjs noch nicht — kein Chromium noetig."
-          fi
+        run: pnpm exec playwright-core install --with-deps chromium
 
-      # Nicht `pnpm run build`: der Branch haengt an sein build-Skript das
-      # Kartenskript an, und die Argumente landeten dann dort statt bei vite.
-      # Darum die Schritte einzeln.
-      - name: Probe nach dist/v2 bauen
-        if: steps.probe.outputs.da == 'true'
-        working-directory: ${{ runner.temp }}/probe
+      - run: pnpm run build
         env:
           SITE_URL: https://bagruber.github.io
-        run: |
-          pnpm exec tsc -b
-          pnpm exec vite build --base /haushaltvis/v2/ --outDir "$GITHUB_WORKSPACE/dist/v2" --emptyOutDir
-          if [ -f scripts/karten.mjs ]; then
-            node scripts/karten.mjs "$GITHUB_WORKSPACE/dist/v2"
-          fi
 
       - name: Sanity-check dist/
         run: |
@@ -93,10 +54,7 @@ jobs:
           ls -la dist
           echo "── dist/data ────────────────────"
           ls -la dist/data
-          if [ -d dist/v2/karten ]; then
-            echo "── Vorschaukarten der Probe ─────"
-            echo "$(find dist/v2/karten -name '*.png' | wc -l) Bilder, $(find dist/v2 -name 'index.html' | wc -l) HTML-Dateien"
-          fi
+          echo "$(find dist/karten -name '*.png' | wc -l) Kartenbilder, $(find dist -name 'index.html' | wc -l) HTML-Dateien"
 
       - uses: actions/upload-pages-artifact@v5
         with:

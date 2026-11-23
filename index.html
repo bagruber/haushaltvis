@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Probe Formsprache: die Vorschau unter /v2/ soll nicht in Suchmaschinen landen.
-         Vor einem Merge nach main entfernen. -->
+    <!-- Vorerst fuer beide Versionen. Die Ratsversion zeigt Unbeschlossenes und
+         soll nicht gefunden werden; die Buergerversion erst nach der Freigabe. -->
     <meta name="robots" content="noindex" />
     <title>Haushalt Moosburg - Wohin fließt das Geld?</title>
     <meta
@@ -26,25 +26,9 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <script>
-      // SPA redirect handshake with 404.html — restores the path the user asked for.
-      (function () {
-        var q = window.location.search;
-        if (q && q.indexOf("p=") !== -1) {
-          var params = new URLSearchParams(q);
-          var p = params.get("p") || "";
-          var qq = params.get("q") || "";
-          window.history.replaceState(
-            null,
-            "",
-            window.location.pathname.replace(/\/$/, "") +
-              p.replace(/~and~/g, "&") +
-              (qq ? "?" + qq.replace(/~and~/g, "&") : "") +
-              window.location.hash
-          );
-        }
-      })();
-    </script>
+    <!-- Gegenstueck zu 404.html auf GitHub Pages. Als eigene Datei, nicht inline:
+         moosburg.eu erlaubt Skripte nur aus Dateien (CSP script-src 'self'). -->
+    <script src="%BASE_URL%weiterleitung.js"></script>
   </head>
   <body>
     <div id="root"></div>

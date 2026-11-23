@@ -8,9 +8,13 @@
       // root index.html picks it up. https://github.com/rafgraph/spa-github-pages
       (function () {
         var l = window.location;
-        // /haushaltvis/ → one segment to preserve; the preview under
-        // /haushaltvis/v2/ is its own app and needs both segments.
-        var segmentCount = /^\/haushaltvis\/v2(\/|$)/.test(l.pathname) ? 2 : 1;
+        // Die Vorschau unter /haushaltvis/v2/ ist seit dem Merge die Wurzel.
+        // Alte Links landen an derselben Stelle dort.
+        if (/^\/haushaltvis\/v2(\/|$)/.test(l.pathname)) {
+          l.replace(l.pathname.replace(/^\/haushaltvis\/v2/, "/haushaltvis") + l.search + l.hash);
+          return;
+        }
+        var segmentCount = 1;
         l.replace(
           l.protocol +
             "//" +
