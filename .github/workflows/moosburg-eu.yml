@@ -67,6 +67,25 @@ jobs:
           RewriteRule . /haushalt/index.html [L]
           HTACCESS
 
+      # Das eigene Konto beginnt im Ordner haushalt, deshalb unten ./. Landet
+      # das Login doch in der Domain-Wurzel, etwa weil die Secrets die des
+      # gemeinsamen Kontos sind, hieße ./ die ganze Domain: dann hier abbrechen,
+      # bevor etwas übertragen wird. So am 23.11.2026 beinahe geschehen.
+      - name: Ziel prüfen
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          set -o pipefail
+          liste=$(curl -sS --ssl-reqd --user "$FTP_USER:$FTP_PASSWORD" --list-only "ftp://$FTP_HOST/" | tr -d '\r')
+          # Ordner, die es nur in der Wurzel gibt; data/ hat die App selbst.
+          if echo "$liste" | grep -qx -e stadtrat -e abstimmung -e api; then
+            echo "Das Login liegt in der Domain-Wurzel, nicht im Ordner haushalt. Abbruch."
+            exit 1
+          fi
+          echo "Login-Verzeichnis, erste Einträge:"; echo "$liste" | head -10
+
       - name: Nach haushalt/ spiegeln
         # v4.4.0, auf den Commit gepinnt: Ein verschobener Tag soll nicht
         # unbemerkt anderen Code an das FTP-Passwort bringen.
@@ -80,13 +99,11 @@ jobs:
           # Zertifikat lautet auf *.hstgr.io, ftp.moosburg.eu passt nicht dazu.
           security: strict
           local-dir: ./dist-buerger/
-          # Das gemeinsame Konto der anderen Repos, dessen Login in der
-          # Domain-Wurzel beginnt. Nie ./ eintragen: Am 23.11.2026 stand hier
-          # ./ für ein eigenes Konto, die Secrets waren aber die des
-          # gemeinsamen, und der Lauf begann, in der Wurzel Ordner anzulegen;
-          # als Nächstes hätte er Portal, api/ und .htaccess gelöscht.
-          # haushalt/ ist mit jedem Konto ungefährlich.
-          server-dir: haushalt/
+          # Eigenes FTP-Konto, in hPanel auf das Verzeichnis haushalt
+          # beschränkt, wie es das Audit vom November 2026 empfiehlt: Das Login
+          # beginnt schon dort. Der Schritt „Ziel prüfen“ stellt sicher, dass
+          # ./ nicht die Domain-Wurzel ist.
+          server-dir: ./
           # Kurz nach einer anderen Übertragung nimmt Hostinger die Verbindung
           # verzögert an; die 30 s Standard-Timeout reichen dann nicht.
           timeout: 120000
