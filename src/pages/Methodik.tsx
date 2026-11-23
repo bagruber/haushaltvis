@@ -2,6 +2,7 @@ import { Term } from "@/components/Term";
 import { usePageTitle } from "@/lib/title";
 import { latestYear, useData } from "@/lib/data";
 import { fmtDatum } from "@/lib/format";
+import { buerger } from "@/lib/variante";
 
 export function Methodik() {
   usePageTitle("Methodik & Datengrundlage");
@@ -90,7 +91,7 @@ export function Methodik() {
           </li>
           <li>
             <b>Neu und nicht mehr vorhanden:</b> Eine Haushaltsstelle gibt es in einem Jahr, wenn
-            sie dort eine Zeile hat, im Plan, im Entwurf oder in einem Zwischenstand. Fehlt die
+            sie dort {buerger ? "eine Zeile im Plan hat" : "eine Zeile hat, im Plan, im Entwurf oder in einem Zwischenstand"}. Fehlt die
             Zeile, gibt es sie nicht. Eine Stelle mit 0 € ist eine ganz normale Stelle. In den
             Listen steht dann im leeren Feld „neu“ oder „entfällt“.
           </li>
@@ -100,14 +101,16 @@ export function Methodik() {
             nicht, dort zählt das Mittel der Monate bisher
             {entwurf && `, und der Entwurf ${entwurf.jahr} rechnet mit dem jüngsten Monat, also mit den Preisen von heute`}.
           </li>
-          <li>
-            <b>Pfeile in der Gesamtliste:</b> Sie vergleichen den Ansatz mit dem des Vorjahres,
-            einmal in Euro, einmal nach Abzug der Teuerung und je Einwohner. Unter 2 % in beide
-            Richtungen gilt als gleich geblieben. Die Teuerung ist der Verbraucherpreisindex zum
-            Jahresbeginn, also der Dezember des Vorjahres; solange der fehlt, der jüngste Monat.
-            Die Einwohnerzahl ist der Stand zum 31.12. des Vorjahres
-            {entwurf && `, für ${entwurf.jahr} vorerst noch die von ${entwurf.jahr - 1}`}.
-          </li>
+          {!buerger && (
+            <li>
+              <b>Pfeile in der Gesamtliste:</b> Sie vergleichen den Ansatz mit dem des Vorjahres,
+              einmal in Euro, einmal nach Abzug der Teuerung und je Einwohner. Unter 2 % in beide
+              Richtungen gilt als gleich geblieben. Die Teuerung ist der Verbraucherpreisindex zum
+              Jahresbeginn, also der Dezember des Vorjahres; solange der fehlt, der jüngste Monat.
+              Die Einwohnerzahl ist der Stand zum 31.12. des Vorjahres
+              {entwurf && `, für ${entwurf.jahr} vorerst noch die von ${entwurf.jahr - 1}`}.
+            </li>
+          )}
         </ul>
       </section>
 

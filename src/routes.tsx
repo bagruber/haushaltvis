@@ -25,6 +25,7 @@ import { Info } from "./pages/Info";
 import { Methodik } from "./pages/Methodik";
 import { Glossar } from "./pages/Glossar";
 import { Impressum, Datenschutz, Barrierefreiheit } from "./pages/Rechtliches";
+import { buerger } from "./lib/variante";
 
 /**
  * /erkunden/einnahmen/verlauf ist ein Abschnitt der Einnahmen-Seite, jede
@@ -53,12 +54,15 @@ const routes = [
             { path: "einnahmen/:teil?", element: <EinnahmenTeil /> },
             { path: "investitionen/:teil?", element: <Investitionen /> },
             { path: "querschnitte/:teil?", element: <Querschnitte /> },
-            // Die Stellenzahl der Kennung sagt die Ebene: 2, 21, 5701.
-            { path: "gesamtliste/:teil?", element: <Gesamtliste /> },
+            // Die Stellenzahl der Kennung sagt die Ebene: 2, 21, 5701. Die
+            // Bürgerversion hat keine Gesamtliste, ihre Adressen landen hier.
+            buerger
+              ? { path: "gesamtliste/*", element: <Navigate to="/erkunden" replace /> }
+              : { path: "gesamtliste/:teil?", element: <Gesamtliste /> },
           ],
         },
         { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
-        { path: "/gesamtliste", element: <Navigate to="/erkunden/gesamtliste" replace /> },
+        { path: "/gesamtliste", element: <Navigate to={buerger ? "/erkunden" : "/erkunden/gesamtliste"} replace /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
         // Der Bereich (2-stellige Gliederung) neben /einrichtung und /posten:
         // jede Haushaltsebene hat damit ihre kurze Adresse.
@@ -77,9 +81,15 @@ const routes = [
         { path: "/impressum", element: <Impressum /> },
         { path: "/datenschutz", element: <Datenschutz /> },
         { path: "/barrierefreiheit", element: <Barrierefreiheit /> },
-        { path: "/intern/zuordnung", element: <Suspense fallback={<Loading />}><Zuordnung /></Suspense> },
-        { path: "/intern/themen", element: <Suspense fallback={<Loading />}><ThemenVorschau /></Suspense> },
-        { path: "/intern/themen/:id", element: <Suspense fallback={<Loading />}><ThemeDetail /></Suspense> },
+        // Werkzeuge und die nicht freigegebene Themenzuordnung: nicht in der
+        // Bürgerversion, dort fängt die letzte Regel die Adressen auf.
+        ...(buerger
+          ? []
+          : [
+              { path: "/intern/zuordnung", element: <Suspense fallback={<Loading />}><Zuordnung /></Suspense> },
+              { path: "/intern/themen", element: <Suspense fallback={<Loading />}><ThemenVorschau /></Suspense> },
+              { path: "/intern/themen/:id", element: <Suspense fallback={<Loading />}><ThemeDetail /></Suspense> },
+            ]),
         { path: "*", element: <Navigate to="/" replace /> },
       ],
     },

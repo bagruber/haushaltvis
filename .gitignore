@@ -1,5 +1,6 @@
 node_modules
 dist
+dist-buerger
 *.tsbuildinfo
 .DS_Store
 __pycache__

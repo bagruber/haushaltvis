@@ -25,6 +25,8 @@ if (!ordner) {
   process.exit(1)
 }
 const SITE = (process.env.SITE_URL || 'https://bagruber.github.io').replace(/\/$/, '')
+// Die Bürgerversion hat keine Gesamtliste (src/lib/variante.ts).
+const buerger = process.env.VITE_VARIANTE === 'buerger'
 
 // Icon-Namen, nicht Komponenten: die Zuordnung Einzelplan -> Icon lebt in
 // src/lib/kategorien.ts, hier stehen nur ihre Namen, weil Node die .ts-Datei
@@ -345,13 +347,14 @@ const SEITEN = [
   ['/barrierefreiheit', 'Seite', 'PersonArmsSpread', 'Barrierefreiheit', 'Wie zugänglich diese Seite ist und wo sie noch nicht reicht.'],
 ]
 for (const [pfad, art, iconName, titel, satz] of SEITEN) {
+  if (buerger && pfad.startsWith('/erkunden/gesamtliste')) continue
   const bild = pfad === '/' ? '/ueberblick' : pfad
   nimm(pfad, titel, satz, bild, karteSeite({ art, iconName, titel, satz, adresse: adresse(pfad) }))
 }
 
 // Die Gesamtliste zeigt denselben Haushalt in Nummernfolge. Jede Ebene ist
 // dort eine Sprungmarke und damit eine Adresse — das Bild hat sie schon.
-for (const [ebene, nummer, name] of [
+for (const [ebene, nummer, name] of buerger ? [] : [
   ...[...epNamen].sort().map(([ep, name]) => ['/einzelplan/', ep, name]),
   ...[...bereiche].sort().map(([ab, p]) => ['/bereich/', ab, labels.abschnitt?.[ab] ?? ab]),
   ...[...einrichtungen].sort().map(([glz, p]) => ['/einrichtung/', glz, saeubere(p.glz_text)]),

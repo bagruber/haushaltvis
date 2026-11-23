@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Budget, Data, EntwurfDatei, Erlaeuterungen, Fact, Labels, Posten, Themes, ThemeTag, BudgetEvent, Context } from "./types";
+import { buerger } from "../variante";
 
 // ── Loader (cached) ─────────────────────────────────────────────────────────
 const base = import.meta.env.BASE_URL;
@@ -79,6 +80,11 @@ export function mitEntwurf(budget: Budget, e: EntwurfDatei | null): Budget {
   };
 }
 
+const nurSuchwoerter = (e: Erlaeuterungen): Erlaeuterungen => ({
+  ...e,
+  stellen: Object.fromEntries(Object.entries(e.stellen).flatMap(([h, s]) => (s.such ? [[h, { such: s.such }]] : []))),
+});
+
 export function loadData(): Promise<Data> {
   if (!cache) {
     cache = Promise.all([
@@ -91,8 +97,9 @@ export function loadData(): Promise<Data> {
       optional<Record<string, import("./types").GlossarEntry>>("data/glossar.json", {}),
       optional<Record<string, import("./types").Aggregator>>("data/aggregatoren.json", {}),
       optional<Zuordnung>("data/zuordnung.json", {}),
-      optional<{ staende: import("./types").Zwischenstand[] }>("data/zwischenstand.json", { staende: [] }),
-      optional<EntwurfDatei | null>("data/entwurf.json", null),
+      // Die Bürgerversion liefert beides nicht aus und fragt auch nicht danach.
+      buerger ? { staende: [] } : optional<{ staende: import("./types").Zwischenstand[] }>("data/zwischenstand.json", { staende: [] }),
+      buerger ? null : optional<EntwurfDatei | null>("data/entwurf.json", null),
       optional<Erlaeuterungen | null>("data/erlaeuterungen.json", null),
     ]).then(([beschlossen, themes, ev, labels, context, einleitungen, glossar, aggregatoren, zuordnung, zwischenstand, entwurf, erlaeuterungen]) => {
       const budget = mitEntwurf(beschlossen, entwurf);
@@ -112,8 +119,14 @@ export function loadData(): Promise<Data> {
         aggregatoren,
         zwischenstand: zwischenstand.staende ?? [],
         finanzplan: budget.meta.entwurf ? entwurf?.finanzplan : undefined,
-        // Die Erläuterungen gehören zum Entwurf: ohne ihn, oder zu einem anderen Jahr, nicht.
-        erlaeuterungen: erlaeuterungen && erlaeuterungen.jahr === budget.meta.entwurf?.jahr ? erlaeuterungen : undefined,
+        // Der Wortlaut der Erläuterungen gehört zum Entwurf: ohne ihn, oder zu
+        // einem anderen Jahr, bleiben nur die Suchwörter. Die beschreiben die
+        // Stelle selbst und gelten über das Jahr hinaus.
+        erlaeuterungen: erlaeuterungen
+          ? erlaeuterungen.jahr === budget.meta.entwurf?.jahr
+            ? erlaeuterungen
+            : nurSuchwoerter(erlaeuterungen)
+          : undefined,
       });
     });
   }

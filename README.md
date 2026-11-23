@@ -110,8 +110,27 @@ scripts/         Vorschaukarten je Adresse (laeuft nach `vite build`)
 Die Roh-Exporte unter `haushaltsplaene/` sind bewusst nicht eingecheckt; die
 fertig aufbereiteten Daten liegen in `public/data/` bzw. `data/processed/`.
 
-Deployment automatisch via GitHub Actions (`.github/workflows/pages.yml`) bei
-Push auf `main`.
+## Zwei Versionen aus einem Stand
+
+| | Ratsversion | Bürgerversion |
+|---|---|---|
+| Für | Stadtrat und Verwaltung | Bürgerinnen und Bürger |
+| Adresse | bagruber.github.io/haushaltvis | moosburg.eu/haushalt (bis zur Freigabe unverlinkt) |
+| Inhalt | alles, auch Entwurf, Finanzplan, Zwischenstände, Erläuterungen, Gesamtliste | nur Beschlossenes; von den Erläuterungen nur die Suchwörter |
+| Deploy | `pages.yml`, automatisch bei Push auf `main` | `moosburg-eu.yml`, vorerst nur von Hand |
+
+Die Bürgerversion baut mit `VITE_VARIANTE=buerger` (`src/lib/variante.ts`).
+`scripts/buerger.mjs` entfernt danach die Daten, die dort nicht hingehören, und
+bricht ab, wenn im fertigen Ordner noch etwas davon steht. Lokal:
+
+```bash
+VITE_VARIANTE=buerger pnpm exec vite build --base /haushalt/ --outDir dist-buerger
+node scripts/buerger.mjs dist-buerger
+SITE_URL=https://moosburg.eu VITE_VARIANTE=buerger node scripts/karten.mjs dist-buerger
+node scripts/buerger.mjs dist-buerger --pruefen
+```
+
+Adressen, Deploy und was dabei bricht: [PLATTFORM.md](PLATTFORM.md).
 
 `pnpm build` baut die App und legt danach mit `node scripts/karten.mjs dist`
 fuer jede teilbare Adresse eine eigene HTML-Datei mit eigener Vorschaukarte ab

@@ -15,6 +15,7 @@ import {
   TreeStructure,
   Wallet,
 } from "@phosphor-icons/react";
+import { buerger } from "./variante";
 
 export interface Seite {
   route: string;
@@ -63,13 +64,17 @@ export const SEITEN: Seite[] = [
     stichworte: ["Personal", "Strom", "Gebäude", "Wasser", "Kostenblöcke"],
     ort: ERKUNDEN,
   },
-  {
-    route: "/erkunden/gesamtliste",
-    label: "Gesamtliste",
-    icon: ListNumbers,
-    stichworte: ["alle Haushaltsstellen", "Tabelle", "Excel", "Liste"],
-    ort: ERKUNDEN,
-  },
+  ...(buerger
+    ? []
+    : [
+        {
+          route: "/erkunden/gesamtliste",
+          label: "Gesamtliste",
+          icon: ListNumbers,
+          stichworte: ["alle Haushaltsstellen", "Tabelle", "Excel", "Liste"],
+          ort: ERKUNDEN,
+        },
+      ]),
   { route: "/wofuer-zahle-ich", label: "Wofür zahle ich?", icon: Wallet, stichworte: ["Rechner", "Steuerbeitrag", "je Einwohner"] },
   { route: "/themen", label: "Themen", icon: SquaresFour, stichworte: ["Bildung", "Mobilität", "Soziales", "Umwelt"] },
   { route: "/methodik", label: "Methodik und Daten", icon: Scroll, stichworte: ["Quellen", "AKDB", "Kameralistik"], ort: PROJEKT },

@@ -1,0 +1,83 @@
+name: Deploy auf moosburg.eu/haushalt/
+
+# Die Bürgerversion: nur Beschlossenes, ohne Entwurf, Zwischenstände, den
+# Wortlaut der Erläuterungen und die Gesamtliste (src/lib/variante.ts,
+# scripts/buerger.mjs). Gebaut aus demselben Stand wie die Ratsversion auf
+# GitHub Pages (pages.yml).
+#
+# Bis zur Freigabe nur von Hand: Actions → „Deploy auf moosburg.eu/haushalt/“
+# → Run workflow. Die Seite ist auf moosburg.eu nirgends verlinkt und trägt
+# noindex (index.html).
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-haushalt
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - id: deps
+        run: |
+          pnpm install --frozen-lockfile
+          echo "playwright=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Chromium aus dem Cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: chromium-${{ runner.os }}-${{ steps.deps.outputs.playwright }}
+      - name: Chromium bereitstellen
+        run: pnpm exec playwright-core install --with-deps chromium
+
+      # Schneiden vor den Karten, damit auch die Karten nur das Beschlossene
+      # kennen; danach noch einmal prüfen, über alles, was hochgeht.
+      - name: Bürgerversion bauen und prüfen
+        env:
+          VITE_VARIANTE: buerger
+          SITE_URL: https://moosburg.eu
+        run: |
+          pnpm exec tsc -b
+          pnpm exec vite build --base /haushalt/ --outDir dist-buerger --emptyOutDir
+          node scripts/buerger.mjs dist-buerger
+          node scripts/karten.mjs dist-buerger
+          node scripts/buerger.mjs dist-buerger --pruefen
+
+      # Die App nutzt echte Pfade. Adressen mit eigener Vorschaukarte sind
+      # Ordner mit index.html, die liefert der Server selbst; alle übrigen
+      # ohne Dateiendung gehen an die App. Mit Endung nicht: eine fehlende
+      # .json soll 404 sein, nicht die App-Schale mit 200.
+      - name: SPA-Fallback für Apache
+        run: |
+          cat > dist-buerger/.htaccess <<'HTACCESS'
+          RewriteEngine On
+          RewriteBase /haushalt/
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{2,5}$
+          RewriteRule . /haushalt/index.html [L]
+          HTACCESS
+
+      - name: Nach haushalt/ spiegeln
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist-buerger/
+          server-dir: haushalt/
+
+          # Alle Projekte teilen sich ein FTP-Konto. Kurz nach einer anderen
+          # Übertragung nimmt Hostinger die Verbindung verzögert an, und die
+          # 30 s Standard-Timeout der Action reichen dann nicht.
+          timeout: 120000
