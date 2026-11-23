@@ -67,7 +67,10 @@ JSONs gebaut. Alles skriptbasiert und reproduzierbar:
 
 ```bash
 python etl/ingest.py     # Excel → kanonische Faktentabelle (data/processed/budget.json)
+python etl/entwurf.py    # Arbeitsplan → Entwurf des kommenden Jahres (entwurf.json)
+python etl/erlaeuterungen.py  # gesichtete Erläuterungen der Kämmerei (erlaeuterungen.json)
 python etl/classify.py   # Themen-Zuordnung laut etl/taxonomy.yaml
+python etl/zwischenstand.py   # Stichtags-Auswertungen (zwischenstand.json)
 python etl/build_web.py  # minifizierte JSONs nach public/data/
 # Hilfen:
 python etl/trace.py            # Posten → Frontend-Routen (data/processed/trace.csv)
@@ -93,10 +96,15 @@ Standard-Zuordnung). Schema und Ablauf: **[DATENFORMAT.md](DATENFORMAT.md)**.
 ```
 etl/             Python-Daten-Pipeline + editierbare YAMLs
 haushaltsplaene/ AKDB-Quell-Exporte (Excel/PDF) — lokal, NICHT im Repo
+  akdb/          Langexporte, liest etl/ingest.py (jüngstes Endjahr gewinnt)
+  zwischenstand/ Stichtags-Auswertungen, liest etl/zwischenstand.py (alle)
+  arbeitsplan/   Arbeitsplan der Kämmerei, liest etl/entwurf.py (jüngster Stand)
+  archiv/        frühere Entwürfe und Einzelauswertungen
 public/data/     fertige JSONs für die Web-App
 src/lib/         Daten-Laden, Typen, Selektoren, Farben
 src/components/  Charts, Layout, Suche, Timeline, Glossar
 src/pages/       die Seiten/Routen
+scripts/         Vorschaukarten je Adresse (laeuft nach `vite build`)
 ```
 
 Die Roh-Exporte unter `haushaltsplaene/` sind bewusst nicht eingecheckt; die
@@ -104,6 +112,18 @@ fertig aufbereiteten Daten liegen in `public/data/` bzw. `data/processed/`.
 
 Deployment automatisch via GitHub Actions (`.github/workflows/pages.yml`) bei
 Push auf `main`.
+
+`pnpm build` baut die App und legt danach mit `node scripts/karten.mjs dist`
+fuer jede teilbare Adresse eine eigene HTML-Datei mit eigener Vorschaukarte ab
+(Messenger lesen nur die Metazeilen der Datei, die unter der Adresse liegt).
+Gerendert wird in einem lokalen Chromium; einmalig:
+
+```bash
+pnpm exec playwright-core install chromium
+```
+
+Wird spaeter nur `data/` getauscht, erzeugt `pnpm karten` die Karten auf dem
+fertigen Ordner neu, ohne die App neu zu bauen.
 
 ## Hosting-Portabilität & Doppik
 

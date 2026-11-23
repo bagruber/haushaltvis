@@ -2,3 +2,4 @@
 export * from "./data/types";
 export * from "./data/core";
 export * from "./data/selectors";
+export * from "./data/gesamtliste";

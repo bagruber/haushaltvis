@@ -127,7 +127,7 @@ export default function Zuordnung() {
       <div draggable onDragStart={(e) => startDrag(e, id)} onDragEnd={() => setOverTheme(null)}
         onClick={() => setSelected((s) => (s === id ? null : id))}
         className={"flex items-center gap-2 rounded px-1.5 py-0.5 cursor-grab active:cursor-grabbing " + (selected === id ? "bg-gold-200/60 ring-1 ring-gold-500" : "hover:bg-cream-dark")}
-        style={{ paddingLeft: depth * 14 + 6 }} title="Ziehen auf ein Thema — oder anklicken und dann Thema wählen">
+        style={{ paddingLeft: depth * 14 + 6 }} title="Ziehen auf ein Thema oder anklicken und dann Thema wählen">
         <span className="shrink-0 tabular-nums text-xs text-ink-muted w-14">{code}</span>
         <span className="flex-1 min-w-0 truncate text-sm" title={label}>{label}</span>
         <span className="flex gap-0.5 shrink-0">{own.map((t) => dot(t))}{inh.map((t) => dot(t, true))}</span>
@@ -143,7 +143,7 @@ export default function Zuordnung() {
         <p className="text-sm text-ink-soft max-w-3xl">
           <b>Verwaltungs- und Vermögenshaushalt werden getrennt eingeteilt</b> (Umschalter oben). Nach kameraler Nummer geordnet.
           Ein zugeordneter Unterabschnitt gilt implizit für seine Posten <i>im gewählten Haushalt</i> (○ = geerbt).
-          Mehrfachzuordnung möglich. Änderungen bleiben nur in <b>diesem Browser</b> — mit <b>Export</b> sichern.
+          Mehrfachzuordnung möglich. Änderungen bleiben nur in <b>diesem Browser</b>, mit <b>Export</b> sichern.
         </p>
         <p className="text-xs text-ink-muted max-w-3xl">
           Übernahme ohne Neubau: <b>Export JSON</b> → Datei als <code>zuordnung.json</code> in den

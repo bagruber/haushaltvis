@@ -52,6 +52,10 @@ def main():
 
     budget = json.loads(BUDGET.read_text(encoding="utf-8"))
     posten = budget["posten"]
+    # Stellen, die erst der Entwurf kennt, bekommen ihr Thema nach derselben Regel.
+    entwurf = BUDGET.parent / "entwurf.json"
+    if entwurf.exists():
+        posten = {**json.loads(entwurf.read_text(encoding="utf-8"))["posten"], **posten}
 
     # latest available volume per posten (for coverage reporting), prefer 2024->2023
     vol = {}

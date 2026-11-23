@@ -21,9 +21,8 @@ personal:
   art: struktur
   kriterium: "Gruppierung 4… (Personalausgaben)"
   beschreibung: >-
-    Bezüge und Gehälter der Beamten und tariflich Beschäftigten, Sozial-
-    versicherungsbeiträge, Versorgungskassen und Beihilfen — der gesamte
-    Personalaufwand des Verwaltungshaushalts.
+    Bezüge und Gehälter, Sozialversicherung, Versorgungskassen und Beihilfen:
+    der gesamte Personalaufwand des Verwaltungshaushalts.
   ea: A
   grz_hauptgruppe: "4"
 
@@ -32,9 +31,8 @@ zuschuesse:
   art: struktur
   kriterium: "Gruppierung 70/71 (Zuweisungen und Zuschüsse für laufende Zwecke)"
   beschreibung: >-
-    Geld, das die Stadt weitergibt, statt es selbst auszugeben: Betriebskosten
-    der Kindertagesstätten nach BayKiBiG, Zuschüsse an Vereine, Verbände und
-    freie Träger. Rund ein Zehntel des laufenden Haushalts.
+    Geld, das die Stadt weitergibt: Betriebskosten der Kindertagesstätten nach
+    BayKiBiG, Zuschüsse an Vereine, Verbände und freie Träger.
   ea: A
   haushalt: verwaltung
   grz_prefix: ["70", "71"]
@@ -44,9 +42,8 @@ gebaeude:
   art: struktur
   kriterium: "Gruppierung 50/51 (Unterhaltung von Grundstücken und Anlagen)"
   beschreibung: >-
-    Was der Erhalt des Bestands kostet — Unterhalt eigener Gebäude,
-    Wartungsverträge, Spiel- und Sportanlagen. Das laufende Gegenstück zu den
-    Baumaßnahmen im Vermögenshaushalt.
+    Unterhalt eigener Gebäude, Wartungsverträge, Spiel- und Sportanlagen. Das
+    laufende Gegenstück zu den Baumaßnahmen im Vermögenshaushalt.
   ea: A
   haushalt: verwaltung
   grz_prefix: ["50", "51"]
@@ -56,9 +53,8 @@ it:
   art: stichwort
   kriterium: "Verwaltungshaushalt, Kostenart mit IT-Bezug"
   beschreibung: >-
-    Der laufende IT-Aufwand: EDV-Kosten an Dritte, Software, Lizenzen,
-    Sachbedarf für EDV-Anlagen. Seit 2016 mehr als verdreifacht. Beschaffungen
-    von Hardware zählen als Investition und stehen im Vermögenshaushalt.
+    EDV-Kosten an Dritte, Software, Lizenzen und Sachbedarf. Hardware zählt als
+    Investition und steht im Vermögenshaushalt.
   ea: A
   haushalt: verwaltung
   stichworte: [edv, datenverarb, software, informationstechn, lizenz, digital]
@@ -68,8 +64,7 @@ strom:
   art: stichwort
   kriterium: "Verwaltungshaushalt, Kostenart mit Energiebezug"
   beschreibung: >-
-    Laufende Energiekosten des Verwaltungshaushalts — Stromverbrauch,
-    Heizung/Nahwärme, Brennstoffe und Straßenbeleuchtung.
+    Stromverbrauch, Heizung und Nahwärme, Brennstoffe und Straßenbeleuchtung.
   ea: A
   haushalt: verwaltung
   stichworte: [strom, energie, heizung, heizkosten, beleuchtung, brennstoff, nahwärme, fernwärme, gas]
@@ -79,7 +74,6 @@ wasser:
   art: stichwort
   kriterium: "Verwaltungshaushalt, Kostenart mit Wasserbezug"
   beschreibung: >-
-    Laufende Kosten der Wasserver- und -entsorgung im Verwaltungshaushalt —
     Frischwasserbezug, Abwasser- und Kanalgebühren sowie Entwässerung.
   ea: A
   haushalt: verwaltung

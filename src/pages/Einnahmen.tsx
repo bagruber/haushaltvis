@@ -1,36 +1,46 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { TimelineControls } from "@/components/Timeline";
 import { useData, incomeByCategory, incomeCategorySeries, adjustSeries, totals, latestYear } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { shades, GOLD_BASE } from "@/lib/colors";
 import { ChartTable } from "@/components/ChartTable";
-import { Loading } from "@/components/ui";
+import { AbschnittLink, Loading } from "@/components/ui";
+import { kennung, useAnsicht, useTeilScroll } from "@/lib/teilen";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
+import { extremImFenster, useBreit } from "@/lib/notiz";
 import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
+import { jahresAchse } from "@/lib/charts";
 
-const STEUERN: [string, string][] = [
+export const STEUERN: [string, string][] = [
   ["Einkommensteuer-Anteil", "#c8102e"],
   ["Gewerbesteuer", "#b8964e"],
   ["Schlüsselzuweisungen & Finanzausgleich", "#6b3e7a"],
   ["Grundsteuer", "#009ac7"],
   ["Umsatzsteuer-Anteil", "#0a9e4c"],
 ];
+const GEWERBE = STEUERN.findIndex(([n]) => n === "Gewerbesteuer");
 
 export function Einnahmen() {
   usePageTitle("Einnahmen");
   const { data, error } = useData();
 
+  const { teil } = useParams();
+  const navigate = useNavigate();
   const { year: selYear } = useYearCtx();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
+  const { zeigen } = useNummern();
+  const breit = useBreit();
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
     const groups = incomeByCategory(data, y);
 
     const years = data.budget.meta.years;
+    const entwurf = data.budget.meta.entwurf?.jahr;
+    const eIndex = entwurf == null ? -1 : years.indexOf(entwurf);
     const fmtY = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
     // Solid where an Ist exists, dashed for the trailing years that only carry
     // a Plan. Same colour, so the line reads as one series that turns uncertain
@@ -42,18 +52,39 @@ export function Einnahmen() {
       const ist = years.map((_, i) => s.ergebnis[i] ?? null);
       let lastIst = -1;
       for (let i = 0; i < years.length; i++) if (ist[i] != null) lastIst = i;
-      const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst ? values[i] : null));
-      return { name, values, ist, plan, lastIst };
+      const plan = years.map((_, i) => (lastIst >= 0 && i >= lastIst && i !== eIndex ? values[i] : null));
+      const entwurfTeil = years.map((_, i) => (eIndex >= 0 && (i === eIndex || i === eIndex - 1) ? values[i] : null));
+      return { name, values, ist, plan, entwurfTeil, lastIst };
     });
-    const fmtCell = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
+    // Note on the Gewerbesteuer dip: its lowest Ist in the first two pandemic years.
+    const pandemie = breit ? extremImFenster(years, steuerSeries[GEWERBE].ist, [2020, 2021], "min") : null;
+    const fmtCell = (v: number | null) => (v == null ? "-" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
     const steuerRows = years.map((yy, i) => [
-      `${yy}${steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
+      `${yy}${i === eIndex ? " (Entwurf)" : steuerSeries.some((s) => s.ist[i] != null) ? "" : " (Plan)"}`,
       ...steuerSeries.map((s) => fmtCell(s.values[i])),
     ]);
     const steuerOpt: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)) },
-      grid: { left: 66, right: 16, top: 12, bottom: 56 },
-      xAxis: { type: "category", data: years.map(String) },
+      // One line per tax: the Ist where there is one, otherwise the Plan, marked as such.
+      // Built by hand because the dashed tail is a second series per tax.
+      tooltip: {
+        trigger: "axis",
+        formatter: (params) => {
+          const rows = params as { dataIndex: number }[];
+          if (!rows.length) return "";
+          const i = rows[0].dataIndex;
+          const body = STEUERN.map(([name, color], si) => {
+            const s = steuerSeries[si];
+            const v = s.values[i];
+            const wert = v == null ? "-" : `${fmtCell(v)}${mode.perCapita ? "/Kopf" : ""}`;
+            return `<div style="display:flex;gap:12px;justify-content:space-between">
+              <span><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background:${color};margin-right:6px"></span>${name}${s.ist[i] == null && v != null ? (i === eIndex ? " (Entwurf)" : " (Plan)") : ""}</span>
+              <b>${wert}</b></div>`;
+          }).join("");
+          return `<b>${years[i]}</b>${body}`;
+        },
+      },
+      grid: { left: 8, right: 16, top: pandemie != null ? 56 : 12, bottom: 56, containLabel: true },
+      xAxis: jahresAchse(years, entwurf, breit),
       yAxis: { type: "value", axisLabel: { formatter: fmtY } },
       legend: { bottom: 0, type: "scroll", data: STEUERN.map(([n]) => n) },
       series: [
@@ -65,9 +96,15 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color },
           itemStyle: { color },
           connectNulls: true,
+          // Klickbar ist die ganze Linie, nicht nur ihre Punkte: sie führt zur
+          // Seite der Einnahmeart.
+          triggerLineEvent: true,
+          // Wie in den Querschnitten: beim Hover verblassen die anderen, und
+          // die handschriftliche Notiz verblasst mit ihrer Linie.
+          emphasis: { focus: "series" as const },
         })),
-        // Plan tail: same colour, dashed, kept out of the legend and the
-        // tooltip so it reads as a continuation rather than a second series.
+        // Plan tail: same colour, dashed, kept out of the legend so it reads as a
+        // continuation rather than a second series. The tooltip above covers it.
         ...STEUERN.map(([name, color], si) => ({
           name: `${name} (Plan)`,
           type: "line" as const,
@@ -77,14 +114,41 @@ export function Einnahmen() {
           lineStyle: { width: 2.5, color, type: "dashed" as const },
           itemStyle: { color },
           connectNulls: true,
-          tooltip: { show: false },
+          triggerLineEvent: true,
+          emphasis: { focus: "series" as const },
         })),
+        // Der Entwurf: gepunktet und mit eckigem Hohlpunkt, wie in der Timeline.
+        ...(eIndex >= 0
+          ? STEUERN.map(([name, color], si) => ({
+              name: `${name} (Entwurf)`,
+              type: "line" as const,
+              data: steuerSeries[si].entwurfTeil.map((v, i) => (i === eIndex - 1 && v != null ? { value: v, symbol: "none" } : v)),
+              symbol: "emptyRect",
+              symbolSize: 8,
+              lineStyle: { width: 2.5, color, type: "dotted" as const },
+              itemStyle: { color, borderWidth: 2 },
+              connectNulls: false,
+              triggerLineEvent: true,
+              emphasis: { focus: "series" as const },
+            }))
+          : []),
       ],
     };
 
     const hasContext = !!(data.context.cpi || data.context.population);
-    return { y, groups, colors: shades(GOLD_BASE, groups.length), total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext };
-  }, [data, selYear, mode]);
+    const notiz =
+      pandemie != null
+        ? {
+            text: "Corona-Pandemie",
+            x: String(years[pandemie]),
+            y: steuerSeries[GEWERBE].ist[pandemie]!,
+            serien: [STEUERN[GEWERBE][0], `${STEUERN[GEWERBE][0]} (Plan)`],
+          }
+        : undefined;
+    return { y, groups, total: totals(data.budget, y).einnahmen, steuerOpt, steuerRows, hasContext, notiz };
+  }, [data, selYear, mode, breit]);
+
+  useTeilScroll(teil, !!view);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
@@ -94,36 +158,63 @@ export function Einnahmen() {
       <header className="space-y-2">
         <h1 className="headline text-3xl">Woher das Geld kommt</h1>
         <p className="max-w-2xl text-ink-soft">
-          Die Einnahmen der Stadt nach Art geordnet — Steuern, Zuweisungen, Gebühren und mehr.
-          Interne Verrechnungen sind ausgeblendet.
+          Die Einnahmen der Stadt nach Art: Steuern, Zuweisungen, Gebühren und mehr. Interne
+          Verrechnungen sind ausgeblendet.
         </p>
         <span className="inline-block rounded-md bg-white border border-ink-line px-3 py-1.5 text-sm">
           Einnahmen {view.y}: <b>{fmtEurShort(view.total)}</b>
         </span>
       </header>
 
-      <section className="space-y-2">
+      <section id="verlauf" className="scroll-mt-28 space-y-2">
         <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-xl font-bold">Steuern & Zuweisungen im Zeitverlauf</h2>
+          <h2 className="flex items-baseline gap-2 font-display text-xl font-bold">
+            Steuern &amp; Zuweisungen im Zeitverlauf
+            <AbschnittLink pfad="/erkunden/einnahmen/verlauf" titel="Steuern &amp; Zuweisungen im Zeitverlauf" />
+          </h2>
           <span className="text-xs text-ink-muted">Ergebnis (Ist); {view.y} = Ansatz</span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
-        <EChart option={view.steuerOpt} ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen — Zahlen in der Tabelle darunter" style={{ height: 300 }} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} />
+        <EChart
+          option={view.steuerOpt}
+          notiz={view.notiz}
+          // Ein Klick auf eine Linie (Ist oder Plan-Ende) öffnet ihre Einnahmeart.
+          onEvents={{
+            click: (p) => {
+              const name = (p as { seriesName?: string }).seriesName?.replace(/ \(Plan\)$/, "");
+              if (name) navigate(`/erkunden/einnahmen/${kennung(name)}`);
+            },
+          }}
+          ariaLabel="Zeitverlauf der wichtigsten Steuern und Zuweisungen, Zahlen in der Tabelle darunter"
+          style={{ height: 300 }}
+        />
+        <p className="text-xs text-ink-muted">
+          Ein Klick auf eine Linie öffnet die Einnahmeart mit eigenem Verlauf und dem Stand zum 01. Oktober,
+          ebenso jede Überschrift in der Liste unten.
+        </p>
         <ChartTable columns={["Jahr", ...STEUERN.map(([n]) => n)]} rows={view.steuerRows} />
       </section>
 
       <div className="space-y-6">
-        {view.groups.map((g, i) => (
-          <section key={g.key} className="border-t-2 pt-3" style={{ borderColor: view.colors[i] }}>
+        {view.groups.map((g) => {
+          const dup = doppelte(g.posten.slice(0, 8).map((p) => p.label));
+          return (
+          <section key={g.key} id={kennung(g.key)} className="scroll-mt-28 border-t border-ink-line pt-3">
             <div className="flex items-baseline justify-between gap-3 mb-2">
-              <h2 className="font-display text-lg font-bold">{g.label}</h2>
+              <h2 className="flex min-w-0 items-baseline gap-2 font-display text-lg font-bold">
+                <Link to={`/erkunden/einnahmen/${kennung(g.key)}`} className="truncate hover:text-red-600">{g.label}</Link>
+                <AbschnittLink pfad={`/erkunden/einnahmen/${kennung(g.key)}`} titel={g.label} />
+              </h2>
               <span className="tabular-nums text-ink-soft">{fmtEur(g.value)}</span>
             </div>
             <ul className="space-y-1.5 text-sm">
               {g.posten.slice(0, 8).map((p) => (
                 <li key={p.key} className="border-b border-ink-line/50 pb-1.5 last:border-0">
                   <Link to={`/posten/${p.key}`} className="flex items-center justify-between gap-3 hover:text-red-600 transition-colors">
-                    <span className="truncate">{p.label}</span>
+                    <span className="flex min-w-0 items-baseline">
+                      <Nummer wert={p.key} sichtbar={zeigen || dup.has(p.label)} />
+                      <span className="truncate">{p.label}</span>
+                    </span>
                     <span className="tabular-nums shrink-0 font-medium">{fmtEur(p.value)}</span>
                   </Link>
                 </li>
@@ -133,7 +224,8 @@ export function Einnahmen() {
               )}
             </ul>
           </section>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
 import {
@@ -14,9 +14,14 @@ import {
 } from "@/lib/data";
 import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import { AbschnittLink, Kennzahl, Loading } from "@/components/ui";
+import { useTeilScroll } from "@/lib/teilen";
+import { Term } from "@/components/Term";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
 import { ChartTable } from "@/components/ChartTable";
 import { fmtEur, fmtEurShort } from "@/lib/format";
+import { jahresAchse, jahrText } from "@/lib/charts";
+import { useBreit } from "@/lib/notiz";
 
 const KINDS: FundingKind[] = ["foerderung", "beitraege", "verkauf"];
 const EIGEN_COLOR = "#c8102e";
@@ -51,10 +56,13 @@ function spanLabel(p: InvestProject): string {
 
 export function Investitionen() {
   usePageTitle("Investitionen");
+  const { teil } = useParams();
   const { data, error } = useData();
   const navigate = useNavigate();
+  const { zeigen } = useNummern();
   const { year: selYear } = useYearCtx();
 
+  const breit = useBreit();
   const view = useMemo(() => {
     if (!data) return null;
     const y = selYear ?? latestYear(data.budget);
@@ -69,7 +77,7 @@ export function Investitionen() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        valueFormatter: (v) => (v ? fmtEur(v as number) : "—"),
+        valueFormatter: (v) => (v ? fmtEur(v as number) : "-"),
       },
       legend: { bottom: 0, itemWidth: 12, itemHeight: 12 },
       grid: { left: 8, right: 24, top: 8, bottom: 56, containLabel: true },
@@ -114,10 +122,10 @@ export function Investitionen() {
 
     const stacked = investmentStacked(data, 12);
     const stackedOpt: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "—"), order: "valueDesc" },
+      tooltip: { trigger: "axis", valueFormatter: (v) => (v ? fmtEur(v as number) : "-"), order: "valueDesc" },
       legend: { type: "scroll", bottom: 0 },
-      grid: { left: 64, right: 16, top: 12, bottom: 56 },
-      xAxis: { type: "category", boundaryGap: false, data: stacked.years.map(String) },
+      grid: { left: 8, right: 16, top: 12, bottom: 56, containLabel: true },
+      xAxis: jahresAchse(stacked.years, data.budget.meta.entwurf?.jahr, breit, { boundaryGap: false }),
       yAxis: { type: "value", axisLabel: { formatter: (v: number) => fmtEurShort(v) } },
       series: stacked.series.map((s) => ({
         name: s.name,
@@ -136,8 +144,12 @@ export function Investitionen() {
     const vorhaben = projects.filter((p) => !p.daueransatz).slice(0, 20);
     const dauer = projects.filter((p) => p.daueransatz);
 
-    return { y, projects, imJahr, top, cov, jahrOpt, totalJahr, covJahr, stackedOpt, stackedYears: stacked.years, stackedTotals, vorhaben, dauer };
-  }, [data, selYear]);
+    return {
+      y, projects, imJahr, top, cov, jahrOpt, totalJahr, covJahr, stackedOpt, stackedYears: stacked.years, stackedTotals, vorhaben, dauer,
+      dupVorhaben: doppelte(vorhaben.map((p) => p.label)),
+      dupDauer: doppelte(dauer.map((p) => p.label)),
+    };
+  }, [data, selYear, breit]);
 
   const onEvents = useMemo(
     () => ({
@@ -150,6 +162,8 @@ export function Investitionen() {
     [view, navigate],
   );
 
+  useTeilScroll(teil, !!view);
+
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
 
@@ -160,10 +174,14 @@ export function Investitionen() {
     <div className="space-y-10">
       <header className="max-w-2xl space-y-3">
         <h1 className="headline text-3xl">Investitionen</h1>
+        {/* Round 1: the word "Investitionen" itself was unclear, so the page opens with what it means. */}
+        <p className="text-lg">
+          <Term name="investition">Investitionen</Term> sind Ausgaben für Dinge, die viele Jahre bleiben:
+          Schulhäuser, Straßen, Grundstücke, Fahrzeuge.
+        </p>
         <p className="text-ink-soft">
-          Der Vermögenshaushalt: Bauten, Grundstücke und Anschaffungen. Ein Vorhaben läuft meist
-          über mehrere Jahre — hier steht es als Ganzes, mit seiner Laufzeit und dem, was am Ende
-          die Stadt selbst trägt.
+          Sie stehen im <Term name="vermoegenshaushalt">Vermögenshaushalt</Term>. Jedes Vorhaben
+          erscheint hier als Ganzes, mit Laufzeit und Eigenanteil der Stadt.
         </p>
       </header>
 
@@ -174,29 +192,27 @@ export function Investitionen() {
           ["Eigenanteil der Stadt", fmtEurShort(covJahr.eigen), "aus Steuern und Krediten"],
           ["Davon Förderung", fmtEurShort(covJahr.parts.foerderung), "Zuweisungen und Zuschüsse"],
         ].map(([label, value, hint]) => (
-          <div key={label}>
-            <div className="eyebrow text-ink-muted">{label}</div>
-            <div className="mt-1.5 font-display text-2xl font-bold tabular-nums">{value}</div>
-            <div className="mt-0.5 text-xs text-ink-muted">{hint}</div>
-          </div>
+          <Kennzahl key={label} wert={value} label={`${label}, ${hint}`} className="text-2xl" />
         ))}
       </section>
 
-      <section className="space-y-3">
+      <section id="wer-bezahlt" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Wer {y} bezahlt</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Wer {y} bezahlt
+            <AbschnittLink pfad="/erkunden/investitionen/wer-bezahlt" titel={`Wer ${y} bezahlt`} />
+          </h2>
           <span className="text-xs text-ink-muted">Klick öffnet die Einrichtung</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
-          Jeder Balken ist ein Vorhaben im laufenden Jahr, aufgeteilt nach Herkunft des Geldes.
-          Getrennt ausgewiesen, weil es etwas anderes ist: <b>Förderung</b> kommt von Bund und
-          Land, <b>Anliegerbeiträge</b> von Grundstückseigentümern, <b>Verkaufserlöse</b> aus
-          veräußerten Grundstücken. Nur der rote Teil stammt aus Steuern und Krediten.
+          Jeder Balken ist ein Vorhaben, aufgeteilt nach Herkunft des Geldes: <b>Förderung</b> von
+          Bund und Land, <b>Anliegerbeiträge</b> von Grundstückseigentümern, <b>Verkaufserlöse</b>{" "}
+          aus Grundstücken. Nur der rote Teil kommt aus Steuern und Krediten.
         </p>
         <EChart
           option={view.jahrOpt}
           onEvents={onEvents}
-          ariaLabel={`Investitionsvorhaben ${y}, aufgeteilt nach Finanzierungsquelle — Zahlen in der Tabelle darunter`}
+          ariaLabel={`Investitionsvorhaben ${y}, aufgeteilt nach Finanzierungsquelle, Zahlen in der Tabelle darunter`}
           style={{ height: TOP_JAHR * 32 + 80 }}
         />
         <ChartTable
@@ -213,16 +229,17 @@ export function Investitionen() {
         />
       </section>
 
-      <section className="space-y-3">
+      <section id="vorhaben" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Vorhaben über ihre ganze Laufzeit</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Vorhaben über ihre ganze Laufzeit
+            <AbschnittLink pfad="/erkunden/investitionen/vorhaben" titel={"Vorhaben über ihre ganze Laufzeit"} />
+          </h2>
           <span className="text-xs text-ink-muted">Summe aller Jahre, größte zuerst</span>
         </div>
         <p className="max-w-2xl text-ink-soft">
-          Die Laufzeit ist aus den Daten abgeleitet: Ein Vorhaben existiert in den Jahren, in
-          denen es einen Ansatz trägt. Weil die Datenreihe {view.stackedYears[0]} beginnt und{" "}
-          {view.stackedYears[view.stackedYears.length - 1]} endet, sind Vorhaben an diesen Rändern
-          als offen gekennzeichnet — sie liefen schon vorher oder laufen weiter.
+          Die Laufzeit sind die Jahre mit Ansatz. Vorhaben am Anfang ({view.stackedYears[0]}) oder
+          Ende ({view.stackedYears[view.stackedYears.length - 1]}) der Datenreihe gelten als offen.
         </p>
         <ul>
           {view.vorhaben.map((p) => {
@@ -234,7 +251,10 @@ export function Investitionen() {
                   className="group block border-b border-ink-line py-3 hover:border-ink-soft transition-colors"
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span className="font-medium group-hover:text-red-600 transition-colors">{p.label}</span>
+                    <span className="flex items-baseline font-medium group-hover:text-red-600 transition-colors">
+                      <Nummer wert={p.glz} sichtbar={zeigen || view.dupVorhaben.has(p.label)} />
+                      {p.label}
+                    </span>
                     <span className="font-display font-bold tabular-nums">{fmtEur(p.total)}</span>
                   </div>
                   <div className="mt-1.5 flex h-1.5 w-full overflow-hidden rounded-sm bg-cream-dark">
@@ -251,7 +271,7 @@ export function Investitionen() {
                     {c.eigen > 0 && <span>Eigenanteil {fmtEur(Math.round(c.eigen))}</span>}
                     {c.ueberschuss > 0 && (
                       <span className="text-ink-soft">
-                        trägt sich selbst — Einnahmen übersteigen die Kosten um{" "}
+                        trägt sich selbst, Überschuss{" "}
                         {fmtEur(Math.round(c.ueberschuss))}
                       </span>
                     )}
@@ -264,15 +284,17 @@ export function Investitionen() {
       </section>
 
       {view.dauer.length > 0 && (
-        <section className="space-y-3">
+        <section id="laufende-ansaetze" className="scroll-mt-28 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-            <h2 className="font-display text-2xl font-bold">Laufende Ansätze</h2>
+            <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+              Laufende Ansätze
+              <AbschnittLink pfad="/erkunden/investitionen/laufende-ansaetze" titel={"Laufende Ansätze"} />
+            </h2>
             <span className="text-xs text-ink-muted">kein einzelnes Vorhaben</span>
           </div>
           <p className="max-w-2xl text-ink-soft">
-            Diese Positionen tragen in fast jedem Jahr einen Ansatz — Grunderwerb,
-            Straßenunterhalt, Fahrzeugbeschaffung. Sie sind Daueraufgaben, keine Projekte mit
-            Anfang und Ende.
+            Positionen mit Ansatz in fast jedem Jahr, etwa Grunderwerb, Straßenunterhalt oder
+            Fahrzeuge. Daueraufgaben, keine Projekte.
           </p>
           <ul>
             {view.dauer.map((p) => (
@@ -281,7 +303,10 @@ export function Investitionen() {
                   to={`/einrichtung/${p.glz}`}
                   className="group flex flex-wrap items-baseline justify-between gap-x-4 border-b border-ink-line py-2.5 hover:border-ink-soft transition-colors"
                 >
-                  <span className="group-hover:text-red-600 transition-colors">{p.label}</span>
+                  <span className="flex items-baseline group-hover:text-red-600 transition-colors">
+                    <Nummer wert={p.glz} sichtbar={zeigen || view.dupDauer.has(p.label)} />
+                    {p.label}
+                  </span>
                   <span className="tabular-nums text-ink-soft">
                     {fmtEur(p.total)} <span className="text-xs text-ink-muted">seit {p.first}</span>
                   </span>
@@ -292,20 +317,23 @@ export function Investitionen() {
         </section>
       )}
 
-      <section className="space-y-3">
+      <section id="verlauf" className="scroll-mt-28 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-2xl font-bold">Investitionen über die Jahre</h2>
+          <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+            Investitionen über die Jahre
+            <AbschnittLink pfad="/erkunden/investitionen/verlauf" titel={"Investitionen über die Jahre"} />
+          </h2>
           <span className="text-xs text-ink-muted">Ansätze, gestapelt nach Einzelplan</span>
         </div>
         <EChart
           option={view.stackedOpt}
-          ariaLabel="Investitionen über die Jahre, gestapelt nach Einzelplan — Jahressummen in der Tabelle darunter"
+          ariaLabel="Investitionen über die Jahre, gestapelt nach Einzelplan, Jahressummen in der Tabelle darunter"
           style={{ height: 380 }}
         />
         <ChartTable
           summary="Jahressummen als Tabelle"
           columns={["Jahr", "Summe Investitionen (Ansatz)"]}
-          rows={view.stackedYears.map((yy, i) => [String(yy), fmtEur(view.stackedTotals[i])])}
+          rows={view.stackedYears.map((yy, i) => [jahrText(yy, data!.budget.meta.entwurf?.jahr), fmtEur(view.stackedTotals[i])])}
         />
       </section>
     </div>

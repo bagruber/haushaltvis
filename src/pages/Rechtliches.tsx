@@ -82,7 +82,7 @@ export function Datenschutz() {
           Verantwortlich ist der im <Link to="/impressum" className="underline hover:text-ink">Impressum</Link>{" "}
           genannte Betreiber. Da keine personenbezogenen Daten erhoben oder gespeichert werden,
           laufen Auskunfts-, Berichtigungs- und Löschansprüche (Art. 15–17 DSGVO) in der Praxis
-          leer — bei Fragen genügt eine formlose Nachricht.
+          leer - bei Fragen genügt eine formlose Nachricht.
         </p>
       </section>
     </div>
@@ -96,7 +96,7 @@ export function Barrierefreiheit() {
       <h1 className="headline text-3xl">Erklärung zur Barrierefreiheit</h1>
       <p className="text-ink-soft">
         Diese Erklärung erfolgt freiwillig: Als privates Projekt unterliegt die Seite nicht der
-        BayBITV — sie orientiert sich aber bewusst an deren Anforderungen (WCAG 2.1 AA /
+        BayBITV - sie orientiert sich aber bewusst an deren Anforderungen (WCAG 2.1 AA /
         EN 301 549), damit einer späteren Übernahme durch die Stadt nichts im Weg steht.
       </p>
       <section className="space-y-2 text-ink-soft">
@@ -129,7 +129,7 @@ export function Barrierefreiheit() {
           >
             GitHub-Issue
           </a>
-          {" "}— sie werden zeitnah behoben.
+          {" "}- sie werden zeitnah behoben.
         </p>
       </section>
     </div>

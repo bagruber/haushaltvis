@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { createBrowserRouter, createHashRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, createHashRouter, Navigate, useParams } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Loading } from "./components/ui";
 
@@ -12,9 +12,11 @@ import { Home } from "./pages/Home";
 import { ErkundenLayout } from "./pages/ErkundenLayout";
 import { Erkunden } from "./pages/Erkunden";
 import { Einnahmen } from "./pages/Einnahmen";
+import { Einnahmeart } from "./pages/Einnahmeart";
 import { Investitionen } from "./pages/Investitionen";
 import { Querschnitte } from "./pages/Querschnitte";
 import { WofuerZahleIch } from "./pages/WofuerZahleIch";
+import { Gesamtliste } from "./pages/Gesamtliste";
 import { EinzelplanDetail } from "./pages/EinzelplanDetail";
 import { Themen } from "./pages/Themen";
 import { PostenDetail } from "./pages/PostenDetail";
@@ -24,23 +26,43 @@ import { Methodik } from "./pages/Methodik";
 import { Glossar } from "./pages/Glossar";
 import { Impressum, Datenschutz, Barrierefreiheit } from "./pages/Rechtliches";
 
+/**
+ * /erkunden/einnahmen/verlauf ist ein Abschnitt der Einnahmen-Seite, jede
+ * andere Kennung eine Einnahmeart mit eigener Seite. Die Adressen bleiben
+ * dieselben, unter denen die Vorschaukarten die Einnahmearten schon führen.
+ */
+function EinnahmenTeil() {
+  const { teil } = useParams();
+  return teil && teil !== "verlauf" ? <Einnahmeart teil={teil} /> : <Einnahmen />;
+}
+
 const routes = [
     {
       element: <Layout />,
       children: [
         { path: "/", element: <Home /> },
+        // Teilbare Abschnitte stehen im Pfad, nicht im Hash und nicht in der
+        // Query: nur so hat jeder Abschnitt eine eigene Adresse, unter der eine
+        // eigene HTML-Datei mit eigener Vorschaukarte liegen kann (scripts/karten.mjs).
+        { path: "/ueberblick/:teil", element: <Home /> },
         {
           path: "/erkunden",
           element: <ErkundenLayout />,
           children: [
             { index: true, element: <Erkunden /> },
-            { path: "einnahmen", element: <Einnahmen /> },
-            { path: "investitionen", element: <Investitionen /> },
-            { path: "querschnitte", element: <Querschnitte /> },
+            { path: "einnahmen/:teil?", element: <EinnahmenTeil /> },
+            { path: "investitionen/:teil?", element: <Investitionen /> },
+            { path: "querschnitte/:teil?", element: <Querschnitte /> },
+            // Die Stellenzahl der Kennung sagt die Ebene: 2, 21, 5701.
+            { path: "gesamtliste/:teil?", element: <Gesamtliste /> },
           ],
         },
         { path: "/wofuer-zahle-ich", element: <WofuerZahleIch /> },
+        { path: "/gesamtliste", element: <Navigate to="/erkunden/gesamtliste" replace /> },
         { path: "/einzelplan/:ep", element: <EinzelplanDetail /> },
+        // Der Bereich (2-stellige Gliederung) neben /einrichtung und /posten:
+        // jede Haushaltsebene hat damit ihre kurze Adresse.
+        { path: "/bereich/:ab", element: <EinzelplanDetail /> },
         { path: "/geldfluss", element: <Navigate to="/erkunden" replace /> },
         { path: "/einnahmen", element: <Navigate to="/erkunden/einnahmen" replace /> },
         { path: "/investitionen", element: <Navigate to="/erkunden/investitionen" replace /> },
@@ -51,7 +73,7 @@ const routes = [
         { path: "/einrichtung/:glz", element: <EinrichtungDetail /> },
         { path: "/info", element: <Info /> },
         { path: "/methodik", element: <Methodik /> },
-        { path: "/glossar", element: <Glossar /> },
+        { path: "/glossar/:teil?", element: <Glossar /> },
         { path: "/impressum", element: <Impressum /> },
         { path: "/datenschutz", element: <Datenschutz /> },
         { path: "/barrierefreiheit", element: <Barrierefreiheit /> },

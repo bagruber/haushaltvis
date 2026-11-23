@@ -3,21 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Haushalt Moosburg — Wohin fließt das Geld?</title>
+    <!-- Probe Formsprache: die Vorschau unter /v2/ soll nicht in Suchmaschinen landen.
+         Vor einem Merge nach main entfernen. -->
+    <meta name="robots" content="noindex" />
+    <title>Haushalt Moosburg - Wohin fließt das Geld?</title>
     <meta
       name="description"
-      content="Der Haushalt der Stadt Moosburg an der Isar, interaktiv und verständlich aufbereitet — Einnahmen, Ausgaben und ihre Entwicklung über die Jahre."
+      content="Der Haushalt der Stadt Moosburg an der Isar, verständlich aufbereitet: Einnahmen, Ausgaben und ihre Entwicklung über die Jahre."
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Haushalt Moosburg" />
-    <meta property="og:title" content="Haushalt Moosburg — Wohin fließt das Geld?" />
+    <meta property="og:title" content="Haushalt Moosburg - Wohin fließt das Geld?" />
     <meta
       property="og:description"
-      content="Der Haushalt der Stadt Moosburg an der Isar, interaktiv und verständlich aufbereitet — Einnahmen, Ausgaben und ihre Entwicklung über die Jahre."
+      content="Der Haushalt der Stadt Moosburg an der Isar, verständlich aufbereitet: Einnahmen, Ausgaben und ihre Entwicklung über die Jahre."
     />
     <meta property="og:url" content="https://bagruber.github.io/haushaltvis/" />
     <meta property="og:locale" content="de_DE" />
-    <meta name="twitter:card" content="summary" />
+    <!-- Fallback-Karte. scripts/karten.mjs legt je Adresse eine eigene HTML-Datei
+         mit eigener Karte ab; diese hier gilt, wo es keine gibt. -->
+    <meta property="og:image" content="https://bagruber.github.io%BASE_URL%og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <script>
       // SPA redirect handshake with 404.html — restores the path the user asked for.
       (function () {

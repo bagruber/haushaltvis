@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import type { EChartsOption } from "echarts";
+import { CaretRight } from "@phosphor-icons/react";
 import { EChart } from "@/components/EChart";
 import {
   useData,
@@ -10,6 +11,8 @@ import {
   topPosten,
   breakdownByAbschnitt,
   latestYear,
+  nurPlanSatz,
+  preisText,
   type Data,
   type BudgetEvent,
 } from "@/lib/data";
@@ -17,7 +20,8 @@ import { useYearCtx } from "@/lib/year";
 import { usePageTitle } from "@/lib/title";
 import { Card, Loading } from "@/components/ui";
 import { ChartTable } from "@/components/ChartTable";
-import { Timeline, TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { Timeline, TimelineControls } from "@/components/Timeline";
+import { useAnsicht } from "@/lib/teilen";
 import { sankeyTooltip } from "@/lib/charts";
 import { fmtEur, fmtEurShort } from "@/lib/format";
 
@@ -42,7 +46,7 @@ export function ThemeDetail() {
   const { data, error } = useData();
   const navigate = useNavigate();
   const { year } = useYearCtx();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -144,8 +148,9 @@ export function ThemeDetail() {
 
   return (
     <div className="space-y-10">
-      <nav className="text-sm text-ink-muted">
-        <Link to="/intern/themen" className="hover:text-ink">Themen</Link> ›{" "}
+      <nav className="flex items-center gap-1.5 text-sm text-ink-muted">
+        <Link to="/intern/themen" className="hover:text-ink">Themen</Link>
+        <CaretRight size={12} aria-hidden />
         <span className="text-ink">{def.label}</span>
       </nav>
 
@@ -176,7 +181,7 @@ export function ThemeDetail() {
                   <EChart
                     option={sankeyOpt}
                     onEvents={sankeyEvents}
-                    ariaLabel={`Geldfluss ${def.label} ${y}: Einnahmequellen, Bereiche und Einrichtungen — Zahlen in der Tabelle darunter`}
+                    ariaLabel={`Geldfluss ${def.label} ${y}: Einnahmequellen, Bereiche und Einrichtungen, Zahlen in der Tabelle darunter`}
                     style={{ height: sankeyHeight }}
                   />
                 </div>
@@ -195,12 +200,12 @@ export function ThemeDetail() {
         <div className="grid lg:grid-cols-2 gap-4">
           <Card
             title="Entwicklung der Ausgaben"
-            hint={`Plan (Ansatz) gegen Ergebnis (Ist). Für ${y} nur der Plan.` + (mode.real ? ` Inflationsbereinigt in Preisen von ${y}.` : "") + (mode.perCapita ? " Je Einwohner." : "")}
+            hint={`Plan (Ansatz) gegen Ergebnis (Ist). ${nurPlanSatz(data!.budget)}` + (mode.real ? ` Inflationsbereinigt ${preisText(data!.context, y)}.` : "") + (mode.perCapita ? " Je Einwohner." : "")}
           >
-            <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} hasInvest={false} />
+            <TimelineControls mode={mode} setMode={setMode} hasContext={hasContext} />
             <Timeline laufend={vwSeries} mode={mode} context={data!.context} baseYear={y} color={def.color} height={300} />
           </Card>
-          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y} — Klick öffnet den Posten`}>
+          <Card title="Größte Kostenpunkte" hint={`Verwaltungshaushalt ${y}, Klick öffnet den Posten`}>
             <ol className="space-y-1.5 text-sm">
               {vwTop.map((p) => (
                 <li key={p.key} className="border-b border-ink-line/60 pb-1.5">
@@ -224,18 +229,18 @@ export function ThemeDetail() {
           </div>
 
           <Card
-            title="Was Investitionen netto kosten"
-            hint={`Brutto-Investitionen ${fmtEurShort(vmTotal)}, davon durch Förderungen/Einnahmen gedeckt ${fmtEurShort(vmFoerder)}. Der farbige Teil bleibt an der Stadt hängen.`}
+            title="Was Investitionen die Stadt kosten"
+            hint={`Investitionen gesamt ${fmtEurShort(vmTotal)}, davon durch Förderungen und Einnahmen gedeckt ${fmtEurShort(vmFoerder)}. Der farbige Teil ist der Eigenanteil der Stadt.`}
           >
             {investOpt && (
               <EChart
                 option={investOpt}
-                ariaLabel={`Investitionen ${def.label} ${y} mit Förderung und Netto-Eigenanteil — Zahlen in der Tabelle darunter`}
+                ariaLabel={`Investitionen ${def.label} ${y} mit Förderung und Eigenanteil der Stadt, Zahlen in der Tabelle darunter`}
                 style={{ height: Math.max(280, invest.length * 36 + 80) }}
               />
             )}
             <ChartTable
-              columns={["Vorhaben", "Brutto", "Förderung", "Netto"]}
+              columns={["Vorhaben", "Gesamt", "Förderung", "Eigenanteil"]}
               rows={invest.map((i) => [i.label, fmtEur(i.invest), fmtEur(i.foerderung), fmtEur(i.netto)])}
             />
           </Card>
@@ -255,7 +260,7 @@ export function ThemeDetail() {
                   <div className="font-medium">
                     {e.title}
                     {(e as { _auto?: boolean })._auto && (
-                      <span className="ml-2 text-[10px] uppercase tracking-wide text-ink-muted">automatisch erkannt</span>
+                      <span className="ml-2 text-xs text-ink-muted">automatisch erkannt</span>
                     )}
                   </div>
                   {e.text && <div className="text-sm text-ink-muted">{e.text}</div>}

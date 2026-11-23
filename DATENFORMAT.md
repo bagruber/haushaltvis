@@ -99,8 +99,13 @@ nach `data/` legen → fertig (kein Build).
 
 - **`data/themes.json`** — `{ themes: { <id>: {label, color, description} }, assignment: { … } }`.
   Enthält die Themen-Definitionen (Name, Farbe) und eine Standard-Zuordnung.
-- **`data/context.json`** — `{ population: { "2024": 19908, … }, cpi: { "2024": 119.3, … } }`
-  für Pro-Kopf- und Inflations-Ansichten.
+- **`data/context.json`** — `{ population: { "2024": 19908, … }, cpi: { "2024": 119.3, … },
+  vpi_monat: { "2025-12": 122.7, … } }` für Pro-Kopf- und Inflations-Ansichten. `cpi` ist
+  der Jahresdurchschnitt des Verbraucherpreisindex, `vpi_monat` der Index je Monat. Fehlt
+  einem Jahr der Durchschnitt, rechnet die App mit dem Mittel seiner Monate bisher, und für
+  das Entwurfsjahr, das noch keinen Monat hat, mit dem jüngsten Monat. Die Pfeile der
+  Gesamtliste rechnen mit dem Stand zum Jahresbeginn (Dezember des Vorjahres), solange der
+  fehlt, mit dem jüngsten Monat.
 - **`data/labels.json`** — `{ abschnitt: { "21": "Schulen" }, unterabschnitt: { … } }`
   saubere Namen für Bereiche.
 - **`data/einleitungen.json`** — `{ "ep:2": "Einleitungstext …" }` je Einzelplan.
@@ -111,6 +116,62 @@ nach `data/` legen → fertig (kein Build).
   {ansatz, ergebnis, prov} } }`. Wird von `build_web.py` aus `etl/aggregatoren.yaml`
   berechnet — dort lassen sich Kriterien und Stichwortlisten pflegen.
 - **`data/events.json`** — `{ "events": [ { scope, id, year, title, text } ] }`.
+- **`data/zwischenstand.json`** — der Vollzug zu einem Stichtag, je Jahr ein
+  Eintrag, nach Jahr aufsteigend. Das laufende Jahr und derselbe Stichtag im
+  Vorjahr stehen so nebeneinander:
+
+  ```jsonc
+  {
+    "staende": [
+      {
+        "jahr": 2025,
+        "stichtag": "2025-10-01",
+        "quelle": "Haushalt 2025 Stand 30.09.2025.xlsx",
+        "werte": { "0000.4100": [103028.23, 92676.56] }    // [gebucht, bezahlt]
+      },
+      {
+        "jahr": 2026,
+        "stichtag": "2026-10-01",
+        "quelle": "Haushalt 2026 Stand 01.10.2026 - mit Haushaltssperre.xlsx",
+        "werte": { "0000.4100": [100868.84, 100868.84] }
+      },
+      {
+        "jahr": 2026,
+        "stichtag": "2026-11-13",
+        "quelle": "Arbeitsplan 2027 Stand 13.11.2026.xlsx, Blatt 2026",
+        "werte": { "0000.4100": [121892.92, 121892.92] }
+      }
+    ]
+  }
+  ```
+
+  `gebucht` ist das Anordnungs-Soll (AKDB-Spalte `Soll_HS`), `bezahlt` der
+  Abfluss (`Ist_HS`). Die Haushaltsstellen sind dieselben wie in `budget.json`;
+  was dort nicht vorkommt, wird nicht übernommen. Ein Stand zum Monatsletzten
+  gilt als Stand zum Ersten des Folgemonats (30.09. → 01.10.), damit beide
+  Jahre denselben Stichtag tragen. Ein Jahr kann mehrere Stände haben: Die
+  Zeitreihen nehmen je Jahr den Stand an dem Tag, den die meisten Jahre teilen,
+  die Gesamtliste den jüngsten.
+  Bewusst eine eigene Datei: `budget.json` bleibt unverändert, und ihr Löschen
+  nimmt das Feature in der App zurück. Erzeugt von `etl/zwischenstand.py` aus
+  allen Auswertungen in `haushaltsplaene/zwischenstand/` und dem Blatt des
+  laufenden Jahres im jüngsten Arbeitsplan.
+- **`data/entwurf.json`** — der Haushaltsentwurf des kommenden Jahres aus dem
+  Arbeitsplan der Kämmerei: `{ jahr, stand, quelle, ansatz: { <hhst_id>: € },
+  posten: { … }, finanzplan: { jahr, ansatz: { … } } }`. `ansatz` hat eine Zeile
+  je Haushaltsstelle des Arbeitsplans, auch mit 0 €; `posten` nur die Stellen,
+  die `budget.json` noch nicht kennt, im selben Schema. Die App hängt das Jahr
+  beim Laden an und kennzeichnet es überall als Entwurf, öffnet aber auf dem
+  letzten beschlossenen Jahr; nur die Gesamtliste beginnt mit dem Entwurf.
+  Steht das Jahr selbst in `budget.json`, gilt die Datei nicht mehr. Erzeugt von
+  `etl/entwurf.py` aus `haushaltsplaene/arbeitsplan/`.
+- **`data/erlaeuterungen.json`** — die Erläuterungen der Kämmerei aus dem
+  Arbeitsplan, so weit gesichtet: `{ jahr, stand, quelle, stellen: { <hhst_id>:
+  { text?: [ … ], such?: [ … ] } } }`. `text` steht wörtlich und nur, wo er
+  gezeigt wird, Namen von Firmen und Fachsoftware durch ihre Art in eckigen
+  Klammern ersetzt; `such` sind Suchwörter. Die Sichtung steht in
+  `etl/erlaeuterungen.yaml`, erzeugt von `etl/erlaeuterungen.py`. Ohne die Datei
+  gibt es keine Erläuterungen und keine Suchwörter.
 
 Alle diese Dateien lassen sich einzeln austauschen; die App lädt sie tolerant
 (fehlt eine, läuft die App ohne das jeweilige Extra weiter).

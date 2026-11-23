@@ -1,12 +1,14 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useData } from "@/lib/data";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import { AbschnittLink, Loading } from "@/components/ui";
+import { useTeilScroll } from "@/lib/teilen";
 
 export function Glossar() {
   usePageTitle("Glossar");
   const { data } = useData();
+  const { teil } = useParams();
   const { hash } = useLocation();
 
   const entries = data
@@ -25,6 +27,8 @@ export function Glossar() {
     }
   }, [hash, entries.length]);
 
+  useTeilScroll(teil, entries.length > 0);
+
   if (!data) return <Loading />;
 
   return (
@@ -32,8 +36,7 @@ export function Glossar() {
       <header className="space-y-2">
         <h1 className="headline text-3xl">Glossar</h1>
         <p className="text-ink-soft">
-          Fachbegriffe der Kameralistik und kommunaler Haushalte — kurz und
-          verständlich erklärt.
+          Fachbegriffe der Kameralistik und kommunaler Haushalte, kurz erklärt.
         </p>
       </header>
 
@@ -44,7 +47,10 @@ export function Glossar() {
             id={id}
             className="scroll-mt-28 rounded-lg border border-ink-line bg-white p-4"
           >
-            <dt className="font-display text-lg font-bold">{e.title}</dt>
+            <dt className="flex flex-wrap items-baseline gap-2 font-display text-lg font-bold">
+              {e.title}
+              <AbschnittLink pfad={`/glossar/${id}`} titel={e.title} />
+            </dt>
             <dd className="mt-1 text-ink-soft">{e.text}</dd>
           </div>
         ))}

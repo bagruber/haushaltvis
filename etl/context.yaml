@@ -6,8 +6,9 @@
 #   jeweils der 31.12.; ein Haushaltsjahr nutzt den Stand vom 31.12. des Vorjahres,
 #   damit auch das laufende Jahr einen Wert hat (2026 = Stand 31.12.2025).
 # cpi: Verbraucherpreisindex Deutschland, Jahresdurchschnitt, Basis 2020 = 100
-#   (Statistisches Bundesamt). 2025/2026 aus den amtlichen Inflationsraten
-#   fortgeschrieben (2025: +2,2 %; 2026: Prognose ~+2 %).
+#   (Statistisches Bundesamt). 2025 aus der amtlichen Inflationsrate
+#   fortgeschrieben (+2,2 %). Das laufende Jahr steht hier erst, wenn sein
+#   Durchschnitt veröffentlicht ist; bis dahin rechnet die App mit vpi_monat.
 # ─────────────────────────────────────────────────────────────────────────────
 
 population:
@@ -22,6 +23,7 @@ population:
   2024: 19882   # Stand 31.12.2023
   2025: 20012   # Stand 31.12.2024
   2026: 20107   # Stand 31.12.2025
+  2027: 20107   # noch kein Stand 31.12.2026: vorerst der Wert von 2026
 
 cpi:
   2016: 94.9
@@ -34,4 +36,37 @@ cpi:
   2023: 116.7
   2024: 119.3
   2025: 121.9
-  2026: 124.3   # Prognose
+
+# vpi_monat: Verbraucherpreisindex Deutschland je Monat, Basis 2020 = 100
+#   (Statistisches Bundesamt, Tabelle 61111-0002, über die Zeitreihe
+#   BBDP1.M.DE.N.VPI.C.A00000.I20.A der Bundesbank, abgerufen 19.11.2026).
+#   Je Jahr der Dezember und alle Monate des laufenden Jahres:
+#   - Für die Veränderung von Ansatz zu Ansatz in der Gesamtliste: ein Ansatz
+#     gilt ab Jahresbeginn, also zählt der Stand zum 1.1., der Dezemberwert des
+#     Vorjahres. Fehlt der noch, nimmt die App den jüngsten Monat davor.
+#   - Für das laufende Jahr, solange cpi keinen Durchschnitt hat: das Mittel
+#     der Monate bisher; für das Entwurfsjahr der jüngste Monat.
+#   Jeden Monat den neuen Wert ergänzen, im Januar den Jahresdurchschnitt
+#   des Vorjahres unter cpi.
+vpi_monat:
+  "2015-12": 94.3
+  "2016-12": 95.6
+  "2017-12": 96.9
+  "2018-12": 98.5
+  "2019-12": 100.0
+  "2020-12": 99.8
+  "2021-12": 104.7
+  "2022-12": 113.2
+  "2023-12": 117.4
+  "2024-12": 120.5
+  "2025-12": 122.7
+  "2026-01": 122.8
+  "2026-02": 123.1
+  "2026-03": 124.5
+  "2026-04": 125.2
+  "2026-05": 125.0
+  "2026-06": 124.6
+  "2026-07": 125.6
+  "2026-08": 125.8
+  "2026-09": 126.6
+  "2026-10": 126.5

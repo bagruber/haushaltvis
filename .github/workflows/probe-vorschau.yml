@@ -1,0 +1,19 @@
+name: Vorschau /v2 anstossen
+
+# Die Umgebung github-pages deployt nur von main. Dieser Workflow baut deshalb
+# nichts selbst, sondern startet pages.yml auf main neu; der holt sich den
+# aktuellen Stand dieses Branches und legt ihn unter /haushaltvis/v2/ ab.
+on:
+  push:
+    branches: [probe/formsprache]
+
+permissions:
+  actions: write
+
+jobs:
+  anstossen:
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

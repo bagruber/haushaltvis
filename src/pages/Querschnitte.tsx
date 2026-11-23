@@ -1,25 +1,20 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
 import type { EChartsOption } from "echarts";
 import { EChart } from "@/components/EChart";
-import { useData, latestYear, adjustSeries } from "@/lib/data";
+import { useData, latestYear, adjustSeries, preisstand, totals } from "@/lib/data";
+import { Nummer, doppelte, useNummern } from "@/lib/nummern";
+import { extremImFenster, useBreit } from "@/lib/notiz";
 import type { Aggregator, YearSeries } from "@/lib/data";
-import { TimelineControls, type TimelineMode } from "@/components/Timeline";
+import { TimelineControls } from "@/components/Timeline";
 import { usePageTitle } from "@/lib/title";
-import { Loading } from "@/components/ui";
+import { Buildings, Tag, TreeStructure } from "@phosphor-icons/react";
+import { AbschnittLink, KategorieZeile, Kennzahl, Klecks, Loading } from "@/components/ui";
+import { COLOR, ICON, ORDER } from "@/lib/kostenblock";
+import { useAnsicht, useTeilScroll } from "@/lib/teilen";
 import { ChartTable } from "@/components/ChartTable";
-import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
-
-// Fixed display order + colour per aggregator (keys from etl/aggregatoren.yaml).
-const ORDER = ["personal", "zuschuesse", "gebaeude", "it", "strom", "wasser"] as const;
-const COLOR: Record<string, string> = {
-  personal: "#2f6f8f",
-  zuschuesse: "#6b3e7a",
-  gebaeude: "#c26a2c",
-  it: "#0a9e4c",
-  strom: "#d4a017",
-  wasser: "#3a8fb7",
-};
+import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
+import { jahresAchse, jahrText } from "@/lib/charts";
 
 /** How many single Posten to name inside each Gruppierung before summarising. */
 const POSTEN_JE_GRUPPE = 6;
@@ -61,6 +56,7 @@ function groupsOf(
         count: g.count,
         sum: g.sum,
         top,
+        doppelt: doppelte(top.map((r) => r.label)),
         restCount: g.count - top.length,
         restSum: g.sum - top.reduce((s, r) => s + r.sum, 0),
       };
@@ -70,8 +66,11 @@ function groupsOf(
 
 export function Querschnitte() {
   usePageTitle("Querschnitte");
+  const { teil } = useParams();
   const { data, error } = useData();
-  const [mode, setMode] = useState<TimelineMode>({});
+  const [mode, setMode] = useAnsicht();
+  const { zeigen } = useNummern();
+  const breit = useBreit();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -101,9 +100,9 @@ export function Querschnitte() {
     // deflate to the base year's prices, then divide by that year's population.
     const factorFor = (y: number) => {
       let f = 1;
-      if (mode.real && ctx.cpi?.[String(y)] && ctx.cpi?.[String(latest)]) {
-        f *= ctx.cpi[String(latest)] / ctx.cpi[String(y)];
-      }
+      const preis = preisstand(ctx, y)?.wert;
+      const basis = preisstand(ctx, latest)?.wert;
+      if (mode.real && preis && basis) f *= basis / preis;
       if (mode.perCapita && ctx.population?.[String(y)]) f /= ctx.population[String(y)];
       return f;
     };
@@ -116,18 +115,24 @@ export function Querschnitte() {
     }
     const factSum = (h: string) => (factByHhstYear.get(h) ?? 0) * detailFactor;
 
-    const fmtV = (v: number | null) => (v == null ? "—" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
+    const fmtV = (v: number | null) => (v == null ? "-" : mode.perCapita ? fmtEurFine(v) : fmtEur(v));
     const fmtAxis = (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v));
+
+    // Note on the energy costs: their highest Ansatz in the budgets after the war began.
+    const gaskrise =
+      breit && adjusted.strom ? extremImFenster(years, adjusted.strom.ansatz, [2022, 2023, 2024], "max") : null;
 
     const overview: EChartsOption = {
       tooltip: {
         trigger: "axis",
-        valueFormatter: (v) => (v == null ? "—" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)),
+        valueFormatter: (v) => (v == null ? "-" : mode.perCapita ? `${fmtEurFine(v as number)}/Kopf` : fmtEur(v as number)),
         order: "valueDesc",
       },
-      legend: { bottom: 0, type: "scroll" },
-      grid: { left: 8, right: 16, top: 12, bottom: 44, containLabel: true },
-      xAxis: { type: "category", boundaryGap: false, data: years.map(String) },
+      legend: { bottom: 0 },
+      // Auf dem Telefon bricht die Legende in drei Zeilen um und braucht den Platz,
+      // sonst liegt sie über den Jahreszahlen.
+      grid: { left: 8, right: 16, top: gaskrise != null ? 56 : 12, bottom: breit ? 44 : 84, containLabel: true },
+      xAxis: jahresAchse(years, data.budget.meta.entwurf?.jahr, breit, { boundaryGap: false }),
       yAxis: { type: "value", axisLabel: { formatter: fmtAxis } },
       series: keys.map((k) => ({
         name: aggs[k].title,
@@ -141,12 +146,15 @@ export function Querschnitte() {
       })),
     };
 
+    const gesamt = totals(data.budget, latest).ausgaben;
     const cards = keys.map((k) => {
       const s = adjusted[k];
       return {
         key: k,
         agg: aggs[k],
         color: COLOR[k],
+        // Share from the raw Ansatz, so it stays right with the real / per-head switches on.
+        anteil: gesamt ? (aggs[k].reihe[String(latest)]?.ansatz ?? 0) / gesamt : null,
         ansatzLatest: s.ansatz[years.indexOf(latest)],
         ergebnisFinal: s.ergebnis[years.indexOf(finalYear)],
         groups: groupsOf(aggs[k], data.budget.posten, factSum),
@@ -154,8 +162,14 @@ export function Querschnitte() {
     });
 
     const hasContext = !!(ctx.cpi || ctx.population);
-    return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext };
-  }, [data, mode]);
+    const notiz =
+      gaskrise != null
+        ? { text: "Ukrainekrieg, Gaskrise", x: String(years[gaskrise]), y: adjusted.strom.ansatz[gaskrise]!, serien: [aggs.strom.title] }
+        : undefined;
+    return { keys, years, latest, finalYear, overview, cards, aggs, adjusted, fmtV, hasContext, notiz };
+  }, [data, mode, breit]);
+
+  useTeilScroll(teil, !!view);
 
   if (error) return <p className="text-red-600">Daten konnten nicht geladen werden.</p>;
   if (!view) return <Loading />;
@@ -165,61 +179,71 @@ export function Querschnitte() {
       <header className="space-y-2">
         <h1 className="headline text-3xl">Querschnitte</h1>
         <p className="max-w-2xl text-ink-soft">
-          Manche Kosten verteilen sich über den ganzen Haushalt — Personal steckt in fast
-          jeder Einrichtung, Strom in jedem Gebäude. Diese <b>Kostenblöcke</b> bündeln solche
-          Ausgaben quer zur kameralen Gliederung, damit ihre Entwicklung sichtbar wird.
+          Personal steckt in fast jeder Einrichtung, Strom in jedem Gebäude. <b>Kostenblöcke</b>{" "}
+          bündeln solche Ausgaben quer über den ganzen Haushalt.
         </p>
       </header>
 
-      <section className="space-y-2">
+      <section id="verlauf" className="scroll-mt-28 space-y-2">
         <div className="flex items-baseline justify-between gap-2 border-b border-ink-line pb-2">
-          <h2 className="font-display text-xl font-bold">Entwicklung über die Jahre</h2>
+          <h2 className="flex items-baseline gap-2 font-display text-xl font-bold">
+            Entwicklung über die Jahre
+            <AbschnittLink pfad="/erkunden/querschnitte/verlauf" titel="Entwicklung über die Jahre" />
+          </h2>
           <span className="text-xs text-ink-muted">
             Ansätze (Plan) je Kostenblock
             {mode.real && `, in Preisen von ${view.latest}`}
             {mode.perCapita && ", je Einwohner"}
           </span>
         </div>
-        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} hasInvest={false} />
+        <TimelineControls mode={mode} setMode={setMode} hasContext={view.hasContext} />
         <EChart
           option={view.overview}
-          ariaLabel="Entwicklung der Kostenblöcke über die Jahre — Zahlen in der Tabelle darunter"
+          notiz={view.notiz}
+          ariaLabel="Entwicklung der Kostenblöcke über die Jahre, Zahlen in der Tabelle darunter"
           style={{ height: 360 }}
         />
         <ChartTable
           summary="Jahreswerte (Ansatz) als Tabelle"
           columns={["Jahr", ...view.keys.map((k) => view.aggs[k].title)]}
           rows={view.years.map((y, i) => [
-            String(y),
+            jahrText(y, data!.budget.meta.entwurf?.jahr),
             ...view.keys.map((k) => view.fmtV(view.adjusted[k].ansatz[i])),
           ])}
         />
       </section>
 
-      {view.cards.map((c) => (
-        <section key={c.key} className="space-y-3 border-t-2 pt-4" style={{ borderColor: c.color }}>
+      {view.cards.map((c, i) => (
+        <section key={c.key} id={c.key} className="scroll-mt-28 space-y-4 rounded-lg border border-ink-line bg-white p-5">
+          <div className="flex items-center gap-3">
+            <Klecks farbe={c.color} icon={ICON[c.key] ?? Buildings} variante={i} />
+            <KategorieZeile farbe={c.color} icon={c.agg.art === "struktur" ? TreeStructure : Tag}>
+              {c.agg.art === "struktur" ? "Gruppierungsplan" : "Stichwort-Auswahl"}
+            </KategorieZeile>
+          </div>
           <div className="space-y-1">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h2 className="font-display text-xl font-bold">{c.agg.title}</h2>
-              <span className="eyebrow text-ink-muted">
-                {c.agg.art === "struktur" ? "Gruppierungsplan" : "Stichwort-Auswahl"}
-              </span>
-            </div>
+            <h2 className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-bold">
+              {c.agg.title}
+              <AbschnittLink pfad={`/erkunden/querschnitte/${c.key}`} titel={c.agg.title} />
+            </h2>
             <p className="max-w-2xl text-sm text-ink-soft">{c.agg.beschreibung}</p>
             <p className="text-xs text-ink-muted">Kriterium: {c.agg.kriterium}</p>
           </div>
 
           <div className="flex flex-wrap gap-x-10 gap-y-3">
-            {[
-              [`Ansatz ${view.latest}`, view.fmtV(c.ansatzLatest)],
-              [`Ergebnis ${view.finalYear}`, view.fmtV(c.ergebnisFinal)],
-              ["Haushaltsstellen", String(c.agg.hhst.length)],
-            ].map(([label, value]) => (
-              <div key={label}>
-                <div className="eyebrow text-ink-muted">{label}</div>
-                <div className="font-display text-xl font-bold tabular-nums">{value}</div>
-              </div>
-            ))}
+            <Kennzahl
+              wert={view.fmtV(c.ansatzLatest)}
+              label={c.anteil ? `Ansatz ${view.latest}, ${fmtPct(c.anteil)} aller Ausgaben` : `Ansatz ${view.latest}`}
+              className="text-2xl"
+            />
+            <Kennzahl wert={view.fmtV(c.ergebnisFinal)} label={`Ergebnis ${view.finalYear}`} className="text-2xl" />
+          </div>
+
+          <div className="flex items-baseline gap-2 border-t border-ink-line pt-3">
+            <span className="font-display text-3xl font-semibold lining-nums tabular-nums">
+              {c.agg.hhst.length.toLocaleString("de-DE")}
+            </span>
+            <span className="text-sm text-ink-muted">Haushaltsstellen</span>
           </div>
 
           <details className="group">
@@ -232,7 +256,7 @@ export function Querschnitte() {
                   <div className="flex items-baseline justify-between gap-3 border-b border-ink-line pb-1">
                     <span className="font-medium">{g.text}</span>
                     <span className="shrink-0 tabular-nums text-ink-soft">
-                      {g.sum ? view.fmtV(g.sum) : "—"}
+                      {g.sum ? view.fmtV(g.sum) : "-"}
                       <span className="ml-2 text-xs text-ink-muted">
                         {g.count} {g.count === 1 ? "Posten" : "Posten"}
                       </span>
@@ -245,7 +269,10 @@ export function Querschnitte() {
                           to={`/posten/${r.hhst}`}
                           className="flex items-baseline justify-between gap-3 border-b border-ink-line/40 py-1 hover:text-red-600 transition-colors"
                         >
-                          <span className="min-w-0 truncate text-ink-soft">{r.label}</span>
+                          <span className="flex min-w-0 items-baseline text-ink-soft">
+                            <Nummer wert={r.hhst} sichtbar={zeigen || g.doppelt.has(r.label)} />
+                            <span className="truncate">{r.label}</span>
+                          </span>
                           <span className="shrink-0 tabular-nums">{view.fmtV(r.sum)}</span>
                         </Link>
                       </li>
@@ -253,15 +280,14 @@ export function Querschnitte() {
                     {g.restCount > 0 && (
                       <li className="flex items-baseline justify-between gap-3 py-1 text-xs text-ink-muted">
                         <span>+ {g.restCount} weitere</span>
-                        <span className="tabular-nums">{g.restSum > 0 ? view.fmtV(g.restSum) : "—"}</span>
+                        <span className="tabular-nums">{g.restSum > 0 ? view.fmtV(g.restSum) : "-"}</span>
                       </li>
                     )}
                   </ul>
                 </div>
               ))}
               <p className="text-xs text-ink-muted">
-                Beträge sind das Ergebnis {view.finalYear}. Ein Klick öffnet die Haushaltsstelle mit
-                ihrem Zeitverlauf.
+                Beträge: Ergebnis {view.finalYear}.
               </p>
             </div>
           </details>
@@ -269,10 +295,9 @@ export function Querschnitte() {
       ))}
 
       <p className="text-xs text-ink-muted max-w-2xl">
-        „Gruppierungsplan" heißt: exakt aus der kameralen Systematik abgeleitet.
-        „Stichwort-Auswahl" fasst Posten anhand ihrer Bezeichnung zusammen — die enthaltenen
-        Kostenarten sind oben aufklappbar. Für das laufende Jahr steht nur der Plan; das
-        Ergebnis stammt daher aus {view.finalYear}.
+        „Gruppierungsplan": exakt aus der kameralen Systematik. „Stichwort-Auswahl": nach
+        Bezeichnung zusammengefasst, die Kostenarten sind aufklappbar. Das Ergebnis stammt aus{" "}
+        {view.finalYear}, weil es für das laufende Jahr nur den Plan gibt.
       </p>
     </div>
   );

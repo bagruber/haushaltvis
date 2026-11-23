@@ -1,9 +1,9 @@
 {
  "meta": {
-  "generated": "2026-07-30T05:19:22",
-  "n_posten": 4306,
+  "generated": "2026-11-19T14:09:59",
+  "n_posten": 4351,
   "n_themes": 11,
-  "multi_tagged": 525
+  "multi_tagged": 527
  },
  "themes": {
   "kinder_jugend_familie": {
@@ -63,6 +63,284 @@
   }
  },
  "assignment": {
+  "0241.1198": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "0241.6410": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "0341.2616": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "0341.8412": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "0681.9412": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "1122.6368": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "1161.1198": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "1161.6410": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "1311.1149": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "1311.9356": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "1313.1149": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "1313.9356": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "2110.3611": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   }
+  ],
+  "2110.9341": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   }
+  ],
+  "2111.3600": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   }
+  ],
+  "2111.3611": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   }
+  ],
+  "2130.3611": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   }
+  ],
+  "3503.5430": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   },
+   {
+    "theme": "kultur_freizeit",
+    "weight": 1.0
+   }
+  ],
+  "3521.1198": [
+   {
+    "theme": "bildung",
+    "weight": 1.0
+   },
+   {
+    "theme": "kultur_freizeit",
+    "weight": 1.0
+   }
+  ],
+  "3600.7180": [
+   {
+    "theme": "umwelt",
+    "weight": 1.0
+   }
+  ],
+  "4001.1771": [
+   {
+    "theme": "soziales",
+    "weight": 1.0
+   }
+  ],
+  "5652.6500": [
+   {
+    "theme": "sport_gesundheit",
+    "weight": 1.0
+   }
+  ],
+  "5701.6500": [
+   {
+    "theme": "sport_gesundheit",
+    "weight": 1.0
+   }
+  ],
+  "5702.6500": [
+   {
+    "theme": "sport_gesundheit",
+    "weight": 1.0
+   }
+  ],
+  "6300.1198": [
+   {
+    "theme": "mobilitaet",
+    "weight": 1.0
+   }
+  ],
+  "6332.3619": [
+   {
+    "theme": "mobilitaet",
+    "weight": 1.0
+   }
+  ],
+  "6332.9500": [
+   {
+    "theme": "mobilitaet",
+    "weight": 1.0
+   }
+  ],
+  "6332.9590": [
+   {
+    "theme": "mobilitaet",
+    "weight": 1.0
+   }
+  ],
+  "6751.5450": [
+   {
+    "theme": "sicherheit",
+    "weight": 1.0
+   }
+  ],
+  "6815.6320": [
+   {
+    "theme": "mobilitaet",
+    "weight": 1.0
+   }
+  ],
+  "6860.9400": [
+   {
+    "theme": "mobilitaet",
+    "weight": 1.0
+   }
+  ],
+  "7000.1112": [
+   {
+    "theme": "umwelt",
+    "weight": 1.0
+   }
+  ],
+  "7201.6500": [
+   {
+    "theme": "umwelt",
+    "weight": 1.0
+   }
+  ],
+  "7511.9500": [
+   {
+    "theme": "soziales",
+    "weight": 1.0
+   }
+  ],
+  "7621.6500": [
+   {
+    "theme": "kultur_freizeit",
+    "weight": 1.0
+   }
+  ],
+  "7621.9341": [
+   {
+    "theme": "kultur_freizeit",
+    "weight": 1.0
+   }
+  ],
+  "8610.5040": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "8610.6790": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "8610.9400": [
+   {
+    "theme": "verwaltung_finanzen",
+    "weight": 1.0
+   }
+  ],
+  "8801.9450": [
+   {
+    "theme": "wohnen",
+    "weight": 1.0
+   }
+  ],
+  "8815.9500": [
+   {
+    "theme": "wohnen",
+    "weight": 1.0
+   }
+  ],
+  "8831.3400": [
+   {
+    "theme": "wohnen",
+    "weight": 1.0
+   }
+  ],
+  "8831.9321": [
+   {
+    "theme": "wohnen",
+    "weight": 1.0
+   }
+  ],
+  "8831.9500": [
+   {
+    "theme": "wohnen",
+    "weight": 1.0
+   }
+  ],
+  "8832.9500": [
+   {
+    "theme": "wohnen",
+    "weight": 1.0
+   }
+  ],
   "9121.3776": [
    {
     "theme": "verwaltung_finanzen",
@@ -27549,31 +27827,7 @@
     "weight": 1.0
    }
   ],
-  "46417.6799": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46413.3671": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46433.4340": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46433.3610": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46413.3610": [
+  "46413.9535": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27585,19 +27839,13 @@
     "weight": 1.0
    }
   ],
-  "46433.9870": [
+  "46413.3610": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46431.3670": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46416.9450": [
+  "46411.9420": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27609,13 +27857,121 @@
     "weight": 1.0
    }
   ],
-  "46417.9535": [
+  "46448.3610": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46413.1541": [
+  "46431.9412": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46416.5450": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46412.9870": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46433.3610": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.6521": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46414.5442": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46431.9350": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46412.9535": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46433.4340": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46411.9535": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46412.7040": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46448.5431": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46415.5420": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.1559": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46416.5600": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46410.5430": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.1699": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46433.9870": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46433.4140": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27633,277 +27989,13 @@
     "weight": 1.0
    }
   ],
-  "46416.9535": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.7040": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
   "46417.5600": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46415.6440": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46448.9880": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46416.5441": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46448.3610": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46439.1430": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46415.1782": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46448.9350": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46431.9350": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46411.9535": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46415.5442": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46417.5420": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46448.9321": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.9412": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46410.5420": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46417.9490": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.9880": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46410.5430": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46411.9420": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46431.9412": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46413.9535": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46417.1699": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46416.5420": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46416.6521": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46417.1100": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.7008": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46416.5450": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46413.9400": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46415.5420": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46431.9400": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46416.5600": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.1419": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46414.9359": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46413.6799": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46410.9535": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.7009": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46414.5442": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46415.1559": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46415.6521": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.9870": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46412.9535": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46411.9590": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46414.5450": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46414.3671": [
+  "46416.9535": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27915,37 +28007,61 @@
     "weight": 1.0
    }
   ],
-  "46431.9535": [
+  "46416.5420": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46433.4440": [
+  "46412.7008": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46417.1559": [
+  "46413.3671": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46448.5431": [
+  "46439.1430": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46448.6551": [
+  "46413.1541": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
    }
   ],
-  "46414.6799": [
+  "46415.6521": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46415.1782": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46414.9359": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.1100": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46415.5442": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27957,7 +28073,145 @@
     "weight": 1.0
    }
   ],
-  "46415.9500": [
+  "46448.9321": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46434.3619": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46416.5441": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46448.9350": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46431.9535": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46413.6799": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46412.9412": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46411.9590": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46433.4440": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46410.5420": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46414.6799": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46448.6551": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46415.6440": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.9535": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46412.9880": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46416.9450": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.5420": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46410.9535": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.6799": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46413.9400": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46431.9400": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46417.9490": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46414.5450": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46431.3670": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27969,19 +28223,37 @@
     "weight": 1.0
    }
   ],
+  "46414.3671": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46412.7009": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46415.9500": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46416.6521": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46448.9880": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
   "46434.9870": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46433.4140": [
-   {
-    "theme": "kinder_jugend_familie",
-    "weight": 1.0
-   }
-  ],
-  "46417.6521": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0
@@ -27993,7 +28265,13 @@
     "weight": 1.0
    }
   ],
-  "46434.3619": [
+  "46412.1419": [
+   {
+    "theme": "kinder_jugend_familie",
+    "weight": 1.0
+   }
+  ],
+  "46415.1559": [
    {
     "theme": "kinder_jugend_familie",
     "weight": 1.0

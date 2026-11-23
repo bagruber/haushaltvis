@@ -1,0 +1,546 @@
+# Gesichtete Erläuterungen der Kämmerei aus dem Arbeitsplan (etl/erlaeuterungen.py).
+#
+# Je Haushaltsstelle die Entscheidung über ihren Erläuterungstext:
+#   zeigen: true    wörtlich auf der Seite der Haushaltsstelle und in den Listen
+#   zeigen: kurz    nur der kurze Text
+#   zeigen: false   nicht gezeigt
+#   text            gezeigt statt des wörtlichen Textes: derselbe Text, nur ohne Namen
+#   suchwoerter     findet die Stelle in der Suche, auch wenn der Text nicht steht
+#   pruef           Prüfwert des Textes, wie er bei der Sichtung im Arbeitsplan stand
+#
+# Die Texte selbst stehen nicht hier, nur unter `text` ein gezeigter Text ohne
+# Namen: Das Repository ist öffentlich, und was nicht gezeigt wird, soll auch
+# hier nicht stehen. Texte und Gründe der
+# Sichtung liegen lokal neben dem Arbeitsplan (haushaltsplaene/arbeitsplan/
+# erlaeuterungen-sichtung.yaml, nicht im Repo).
+#
+# Gezeigt wird, was ohne Vorwissen richtig verstanden wird. Nicht gezeigt:
+# interne Vermerke (Haushaltsreste, Verweise auf andere Haushaltsstellen,
+# Fragen, Hinweise unter Kollegen), Kürzel, die den Sinn tragen, Rechenformeln
+# in Kürzeln, Angaben zu Personen oder bestimmbaren Mietern, Planungen, die als
+# Beschluss gelesen werden könnten. Ein Kürzel als ein Posten einer sonst
+# klaren Liste hindert nicht.
+#
+# Namen von Firmen, Personen und Fachsoftware stehen in keinem gezeigten Text.
+# Wo der Text ohne sie trägt, steht an ihrer Stelle in eckigen Klammern, was
+# sie sind („[Bibliothekssoftware]“), sonst wird er nicht gezeigt. Allgemein
+# bekannte Namen wie iPad oder Windows Server bleiben, ebenso städtische und
+# öffentliche Gesellschaften wie die Kläranlage Moosburg GmbH oder die Sparkasse.
+#
+# Ändert die Kämmerei einen Text, passt der Prüfwert nicht mehr, und das Skript
+# lässt die Stelle weg, bis sie neu gesichtet ist.
+
+"0000.1198": {pruef: 2acf0e9ba8e37310, zeigen: false, suchwoerter: []}
+"0000.1515": {pruef: f76abc32b57ea5d7, zeigen: false, suchwoerter: []}
+"0000.1692": {pruef: 6ea513d8f54875ea, zeigen: false, suchwoerter: []}
+"0000.5510": {pruef: fbdc82b71b38b60e, zeigen: true, suchwoerter: ["Leasing", "Leasingrate", "Versicherung", "Kfz-Steuer"]}
+"0000.6410": {pruef: af00d45a91e80aef, zeigen: false, suchwoerter: []}
+"0000.6500": {pruef: cfb2eb6042601afd, zeigen: true, suchwoerter: ["Glückwunschkarte", "Grußkarte"]}
+"0200.1198": {pruef: 833e2cca9fb55db6, zeigen: false, suchwoerter: []}
+"0200.1590": {pruef: cd89e868738258a9, zeigen: true, suchwoerter: ["Haftpflichtversicherung", "Wasser", "Abwasser"]}
+"0200.4140": {pruef: c41eb2637e4ed420, zeigen: false, suchwoerter: []}
+"0200.6312": {pruef: 287b0a7c72006430, zeigen: true, suchwoerter: ["Geburtstag", "Jubilar", "Jubiläum", "Auszeichnung", "Bewirtung"]}
+"0200.6321": {pruef: 576402c4157270e2, zeigen: false, suchwoerter: []}
+"0200.6322": {pruef: 2fab67688bc78130, zeigen: true, suchwoerter: ["IT-Sicherheit", "Informationssicherheit"]}
+"0200.6410": {pruef: 60358bed8c43d781, zeigen: false, suchwoerter: []}
+"0200.6430": {pruef: 391db7f164884998, zeigen: false, suchwoerter: []}
+"0200.6443": {pruef: 6a8bf2032520b3b1, zeigen: false, suchwoerter: []}
+"0200.6450": {pruef: af01bcbab1ac0e48, zeigen: false, suchwoerter: []}
+"0200.6610": {pruef: dfb157fe3e6c175b, zeigen: true, suchwoerter: ["Städtetag", "Gemeindetag", "Tierschutzverein", "Bauernverband", "Haus- und Grundbesitzerverein", "Schutzgemeinschaft Erding-Nord"]}
+"0200.6760": {pruef: 67a35b2938415073, zeigen: true, suchwoerter: ["Datenschutzbeauftragter", "Datenschutz", "Landratsamt"]}
+"0200.9341": {pruef: 5c04d12d95ebd28d, zeigen: false, suchwoerter: ["Informationssicherheit", "IT-Sicherheit"]}
+"0221.1198": {pruef: 4b5fd758ec204e27, zeigen: false, suchwoerter: []}
+"0221.6322": {pruef: 8d9e4660abf63a53, zeigen: true, text: ["Wartungskosten [Personalsoftware] mit Erweiterungen und [Zeiterfassungssoftware]"], suchwoerter: ["Zeiterfassung", "Arbeitszeiterfassung", "Personalsoftware", "Softwarewartung"]}
+"0221.6410": {pruef: 3eda8e8de51a0757, zeigen: false, suchwoerter: []}
+"0241.1198": {pruef: dac749102ceb9b59, zeigen: false, suchwoerter: []}
+"0241.1540": {pruef: a72bd6825ac54c06, zeigen: false, suchwoerter: ["Ticket"]}
+"0241.6321": {pruef: 896b7cceff088c02, zeigen: true, suchwoerter: ["Künstlersozialkasse", "Künstlersozialabgabe"]}
+"0241.6369": {pruef: 123871ae8fbc4301, zeigen: false, suchwoerter: ["Homepage", "Website", "Hosting", "KI-Assistent", "KI"]}
+"0241.6410": {pruef: dac749102ceb9b59, zeigen: false, suchwoerter: []}
+"0241.9340": {pruef: d5b6bf4ba1d67f58, zeigen: false, suchwoerter: ["KI-Assistent", "KI", "Website", "Chatbot"]}
+"0261.6369": {pruef: 4f7551de476f82b2, zeigen: true, text: ["Umsetzung Digitalisierung 5T €, Bauakte, Digitalisierung Posteingang, Aktenaussonderung, Altakten-Verscannung 25T €, [Formularsoftware] und Anpassung Formulare 5T €"], suchwoerter: ["Bauakte", "Posteingang", "Altakte", "Scannen", "Formular", "Formularsoftware"]}
+"0261.7110": {pruef: 3873d865f09c1df3, zeigen: false, suchwoerter: []}
+"0261.9340": {pruef: 155a73e0d65ec9cf, zeigen: false, suchwoerter: ["Bauakte", "Formular", "Formularsoftware", "Onlineformular"]}
+"0301.4140": {pruef: 27544acc2a0dbd50, zeigen: false, suchwoerter: []}
+"0301.6322": {pruef: f1761afe566a4e98, zeigen: false, suchwoerter: ["Finanzsoftware"]}
+"0301.6510": {pruef: de98557b3aa86c03, zeigen: false, suchwoerter: []}
+"0301.6610": {pruef: da115ca81411c4db, zeigen: true, suchwoerter: ["Kassenverwalterverband", "Prüfungsverband"]}
+"0331.6322": {pruef: ae81cace4c68dab6, zeigen: true, suchwoerter: ["Vollstreckung", "Vollstreckungsprogramm", "Zwangsvollstreckung", "Softwarewartung"]}
+"0331.6440": {pruef: 003525786eb384bd, zeigen: true, suchwoerter: []}
+"0332.5620": {pruef: 010b6f18c1f3b531, zeigen: false, suchwoerter: ["Schulung"]}
+"0332.6322": {pruef: ad047e186e680099, zeigen: true, text: ["Wartungskosten [Grundstücksverwaltungsprogramm]"], suchwoerter: ["Grundstücksverwaltung", "Softwarewartung"]}
+"0332.6551": {pruef: c9d0d3710e0d6bb2, zeigen: true, suchwoerter: ["Rechtsberatung", "Erschließungsbeitrag", "Erschließung", "Anwalt"]}
+"0341.5200": {pruef: ef9d4b8354ab420b, zeigen: true, suchwoerter: ["Hundesteuermarke", "Hundesteuer", "Hundemarke"]}
+"0341.6322": {pruef: d9e69ad7946f17c5, zeigen: true, suchwoerter: ["Gewerbesteuer", "Steuerveranlagung", "Softwarewartung"]}
+"0341.6525": {pruef: 2e8e29818072cad1, zeigen: false, suchwoerter: ["Steuerbescheid", "Bescheid"]}
+"0351.1692": {pruef: caf33cb5a6da3a2a, zeigen: true, suchwoerter: ["Vermietung", "Verpachtung", "Pacht"]}
+"0351.5620": {pruef: a6912c023c5ff6cc, zeigen: false, suchwoerter: ["Schulung"]}
+"0351.6322": {pruef: ad047e186e680099, zeigen: true, text: ["Wartungskosten [Grundstücksverwaltungsprogramm]"], suchwoerter: ["Grundstücksverwaltung", "Softwarewartung"]}
+"0501.1000": {pruef: de0adf54530dc658, zeigen: true, suchwoerter: ["Online-Leistung", "Onlinedienst"]}
+"0501.6322": {pruef: 847db16a6cb729d2, zeigen: true, text: ["Wartung [Standesamtssoftware]"], suchwoerter: []}
+"0501.6369": {pruef: da4cfe2398f63158, zeigen: true, suchwoerter: ["Urkundenprüfung", "Urkunde"]}
+"0501.6500": {pruef: f2581b29df9ab585, zeigen: true, suchwoerter: ["Stammbuch", "Familienstammbuch"]}
+"0601.1692": {pruef: 1982448d59d5f425, zeigen: false, suchwoerter: []}
+"0601.4140": {pruef: 79c525a7dfa08361, zeigen: false, suchwoerter: []}
+"0601.6322": {pruef: f13198e8bac67d62, zeigen: false, suchwoerter: ["Firewall", "Virenscanner", "Spamfilter", "Fernwartung", "Newsletter", "Adobe"]}
+"0601.6369": {pruef: a769586ae7b839d2, zeigen: true, text: ["Umstellung Windows Server 15T €, Umstellung SQL-Server 5T €  [Software zur Geräteverwaltung] 3T €, Ablösung [Dokumentenmanagement] 7T €"], suchwoerter: ["Server", "Windows Server", "SQL-Server", "Geräteverwaltung", "Dokumentenmanagement"]}
+"0601.6370": {pruef: 178837ae2784672a, zeigen: true, suchwoerter: ["Toner", "Kabel"]}
+"0601.9340": {pruef: 497f50939e96cbfa, zeigen: false, suchwoerter: ["Windows Server", "Lizenz", "Softwarelizenz", "IT-Sicherheit"]}
+"0601.9356": {pruef: 5f82534a7f0d974f, zeigen: false, suchwoerter: ["Laptop", "PC", "Computer", "Tablet", "Serverraum", "Drucker"]}
+"0621.6322": {pruef: 0e3faf6096663dc9, zeigen: true, text: ["Wartung [Archivsoftware] und [Software für den Archivscanner]"], suchwoerter: ["Archivscanner", "Scanner", "Archivsoftware", "Softwarewartung"]}
+"0681.1416": {pruef: 49340c31d54272ff, zeigen: false, suchwoerter: []}
+"0681.3610": {pruef: d7d47a3197a5faeb, zeigen: false, suchwoerter: ["KfW", "Denkmalpflege", "Landesstiftung", "Städtebauförderung", "Fördermittel"]}
+"0681.5010": {pruef: 417ed4237488935c, zeigen: true, suchwoerter: ["Reparatur", "Instandhaltung"]}
+"0681.5045": {pruef: c189e3e4c751589e, zeigen: true, suchwoerter: ["Aufzug", "Lüftungsanlage", "Lüftung", "Brandmeldeanlage"]}
+"0681.5200": {pruef: 384e2e02a67c1d43, zeigen: false, suchwoerter: ["Möbel", "Büromöbel"]}
+"0681.5310": {pruef: f1b204f2f415cf1e, zeigen: true, suchwoerter: ["Hypogebäude", "Stellplatz", "Parkplatz"]}
+"0681.5400": {pruef: 746c17c0e7c518f2, zeigen: true, suchwoerter: ["Gebäudeversicherung", "Versicherung", "Kaminkehrer", "Schornsteinfeger", "Müllentsorgung", "Heizung"]}
+"0681.5430": {pruef: 534b7d4aae006174, zeigen: true, suchwoerter: ["Fensterreinigung", "Fenster", "Huberhaus"]}
+"0681.5431": {pruef: 784af2bcf5b91464, zeigen: false, suchwoerter: []}
+"0681.6525": {pruef: a802ec9cb6216236, zeigen: true, suchwoerter: ["Porto", "Portokosten", "Post"]}
+"0681.9350": {pruef: 2e9ce076db7947a3, zeigen: true, suchwoerter: ["Möbel", "Rathaussanierung"]}
+"0681.9412": {pruef: 192cb0180536a29b, zeigen: true, suchwoerter: ["Herstellungsbeitrag"]}
+"0681.9450": {pruef: 49b3a09554e0a173, zeigen: false, suchwoerter: ["Möbel", "Möbelbeschaffung"]}
+"0681.9490": {pruef: c2ec70cc6a0964d6, zeigen: false, suchwoerter: []}
+"0682.3610": {pruef: c707106ff1a6b67c, zeigen: false, suchwoerter: ["Kulturfonds Bayern", "Kulturfonds"]}
+"0682.5010": {pruef: 9c8e3c3156dc045f, zeigen: true, suchwoerter: ["Heizung", "Heizkreislauf", "Reparatur"]}
+"0682.5045": {pruef: 8e43e21dada890aa, zeigen: true, suchwoerter: ["Aufzug", "Brandmeldeanlage", "Lüftung", "Rauchabzug"]}
+"0682.5400": {pruef: 1066858e4dfee96e, zeigen: true, suchwoerter: ["Müllentsorgung", "Versicherung", "Brandmeldeanlage"]}
+"0682.5423": {pruef: f3276a7ea148852a, zeigen: true, suchwoerter: ["Rathaus", "Pelletheizung"]}
+"0682.5430": {pruef: e97cf2a3b23dbe01, zeigen: true, suchwoerter: ["Glasreinigung", "Fensterreinigung", "Sitzungssaal"]}
+"0682.5441": {pruef: 154e2a264959428a, zeigen: false, suchwoerter: []}
+"0682.9350": {pruef: f4a990dd7e94f648, zeigen: true, suchwoerter: ["Klimagerät", "Klimaanlage", "Hitze"]}
+"0682.9400": {pruef: 597390f089e341cf, zeigen: false, suchwoerter: []}
+"0682.9490": {pruef: 7a00db17cd606a8d, zeigen: false, suchwoerter: []}
+"0801.5620": {pruef: f436e10118557565, zeigen: false, suchwoerter: ["Schulung"]}
+"0842.4591": {pruef: e12d2378c3de0151, zeigen: false, suchwoerter: ["Gesundheitsmanagement", "Betriebsarzt"]}
+"1100.1599": {pruef: a45ce05987870014, zeigen: true, suchwoerter: ["Fundgeld", "Fundsache", "Fundbüro"]}
+"1100.5620": {pruef: fd2d835e58731359, zeigen: false, suchwoerter: ["Schulung"]}
+"1100.6329": {pruef: 2ddf2a06574d4ab0, zeigen: false, suchwoerter: ["Tierheim"]}
+"1100.6610": {pruef: de021638c1e06d8b, zeigen: false, suchwoerter: []}
+"1111.1300": {pruef: fc39a0e7aab86e9d, zeigen: true, suchwoerter: ["Umweltplakette", "Bescheinigung"]}
+"1111.5620": {pruef: c125d065d464df68, zeigen: true, suchwoerter: ["Lehrgang", "Zertifikatslehrgang", "Grundlagenkurs"]}
+"1111.9340": {pruef: bb77757259cf0d1c, zeigen: false, suchwoerter: ["EC-Gerät", "Kartenzahlung", "EC-Karte"]}
+"1122.4140": {pruef: eca13c6b8afa16f5, zeigen: false, suchwoerter: []}
+"1122.4340": {pruef: eca13c6b8afa16f5, zeigen: false, suchwoerter: []}
+"1122.4440": {pruef: eca13c6b8afa16f5, zeigen: false, suchwoerter: []}
+"1122.6322": {pruef: 1f250ac1796e7047, zeigen: false, suchwoerter: ["Toner", "Tinte", "Softwarewartung"]}
+"1122.6368": {pruef: e8a5284d064ff046, zeigen: false, suchwoerter: []}
+"1122.6369": {pruef: 41d63e7b5a5c00f0, zeigen: false, suchwoerter: []}
+"1141.3600": {pruef: 9c2bbcf46a8321d9, zeigen: true, suchwoerter: ["Fördersatz", "Fördermittel"]}
+"1141.6320": {pruef: f6b8c7ed9e5fe022, zeigen: true, suchwoerter: ["Klimabildung", "Kampagne", "Veranstaltung", "Öffentlichkeitsarbeit"]}
+"1141.6321": {pruef: 071ebe38eb3d0f54, zeigen: true, suchwoerter: ["Fairtrade", "Mitmachaktion"]}
+"1141.9341": {pruef: de4060b1ba696871, zeigen: true, suchwoerter: ["Machbarkeitsstudie", "Wärmeplanung", "Digitaler Zwilling"]}
+"1161.1000": {pruef: 48f783340c22a1bc, zeigen: true, suchwoerter: ["Online-Leistung", "Onlinedienst"]}
+"1161.6322": {pruef: fe93ed9bda15beca, zeigen: true, text: ["Wartung [Einwohnermeldesoftware] mit Modulen / ab Frühjahr 2027 Umstellung auf Rechenzentrum jährl. 46 T€ einmalig 5 T€"], suchwoerter: ["Rechenzentrum", "Softwarewartung"]}
+"1171.5620": {pruef: 382685fa082b009a, zeigen: false, suchwoerter: []}
+"1171.6322": {pruef: d13aa23b1bf6a217, zeigen: true, text: ["Wartung [Gewerbesoftware]"], suchwoerter: ["Gewerbeprogramm", "Gewerbesoftware", "Softwarewartung"]}
+"1311.1146": {pruef: 22148966bfeaa656, zeigen: true, suchwoerter: ["Kostenersatz", "Feuerwehreinsatz"]}
+"1311.1149": {pruef: 1972e8813554979f, zeigen: true, suchwoerter: ["Atemschutzwerkstatt", "Atemschutz", "Schlauchwerkstatt", "Feuerwehrschlauch"]}
+"1311.1411": {pruef: 81291550abaa18c3, zeigen: true, suchwoerter: ["Kaltmiete", "Mieterhöhung", "Feuerwehrwohnung"]}
+"1311.3454": {pruef: f7293234fde8d49c, zeigen: true, suchwoerter: ["Kran"]}
+"1311.3610": {pruef: be272a7e3b730a88, zeigen: false, suchwoerter: ["Kran", "Atemschutzwerkstatt", "Löschfahrzeug", "Drehleiter"]}
+"1311.4099": {pruef: ae0ccc26689f2168, zeigen: true, suchwoerter: ["Verdienstausfall", "Lohnerstattung", "Feuerwehreinsatz"]}
+"1311.5010": {pruef: 82907d7649e749af, zeigen: true, suchwoerter: ["Heizung", "Reparatur", "Klimagerät", "Klimaanlage", "Wohnung"]}
+"1311.5040": {pruef: b9fe1b58dce6165e, zeigen: true, suchwoerter: ["Sirene", "Sirenenwartung"]}
+"1311.5045": {pruef: a41d23a8d846ea4f, zeigen: true, suchwoerter: ["Aufzug"]}
+"1311.5200": {pruef: 43158d80e5d250db, zeigen: true, suchwoerter: ["Bürostuhl", "Schreibtisch", "Büromöbel", "Möbel", "Regal", "Jugendfeuerwehr"]}
+"1311.5209": {pruef: 8fe9f5c29baa6092, zeigen: true, suchwoerter: ["Atemschutz", "Notstromaggregat", "Notstrom", "Schlauch", "Wassersauger", "Tauchpumpe"]}
+"1311.5220": {pruef: 6aeafea6af0b4f28, zeigen: true, suchwoerter: ["Waschmaschine", "Trockner", "Schlauchwaschanlage"]}
+"1311.5400": {pruef: 0c83154ef018b0b9, zeigen: true, suchwoerter: ["Müllentsorgung", "Versicherung"]}
+"1311.5441": {pruef: 1a8062bfb8317d93, zeigen: true, suchwoerter: ["Akku"]}
+"1311.5510": {pruef: 569ca23d5ea1cb55, zeigen: true, suchwoerter: ["Versicherung", "Reifen", "Wartung", "Servicevertrag", "Feuerwehrauto", "Feuerwehrfahrzeug"]}
+"1311.5600": {pruef: 8846f2e32a3fc161, zeigen: true, suchwoerter: ["Chemikalienschutzanzug", "Schutzanzug", "Einsatzkleidung", "Helm", "Feuerwehrhelm"]}
+"1311.5620": {pruef: b450b8d48d20dda1, zeigen: true, suchwoerter: ["Führerschein", "Lehrgang", "Gerätewart", "Übung", "Lehrgangsentschädigung"]}
+"1311.5690": {pruef: 5c5d453b25005b08, zeigen: true, suchwoerter: ["Impfung", "Untersuchung", "Sicherheitswache", "Brandsicherheitswache"]}
+"1311.6322": {pruef: d624f1fddf727419, zeigen: true, text: ["Wartung [Feuerwehr-Verwaltungssoftware], [Alarmierungs-App] usw., Toner, Kleinmaterial und sonstiges Verbrauchsmaterial, Windows Server Lizenz mit CAL, 4x Bildübertragung"], suchwoerter: ["Feuerwehrsoftware", "Alarmierung", "Toner", "Windows Server", "Lizenz", "Bildübertragung"]}
+"1311.6325": {pruef: 4dab1b7e529b6bd6, zeigen: true, suchwoerter: ["Ölbindemittel", "Löschschaum", "Schaummittel", "Desinfektionsmittel", "Atemschutzmaske", "Waschmittel"]}
+"1311.6361": {pruef: 3b5f9155ae5afdc7, zeigen: true, suchwoerter: ["Sonderabfall"]}
+"1311.7180": {pruef: 0cd8755dbfa3be46, zeigen: true, suchwoerter: ["Feuerwehrverein", "Hauptversammlung", "Sozialzuschuss", "Gutschein", "Erholungsheim"]}
+"1311.9341": {pruef: 12d8a9d422c8a1f6, zeigen: false, suchwoerter: ["Feuerwehrbedarfsplan", "Bedarfsplan"]}
+"1311.9350": {pruef: 59f87c6446eb7f91, zeigen: false, suchwoerter: ["Pressluftatmer", "Sirene", "Atemluftkompressor", "Atemschutz"]}
+"1311.9357": {pruef: f56d354c77a320e8, zeigen: false, suchwoerter: ["LKW", "Ladekran", "Fahrgestell", "Löschfahrzeug"]}
+"1311.9450": {pruef: b06483cb26e45da7, zeigen: false, suchwoerter: ["Bodenbeschichtung", "Fahrzeughalle", "Fenstertausch", "Fenster", "Spengler"]}
+"1312.1146": {pruef: 22148966bfeaa656, zeigen: true, suchwoerter: ["Kostenersatz", "Feuerwehreinsatz"]}
+"1312.4099": {pruef: ae0ccc26689f2168, zeigen: true, suchwoerter: ["Verdienstausfall", "Lohnerstattung", "Feuerwehreinsatz"]}
+"1312.5040": {pruef: b587fc6959c2ee2f, zeigen: true, suchwoerter: ["Sirene", "Sirenenwartung"]}
+"1312.5209": {pruef: 8a4a7b5fdbd77810, zeigen: true, suchwoerter: ["Schlauch", "Feuerwehrschlauch", "Atemschutz", "Atemschutzflasche"]}
+"1312.5510": {pruef: 49ee057c90f0e9b2, zeigen: true, suchwoerter: ["Versicherung", "Instandsetzung", "Rost", "Feuerwehrauto", "Feuerwehrfahrzeug"]}
+"1312.5600": {pruef: 1764edd72eff1e8d, zeigen: true, suchwoerter: ["Einsatzkleidung", "Jacke", "Hose", "Handschuh", "Stiefel"]}
+"1312.5620": {pruef: fe3837e3102d75cb, zeigen: true, suchwoerter: ["Führerschein"]}
+"1312.5690": {pruef: eb7fa7cabe94af7b, zeigen: true, suchwoerter: ["Untersuchung", "Impfung"]}
+"1312.6322": {pruef: 77c52781b0cc7117, zeigen: true, text: ["Wartung [Feuerwehr-Verwaltungssoftware], [Alarmierungs-App] usw., Toner, Kleinmaterial und sonstiges Verbrauchsmaterial"], suchwoerter: ["Feuerwehrsoftware", "Alarmierung", "Toner", "Softwarewartung"]}
+"1312.6325": {pruef: 9db19b5c05545a06, zeigen: true, suchwoerter: ["Ölbindemittel", "Feuerwehr-Dienstleistungszentrum"]}
+"1312.7180": {pruef: 8a7193bfcc71ab3c, zeigen: true, suchwoerter: ["Jahreshauptversammlung", "Sozialzuschuss", "Gutschein", "Erholungsheim"]}
+"1312.9350": {pruef: 19ce630d0df0be3e, zeigen: true, suchwoerter: ["Sirene", "Pressluftatmer", "Atemluftkompressor", "Atemschutz"]}
+"1312.9490": {pruef: 0a7d32382485e064, zeigen: false, suchwoerter: ["Feuerwehrhaus", "Gerätehaus", "Feuerwehrbedarfsplan"]}
+"1313.1146": {pruef: 22148966bfeaa656, zeigen: true, suchwoerter: ["Kostenersatz", "Feuerwehreinsatz"]}
+"1313.1149": {pruef: e6dbbc065fd1d364, zeigen: true, suchwoerter: ["Einsatzkleidung", "Wäsche", "Nachbargemeinde"]}
+"1313.3454": {pruef: de9bef911c3f752f, zeigen: false, suchwoerter: ["Löschfahrzeug", "Feuerwehrauto"]}
+"1313.3610": {pruef: 777efd60b0c8f40b, zeigen: false, suchwoerter: ["Löschfahrzeug", "Feuerwehrauto"]}
+"1313.4099": {pruef: ae0ccc26689f2168, zeigen: true, suchwoerter: ["Verdienstausfall", "Lohnerstattung", "Feuerwehreinsatz"]}
+"1313.5010": {pruef: 988a8080d77ec61f, zeigen: true, suchwoerter: ["Blitzableiter", "Blitzschutz"]}
+"1313.5045": {pruef: da0df5b00736cdee, zeigen: true, suchwoerter: ["Industriewaschmaschine", "Waschmaschine"]}
+"1313.5209": {pruef: 5f5e6bb20fbfc26d, zeigen: true, suchwoerter: ["Atemschutz", "Akku"]}
+"1313.5220": {pruef: b3d4cdae7209b317, zeigen: true, suchwoerter: ["Waschmaschine", "Trockner", "Dampfstrahler", "Hochdruckreiniger"]}
+"1313.5510": {pruef: 5db9f5d661dfec1a, zeigen: true, text: ["Versicherungen , Spritkosten , Wartung Geräte, Wartung Fahrzeuge, Hänger, Aggregat , Wartungsvertrag ([Fahrzeughersteller]) , Ersatz Kettensägen Kanister , Ersatz Tragetuch AGT Notfalltasche, Zusätzliche Akkus für neuen 43er"], suchwoerter: ["Versicherung", "Sprit", "Kettensäge", "Anhänger", "Akku", "Feuerwehrauto"]}
+"1313.5600": {pruef: 560391dc835753b9, zeigen: true, suchwoerter: ["Einsatzkleidung", "Helm", "Stiefel", "Jugendfeuerwehr"]}
+"1313.5620": {pruef: 51d97581b7f476cc, zeigen: true, suchwoerter: ["Lehrgang", "Atemschutzübung", "Atemschutz", "Führerschein"]}
+"1313.5690": {pruef: e8e2a634c7055539, zeigen: true, suchwoerter: ["Impfung", "Untersuchung", "Führerschein", "Führerscheinverlängerung"]}
+"1313.6322": {pruef: 77c52781b0cc7117, zeigen: true, text: ["Wartung [Feuerwehr-Verwaltungssoftware], [Alarmierungs-App] usw., Toner, Kleinmaterial und sonstiges Verbrauchsmaterial"], suchwoerter: ["Feuerwehrsoftware", "Alarmierung", "Toner", "Wartung"]}
+"1313.6325": {pruef: fcaf454f399598f6, zeigen: true, suchwoerter: ["Ölbindemittel", "Kettensäge", "Ersatzkette", "Waschmittel", "Einsatzkleidung"]}
+"1313.6450": {pruef: bc629bbf0316470b, zeigen: true, suchwoerter: ["Haftpflicht", "Haftpflichtversicherung"]}
+"1313.6610": {pruef: 3fcd34686ab48b73, zeigen: true, suchwoerter: ["Kreisfeuerwehrverband", "Feuerwehrverband", "Erholungsheim"]}
+"1313.7180": {pruef: b72d658f87510318, zeigen: true, suchwoerter: ["Hauptversammlung", "Sozialzuschuss", "Gutschein", "Erholungsheim"]}
+"1313.9350": {pruef: 4b84bbb478104795, zeigen: false, suchwoerter: ["Atemschutzgerät", "Atemschutz", "Atemluftkompressor"]}
+"1313.9356": {pruef: 400e4e49657ea86d, zeigen: true, suchwoerter: ["Notebook", "Laptop", "Drucker"]}
+"1313.9450": {pruef: b68341e1dfdc2c51, zeigen: true, suchwoerter: ["Wasserenthärtungsanlage", "Wasserenthärtung", "Waschmaschine"]}
+"1351.6320": {pruef: 3b7f94698650fe71, zeigen: false, suchwoerter: ["Brandschau"]}
+"1491.9590": {pruef: f8d1bac4574a8070, zeigen: false, suchwoerter: []}
+"1600.9880": {pruef: 2726d96b303d00f1, zeigen: false, suchwoerter: []}
+"2110.1710": {pruef: aa5378f4c160db32, zeigen: true, suchwoerter: ["Schüler", "Schülerpauschale"]}
+"2110.3611": {pruef: dfd277bd45171140, zeigen: true, suchwoerter: []}
+"2110.5010": {pruef: 39db231e4630fafc, zeigen: true, suchwoerter: ["Brandschutztür", "Malerarbeiten", "Hausmeisterwohnung", "Duschkabine", "Fassade", "Fassadenreparatur"]}
+"2110.5045": {pruef: 6cf8310b56ab191d, zeigen: true, suchwoerter: ["Aufzug", "Brandmeldeanlage", "Lautsprecheranlage", "Rauchabzug"]}
+"2110.5400": {pruef: aacfb37a9ab3bcd9, zeigen: true, suchwoerter: ["Versicherung", "Gebäudeversicherung", "Inhaltsversicherung", "Müllentsorgung", "Speisereste", "Kaminkehrer"]}
+"2110.5441": {pruef: c71c49beadc64aaf, zeigen: false, suchwoerter: []}
+"2110.6322": {pruef: 31c4ff35162ef8ad, zeigen: true, text: ["Wartung [Schulsoftware], Virenscanner, Firewall usw."], suchwoerter: ["Schulsoftware", "Virenscanner", "Firewall"]}
+"2110.6370": {pruef: a8554069d6b9e7e4, zeigen: true, suchwoerter: ["Toner", "Drucker", "Monitor", "Smartphone", "Kabel"]}
+"2110.9340": {pruef: da363b695c11e135, zeigen: false, suchwoerter: ["Apps", "iPad", "Tablet"]}
+"2110.9341": {pruef: 4339619802d751ab, zeigen: true, suchwoerter: ["Kläranlage", "Abwasserkanal"]}
+"2110.9356": {pruef: cb2ffc16b37540ad, zeigen: true, suchwoerter: ["iPad", "Tablet", "Lautsprecher", "Klassenzimmer", "Netzwerktechnik"]}
+"2110.9451": {pruef: 48d8d80f06149c15, zeigen: true, suchwoerter: ["LED", "Beleuchtung", "Klassenzimmer", "Dachsanierung", "Torschließer"]}
+"2111.1710": {pruef: aa5378f4c160db32, zeigen: true, suchwoerter: ["Schüler", "Schülerpauschale"]}
+"2111.3611": {pruef: 9f611ebe5cd89373, zeigen: true, suchwoerter: []}
+"2111.6322": {pruef: 31c4ff35162ef8ad, zeigen: true, text: ["Wartung [Schulsoftware], Virenscanner, Firewall usw."], suchwoerter: ["Schulsoftware", "Virenscanner", "Firewall"]}
+"2111.6370": {pruef: a8554069d6b9e7e4, zeigen: true, suchwoerter: ["Toner", "Drucker", "Monitor", "Smartphone", "Kabel"]}
+"2111.6387": {pruef: 0ccd2c2b0c512137, zeigen: true, suchwoerter: ["Turnhalle", "Schwimmunterricht", "Schwimmen", "Eislaufen", "Sportunterricht"]}
+"2111.9356": {pruef: a32e0da6834d4da5, zeigen: true, suchwoerter: ["iPad", "Tablet", "Ganztagsschule", "Netzwerktechnik"]}
+"2111.9420": {pruef: eba9e98c94bf9771, zeigen: false, suchwoerter: []}
+"2130.1710": {pruef: 138e93436f51363d, zeigen: true, suchwoerter: ["Schüler", "Schülerpauschale"]}
+"2130.3611": {pruef: 47221be01feb49a7, zeigen: true, suchwoerter: []}
+"2130.6322": {pruef: 31c4ff35162ef8ad, zeigen: true, text: ["Wartung [Schulsoftware], Virenscanner, Firewall usw."], suchwoerter: ["Schulsoftware", "Virenscanner", "Firewall"]}
+"2130.6370": {pruef: a8554069d6b9e7e4, zeigen: true, suchwoerter: ["Toner", "Drucker", "Monitor", "Smartphone", "Kabel"]}
+"2130.6387": {pruef: 247b41de3973a36c, zeigen: true, suchwoerter: ["Schwimmunterricht", "Schwimmen", "Eislaufen", "Turnhalle"]}
+"2130.9340": {pruef: 6bb6fa7e7970788f, zeigen: true, text: ["Kauf Apps, sonstige Software 2 T€;\nKauf [Lizenz für die Geräteverwaltung] für 1:1 Ausstattung Schüler iPads 6 T€"], suchwoerter: ["Apps", "Geräteverwaltung", "iPad", "Tablet"]}
+"2130.9350": {pruef: fd3456f7b1749b5b, zeigen: false, suchwoerter: []}
+"2130.9356": {pruef: 2f9b54f269873967, zeigen: true, suchwoerter: ["iPad", "Tablet", "Lehrer", "Netzwerktechnik", "USV"]}
+"2155.5010": {pruef: ab477926f6f82bf7, zeigen: true, suchwoerter: ["Malerarbeiten", "Sonnenschutz", "Taubenabwehr", "Fassade", "Gerüst", "Brandschutztür"]}
+"2155.5045": {pruef: fc844ea0d2878ad1, zeigen: false, suchwoerter: ["Aufzug", "Brandmeldeanlage", "Rauchabzug", "Lautsprecheranlage"]}
+"2155.5220": {pruef: 631ea37f73346455, zeigen: true, suchwoerter: ["Maschinenreparatur", "Reparatur"]}
+"2155.5400": {pruef: e8919bea2c5b8cbd, zeigen: true, suchwoerter: ["Versicherung", "Gebäudeversicherung", "Inhaltsversicherung", "Müllentsorgung", "Speisereste", "Schädlingsbekämpfung"]}
+"2155.9350": {pruef: 09aac464180e4d94, zeigen: true, suchwoerter: ["Bodenreinigungsmaschine", "Reinigungsmaschine", "Staubsauger"]}
+"2155.9450": {pruef: a0257888dfa0aa70, zeigen: true, suchwoerter: ["Pumpe", "Hebeanlage"]}
+"2950.6450": {pruef: 24b7df1c80b75fac, zeigen: false, suchwoerter: []}
+"3000.6314": {pruef: 0d039eb5a966e36d, zeigen: true, suchwoerter: ["Bry-sur-Marne", "Sawbridgeworth", "Kärnten", "Partnerstadt", "Bewirtung", "Geschenk"]}
+"3201.5010": {pruef: 39ecd444cbf00b7f, zeigen: true, suchwoerter: []}
+"3201.6329": {pruef: 98b8bb2b4ab15c8f, zeigen: true, suchwoerter: ["Restaurator", "Restaurierung", "Bilderrahmung", "Ausstellung", "Veranstaltung"]}
+"3201.9400": {pruef: 8347975bc636f2cc, zeigen: true, suchwoerter: ["Bestandsaufnahme", "Denkmalschutz", "Denkmalschutzbehörde"]}
+"3201.9450": {pruef: 702ceda4a1d6dca7, zeigen: false, suchwoerter: ["Alarmanlage", "Denkmalschutz"]}
+"3400.6317": {pruef: 90dd68f3c6aef3dc, zeigen: true, suchwoerter: ["Offene Ateliers", "Atelier", "Kunst"]}
+"3400.6319": {pruef: ed0d1163adbe4ac4, zeigen: true, suchwoerter: ["Kurzfilmnacht", "Kurzfilm", "Film"]}
+"3400.6329": {pruef: c0321bd5d348e223, zeigen: true, suchwoerter: ["Christbaum", "Weihnachtsbeleuchtung", "Faschingsumzug", "Fronleichnam", "Stadtfahne", "Krippenweg"]}
+"3400.6790": {pruef: 2c6910772c473a98, zeigen: true, suchwoerter: ["Verein", "Brauchtum", "Brauchtumspflege"]}
+"3400.7180": {pruef: ec218ab1556c9e00, zeigen: true, suchwoerter: ["Faschingsumzug", "Fasching"]}
+"3400.7182": {pruef: 69b56f3300f81488, zeigen: true, suchwoerter: ["Kulturreferent", "Kulturbudget"]}
+"3400.7183": {pruef: 1299d0d481513f27, zeigen: true, suchwoerter: ["Familienfest"]}
+"3430.1167": {pruef: 6e2264d487b33db6, zeigen: true, suchwoerter: ["Schausteller", "Festwirt", "Volksfest"]}
+"3430.1305": {pruef: 629cdb06cfc4a66a, zeigen: true, suchwoerter: ["Getränkerückvergütung", "Rückvergütung"]}
+"3430.6316": {pruef: 421dd88ac61cac3b, zeigen: true, suchwoerter: ["Kutsche", "Festumzug"]}
+"3430.6320": {pruef: 30eebf83e2d795eb, zeigen: true, suchwoerter: ["Auszug", "Behördentag", "Seniorennachmittag", "Senioren"]}
+"3430.6321": {pruef: d2f93d765c64a14c, zeigen: true, text: ["Flyer,Plakat, Anzeigen in [Lokalzeitungen]"], suchwoerter: ["Flyer", "Plakat", "Anzeige", "Zeitungsanzeige", "Werbung"]}
+"3430.6360": {pruef: a399cef14aa4af5f, zeigen: true, suchwoerter: ["Security", "Sicherheitsdienst"]}
+"3430.6525": {pruef: 26f19ca2eec90bd7, zeigen: true, suchwoerter: ["Einladung", "Porto"]}
+"3430.9600": {pruef: 834d8b6a5af30bb7, zeigen: true, suchwoerter: ["Gartenhydrant", "Hydrant", "Festzelt", "Schausteller", "Wasseranschluss"]}
+"3503.1410": {pruef: 4fa63fef72126a93, zeigen: true, suchwoerter: ["Schaukasten", "Stadtplatz"]}
+"3503.1415": {pruef: 44d6134832c03971, zeigen: true, suchwoerter: ["Stellplatz", "Parkplatz"]}
+"3503.5010": {pruef: 2451d10f0a1aac63, zeigen: true, suchwoerter: ["Heizung", "Heizungswartung", "Schiebetür", "Reparatur"]}
+"3503.5045": {pruef: 6a2cc792a4329e50, zeigen: true, suchwoerter: ["Aufzug", "Aufzugswartung", "Schiebetür"]}
+"3503.5400": {pruef: 98548f05a7734f35, zeigen: true, suchwoerter: ["Gebäudeversicherung", "Versicherung", "Grundsteuer", "Kaminkehrer", "Schornsteinfeger"]}
+"3503.5430": {pruef: 3ad7344134ed17d8, zeigen: true, suchwoerter: ["Fensterreinigung", "Fenster", "Hubsteiger"]}
+"3503.7094": {pruef: 56ba1ccae98a2caa, zeigen: true, suchwoerter: []}
+"3521.5010": {pruef: 585d7fc55a57e7c9, zeigen: true, suchwoerter: ["Giebel", "Giebelsanierung", "Sanierung"]}
+"3521.6322": {pruef: e374182b7bf4e7ab, zeigen: true, text: ["Wartung [Bibliothekssoftware] / [Ausleihe digitaler Medien] / Selbstverbucher, Kleinmaterial / Toner usw., Austausch 2x Tablet, 1x Beamer und Leinwand (Deckenmontage)"], suchwoerter: ["Bibliothekssoftware", "E-Medien", "Selbstverbucher", "Tablet", "Beamer", "Leinwand"]}
+"3521.9356": {pruef: 6c1788eaaa92b2f7, zeigen: true, suchwoerter: ["Notebook", "Laptop"]}
+"3551.7180": {pruef: 428a4b488e08812c, zeigen: true, suchwoerter: ["Kulturverein", "Vereinszuschuss", "Kulturförderung"]}
+"3600.5400": {pruef: 0e4e4c77e63cfcbb, zeigen: true, suchwoerter: ["Ökofläche"]}
+"3600.7180": {pruef: fbc9ffe3682eefbc, zeigen: true, suchwoerter: []}
+"3600.9321": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"3650.6790": {pruef: 98fdfd5941e938c6, zeigen: true, suchwoerter: ["Mariengrotte", "Grotte"]}
+"3650.9870": {pruef: b47583d5625038ec, zeigen: false, suchwoerter: []}
+"3700.6790": {pruef: 54893b13e389d605, zeigen: true, suchwoerter: ["Johannesturm", "Turm", "Tor"]}
+"4001.7180": {pruef: 29afdfacfebb7fea, zeigen: true, suchwoerter: ["Sozialverband"]}
+"4351.5010": {pruef: 664ff60614ecb5d2, zeigen: true, suchwoerter: ["Heizung", "Heizungswartung"]}
+"4351.5400": {pruef: f9598be61a5b307a, zeigen: true, suchwoerter: ["Versicherung", "Müllentsorgung"]}
+"4351.5430": {pruef: e597d9dba91c78e9, zeigen: true, suchwoerter: []}
+"4600.5620": {pruef: 702ec12c23e2eafe, zeigen: true, suchwoerter: ["Leitungsausbildung"]}
+"4600.6322": {pruef: 59dd43014322dcbf, zeigen: false, suchwoerter: []}
+"4600.6510": {pruef: 35df63fd6bd528c5, zeigen: false, suchwoerter: []}
+"4600.7093": {pruef: c90fd974eb75221b, zeigen: true, suchwoerter: ["Jugendförderung", "Vereinsförderung", "Vereinsförderrichtlinie"]}
+"4605.6790": {pruef: f4d108fb47a540f3, zeigen: true, suchwoerter: ["Spielplatz", "Sandtausch", "Spielsand", "Zaun", "Spielplatzkontrolle", "Reparatur"]}
+"4606.5010": {pruef: 10255c28b2d5dc7e, zeigen: true, suchwoerter: ["Boden", "Küche", "Klimaanlage", "Gamingraum", "Schlüsselchip", "Türbeschlag"]}
+"4606.6322": {pruef: 57fbce7477a9b5f0, zeigen: true, text: ["Wartung [Datensicherungssoftware], Firewall, Adobe usw., sonstiges Verbrauchsmaterial Tinte/Toner usw."], suchwoerter: ["Datensicherung", "Backup", "Firewall", "Adobe", "Tinte", "Toner"]}
+"4606.9400": {pruef: 1bf32deefd35d723, zeigen: true, suchwoerter: ["Türerneuerung", "Tür"]}
+"4640.5200": {pruef: 9767b735c33c321f, zeigen: true, text: ["[Anmeldeportal für Kitaplätze] 4000 inkl Nachbesserungen, KommunikationsAPP alle KIGA's 2000, Allg 3000"], suchwoerter: ["Anmeldeportal", "Kita-Anmeldung", "Kommunikationsapp", "App", "Kindergarten"]}
+"4640.9350": {pruef: b2e666c0543d011a, zeigen: false, suchwoerter: []}
+"46411.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46411.3610": {pruef: dab4f473ab939a28, zeigen: false, suchwoerter: []}
+"46411.9350": {pruef: f8d1bac4574a8070, zeigen: false, suchwoerter: []}
+"46411.9400": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"46411.9490": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"46412.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46412.5010": {pruef: 6c0e50b23fb33d03, zeigen: true, suchwoerter: ["Lüftungsanlage", "Lüftung", "Filter"]}
+"46412.5400": {pruef: 37b989df43a1c515, zeigen: true, suchwoerter: ["Gebäudeversicherung", "Versicherung", "Kaminkehrer", "Fettabscheider"]}
+"46412.9356": {pruef: a86123fbc0421743, zeigen: true, suchwoerter: ["Kopierer", "Kopiergerät"]}
+"46413.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46413.9359": {pruef: b82748f9b623e391, zeigen: true, suchwoerter: ["Tipi", "Sonnenschutz", "Zelt"]}
+"46414.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46414.6322": {pruef: 36ad1feaf9efe3f7, zeigen: true, text: ["Wartung [Kita-Software] 500€, Kleinmaterial / Toner usw. 1,5T €"], suchwoerter: ["Kita-Software", "Toner"]}
+"46414.9356": {pruef: 7b6016fbc6f499ea, zeigen: true, suchwoerter: ["Tablet", "Hort", "Kindergarten"]}
+"46414.9450": {pruef: bad19b25809fe15f, zeigen: true, suchwoerter: ["Fenster", "Fenstererneuerung", "Denkmalschutz", "Hort"]}
+"46415.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46415.5010": {pruef: e20f070f91bdbbd0, zeigen: true, suchwoerter: ["Klimaanlage", "Klima", "Malerarbeiten", "Akustikplatte", "Schallschutz", "Reparatur"]}
+"46415.5430": {pruef: 936a88b3b4a1c529, zeigen: true, suchwoerter: ["Reinigungsfirma", "Putzfirma"]}
+"46416.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46416.5010": {pruef: 39ecd444cbf00b7f, zeigen: true, suchwoerter: []}
+"46416.9450": {pruef: 92179e5d91e38fa6, zeigen: true, suchwoerter: ["Lager", "Lagerraum", "Mäuseschutz"]}
+"46417.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46417.5010": {pruef: 18623340cf1dfbfb, zeigen: true, suchwoerter: ["Malerarbeiten", "Fenster", "Gruppenraum", "Bodentausch", "Heizung", "Heizungswartung"]}
+"46417.5400": {pruef: faf97b74d06968d9, zeigen: true, suchwoerter: ["Versicherung", "Kaminkehrer", "Schornsteinfeger"]}
+"46417.5421": {pruef: e3fbacab5d4f678c, zeigen: true, suchwoerter: []}
+"46417.9359": {pruef: 9f37a00353e156e9, zeigen: true, suchwoerter: ["Spielgerät", "Gartenerweiterung", "Garten"]}
+"46417.9450": {pruef: 11bda2072424173b, zeigen: true, suchwoerter: ["Gartenerweiterung", "Garten", "Heizungserneuerung", "Heizung"]}
+"46418.1194": {pruef: 0c9c2e4b0719a13e, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46418.3610": {pruef: b65b9b002f03325c, zeigen: false, suchwoerter: []}
+"46418.5400": {pruef: d5854c5d226bfd6d, zeigen: true, suchwoerter: ["Versicherung", "Kaminkehrer", "Lüftungsanlage"]}
+"46418.5430": {pruef: 37846c11c70e4c34, zeigen: true, suchwoerter: ["Reinigungsfirma", "Putzfirma"]}
+"46418.9350": {pruef: b150ccd8b9af647e, zeigen: false, suchwoerter: []}
+"46418.9400": {pruef: 597390f089e341cf, zeigen: false, suchwoerter: []}
+"46418.9490": {pruef: fd3456f7b1749b5b, zeigen: false, suchwoerter: []}
+"46419.1194": {pruef: 9fd2ec995fdf1068, zeigen: false, suchwoerter: ["Beitragszuschuss", "Elternbeitrag"]}
+"46419.6322": {pruef: 8a402cffca6d0818, zeigen: true, text: ["1x Tablet und 1x Smartphone 1,4T €, Wartung [Kita-Software] 500€, Kleinmaterial / Toner usw. 1,5T €"], suchwoerter: ["Tablet", "Smartphone", "Kita-Software", "Toner"]}
+"46420.9400": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"46420.9490": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"46431.5010": {pruef: 1d564e4bc0274bd2, zeigen: true, suchwoerter: ["Tür", "Sanitär", "Sanitäranlage"]}
+"46431.9450": {pruef: 946c72222e230226, zeigen: true, suchwoerter: ["Wasserenthärtungsanlage", "Wasserenthärtung"]}
+"46439.5010": {pruef: a468145fefa6cab5, zeigen: true, suchwoerter: ["Sockel", "Blechverkleidung", "Kamin", "Kaminsanierung", "Kellertreppe", "Reparatur"]}
+"46439.5400": {pruef: faf97b74d06968d9, zeigen: true, suchwoerter: ["Versicherung", "Kaminkehrer", "Schornsteinfeger"]}
+"46439.9450": {pruef: f2cb6034fe4e4147, zeigen: false, suchwoerter: ["Wasserenthärtungsanlage", "Wasserenthärtung", "Sonnensegel", "Sonnenschutz"]}
+"46448.5400": {pruef: 64e92598f494ecdd, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer"]}
+"5500.9880": {pruef: d98d61484a455e4f, zeigen: false, suchwoerter: ["Keglerverein", "Kegeln", "Großgeräteförderung", "Vereinsförderung", "Vereinsförderrichtlinie"]}
+"5609.6369": {pruef: 0be2cdfa31b2d1b0, zeigen: true, suchwoerter: ["Grünschnitt", "FC Moosburg"]}
+"5611.6790": {pruef: 62b9ed0c3727e348, zeigen: true, suchwoerter: ["Spielplatzkontrolle", "Müllentsorgung", "Müll"]}
+"5612.9400": {pruef: 05f460b52464c1bc, zeigen: false, suchwoerter: ["Bepflanzung", "Hodschagerstraße"]}
+"5613.1599": {pruef: 7ca40c0696b6af3d, zeigen: false, suchwoerter: ["Zigarettenautomat"]}
+"5613.5010": {pruef: eb6d5e52e09e37d6, zeigen: true, suchwoerter: ["Dunstabzug", "Dunstabzugshaube", "Eisstüberl", "Kaminkehrer"]}
+"5613.5045": {pruef: 6971ada74904f74f, zeigen: false, suchwoerter: ["Lüftung", "Brandmeldeanlage", "Rauchabzug"]}
+"5613.5209": {pruef: 30a41864fa2c3443, zeigen: true, suchwoerter: ["Leihschlittschuh", "Schlittschuh", "Schlittschuhverleih", "Schleifring"]}
+"5613.5400": {pruef: 859c94ba296bd7ee, zeigen: true, suchwoerter: ["Grundsteuer", "Versicherung", "Kaminkehrer", "Dunstabzugshaube", "Müllentsorgung"]}
+"5613.5430": {pruef: ae23ced2f2b29208, zeigen: true, suchwoerter: ["Reinigungsfirma", "Putzfirma"]}
+"5613.5510": {pruef: a45550a97e05a777, zeigen: true, text: ["Fahrzeugunterhalt Eismaschine [Hersteller]"], suchwoerter: ["Eismaschine"]}
+"5613.6342": {pruef: 597e877ffc2abecf, zeigen: true, suchwoerter: ["Stromkosten", "Energiekosten"]}
+"5613.6525": {pruef: 1bf17c911da7a2be, zeigen: true, suchwoerter: ["GEMA", "GEMA-Gebühr", "Musik"]}
+"5613.9450": {pruef: 2503627b5a1ec5bc, zeigen: false, suchwoerter: ["Leimbinder", "Rissesanierung", "Lüftungsanlage", "Lüftung", "Dachaufstiegsleiter"]}
+"5651.5010": {pruef: 10aa978b6e9e018e, zeigen: true, suchwoerter: ["Hebeanlage", "Motor", "Reparatur"]}
+"5651.5045": {pruef: ac29bf3f009ebc90, zeigen: false, suchwoerter: ["Lautsprecheranlage", "Brandmeldeanlage"]}
+"5651.5161": {pruef: a22580bea7533994, zeigen: false, suchwoerter: ["Stolperstelle", "Sanierung", "Reparatur"]}
+"5651.5200": {pruef: 8ca23721850cce28, zeigen: true, suchwoerter: ["Staubsauger"]}
+"5651.5400": {pruef: 892a452a3430276e, zeigen: true, suchwoerter: ["Versicherung", "Müllentsorgung", "Grünfläche", "Grünpflege"]}
+"5651.5717": {pruef: bf6a6e19e9a3595a, zeigen: true, suchwoerter: ["Turngerät"]}
+"5651.9350": {pruef: 51c1f953854d4c27, zeigen: true, suchwoerter: ["Trennvorhang", "Trennvorhanganlage", "Vorhang", "Bodenwischmaschine"]}
+"5651.9450": {pruef: c919d312e97d0da6, zeigen: true, suchwoerter: ["Hallenbeleuchtung", "Beleuchtung", "Hebeanlage"]}
+"5652.5010": {pruef: e98752c8d29d1399, zeigen: false, suchwoerter: ["Kühltheke", "Dunstabzug", "Dunstabzugsfilter", "Zirkulationspumpe", "Pumpe", "Brandschutz"]}
+"5652.5045": {pruef: 05843605263df8b1, zeigen: true, suchwoerter: ["Sicherheitsbeleuchtung", "Notbeleuchtung"]}
+"5652.5400": {pruef: fb559f19d7fb2c36, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Müllentsorgung"]}
+"5652.5442": {pruef: 5af295482ac41867, zeigen: true, suchwoerter: ["Gasherd", "Herd"]}
+"5652.6500": {pruef: 2266416972c71e0f, zeigen: true, suchwoerter: ["Tinte", "Toner"]}
+"5652.6790": {pruef: 2840e493632566f3, zeigen: true, suchwoerter: ["Bühne", "Malerarbeiten", "Heizung"]}
+"5700.5400": {pruef: 41eb474adc93e445, zeigen: true, suchwoerter: ["Hallenbad", "Freibad", "Schwimmbad"]}
+"5701.1161": {pruef: 924425dd3ee54cc2, zeigen: false, suchwoerter: []}
+"5701.4140": {pruef: f6073da98f362eea, zeigen: false, suchwoerter: ["Rettungsschwimmer"]}
+"5701.5040": {pruef: c90ebd81a6008cea, zeigen: true, suchwoerter: ["Pumpe", "Brunnen"]}
+"5701.5162": {pruef: 9ba2fb6aaebc6d5e, zeigen: true, suchwoerter: ["Beckenanstrich", "Becken", "Rutsche", "Wasserrutsche", "TÜV", "Grüngut"]}
+"5701.5400": {pruef: f18181707d3d7ece, zeigen: true, suchwoerter: ["Versicherung", "Müllentsorgung", "Kaminkehrer", "Schornsteinfeger"]}
+"5701.6320": {pruef: b894dad79893a152, zeigen: true, suchwoerter: ["Chlor", "Schwefelsäure", "Reagenztablette", "Wasseraufbereitung"]}
+"5701.6329": {pruef: bdc2d7a769b15a8f, zeigen: true, suchwoerter: ["Wasserprobe", "Wasserqualität", "Becken"]}
+"5701.6342": {pruef: bab8b165e6d9b3af, zeigen: false, suchwoerter: []}
+"5701.6500": {pruef: 940283a8cab207bd, zeigen: true, suchwoerter: ["Tinte", "Toner"]}
+"5701.6790": {pruef: 50cd630a9bfd77cc, zeigen: true, suchwoerter: ["Frühjahrssanierung", "Dusche", "Umkleide", "Umkleidekabine", "Becken"]}
+"5701.9400": {pruef: ba8c78e5d54b8ce2, zeigen: false, suchwoerter: []}
+"5701.9490": {pruef: 237fc07290767115, zeigen: false, suchwoerter: []}
+"5702.1161": {pruef: d50fdb1a54d75295, zeigen: false, suchwoerter: ["Eintrittspreis"]}
+"5702.1600": {pruef: 992d0ade98024680, zeigen: true, suchwoerter: ["KWK", "Kraft-Wärme-Kopplung", "Blockheizkraftwerk"]}
+"5702.3610": {pruef: 1abdca3a4cd91d38, zeigen: false, suchwoerter: []}
+"5702.5040": {pruef: eae894ab79c7cb25, zeigen: true, suchwoerter: ["Hubboden", "Pumpe", "Blockheizkraftwerk", "BHKW", "Wasserprobe"]}
+"5702.5045": {pruef: ca9ca76966425737, zeigen: true, suchwoerter: []}
+"5702.5400": {pruef: dc77ae7667b4e709, zeigen: true, suchwoerter: ["Versicherung", "Kaminkehrer", "Schornsteinfeger", "Müllentsorgung"]}
+"5702.6500": {pruef: 940283a8cab207bd, zeigen: true, suchwoerter: ["Tinte", "Toner"]}
+"5702.9350": {pruef: b61d050543c7e8da, zeigen: true, suchwoerter: ["Bodenreinigungsmaschine", "Reinigungsmaschine"]}
+"5702.9400": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"5702.9490": {pruef: fad9eb7550a71f12, zeigen: false, suchwoerter: []}
+"5800.5040": {pruef: 54d09acb3f8817ac, zeigen: false, suchwoerter: ["Fontänenfeld", "Fontäne", "Wasserspiel", "Reinigung"]}
+"5800.5220": {pruef: 2f02ac0f1594e432, zeigen: true, text: ["Gestiegene ET Preise, Nötige Rep./Instandhaltungsmaßnahmen an Mulchgerät, Ersatzmesser und Ersatzteile für [Hersteller] Mäher;"], suchwoerter: ["Mulchgerät", "Mäher", "Rasenmäher", "Ersatzteil", "Ersatzmesser"]}
+"5800.6320": {pruef: 8f0fffba6477c43c, zeigen: true, suchwoerter: ["Hubsteiger", "Hebebühne", "Leitpfosten", "Mähen"]}
+"5800.6329": {pruef: eb17e0687cc6acde, zeigen: true, suchwoerter: ["Samen", "Saatgut", "Pflanze"]}
+"5800.9350": {pruef: 573e366dddc897d7, zeigen: true, suchwoerter: ["Hochregal", "Regal"]}
+"5800.9359": {pruef: 172a50abd144651f, zeigen: false, suchwoerter: ["Hohenadlkreuzung", "Kreuzung", "Ortseingang", "Bepflanzung"]}
+"5821.1699": {pruef: 577a73da74da942d, zeigen: false, suchwoerter: []}
+"5821.5100": {pruef: c09576abd4ac1d5c, zeigen: true, suchwoerter: ["Christbaum", "Weihnachtsbaum", "Pflanzung"]}
+"5901.5401": {pruef: 36b10d2629ef449b, zeigen: true, suchwoerter: ["Gärtnerei", "Baumfällung", "Hubsteiger"]}
+"6001.1000": {pruef: bc2cc59586913c44, zeigen: true, suchwoerter: ["Gebührenerhöhung"]}
+"6001.6322": {pruef: adc3c43e65063cbe, zeigen: false, suchwoerter: ["CAD-Programm", "Softwarewartung"]}
+"6011.6322": {pruef: bd96bd3c1a9b2ad0, zeigen: true, text: ["Wartung [Software für das Gebäudemanagement], Ausschreibungssoftware usw."], suchwoerter: ["CAFM", "Gebäudemanagement", "Ausschreibungssoftware", "Software"]}
+"6100.1710": {pruef: f3b4ac8fdd828478, zeigen: false, suchwoerter: []}
+"6100.3611": {pruef: 537fc4674505a4d7, zeigen: false, suchwoerter: []}
+"6100.6329": {pruef: 6f319604daedbb97, zeigen: false, suchwoerter: []}
+"6100.9350": {pruef: 2205867e2859233c, zeigen: true, suchwoerter: ["Stadtmöblierung", "Stadtmöbel", "Herrnstraße", "Beratungsleistung", "Förderprogramm"]}
+"6100.9490": {pruef: b47583d5625038ec, zeigen: false, suchwoerter: []}
+"6201.1650": {pruef: f76efcf76ef46f8a, zeigen: true, suchwoerter: ["Zinsen", "Darlehen", "Verwaltungskosten"]}
+"6300.3521": {pruef: 7424be034bdddbf2, zeigen: false, suchwoerter: ["Amperauen", "Thalbacher Au", "Westerpointweg"]}
+"6300.5130": {pruef: 0ee8e5ab83f9010b, zeigen: kurz, suchwoerter: ["Straßensanierung", "Gehweg", "Schlagloch", "Frostschaden", "Kiesstraße", "Münchner Straße"]}
+"6300.5131": {pruef: e69e12ebcb25b270, zeigen: true, suchwoerter: ["Standsicherheitsprüfung", "Ampelmast"]}
+"6300.5137": {pruef: 6f7e920e21bae857, zeigen: false, suchwoerter: ["Fremdwasser"]}
+"6300.6369": {pruef: 4cea8c41d4d90c1a, zeigen: false, suchwoerter: []}
+"6300.6799": {pruef: 528275a75b8edd1b, zeigen: false, suchwoerter: []}
+"6300.9321": {pruef: 8154c63e2cad64b4, zeigen: true, suchwoerter: ["Oberes Gereuth", "Gereuth", "Baugebiet"]}
+"6300.9500": {pruef: 5d6f5908d754c01c, zeigen: false, suchwoerter: ["Königsbergerstraße", "Mühlbachbogen", "Burgermühlstraße", "Rektor-Weh-Straße", "Gehweg", "Verkehrsinsel"]}
+"6300.9505": {pruef: 6dfd868c88a23557, zeigen: false, suchwoerter: ["Stadtwaldstraße", "Neustadtstraße", "Gehweg"]}
+"6311.9321": {pruef: d74a56fc013c36c3, zeigen: false, suchwoerter: []}
+"6312.9590": {pruef: 724401ad15a512b1, zeigen: false, suchwoerter: ["Grundlagenermittlung"]}
+"6325.9590": {pruef: fcfe71d5572680ca, zeigen: false, suchwoerter: []}
+"6332.9500": {pruef: 66d3cb3a623c6ef1, zeigen: true, suchwoerter: ["Münchner Straße", "Poststraße", "Straßenausbau"]}
+"6345.9510": {pruef: 4525e4c6044d2cf2, zeigen: true, suchwoerter: ["Kreuzung", "Thalbacher Straße", "Bahnhofstraße"]}
+"6345.9590": {pruef: c135b39ce32eb07d, zeigen: false, suchwoerter: []}
+"6701.6342": {pruef: ac94ce3cb2fbec9e, zeigen: true, suchwoerter: ["LED", "LED-Umrüstung", "Straßenlaterne"]}
+"6701.9460": {pruef: f8d1bac4574a8070, zeigen: false, suchwoerter: []}
+"6751.5220": {pruef: 116c5cfd72e466d4, zeigen: true, suchwoerter: ["Kehrbesen", "Kehrmaschine", "Gehwegkehrmaschine", "Gehweg"]}
+"6751.5450": {pruef: 3edd0e945da4968a, zeigen: true, suchwoerter: ["Wasserverbrauch"]}
+"6751.6362": {pruef: dac4138a7b5b148e, zeigen: true, suchwoerter: ["Ausschreibung", "Neuausschreibung"]}
+"6752.9357": {pruef: 1177622abcf7f778, zeigen: true, suchwoerter: ["Schneepflug", "Schneeräumung", "Streuer"]}
+"6800.1192": {pruef: 50d8b6ee4eb689e7, zeigen: true, suchwoerter: ["Gebührenerhöhung", "Parkgebühr"]}
+"6800.5300": {pruef: e81d4eaeaf2ee1cc, zeigen: true, suchwoerter: ["Stadtgraben"]}
+"6815.1400": {pruef: d119feb877697966, zeigen: false, suchwoerter: ["E-Ladesäule", "Ladesäule", "Elektroauto"]}
+"6815.5390": {pruef: cfc3201faf022c6e, zeigen: true, suchwoerter: ["Steinbockstraße", "Leinbergerstraße"]}
+"6815.6320": {pruef: 2588b345b4d4a54b, zeigen: false, suchwoerter: ["E-Ladesäule", "Ladesäule", "Elektroauto"]}
+"6815.6440": {pruef: fd3eb70b9fa9c351, zeigen: false, suchwoerter: []}
+"6815.9500": {pruef: 9a4f7fd13f385783, zeigen: true, suchwoerter: ["Friedhof", "Friedhofsparkplatz", "Rektor-Weh-Straße"]}
+"6860.1192": {pruef: 17918ce28da7c62c, zeigen: false, suchwoerter: []}
+"6860.6329": {pruef: 9bc1a3ce100e4397, zeigen: true, suchwoerter: ["Sanierung", "Tiefgaragensanierung"]}
+"6890.5400": {pruef: bd8c453c32f41af3, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer"]}
+"6890.9600": {pruef: 60aef44c545b142f, zeigen: true, suchwoerter: ["Batteriespeicher", "Stromspeicher"]}
+"7000.1111": {pruef: de0a7d8c2976fa03, zeigen: true, suchwoerter: ["Gebührenkalkulation", "Abwassergebühr", "Rockermaierareal", "Rockermaier"]}
+"7000.1112": {pruef: 3d1c66995ac0d4a8, zeigen: false, suchwoerter: []}
+"7000.1118": {pruef: a53671875be7e5ac, zeigen: true, suchwoerter: ["Kanalanschluss", "Schacht", "Grundstücksgrenze"]}
+"7000.6495": {pruef: 0969f810017cfe8b, zeigen: true, suchwoerter: []}
+"7000.6550": {pruef: 78a579d7f3fde84c, zeigen: true, suchwoerter: ["BKPV", "Prüfungsverband", "Gebührenkalkulation", "Klageverfahren", "Gutachten"]}
+"7000.7150": {pruef: 036659719394cb4e, zeigen: true, suchwoerter: ["Betreiberentgelt", "Wirtschaftsplan"]}
+"7191.4140": {pruef: 9c8fa3e95f9429a0, zeigen: true, suchwoerter: ["Reinigung", "Schließdienst", "Toilette", "Toilettenreinigung"]}
+"7191.5431": {pruef: 34555fe9adbaa708, zeigen: false, suchwoerter: ["Papiertücher", "Müllbeutel"]}
+"7192.1119": {pruef: 12a46da25ee1321b, zeigen: true, suchwoerter: ["Benutzungsordnung"]}
+"7201.6500": {pruef: 940283a8cab207bd, zeigen: true, suchwoerter: ["Tinte", "Toner"]}
+"7202.6790": {pruef: 658b2a622a788e2a, zeigen: true, suchwoerter: ["Abfall", "Müll", "wilder Müll"]}
+"7300.6790": {pruef: 2064f5c5fe174b14, zeigen: true, suchwoerter: ["Christkindlmarkt", "Weihnachtsmarkt", "Wochenmarkt"]}
+"7511.9500": {pruef: 9a4f7fd13f385783, zeigen: true, suchwoerter: ["Parkplatz", "Friedhofsparkplatz", "Rektor-Weh-Straße"]}
+"7621.5010": {pruef: 50e820a3ed35d070, zeigen: true, suchwoerter: ["Insektengitter", "Fliegengitter", "Heizungspumpe", "Heizung", "Lüftung"]}
+"7621.5400": {pruef: 158f0d13fec0ef0f, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Kaminkehrer", "Feuerstättenbescheid", "Dunstabzug", "Müllentsorgung"]}
+"7621.6500": {pruef: 940283a8cab207bd, zeigen: true, suchwoerter: ["Tinte", "Toner"]}
+"7621.6790": {pruef: a4d2e9f0a77f36e2, zeigen: false, suchwoerter: []}
+"7621.9341": {pruef: 4339619802d751ab, zeigen: true, suchwoerter: ["Kläranlage", "Abwasserkanal"]}
+"7621.9450": {pruef: aac82cf9f339fb61, zeigen: false, suchwoerter: ["Lüftung", "Lüftungsanlage"]}
+"7691.5400": {pruef: 4f0b2a0df4bd111e, zeigen: true, suchwoerter: ["Müllentsorgung", "Gebäudeversicherung", "Versicherung"]}
+"7692.5045": {pruef: 44c4deb90cf5c38e, zeigen: true, suchwoerter: ["Brandmeldeanlage", "Brandmelder", "Aufzug"]}
+"7692.5400": {pruef: 0558caf22da51ca4, zeigen: true, suchwoerter: ["Versicherung", "Kaminkehrer", "Schornsteinfeger", "Müllentsorgung"]}
+"7709.1420": {pruef: 771ab7dc58d6463f, zeigen: true, suchwoerter: ["Vermietung", "Verleih"]}
+"7709.3454": {pruef: 7f497a8de710bea0, zeigen: true, suchwoerter: ["LKW", "Lastwagen", "Kompaktlader"]}
+"7709.6322": {pruef: 8c1258960e6ded85, zeigen: true, suchwoerter: ["Lastenfahrrad", "Lastenrad"]}
+"7711.5045": {pruef: 781c7fad39a96ffb, zeigen: true, suchwoerter: ["Hallentor", "Anschlagmittel", "Hebezeug"]}
+"7711.5400": {pruef: 7e7b9d6c65a7aae6, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer"]}
+"7711.5620": {pruef: ef43084f2bc1da6d, zeigen: true, suchwoerter: ["Führerschein", "Führerscheinverlängerung"]}
+"7711.6322": {pruef: 83c946713c88ed1d, zeigen: true, suchwoerter: ["GIS", "Geoinformationssystem", "Drucker", "Tablet", "Monitor", "Toner"]}
+"7711.9350": {pruef: a549b0b993b943c5, zeigen: false, suchwoerter: ["Rüttelplatte", "Erdrüttelplatte", "Kfz-Tester", "Wegbaufräse"]}
+"7711.9356": {pruef: f92d627e81a887c9, zeigen: false, suchwoerter: ["USV", "unterbrechungsfreie Stromversorgung"]}
+"7711.9400": {pruef: 4346cb31eeb92523, zeigen: false, suchwoerter: ["Hoftor", "Tor", "Ölabscheider"]}
+"7900.6369": {pruef: 84759ab89d7e349b, zeigen: false, suchwoerter: ["Fahrgastinformation"]}
+"7900.6620": {pruef: c90f69d76319ae8d, zeigen: true, suchwoerter: ["Innenstadt", "Innenstadtprojekt"]}
+"7900.6790": {pruef: 880bd0e5a654a30b, zeigen: true, suchwoerter: ["Werbeschild", "Weihnachtsbeleuchtung"]}
+"7910.7180": {pruef: 424245a4f6df784d, zeigen: true, suchwoerter: ["Moosburg Marketing", "Stadtmarketing", "Jahreszuschuss"]}
+"7910.7181": {pruef: 4a522fe5b2c4d3c3, zeigen: true, suchwoerter: ["Moosburg Marketing", "Stadtmarketing", "Bauhof", "Bauhofstunden"]}
+"8100.6329": {pruef: 4eef94ce29d9c43e, zeigen: false, suchwoerter: []}
+"8100.9400": {pruef: f55fca4578fab153, zeigen: false, suchwoerter: []}
+"8101.2200": {pruef: 4382a96ef58a0a5b, zeigen: true, suchwoerter: ["Strombedarf", "E-Mobilität", "Elektromobilität", "Wärmepumpe"]}
+"8131.2200": {pruef: 739a5dc05c3d64a9, zeigen: true, suchwoerter: ["Wärmepumpe", "Wärmepumpenausbau"]}
+"8151.1118": {pruef: d922f238d1477a3a, zeigen: false, suchwoerter: ["Wasseranschluss", "Rückflussventil", "Grundstücksgrenze"]}
+"8151.1171": {pruef: 8cb7fabbe83807eb, zeigen: true, suchwoerter: ["Gebührenkalkulation", "Wassergebühr", "Wasserpreis"]}
+"8151.1599": {pruef: 3422e269c36290a3, zeigen: true, suchwoerter: ["Wasserprobe", "Installationsfirma", "Installateur", "Materialabgabe"]}
+"8151.5100": {pruef: 27c4f2136bbcfbb2, zeigen: true, suchwoerter: ["Hans-Sachs-Straße", "Breitenbergstraße", "Wiesenstraße", "Merianstraße", "Vitztumstraße", "Wasserleitung"]}
+"8151.5250": {pruef: 5d1df0e26aa33ae9, zeigen: true, suchwoerter: ["Zählerwechsel", "Wasseruhr", "Zähler"]}
+"8151.5400": {pruef: 605ca6cb312a137d, zeigen: true, suchwoerter: ["Gebäudeversicherung", "Inhaltsversicherung", "Versicherung", "Grundsteuer"]}
+"8151.6321": {pruef: 5d62bd418504acf9, zeigen: true, suchwoerter: ["Tag der offenen Tür"]}
+"8151.6790": {pruef: aeb2556db727b415, zeigen: true, suchwoerter: ["Rohrbruch", "Wasserrohrbruch"]}
+"8151.6800": {pruef: 3341e32fcc4384f4, zeigen: true, suchwoerter: []}
+"8151.6850": {pruef: 3341e32fcc4384f4, zeigen: true, suchwoerter: []}
+"8151.9350": {pruef: aafe459f758c728d, zeigen: true, suchwoerter: ["Systemtrenner"]}
+"8151.9352": {pruef: 1b409cbf6056af23, zeigen: true, suchwoerter: ["Diamantsäge", "Säge", "Gussrohr"]}
+"8151.9357": {pruef: 96316ba48aae82f2, zeigen: true, suchwoerter: ["E-Auto", "Elektroauto", "Baustelle"]}
+"8151.9412": {pruef: 82bb7fa65d6414f9, zeigen: false, suchwoerter: ["Kanalherstellungsbeitrag", "Herstellungsbeitrag"]}
+"8151.9500": {pruef: 3e159894b08f541a, zeigen: false, suchwoerter: ["Degernpoint", "Baugebiet"]}
+"8151.9502": {pruef: 873317122e397df6, zeigen: false, suchwoerter: ["Hans-Sachs-Straße", "Baugebiet"]}
+"8151.9504": {pruef: 8c1e6c9de1fc4346, zeigen: false, suchwoerter: []}
+"8551.6329": {pruef: a6049d3e4dcdc5c9, zeigen: true, suchwoerter: ["Breitenberg", "Waldumbau", "Baumfällung", "Betriebsbegehung"]}
+"8700.1400": {pruef: 1243e6e5e7403e03, zeigen: false, suchwoerter: []}
+"8700.3303": {pruef: c9fe36bb8cc63113, zeigen: true, suchwoerter: ["Wohnungsbau GmbH", "Wohnungsbaugesellschaft"]}
+"8700.6320": {pruef: 3b3e0b654ba63a6c, zeigen: false, suchwoerter: ["E-Ladesäule", "Ladesäule"]}
+"8801.5400": {pruef: dbc8dc6c14db8618, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Mähen"]}
+"8801.9450": {pruef: 83693af55fb73bb0, zeigen: false, suchwoerter: ["Dach", "Dacherneuerung", "Böhmerwaldstraße"]}
+"8802.5400": {pruef: e2fd839169805941, zeigen: true, suchwoerter: ["Versicherung"]}
+"8803.5010": {pruef: 13408a00978383c1, zeigen: false, suchwoerter: ["Entkalkung", "Wasserleitung", "Bodenbelag", "Sanierung", "Wohnung"]}
+"8803.5400": {pruef: a6cebe35df56164c, zeigen: true, suchwoerter: ["Versicherung", "Treppenhausreinigung", "Treppenhaus", "Grundsteuer"]}
+"8804.5010": {pruef: 39ecd444cbf00b7f, zeigen: true, suchwoerter: []}
+"8804.5045": {pruef: b026de8bc78bee88, zeigen: true, suchwoerter: ["Wasserenthärtungsanlage", "Wasserenthärtung"]}
+"8804.5400": {pruef: 181a079f91e1bfac, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer"]}
+"8806.5400": {pruef: bdfc915e387eefaf, zeigen: true, suchwoerter: ["Versicherung"]}
+"8807.1416": {pruef: 47ee6c6a613defe0, zeigen: true, suchwoerter: ["Vermietung"]}
+"8807.5400": {pruef: e8369cd7299b911c, zeigen: true, suchwoerter: ["Versicherung"]}
+"8807.5441": {pruef: 8b6bbcb9fb7ea508, zeigen: true, suchwoerter: ["Mieter", "Vermietung"]}
+"8807.6369": {pruef: 9c8fa3e95f9429a0, zeigen: true, suchwoerter: ["Reinigung", "Schließdienst"]}
+"8807.9400": {pruef: 597390f089e341cf, zeigen: false, suchwoerter: []}
+"8808.5045": {pruef: 0f4f79480847b195, zeigen: true, suchwoerter: ["Aufzug", "Aufzugsanlage", "Lift"]}
+"8808.5400": {pruef: bd8c453c32f41af3, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer"]}
+"8808.9450": {pruef: 3088d8acebcde7f4, zeigen: true, suchwoerter: ["Dachsanierung", "Dach", "Dachgaube", "Dachfenster"]}
+"8808.9490": {pruef: e7a0d5210bcdede7, zeigen: false, suchwoerter: []}
+"8809.5400": {pruef: 3ec8653563e137ce, zeigen: false, suchwoerter: ["Grundsteuer"]}
+"8811.1451": {pruef: 93b29ee67b30f781, zeigen: true, suchwoerter: ["Verpachtung", "Lagerplatz", "Lagerfläche", "landwirtschaftliche Fläche", "Pachtzins"]}
+"8811.5410": {pruef: 6951bd04fd36fe0f, zeigen: true, suchwoerter: ["Landwirtschaft", "landwirtschaftliches Grundstück"]}
+"8811.6400": {pruef: 5716e7bdc2077284, zeigen: true, suchwoerter: ["SVLFG", "landwirtschaftliche Berufsgenossenschaft"]}
+"8811.6550": {pruef: 749957244453c641, zeigen: true, suchwoerter: ["Rechtsanwalt", "Rechtsberatung", "Verkehrswertgutachten", "Ausschreibung"]}
+"8812.9500": {pruef: 51d0474887391655, zeigen: false, suchwoerter: []}
+"8813.9321": {pruef: d9fc36e6a9dbb2ee, zeigen: false, suchwoerter: []}
+"8815.9321": {pruef: d74a56fc013c36c3, zeigen: false, suchwoerter: []}
+"8815.9500": {pruef: 35bac0e73e92e17d, zeigen: false, suchwoerter: []}
+"8815.9590": {pruef: 597390f089e341cf, zeigen: false, suchwoerter: []}
+"8831.9321": {pruef: a46e545c5c71d157, zeigen: true, suchwoerter: ["Vermessung"]}
+"8831.9590": {pruef: 597390f089e341cf, zeigen: false, suchwoerter: []}
+"8832.9590": {pruef: 5097c273828d4965, zeigen: false, suchwoerter: []}
+"8850.5010": {pruef: 65a5bedb2539ac5a, zeigen: true, suchwoerter: []}
+"8850.9400": {pruef: f452bab0442529bc, zeigen: false, suchwoerter: []}
+"8850.9490": {pruef: d4b03b341740d9e7, zeigen: false, suchwoerter: []}
+"8850.9500": {pruef: c135b39ce32eb07d, zeigen: false, suchwoerter: []}
+"8851.5010": {pruef: d7a4d06f02ff0500, zeigen: false, suchwoerter: ["Fliese", "Eingangsbereich", "Ablauf"]}
+"8851.5045": {pruef: da560e9b9651f369, zeigen: true, suchwoerter: ["Heizung", "Heizungswartung"]}
+"8851.5400": {pruef: 123f6e77dd788414, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Kaminkehrer", "Hausmeister", "Gärtner", "Rauchwarnmelder"]}
+"8851.9450": {pruef: b2e666c0543d011a, zeigen: false, suchwoerter: []}
+"8852.5010": {pruef: 39ecd444cbf00b7f, zeigen: true, suchwoerter: []}
+"8852.5400": {pruef: ae26b4c57e9f2eb2, zeigen: true, suchwoerter: ["Versicherung", "Grundsteuer", "Heckenschnitt", "Hecke"]}
+"8854.5045": {pruef: 1b524afe545338ec, zeigen: true, suchwoerter: ["Aufzug", "Duplexgarage", "Garage"]}
+"8854.9400": {pruef: 85f2b8f72ab84df6, zeigen: false, suchwoerter: []}
+"8854.9490": {pruef: 597390f089e341cf, zeigen: false, suchwoerter: []}
+"8901.3090": {pruef: c6815572d6013cd6, zeigen: true, suchwoerter: ["Zinseinnahmen", "Zinsen"]}
+"8901.8690": {pruef: c6815572d6013cd6, zeigen: true, suchwoerter: ["Zinsen", "Zinseinnahmen"]}
+"8902.3090": {pruef: c6815572d6013cd6, zeigen: true, suchwoerter: ["Zinseinnahmen", "Zinsen"]}
+"8902.8690": {pruef: c6815572d6013cd6, zeigen: true, suchwoerter: ["Zinsen", "Zinseinnahmen"]}
+"9000.0611": {pruef: 0c636b5dbd9d5e1a, zeigen: true, suchwoerter: ["Einwohner", "Einwohnerzahl"]}
+"9000.0616": {pruef: 9db7a0475f072a21, zeigen: true, suchwoerter: ["Grundstücksverkehr", "Grundstückskauf", "Immobilienkauf"]}
+"9000.3614": {pruef: ea657f6f95e00b1b, zeigen: true, suchwoerter: ["Einwohnerzahl", "Umlagekraft", "Finanzausgleich"]}
+"9000.8321": {pruef: a50e5ace8e9b3e50, zeigen: true, suchwoerter: ["Umlagegrundlage", "Umlagesatz"]}
+"9121.3776": {pruef: bcc2d322bb0138e9, zeigen: false, suchwoerter: ["Kreditermächtigung", "Schulden"]}
+"9122.3776": {pruef: e1d83f614124d221, zeigen: false, suchwoerter: []}

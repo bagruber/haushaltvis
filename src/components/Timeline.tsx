@@ -1,13 +1,21 @@
-import { useMemo } from "react";
-import type { EChartsOption } from "echarts";
+import { useMemo, useState } from "react";
+import type { EChartsOption, SeriesOption } from "echarts";
 import { EChart } from "./EChart";
 import { ChartTable } from "./ChartTable";
-import { adjustSeries, netSeries, type Context, type TimeMode, type YearSeries } from "@/lib/data";
-import { fmtEur, fmtEurShort, fmtEurFine } from "@/lib/format";
+import { DiagrammLegende, type LegendenEintrag, type LegendenForm } from "./DiagrammLegende";
+import { Term } from "./Term";
+import { adjustSeries, netSeries, preisText, type Context, type EA, type TimeMode, type YearSeries, type Zwischen } from "@/lib/data";
+import { useBreit, type Notiz } from "@/lib/notiz";
+import { SERIEN, useAnsichtAbweichung, useSerien, type SerieKey } from "@/lib/teilen";
+import { PLAN_COLOR } from "@/lib/marke.mjs";
+import { entwurfBalken } from "@/lib/charts";
+import { fmtEur, fmtEurShort, fmtEurFine, fmtPct } from "@/lib/format";
 
 /** Plan is drawn in a neutral tone so it never competes with the Ist colour. */
-export const PLAN_COLOR = "#8a7a5c";
+export { PLAN_COLOR } from "@/lib/marke.mjs";
 const REFERENZ_COLOR = "#c4bcac";
+/** Investitionen sind in der ganzen App ockerfarbene Balken. */
+export const INVEST_COLOR = "#b39f7a";
 
 export interface TimelineMode extends TimeMode {
   showInvest?: boolean;
@@ -27,30 +35,128 @@ interface Props {
   baseYear: number;
   color?: string;
   height?: number;
+  /** Ausgaben or Einnahmen — only the wording of the Stichtag marks differs. */
+  art?: EA;
+  /** Handwritten note; only used where the chart has none of its own. */
+  notiz?: Notiz;
+  /**
+   * Notiz am Zwischenstand zeigen. Wie die Legende steht sie auf einer Seite
+   * mit vielen Diagrammen nur einmal — am ersten, das Rauten hat.
+   */
+  zwischenNotiz?: boolean;
+  /**
+   * Legende zeigen. Auf einer Seite mit vielen gleich gebauten Diagrammen
+   * (Einzelplan: ein Bereich je Diagramm) steht sie nur über dem ersten —
+   * sie gilt ohnehin für alle.
+   */
+  legende?: boolean;
+}
+
+/** "2026-10-01" → "1.10." — the day the figures were taken. */
+function standTag(iso: string): string {
+  const [, m, d] = iso.split("-");
+  return `${Number(d)}.${Number(m)}.`;
+}
+
+/** The last day the figures cover: the day before the Stichtag. */
+function vortag(iso: string): Date {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d;
+}
+
+/** "2026-10-01" → "30.09." — the last day the figures cover. */
+function bisTag(iso: string): string {
+  const d = vortag(iso);
+  return `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.`;
+}
+
+const MONATE = [
+  "Januar", "Februar", "März", "April", "Mai", "Juni",
+  "Juli", "August", "September", "Oktober", "November", "Dezember",
+];
+
+/** "2026-10-01" → "01. Oktober" — der Stichtag, ausgeschrieben. */
+function standLang(iso: string): string {
+  const [, m, d] = iso.split("-");
+  return `${d}. ${MONATE[Number(m) - 1]}`;
+}
+
+/**
+ * The two marks of the Stichtag. Expenses are ordered and then paid, income is
+ * assessed and then received — the same two columns, different words.
+ */
+function marken(zw: Zwischen, art: EA) {
+  const bis = bisTag(zw.stichtag);
+  return art === "E"
+    ? { soll: `festgesetzt bis ${bis}`, ist: `eingegangen bis ${bis}` }
+    : { soll: `gebucht bis ${bis}`, ist: `bezahlt bis ${bis}` };
 }
 
 /**
  * Ansatz-vs-Ergebnis timeline. Laufende Kosten (VwHH) as lines; Investitionen
  * (VmHH) — lumpy year to year — as bars, only when explicitly enabled.
  */
-export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280 }: Props) {
-  const { option, table } = useMemo(() => {
+export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, color = "#c8102e", height = 280, art = "A", notiz, legende = true, zwischenNotiz = true }: Props) {
+  const breit = useBreit();
+  const { aus, an, setAn } = useSerien();
+  const [hervor, setHervor] = useState<string | null>(null);
+  const { option, table, hinweis, dieNotiz, stand, eintraege } = useMemo(() => {
     const perKopf = (v: number) => `${fmtEurFine(v)}/Kopf`;
-    const fmt = (v: number | null) => (v == null ? "—" : mode.perCapita ? perKopf(v) : fmtEur(v));
+    const fmt = (v: number | null) => (v == null ? "-" : mode.perCapita ? perKopf(v) : fmtEur(v));
     const netto = !!(mode.netto && einnahmen);
     const base = netto ? netSeries(laufend, einnahmen!) : laufend;
     const lf = adjustSeries(base, context, mode, baseYear);
-    const iv = invest && mode.showInvest ? adjustSeries(invest, context, mode, baseYear) : null;
+    const iv = invest ? adjustSeries(invest, context, mode, baseYear) : null;
     // Keep gross on screen while netted: the distance between the two lines is
     // exactly what fees and charges cover, and that is the point of the view.
     const brutto = netto ? adjustSeries(laufend, context, mode, baseYear) : null;
+    // Einnahmen und Ausgaben fallen zu ganz verschiedenen Zeiten im Jahr an;
+    // nach neun Monaten wäre ihre Differenz Rauschen. Darum in dieser Ansicht
+    // keine Marken, sondern ein Satz, der sagt warum.
+    const rechenzeile =
+      [
+        mode.perCapita && "€ je Einwohner",
+        mode.real && preisText(context, baseYear, lf.entwurf),
+        netto && "Eigenanteil nach Abzug der Einnahmen",
+      ]
+        .filter(Boolean)
+        .join(", ") || null;
+    // Alle Stichtage, die im Bild liegen: das laufende Jahr und zum Vergleich
+    // derselbe Stichtag im Vorjahr. Sie teilen sich eine Serie je Marke, also
+    // auch einen Legenden-Knopf, und bleiben Punkte ohne Linie dazwischen.
+    const zws = netto ? [] : (lf.zwischen ?? []).filter((z) => lf.years.includes(z.jahr));
+    const zw = zws.at(-1);
+    const zwIndex = zw ? lf.years.indexOf(zw.jahr) : -1;
+    const mark = zw ? marken(zw, art) : null;
+    const amJahr = (feld: "soll" | "ist") => lf.years.map((y) => zws.find((z) => z.jahr === y)?.[feld] ?? null);
+    const standJe = new Map(zws.map((z) => [String(z.jahr), standTag(z.stichtag)]));
+
+    /**
+     * Jede Serie einmal beschrieben: Name, Form, Farbe, Daten, Tabellenspalte.
+     * Tooltip, Legende und Tabelle lesen dieselbe Liste in derselben Folge —
+     * so kann keine der drei aus der Reihe tanzen.
+     */
+    const bausteine: {
+      key: SerieKey;
+      name: string;
+      form: LegendenForm;
+      farbe: string;
+      werte: (number | null)[];
+      serie: SeriesOption;
+    }[] = [];
 
     // Ist is the fact and carries the colour as a solid line; Plan is an
     // intention and is dashed in a muted tone. Dashing the Ist would signal
     // uncertainty about the one figure that is actually certain.
-    const series: NonNullable<EChartsOption["series"]> = [
-      {
-        name: netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)",
+    bausteine.push({
+      key: "ist",
+      name: netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
+      form: "linie",
+      farbe: color,
+      werte: lf.ergebnis,
+      serie: {
+        name: netto ? "Eigenanteil der Stadt (Ist)" : "Ergebnis (Ist)",
         type: "line",
         data: lf.ergebnis,
         symbolSize: 7,
@@ -59,10 +165,23 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         connectNulls: true,
         z: 3,
       },
-      {
-        name: netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
+    });
+    // Der Entwurf ist noch kein Plan: Er setzt die Linie fort, aber gepunktet
+    // und mit einem eckigen Hohlpunkt, damit er nicht als beschlossen gelesen
+    // wird. Eine eigene Serie, weil ECharts eine Linie nicht abschnittsweise
+    // anders strichelt.
+    const eIndex = lf.entwurf != null ? lf.years.indexOf(lf.entwurf) : -1;
+    const planWerte = lf.ansatz.map((v, i) => (i === eIndex ? null : v));
+    bausteine.push({
+      key: "plan",
+      name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
+      form: "gestrichelt",
+      farbe: PLAN_COLOR,
+      werte: planWerte,
+      serie: {
+        name: netto ? "Eigenanteil der Stadt (Plan)" : "Ansatz (Plan)",
         type: "line",
-        data: lf.ansatz,
+        data: planWerte,
         symbol: "emptyCircle",
         symbolSize: 6,
         lineStyle: { width: 2, type: "dashed", color: PLAN_COLOR },
@@ -70,94 +189,304 @@ export function Timeline({ laufend, invest, einnahmen, mode, context, baseYear, 
         connectNulls: true,
         z: 2,
       },
-    ];
+    });
+    if (eIndex >= 0 && lf.ansatz[eIndex] != null) {
+      const name = `${netto ? "Eigenanteil" : "Ansatz"} ${lf.entwurf} (Entwurf)`;
+      // Der Anschluss ans Vorjahr gehört zur Linie, nicht zum Entwurf: dort
+      // kein Punkt und kein Wert im Tooltip.
+      const anschluss = eIndex > 0 ? lf.ansatz[eIndex - 1] : null;
+      bausteine.push({
+        key: "entwurf",
+        name,
+        form: "gepunktet",
+        farbe: PLAN_COLOR,
+        werte: lf.ansatz.map((v, i) => (i === eIndex ? v : null)),
+        serie: {
+          name,
+          type: "line",
+          data: lf.ansatz.map((v, i) =>
+            i === eIndex ? v : i === eIndex - 1 && anschluss != null ? { value: anschluss, symbol: "none" } : null,
+          ),
+          symbol: "emptyRect",
+          symbolSize: 8,
+          lineStyle: { width: 2, type: "dotted", color: PLAN_COLOR },
+          itemStyle: { color: PLAN_COLOR, borderWidth: 2 },
+          connectNulls: false,
+          z: 2,
+        },
+      });
+    }
+    if (zw && zwIndex >= 0 && mark) {
+      // Kreis = ganzes Jahr, Raute = Teil des Jahres. Die Farbe trennt Plan von
+      // Vollzug wie sonst, die Füllung bezahlt von gebucht. Keine Linie: die
+      // Marke gehört zu keiner Reihe, sie ist ein Zwischenruf.
+      bausteine.push({
+        key: "gebucht",
+        name: mark.soll,
+        form: "raute-hohl",
+        farbe: color,
+        werte: amJahr("soll"),
+        serie: {
+          name: mark.soll,
+          type: "scatter",
+          data: amJahr("soll"),
+          symbol: "emptyDiamond",
+          symbolSize: 10,
+          symbolOffset: [-6, 0],
+          itemStyle: { color, borderColor: color, borderWidth: 2 },
+          z: 4,
+        },
+      });
+      bausteine.push({
+        key: "bezahlt",
+        name: mark.ist,
+        form: "raute-voll",
+        farbe: color,
+        werte: amJahr("ist"),
+        serie: {
+          name: mark.ist,
+          type: "scatter",
+          data: amJahr("ist"),
+          symbol: "diamond",
+          symbolSize: 10,
+          symbolOffset: [6, 0],
+          itemStyle: { color },
+          z: 5,
+        },
+      });
+    }
     if (brutto) {
-      series.push({
-        name: "Ausgaben brutto",
-        type: "line",
-        data: brutto.ansatz,
-        symbol: "none",
-        lineStyle: { width: 1.5, color: REFERENZ_COLOR },
-        itemStyle: { color: REFERENZ_COLOR },
-        connectNulls: true,
-        z: 1,
+      bausteine.push({
+        key: "brutto",
+        name: "Ausgaben gesamt",
+        form: "linie-duenn",
+        farbe: REFERENZ_COLOR,
+        werte: brutto.ansatz,
+        serie: {
+          name: "Ausgaben gesamt",
+          type: "line",
+          data: brutto.ansatz,
+          symbol: "none",
+          lineStyle: { width: 1.5, color: REFERENZ_COLOR },
+          itemStyle: { color: REFERENZ_COLOR },
+          connectNulls: true,
+          z: 1,
+        },
       });
     }
     if (iv) {
-      series.push({ name: "Investitionen (Ansatz)", type: "bar", data: iv.ansatz, barWidth: "40%", itemStyle: { color: "#b39f7a", opacity: 0.85 } });
+      bausteine.push({
+        key: "invest",
+        name: "Investitionen",
+        form: "balken",
+        farbe: INVEST_COLOR,
+        werte: iv.ansatz,
+        serie: {
+          name: "Investitionen",
+          type: "bar",
+          data: entwurfBalken(iv.ansatz, lf.years, lf.entwurf),
+          barWidth: "40%",
+          itemStyle: { color: INVEST_COLOR, opacity: 0.85 },
+        },
+      });
     }
 
+    bausteine.sort((a, b) => SERIEN.indexOf(a.key) - SERIEN.indexOf(b.key));
+    const sichtbar = bausteine.filter((b) => (b.key === "invest" ? !!mode.showInvest : !aus.has(b.key)));
+    const eintraege: LegendenEintrag[] = bausteine.map(({ key, name, form, farbe }) => ({ key, name, form, farbe }));
+    const series = sichtbar.map((b) => b.serie);
+
+    // Die größte Gefahr beim Zwischenstand: jede Raute liegt unter dem Ansatz,
+    // und wer nicht weiß, dass nur neun Monate gezählt sind, liest überall
+    // "die Stadt gibt weniger aus als geplant". Keine Hochrechnung, keine
+    // Dreiviertel-Linie — beide unterstellen gleichmäßiges Ausgeben, und die
+    // Kreisumlage, Personalnachzahlungen und Bauschlussrechnungen fallen
+    // gehäuft am Jahresende an. Stattdessen ein handschriftlicher Zuruf.
+    //
+    // Nur eine Notiz je Diagramm: wo schon eine sitzt, gewinnt die vorhandene.
+    // Unter 640 px gibt es keine; dort trägt die Achse den Stichtag.
+    // Die Notiz gehört zu den beiden Rauten: sind beide ausgeblendet, hat sie
+    // nichts mehr zu zeigen.
+    const rautenDa = sichtbar.some((b) => b.key === "gebucht" || b.key === "bezahlt");
+    const dieNotiz: Notiz | undefined =
+      notiz ??
+      (zw && zwIndex >= 0 && breit && zwischenNotiz && rautenDa
+        ? {
+            text: `Stand ${standLang(zw.stichtag)}`,
+            x: String(zw.jahr),
+            y: zw.ist,
+            form: "kurz",
+            serien: [mark!.soll, mark!.ist],
+            // Die Rauten des Vorjahres stehen genau links daneben.
+            meiden: zws.slice(0, -1).flatMap((z) => [
+              { x: String(z.jahr), y: z.soll },
+              { x: String(z.jahr), y: z.ist },
+            ]),
+          }
+        : undefined);
+
+    const unterzeile = new Map([...standJe].map(([j, t]) => [j, `Stand ${t}`]));
+    if (eIndex >= 0) unterzeile.set(String(lf.entwurf), "Entwurf");
+
     const option: EChartsOption = {
-      tooltip: { trigger: "axis", valueFormatter: (v) => fmt(v as number | null) },
-      // Scroll statt Umbruch: auf dem Telefon lag die zweite Legendenzeile über
-      // den Jahreszahlen. containLabel, weil feste 64 px "800 Tsd." abschnitten.
-      legend: { bottom: 0, type: "scroll" },
-      grid: { left: 8, right: 16, top: 12, bottom: 44, containLabel: true },
-      xAxis: { type: "category", data: laufend.years.map(String) },
-      yAxis: { type: "value", axisLabel: { formatter: (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v)) } },
+      // Eigener Formatter, damit die Rauten-Zeilen nur im Jahr des
+      // Zwischenstands erscheinen statt in jedem Jahr als "-".
+      tooltip: {
+        trigger: "axis",
+        formatter: (params) => {
+          const zeilen = params as { dataIndex: number; seriesName: string; marker: string; value: number | null }[];
+          if (!zeilen.length) return "";
+          const i = zeilen[0].dataIndex;
+          const text = sichtbar
+            .filter((b) => b.werte[i] != null)
+            .map((b) => {
+              const marker = zeilen.find((z) => z.seriesName === b.name)?.marker ?? "";
+              const wert = fmt(b.werte[i]);
+              // Je Jahr gegen dessen eigenen Ansatz: so stehen 2025 und 2026
+              // auf derselben Grundlage nebeneinander.
+              const anteil = lf.ansatz[i];
+              const anteilText =
+                b.key === "bezahlt" && anteil ? ` · ${fmtPct(b.werte[i]! / anteil)} des Ansatzes` : "";
+              return `<div style="display:flex;gap:12px;justify-content:space-between">
+                <span>${marker}${b.name}</span><b>${wert}${anteilText}</b></div>`;
+            })
+            .join("");
+          return `<b>${lf.years[i]}${i === eIndex ? " (Entwurf)" : ""}</b>${text}`;
+        },
+      },
+      // Legende abgeschaltet: DiagrammLegende macht dasselbe per Tastatur,
+      // mit den echten Symbolen und sichtbar ausgeschalteten Eintraegen.
+      legend: { show: false },
+      // Eine Notiz braucht Luft über der Grafik (siehe lib/notiz.ts).
+      grid: {
+        left: 8,
+        right: 16,
+        top: dieNotiz && dieNotiz.form !== "kurz" ? 56 : rechenzeile ? 30 : 12,
+        bottom: 44,
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: laufend.years.map(String),
+        // Nur setzen, wenn es einen Stichtag oder Entwurf gibt: ein ausdrückliches
+        // `undefined` löscht in ECharts die Standardwerte, und die Jahreszahlen
+        // verschwinden.
+        ...(unterzeile.size
+          ? {
+              axisLabel: {
+                formatter: (v: string) => (unterzeile.has(v) ? `${v}\n{stand|${unterzeile.get(v)}}` : v),
+                rich: { stand: { fontSize: 10, lineHeight: 15, color: "#8a8170" } },
+                // Jedes zweite Jahr wie sonst, dazu immer der Stand und der
+                // Entwurf: Sonst fällt gerade das letzte Jahr weg. Am Telefon
+                // reicht der Platz für jedes fünfte, gezählt vom Stand aus, denn
+                // dort trägt die Achse den Stichtag; den Entwurf sagen Legende
+                // und eckiger Punkt.
+                interval: breit
+                  ? (i: number) => i % 2 === 0 || i === zwIndex || i === eIndex
+                  : (i: number) => {
+                      const anker = zwIndex >= 0 ? zwIndex : eIndex;
+                      return i <= anker && (anker - i) % 5 === 0;
+                    },
+              },
+            }
+          : {}),
+      },
+      yAxis: {
+        type: "value",
+        axisLabel: { formatter: (v: number) => (mode.perCapita ? fmtEurFine(v) : fmtEurShort(v)) },
+        // Steht ein Rechen-Schalter an, sagt das Bild es selbst: ein
+        // Screenshot erklärt sich dann, und niemand vergleicht versehentlich
+        // eine bereinigte Kurve mit einer unbereinigten.
+        name: rechenzeile ?? undefined,
+        nameLocation: "end",
+        nameGap: 14,
+        nameTextStyle: { color: "#6f6b63", fontSize: 11, align: "left" },
+      },
       series,
     };
 
-    const columns = [
-      "Jahr",
-      netto ? "Zuschussbedarf (Ist)" : "Ergebnis (Ist)",
-      netto ? "Zuschussbedarf (Plan)" : "Ansatz (Plan)",
-      ...(brutto ? ["Ausgaben brutto"] : []),
-      ...(iv ? ["Investitionen (Ansatz)"] : []),
-    ];
+    // Die Tabelle zeigt, was auch im Bild steht, in derselben Folge. Der
+    // Entwurf steht dort in der Spalte des Ansatzes; die Zeile sagt, was er ist.
+    const planDa = sichtbar.some((b) => b.key === "plan");
+    const spalten = sichtbar.filter((b) => !(planDa && b.key === "entwurf"));
+    const entwurfWerte = sichtbar.find((b) => b.key === "entwurf")?.werte;
+    const columns = ["Jahr", ...spalten.map((b) => b.name)];
     const rows = lf.years.map((y, i) => [
-      `${y}${lf.provisional.has(y) ? " (nur Plan)" : ""}`,
-      fmt(lf.ergebnis[i]),
-      fmt(lf.ansatz[i]),
-      ...(brutto ? [fmt(brutto.ansatz[i])] : []),
-      ...(iv ? [fmt(iv.ansatz[i])] : []),
+      `${y}${i === eIndex ? " (Entwurf)" : lf.provisional.has(y) ? (zw && y === zw.jahr ? ` (Stand ${standTag(zw.stichtag)})` : " (nur Plan)") : ""}`,
+      ...spalten.map((b) => {
+        const v = b.werte[i] ?? (b.key === "plan" ? entwurfWerte?.[i] : null);
+        return v == null ? "" : fmt(v);
+      }),
     ]);
-    return { option, table: { columns, rows } };
-  }, [laufend, invest, einnahmen, mode, context, baseYear, color]);
+
+    return {
+      option,
+      table: { columns, rows },
+      // Der Satz steht nur, wo wirklich etwas ausgeblendet wird.
+      hinweis: netto && laufend.zwischen ? standLang(laufend.zwischen.at(-1)!.stichtag) : null,
+      dieNotiz,
+      // Wie Legende und Notiz: der Satz steht auf einer Seite nur einmal.
+      stand:
+        zw && zwIndex >= 0 && zwischenNotiz && rautenDa
+          ? { tag: standTag(zw.stichtag), jahre: zws.map((z) => z.jahr) }
+          : undefined,
+      eintraege,
+    };
+  }, [laufend, invest, einnahmen, mode, context, baseYear, color, art, notiz, breit, aus, zwischenNotiz]);
 
   return (
     <div>
+      {legende && (
+        <DiagrammLegende eintraege={eintraege} an={an} setAn={setAn} onHervor={setHervor} />
+      )}
       <EChart
         option={option}
-        ariaLabel="Zeitverlauf von Ansatz (Plan) und Ergebnis (Ist) — Zahlen in der Tabelle darunter"
+        notiz={dieNotiz}
+        hervor={hervor}
+        ariaLabel="Zeitverlauf von Ansatz (Plan) und Ergebnis (Ist), Zahlen in der Tabelle darunter"
         style={{ height }}
       />
+      {hinweis && (
+        <p className="mt-1 text-xs text-ink-muted">
+          Der Zwischenstand zum {hinweis} ist hier ausgeblendet, weil Einnahmen und Ausgaben zu
+          verschiedenen Zeiten im Jahr anfallen.
+        </p>
+      )}
+      {/* Der Satz steht da, wo die Notiz im Diagramm nicht hinkommt (unter
+          640 px gibt es keine), und traegt den Begriff ins Glossar. */}
+      {stand && (
+        <p className="mt-1 text-xs text-ink-muted">
+          Die Rauten sind der <Term name="zwischenstand">Zwischenstand</Term> zum {stand.tag}
+          {stand.jahre.length > 1 && <> des jeweiligen Jahres ({stand.jahre.join(" und ")})</>}, also
+          erst ein Teil des Jahres.
+        </p>
+      )}
       <ChartTable columns={table.columns} rows={table.rows} />
     </div>
   );
 }
 
-/** Re-usable checkbox row for timeline options. */
+/**
+ * Die Schalterzeile trägt nur noch Umrechnungen: **wie** gerechnet wird.
+ * **Was** zu sehen ist, steht in der Legende — Investitionen sind eine Serie,
+ * keine Rechenart.
+ */
 export function TimelineControls({
   mode,
   setMode,
   hasContext,
-  hasInvest,
   hasEinnahmen,
 }: {
   mode: TimelineMode;
   setMode: (fn: (m: TimelineMode) => TimelineMode) => void;
   hasContext: boolean;
-  hasInvest: boolean;
   hasEinnahmen?: boolean;
 }) {
-  if (!hasContext && !hasInvest && !hasEinnahmen) return null;
+  const [abweichend, zuruecksetzen] = useAnsichtAbweichung();
+  if (!hasContext && !hasEinnahmen) return null;
   return (
-    <div className="flex flex-wrap gap-4 text-xs mb-1">
-      {hasEinnahmen && (
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input type="checkbox" checked={!!mode.netto} onChange={(e) => setMode((m) => ({ ...m, netto: e.target.checked }))} />
-          <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
-            bilanziert (Zuschussbedarf)
-          </span>
-        </label>
-      )}
-      {hasInvest && (
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input type="checkbox" checked={!!mode.showInvest} onChange={(e) => setMode((m) => ({ ...m, showInvest: e.target.checked }))} />
-          <span>Investitionen zeigen</span>
-        </label>
-      )}
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs mb-1">
+      <span className="text-ink-muted">Rechnen</span>
       {hasContext && (
         <>
           <label className="flex items-center gap-1.5 cursor-pointer">
@@ -169,6 +498,21 @@ export function TimelineControls({
             <span>je Einwohner</span>
           </label>
         </>
+      )}
+      {hasEinnahmen && (
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" checked={!!mode.netto} onChange={(e) => setMode((m) => ({ ...m, netto: e.target.checked }))} />
+          {/* Round 1: "bilanziert (Zuschussbedarf)" was misread; plain words instead. */}
+          <span title="Ausgaben abzüglich eigener Einnahmen wie Gebühren und Entgelte">
+            mit Einnahmen verrechnet
+          </span>
+        </label>
+      )}
+      {/* Nur sichtbar, wenn es etwas zurückzusetzen gibt. */}
+      {abweichend && (
+        <button type="button" onClick={zuruecksetzen} className="text-red-600 hover:underline">
+          Ansicht zurücksetzen
+        </button>
       )}
     </div>
   );

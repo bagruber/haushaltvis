@@ -3,28 +3,55 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import type { Budget, Data, Themes } from "./types";
-import { abschnittName, factsOfYear, factsOfHhst, postenOfGlz, latestYear } from "./core";
+import type { Budget, Data, EntwurfDatei, Themes, Zwischenstand } from "./types";
+import { abschnittName, factsOfYear, factsOfHhst, postenOfGlz, latestYear, mitEntwurf } from "./core";
+import type { SearchItem } from "./selectors";
 import {
+  bereichSeries,
+  einrichtungSeries,
   totals,
   expenseShareByPrimaryTheme,
   netBurdenByEinzelplan,
   themeSankey,
   kameralBothSidesTree,
   adjustSeries,
+  preisstand,
+  preisBasis,
+  preisText,
   incomeCategory,
   isInternal,
   investmentsAll,
   postenSeries,
+  searchIndex,
   searchRank,
+  vergleichsStaende,
+  neuesterStand,
+  wechsel,
+  lebenslauf,
+  vorhanden,
   type YearSeries,
 } from "./selectors";
 import { fmtEur, fmtEurShort, fmtEurFine } from "../format";
+import { doppelte } from "../nummern";
+import { extremImFenster } from "../notiz";
+import { kennung } from "../kennung.mjs";
 
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(resolve(__dirname, `../../../public/data/${name}`), "utf8")) as T;
 
-const budget = read<Budget>("budget.json");
+/** Löschbare Datei: ihr Fehlen ist ein vorgesehener Zustand, kein Testfehler. */
+const readOptional = <T>(name: string): T | null => {
+  try {
+    return read<T>(name);
+  } catch {
+    return null;
+  }
+};
+
+const beschlossen = read<Budget>("budget.json");
+const entwurf = readOptional<EntwurfDatei>("entwurf.json");
+/** Wie die App den Bestand sieht: der Entwurf, wenn es einen gibt, als weiteres Jahr. */
+const budget = mitEntwurf(beschlossen, entwurf);
 const themes = read<Themes>("themes.json");
 const data: Data = {
   budget,
@@ -34,8 +61,11 @@ const data: Data = {
   context: read("context.json"),
   einleitungen: {},
   glossar: {},
-  aggregatoren: {},
+  aggregatoren: read("aggregatoren.json"),
+  zwischenstand: readOptional<{ staende: Zwischenstand[] }>("zwischenstand.json")?.staende ?? [],
 };
+/** Wie die App ohne Stichtagsdatei aussieht — der Rückweg ist ein Löschen. */
+const ohneZwischenstand: Data = { ...data, zwischenstand: [] };
 const year = latestYear(budget);
 
 describe("Datenintegrität", () => {
@@ -289,6 +319,48 @@ describe("adjustSeries", () => {
   });
 });
 
+describe("preisstand: Preisniveau auch für das laufende Jahr und den Entwurf", () => {
+  // 2025 abgeschlossen, 2026 läuft bis Oktober, 2027 ist der Entwurf.
+  const ctx = {
+    cpi: { "2025": 121.9 },
+    vpi_monat: { "2024-12": 120.5, "2025-12": 122.7, "2026-01": 122.8, "2026-02": 123.1, "2026-10": 126.5 },
+  };
+
+  it("ein abgeschlossenes Jahr hat seinen Jahresdurchschnitt", () => {
+    expect(preisstand(ctx, 2025)).toEqual({ wert: 121.9 });
+  });
+
+  it("das laufende Jahr rechnet mit dem Mittel seiner Monate bisher", () => {
+    const p = preisstand(ctx, 2026)!;
+    expect(p.wert).toBeCloseTo((122.8 + 123.1 + 126.5) / 3);
+    expect(p.monate).toBe("Januar bis Oktober");
+    expect(p.ersatz).toBeUndefined();
+  });
+
+  it("der Entwurf rechnet mit dem jüngsten Monat, und nur ein Jahr voraus", () => {
+    expect(preisstand(ctx, 2027)).toEqual({ wert: 126.5, monate: "Oktober 2026", ersatz: true });
+    expect(preisstand(ctx, 2028)).toBeNull();
+  });
+
+  it("ein Dezember allein macht keinen Jahresdurchschnitt", () => {
+    expect(preisstand(ctx, 2024)).toBeNull();
+  });
+
+  it("die Ansicht steht in Preisen eines Jahres mit eigenen Monaten, nie des Entwurfs", () => {
+    expect(preisBasis(ctx, 2027)).toBe(2026);
+    expect(preisBasis(ctx, 2026)).toBe(2026);
+    expect(preisText(ctx, 2027, 2027)).toBe("in Preisen von 2026 (Januar bis Oktober), 2027 zu Preisen vom Oktober 2026");
+    expect(preisText(ctx, 2025)).toBe("in Preisen von 2025");
+  });
+
+  it("der Entwurf bekommt in der bereinigten Ansicht einen Wert", () => {
+    const s: YearSeries = { years: [2025, 2026, 2027], ansatz: [100, 100, 100], ergebnis: [null, null, null], provisional: new Set() };
+    const r = adjustSeries(s, ctx, { real: true }, 2026);
+    expect(r.ansatz[1]).toBeCloseTo(100);
+    expect(r.ansatz[2]).toBeCloseTo((100 * (122.8 + 123.1 + 126.5)) / 3 / 126.5);
+  });
+});
+
 describe("incomeCategory / isInternal (Klassifikationsregeln)", () => {
   const posten = (over: Partial<Parameters<typeof incomeCategory>[0]>) => ({
     hhst_id: "x",
@@ -320,15 +392,402 @@ describe("incomeCategory / isInternal (Klassifikationsregeln)", () => {
 });
 
 describe("searchRank", () => {
-  const items = [
-    { label: "Bildung & Schulen", sub: "Thema", route: "/a" },
-    { label: "Schulden", sub: "Thema", route: "/b" },
+  const items: SearchItem[] = [
+    { label: "Bildung & Schulen", art: "Thema", route: "/a" },
+    { label: "Schulden", art: "Thema", route: "/b" },
   ];
   it("Präfix-Treffer vor Substring-Treffern", () => {
     expect(searchRank(items, "schul")[0].route).toBe("/b");
   });
   it("leere Suche liefert nichts", () => {
     expect(searchRank(items, "  ")).toEqual([]);
+  });
+
+  describe("mehrere Wörter, Erläuterungen, Suchwörter", () => {
+    const posten: SearchItem[] = [
+      {
+        label: "Zuschüsse für lfd. Zwecke an die übrigen Bereiche",
+        art: "Posten",
+        ort: "Sonstige Volksbildung",
+        route: "/posten/3551.7180",
+        rank: 1,
+        kontext: [
+          { text: "Zuschüsse an Kulturvereine", zeigen: "erlaeuterung" },
+          { text: "Kulturverein", zeigen: "suchwort" },
+        ],
+      },
+      { label: "Zuschüsse für lfd. Zwecke an die übrigen Bereiche", art: "Posten", ort: "Heimat- u. sonst. Kulturpflege", route: "/posten/3400.7180", rank: 1 },
+      { label: "Zuschüsse für lfd. Zwecke an die übrigen Bereiche", art: "Posten", ort: "Feuerwehr Moosburg", route: "/posten/1311.7180", rank: 1 },
+      { label: "Reinigungskosten", art: "Posten", ort: "Hallenbad", route: "/posten/5702.5430", rank: 1, kontext: [{ text: "Papiertücher", zeigen: "suchwort" }] },
+    ];
+    const wege = (q: string) => searchRank(posten, q).map((h) => h.route);
+
+    it("findet über die Erläuterung und sagt, warum", () => {
+      const [h] = searchRank(posten, "Kulturverein");
+      expect(h.route).toBe("/posten/3551.7180");
+      expect(h.grund).toBe("„Zuschüsse an Kulturvereine“");
+    });
+
+    it("ein Suchwort findet, die Zeile nennt es", () => {
+      expect(searchRank(posten, "papiertuch")[0].grund).toBe("Suchwort: Papiertücher");
+    });
+
+    it("mehrere Wörter: jedes muss vorkommen, der Ort zählt mit", () => {
+      expect(wege("Zuschuss Kultur").sort()).toEqual(["/posten/3400.7180", "/posten/3551.7180"]);
+      expect(wege("Zuschuss Feuerwehr")).toEqual(["/posten/1311.7180"]);
+      expect(wege("Zuschuss Hallenbad")).toEqual([]);
+    });
+
+    it("ein einzelnes Wort sucht nicht im Ort, sonst käme jede Stelle einer Einrichtung", () => {
+      expect(wege("Feuerwehr")).toEqual([]);
+    });
+
+    it("am Namen gefunden hat keinen Grund", () => {
+      expect(searchRank(posten, "Reinigung")[0].grund).toBeUndefined();
+    });
+  });
+
+  const index = searchIndex(data);
+  it("Alltagswort findet den Amtsbegriff (Müll → Abfall)", () => {
+    const hits = searchRank(index, "Müll");
+    expect(hits.some((h) => /abfall/i.test(h.label))).toBe(true);
+  });
+  it("Gliederungsnummer findet zuerst die Einrichtung", () => {
+    const glz = Object.values(budget.posten).find((p) => p.glz_text)!.glz;
+    expect(searchRank(index, glz)[0].route).toBe(`/einrichtung/${glz}`);
+  });
+  it("volle Haushaltsstelle findet genau diesen Posten", () => {
+    const p = Object.values(budget.posten).find((x) => !isInternal(x))!;
+    expect(searchRank(index, p.hhst_id)[0].route).toBe(`/posten/${p.hhst_id}`);
+  });
+  it("gleichnamige Treffer sind an Art, Ort und Nummer unterscheidbar", () => {
+    const seen = new Set<string>();
+    for (const it of index) {
+      const key = `${it.label}|${it.art}|${it.ort ?? ""}|${it.nummer ?? ""}`;
+      expect(seen.has(key), `doppelt: ${key}`).toBe(false);
+      seen.add(key);
+    }
+  });
+
+  // R2.2: Die zweite Zeile folgt einer Regel statt dem Zufall der Datenquelle.
+  it("jeder Treffer traegt ein Art-Wort aus dem Wortschatz", () => {
+    const wortschatz = new Set(["Seite", "Kostenblock", "Einnahmeart", "Thema", "Einzelplan", "Bereich", "Einrichtung", "Posten"]);
+    for (const it of index) expect(wortschatz.has(it.art), `${it.label}: ${it.art}`).toBe(true);
+  });
+
+  it("jede Ebene unter dem Einzelplan nennt ihren Ort", () => {
+    for (const it of index) {
+      if (it.art === "Einzelplan" || it.art === "Thema" || it.art === "Seite") continue;
+      expect(it.ort, `${it.art} ${it.label} ohne Ort`).toBeTruthy();
+    }
+  });
+
+  it("die Einrichtung steht vor ihren Posten, auch wenn beide gleich heissen", () => {
+    const treffer = searchRank(index, "hallenbad");
+    const einrichtung = treffer.findIndex((h) => h.art === "Einrichtung");
+    const posten = treffer.findIndex((h) => h.art === "Posten");
+    expect(einrichtung).toBeGreaterThanOrEqual(0);
+    expect(posten === -1 || einrichtung < posten).toBe(true);
+  });
+
+  it("Posten des Vermoegenshaushalts und Einnahmen sagen das in der Zeile", () => {
+    const einnahme = index.find((it) => it.art === "Posten" && it.route === "/posten/5701.1161");
+    const invest = index.find((it) => it.art === "Posten" && it.route === "/posten/5701.9400");
+    expect(einnahme?.ort).toMatch(/· Einnahme$/);
+    expect(invest?.ort).toMatch(/· Investition$/);
+  });
+  it("zweistellige Nummer findet zuerst den Bereich, nicht seine Posten", () => {
+    expect(searchRank(index, "21")[0].route).toBe("/bereich/21");
+  });
+  it("Seiten der App sind zu finden", () => {
+    expect(searchRank(index, "querschnitt")[0].route).toBe("/erkunden/querschnitte");
+  });
+  it("der Kostenblock steht vor jedem Einzelposten", () => {
+    const hits = searchRank(index, "strom");
+    const block = hits.findIndex((h) => h.route === "/erkunden/querschnitte/strom");
+    const posten = hits.findIndex((h) => h.route.startsWith("/posten/"));
+    expect(block).toBeGreaterThanOrEqual(0);
+    expect(posten === -1 || block < posten).toBe(true);
+  });
+  it("die Einnahmeart steht vor den Haushaltsstellen, aus denen sie besteht", () => {
+    const hits = searchRank(index, "gewerbesteuer");
+    expect(hits[0].art).toBe("Einnahmeart");
+    expect(hits[0].route).toBe("/erkunden/einnahmen/gewerbesteuer");
+    const art = searchRank(index, "einkommensteuer").findIndex((h) => h.art === "Einnahmeart");
+    const posten = searchRank(index, "einkommensteuer").findIndex((h) => h.art === "Posten");
+    expect(art).toBeGreaterThanOrEqual(0);
+    expect(posten === -1 || art < posten).toBe(true);
+  });
+  // Seite, Suche und Vorschaukarte bilden die Adresse mit derselben Regel
+  // (lib/kennung.mjs); zwei Arten dürfen dabei nicht zusammenfallen.
+  it("jede Einnahmeart hat eine eigene Adresse, und es ist die ihrer Seite", () => {
+    const arten = index.filter((it) => it.art === "Einnahmeart");
+    expect(arten.length).toBeGreaterThan(10);
+    expect(new Set(arten.map((a) => a.route)).size).toBe(arten.length);
+    for (const a of arten) expect(a.route).toBe(`/erkunden/einnahmen/${kennung(a.label)}`);
+  });
+  it("jeder Bereich mit Posten steht genau einmal im Index", () => {
+    const erwartet = new Set(Object.values(budget.posten).map((p) => p.glz.slice(0, 2)));
+    const imIndex = index.filter((it) => it.route.startsWith("/bereich/")).map((it) => it.route.slice(9));
+    expect(imIndex.sort()).toEqual([...erwartet].sort());
+    expect(new Set(imIndex).size).toBe(imIndex.length);
+  });
+  it("jede Ebene des Haushalts traegt das Icon ihres Einzelplans", () => {
+    for (const art of ["/einzelplan/", "/bereich/", "/einrichtung/", "/posten/"]) {
+      const treffer = index.find((it) => it.route.startsWith(art))!;
+      expect(treffer.icon, art).toBeTruthy();
+      expect(treffer.farbe, art).toMatch(/^#/);
+      expect(treffer.nummer, art).toBeTruthy();
+    }
+  });
+  it("Seiten bleiben farblos, damit farbig 'Teil des Haushalts' heisst", () => {
+    for (const it of index.filter((x) => x.art === "Seite")) {
+      expect(it.farbe, it.label).toBeUndefined();
+      expect(it.icon, it.label).toBeTruthy();
+    }
+  });
+});
+
+// Ohne die Datei gibt es nichts zu prüfen — genau das ist der Rückweg.
+describe.skipIf(!data.zwischenstand.length)("Zwischenstand (Stichtag, laufendes Jahr und Vorjahr)", () => {
+  /** In der Zeitreihe: je Jahr einer, alle am selben Tag im Jahr. */
+  const staende = vergleichsStaende(data.zwischenstand);
+  /** Der Stand des laufenden Jahres in der Zeitreihe. */
+  const zs = staende.at(-1)!;
+  const marke = (s: { zwischen?: { jahr: number; soll: number; ist: number }[] }, jahr = zs.jahr) =>
+    s.zwischen?.find((z) => z.jahr === jahr);
+
+  it("der jüngste Stichtag liegt im Jahr, das nur einen Plan hat", () => {
+    expect(zs.jahr).toBe(latestYear(budget));
+    expect(data.zwischenstand.at(-1)!.jahr).toBe(latestYear(budget));
+    expect(zs.stichtag.startsWith(String(zs.jahr))).toBe(true);
+    for (const f of budget.facts.filter((x) => x.year === zs.jahr)) {
+      expect(f.ergebnis, `${f.hhst_id} hat ein Ergebnis im laufenden Jahr`).toBe(null);
+    }
+  });
+
+  // Der Vergleich trägt nur, wenn derselbe Schnitt im Jahr gemeint ist.
+  it("die früheren Stichtage liegen in abgerechneten Jahren, am selben Tag im Jahr", () => {
+    const jahre = staende.map((s) => s.jahr);
+    expect([...jahre].sort()).toEqual(jahre);
+    expect(new Set(jahre).size).toBe(jahre.length);
+    for (const s of staende.slice(0, -1)) {
+      expect(s.stichtag.slice(5), `${s.jahr}`).toBe(zs.stichtag.slice(5));
+      expect(budget.facts.some((f) => f.year === s.jahr && f.ergebnis != null), `${s.jahr} ohne Ergebnis`).toBe(true);
+    }
+  });
+
+  it("jede Stichtagszahl verweist auf einen bekannten Posten", () => {
+    for (const s of data.zwischenstand) {
+      for (const hhst of Object.keys(s.werte)) {
+        expect(budget.posten[hhst], `unbekannte Haushaltsstelle ${hhst} (${s.jahr})`).toBeTruthy();
+      }
+    }
+  });
+
+  it("je Stichtag eine Marke, nach Jahr aufsteigend", () => {
+    const s = bereichSeries(data, "46", "A", "verwaltung");
+    expect(s.zwischen!.map((z) => z.jahr)).toEqual(staende.map((x) => x.jahr));
+    for (const z of s.zwischen!) {
+      expect(z.stichtag).toBe(staende.find((x) => x.jahr === z.jahr)!.stichtag);
+    }
+  });
+
+  it("die Einrichtung summiert genau ihre Posten, in jedem Jahr", () => {
+    for (const stand of staende) {
+      const glz = Object.values(budget.posten).find(
+        (p) => p.ea === "A" && p.haushalt === "verwaltung" && stand.werte[p.hhst_id]?.[0] > 0,
+      )!.glz;
+      const s = einrichtungSeries(data, glz, "A", "verwaltung");
+      let soll = 0;
+      let ist = 0;
+      for (const p of Object.values(budget.posten)) {
+        if (p.glz !== glz || p.ea !== "A" || p.haushalt !== "verwaltung") continue;
+        soll += stand.werte[p.hhst_id]?.[0] ?? 0;
+        ist += stand.werte[p.hhst_id]?.[1] ?? 0;
+      }
+      expect(marke(s, stand.jahr)!.soll).toBeCloseTo(soll, 2);
+      expect(marke(s, stand.jahr)!.ist).toBeCloseTo(ist, 2);
+    }
+  });
+
+  it("der Bereich ist die Summe seiner Einrichtungen", () => {
+    const ab = "46";
+    const glzs = [...new Set(Object.values(budget.posten).filter((p) => p.glz.startsWith(ab)).map((p) => p.glz))];
+    const teile = glzs.map((g) => marke(einrichtungSeries(data, g, "A", "verwaltung"))?.soll ?? 0);
+    const ganz = marke(bereichSeries(data, ab, "A", "verwaltung"))!;
+    expect(ganz.soll).toBeCloseTo(teile.reduce((x, y) => x + y, 0), 2);
+  });
+
+  // Im Ganzen ist bezahlt weniger als gebucht. Beim einzelnen Posten gilt das
+  // NICHT: 19 von 2742 liegen darüber, weil Geld auch ohne vorherige Anordnung
+  // fließt (Bankgebühren im Abbuchungsverfahren, Gebühren an der Kasse). Die
+  // Darstellung darf sich also nicht auf die Reihenfolge der beiden Marken
+  // verlassen.
+  it("im Ganzen ist bezahlt weniger als gebucht, beim einzelnen Posten nicht zwingend", () => {
+    const summe = Object.values(zs.werte).reduce(
+      (s, [soll, ist]) => ({ soll: s.soll + soll, ist: s.ist + ist }),
+      { soll: 0, ist: 0 },
+    );
+    expect(summe.ist).toBeLessThan(summe.soll);
+    expect(Object.values(zs.werte).some(([soll, ist]) => ist > soll)).toBe(true);
+  });
+
+  it("je Einwohner rechnen die Marken mit den Einwohnern ihres eigenen Jahres", () => {
+    const s = bereichSeries(data, "46", "A", "verwaltung");
+    const population = read<{ population: Record<string, number> }>("context.json").population;
+    const kopf = adjustSeries(s, data.context, { perCapita: true }, zs.jahr);
+    for (const stand of staende) {
+      expect(marke(kopf, stand.jahr)!.soll).toBeCloseTo(marke(s, stand.jahr)!.soll / population[String(stand.jahr)], 6);
+    }
+  });
+
+  it("die Zeitreihe nimmt je Jahr den Stand am gemeinsamen Tag, nicht den jüngsten", () => {
+    const tage = (xs: Zwischenstand[]) => xs.map((z) => `${z.jahr} ${z.stichtag.slice(5)}`);
+    const okt25 = { jahr: 2025, stichtag: "2025-10-01", quelle: "", werte: {} };
+    const okt26 = { ...okt25, jahr: 2026, stichtag: "2026-10-01" };
+    const nov26 = { ...okt25, jahr: 2026, stichtag: "2026-11-13" };
+    expect(tage(vergleichsStaende([okt25, okt26, nov26]))).toEqual(["2025 10-01", "2026 10-01"]);
+    // Gleichstand: der spätere Tag, damit ein neuer Stand die alten ablöst, sobald er zwei Jahre hat.
+    expect(tage(vergleichsStaende([okt25, nov26]))).toEqual(["2026 11-13"]);
+    expect(neuesterStand([okt25, okt26, nov26], 2026)).toBe(nov26);
+    expect(neuesterStand([okt25, okt26, nov26], 2027)).toBeUndefined();
+  });
+
+  it("ohne Datendatei ist die Marke weg, nicht null oder 0", () => {
+    expect(bereichSeries(ohneZwischenstand, "46", "A", "verwaltung").zwischen).toBeUndefined();
+    expect(postenSeries(ohneZwischenstand, Object.keys(zs.werte)[0]).zwischen).toBeUndefined();
+  });
+});
+
+describe.skipIf(!entwurf)("Entwurf (entwurf.json als weiteres Jahr)", () => {
+  const e = entwurf!;
+
+  it("hängt das Jahr an, öffnet aber auf dem letzten beschlossenen", () => {
+    expect(budget.meta.years.at(-1)).toBe(e.jahr);
+    expect(budget.meta.entwurf).toEqual({ jahr: e.jahr, stand: e.stand, quelle: e.quelle });
+    expect(latestYear(budget)).toBe(latestYear(beschlossen));
+    expect(latestYear(budget)).toBe(e.jahr - 1);
+  });
+
+  it("jede Zeile des Arbeitsplans wird ein Ansatz ohne Ergebnis, auch 0 €", () => {
+    const fakten = factsOfYear(budget, e.jahr);
+    expect(fakten.length).toBe(Object.keys(e.ansatz).length);
+    expect(fakten.every((f) => f.ergebnis == null && f.provisional)).toBe(true);
+    expect(fakten.some((f) => f.ansatz === 0)).toBe(true);
+    for (const f of fakten) expect(budget.posten[f.hhst_id], f.hhst_id).toBeTruthy();
+  });
+
+  it("der Entwurf ist ausgeglichen: Einnahmen = Ausgaben, je Haushalt", () => {
+    const t = { verwaltung: { E: 0, A: 0 }, vermoegen: { E: 0, A: 0 } };
+    for (const f of factsOfYear(budget, e.jahr)) {
+      const p = budget.posten[f.hhst_id];
+      t[p.haushalt][p.ea] += f.ansatz ?? 0;
+    }
+    expect(t.verwaltung.E).toBeCloseTo(t.verwaltung.A, 2);
+    expect(t.vermoegen.E).toBeCloseTo(t.vermoegen.A, 2);
+  });
+
+  it("ändert an den beschlossenen Jahren nichts", () => {
+    expect(budget.facts.length - beschlossen.facts.length).toBe(Object.keys(e.ansatz).length);
+    for (const [h, p] of Object.entries(beschlossen.posten)) expect(budget.posten[h]).toBe(p);
+  });
+
+  it("steht das Jahr schon in budget.json, gilt der Entwurf nicht mehr", () => {
+    const spaeter = { ...beschlossen, meta: { ...beschlossen.meta, years: [...beschlossen.meta.years, e.jahr] } };
+    expect(mitEntwurf(spaeter, e)).toBe(spaeter);
+    expect(mitEntwurf(beschlossen, null)).toBe(beschlossen);
+  });
+});
+
+describe("neu und nicht mehr vorhanden (wechsel, lebenslauf)", () => {
+  // Klein und künstlich, damit jeder Fall genau einmal vorkommt.
+  const p = (h: string) => ({ ...Object.values(beschlossen.posten)[0], hhst_id: h });
+  const f = (h: string, year: number, ansatz: number | null = 100) => ({ hhst_id: h, year, ansatz, ergebnis: null, provisional: false });
+  const klein: Data = {
+    ...data,
+    budget: {
+      meta: { years: [2020, 2021, 2022, 2023], sources: {} },
+      posten: { A: p("A"), B: p("B"), C: p("C"), N: p("N") },
+      facts: [
+        f("A", 2020), f("A", 2021), f("A", 2023),
+        f("B", 2021), f("B", 2022),
+        f("C", 2021),
+        f("N", 2020, 0), f("N", 2021, 0), f("N", 2022, 0), f("N", 2023, 0),
+      ],
+    },
+    // C hat 2022 keine Ansatzzeile mehr, steht aber im Zwischenstand: Es gibt sie.
+    zwischenstand: [{ jahr: 2022, stichtag: "2022-10-01", quelle: "", werte: { C: [5, 5] } }],
+  };
+
+  it("gegenüber dem Vorjahr: neu, weg oder nichts", () => {
+    expect(wechsel(klein, "B", 2021)).toBe("neu");
+    expect(wechsel(klein, "B", 2023)).toBe("weg");
+    expect(wechsel(klein, "A", 2022)).toBe("weg");
+    expect(wechsel(klein, "A", 2023)).toBe("neu");
+    expect(wechsel(klein, "B", 2022)).toBe(null);
+  });
+
+  it("im ersten Datenjahr gibt es keinen Vergleich", () => {
+    expect(wechsel(klein, "A", 2020)).toBe(null);
+  });
+
+  it("0 € ist eine ganz normale Stelle, nur die fehlende Zeile zählt", () => {
+    for (const j of [2021, 2022, 2023]) expect(wechsel(klein, "N", j)).toBe(null);
+    expect(lebenslauf(klein, "N")).toEqual({});
+  });
+
+  it("der Zwischenstand zählt als Zeile im Jahr", () => {
+    expect(vorhanden(klein, "C", 2022)).toBe(true);
+    expect(wechsel(klein, "C", 2022)).toBe(null);
+    expect(wechsel(klein, "C", 2023)).toBe("weg");
+  });
+
+  it("der Lebenslauf: neu ab, wieder ab nach einer Lücke, nicht mehr vorhanden seit", () => {
+    expect(lebenslauf(klein, "B")).toEqual({ neuAb: 2021, wegSeit: 2023 });
+    expect(lebenslauf(klein, "A")).toEqual({ wiederAb: 2023 });
+    expect(lebenslauf(klein, "C")).toEqual({ neuAb: 2021, wegSeit: 2023 });
+  });
+
+  it.skipIf(!entwurf)("im Entwurf: neu heißt Zeile im Arbeitsplan, keine im Vorjahr", () => {
+    const e = entwurf!;
+    for (const h of Object.keys(budget.posten)) {
+      const w = wechsel(data, h, e.jahr);
+      if (w === "neu") {
+        expect(h in e.ansatz, h).toBe(true);
+        expect(vorhanden(data, h, e.jahr - 1), h).toBe(false);
+      }
+      if (w === "weg") {
+        expect(h in e.ansatz, h).toBe(false);
+        expect(vorhanden(data, h, e.jahr - 1), h).toBe(true);
+      }
+    }
+  });
+});
+
+describe("extremImFenster (Notizen im Diagramm)", () => {
+  const years = [2019, 2020, 2021, 2022];
+  it("findet Tief- und Höchstwert nur innerhalb des Fensters, Lücken zählen nicht", () => {
+    expect(extremImFenster(years, [5, 3, null, 1], [2020, 2021], "min")).toBe(1);
+    expect(extremImFenster(years, [5, 3, 4, 9], [2020, 2021], "max")).toBe(2);
+    expect(extremImFenster(years, [5, null, null, 1], [2020, 2021], "min")).toBeNull();
+  });
+});
+
+describe("doppelte (Nummern-Check)", () => {
+  it("findet Bezeichnungen, die in einer Liste mehrfach vorkommen", () => {
+    expect([...doppelte(["a", "b", "a", "c", "b", "a"])].sort()).toEqual(["a", "b"]);
+    expect(doppelte(["a", "b"]).size).toBe(0);
+  });
+  it("die echten Daten haben gleichnamige Posten innerhalb einer Einrichtung", () => {
+    // Genau diese Fälle bekommen ihre Nummer auch ohne Schalter angezeigt.
+    const byGlz = new Map<string, string[]>();
+    for (const p of Object.values(budget.posten)) {
+      if (p.ea !== "A") continue;
+      byGlz.set(p.glz, [...(byGlz.get(p.glz) ?? []), p.grz_text ?? p.grz]);
+    }
+    const betroffen = [...byGlz.values()].filter((labels) => doppelte(labels).size > 0);
+    expect(betroffen.length).toBeGreaterThan(0);
   });
 });
 
