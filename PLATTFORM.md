@@ -30,10 +30,10 @@ es das Audit vom November 2026 empfiehlt und wie beim Klimaportal: Ein
 fehlerhafter Workflow kommt dann nicht an `/api/`, die Config und die anderen
 Projekte. Das Login beginnt im Ordner, deshalb `server-dir: ./`.
 
-Davor steht der Schritt „Ziel prüfen“: Liegt das Login doch in der
-Domain-Wurzel, bricht der Deploy ab, bevor er etwas überträgt. Anlass war der
-23.11.2026: `./` war schon für ein eigenes Konto gedacht, die Secrets waren aber
-die des gemeinsamen. Der Lauf legte in der Wurzel 64 leere Ordner an und wurde
+Davor steht der Schritt „Ziel prüfen“: Endet `FTP_USER` nicht auf `haushalt`
+oder liegt das Login doch in der Domain-Wurzel, bricht der Deploy ab, bevor er
+etwas überträgt. Anlass war der 23.11.2026: `./` war schon für ein eigenes
+Konto gedacht, die Secrets waren aber die des gemeinsamen. Der Lauf legte in der Wurzel 64 leere Ordner an und wurde
 abgebrochen, bevor er Portal, `api/` und `.htaccess` löschen konnte.
 
 Konto anlegen: hPanel → Dateien → FTP-Konten → neues Konto, Verzeichnis
