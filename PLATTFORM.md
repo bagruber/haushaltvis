@@ -25,13 +25,16 @@ Bürgerversion.
 
 ## Einrichtung
 
-Wie beim Klimaportal ein **eigenes FTP-Konto**, in hPanel (Dateien → FTP-Konten)
-auf das Verzeichnis `haushalt` beschränkt. So empfiehlt es das Audit vom
-November 2026: Ein fehlerhafter Workflow in diesem Repo kommt nicht an `/api/`,
-die Config und die anderen Projekte. Weil das Login schon in `haushalt`
-beginnt, steht im Workflow `server-dir: ./`. **Nie die Secrets des gemeinsamen
-Kontos eintragen, ohne `server-dir` auf `haushalt/` zu stellen**, sonst hieße
-`./` die Domain-Wurzel.
+Das **gemeinsame FTP-Konto** der anderen Repos. Sein Login beginnt in der
+Domain-Wurzel, deshalb `server-dir: haushalt/`. **Nie `./` eintragen**: Am
+23.11.2026 stand dort `./`, gedacht für ein eigenes Konto, die Secrets waren
+aber die des gemeinsamen. Der Lauf legte in der Wurzel 64 leere Ordner an und
+wurde abgebrochen, bevor er Portal, `api/` und `.htaccess` löschen konnte.
+
+Das Audit vom November 2026 empfiehlt je Repo ein eigenes, in hPanel auf den
+Ordner beschränktes Konto, wie beim Klimaportal: Dann kommt ein fehlerhafter
+Workflow nicht an `/api/`, die Config und die anderen Projekte. Umgestellt ist
+das bisher nur dort; für dieses Repo gehört es zur Umsetzung des Audits.
 
 Die Secrets im eigenen Terminal setzen, nicht über einen Agenten; ohne Wert im
 Befehl fragt `gh` verdeckt nach:

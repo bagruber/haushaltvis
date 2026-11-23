@@ -80,11 +80,13 @@ jobs:
           # Zertifikat lautet auf *.hstgr.io, ftp.moosburg.eu passt nicht dazu.
           security: strict
           local-dir: ./dist-buerger/
-          # Eigenes FTP-Konto, in hPanel auf das Verzeichnis haushalt
-          # beschränkt, wie beim Klimaportal: Das Login beginnt schon dort,
-          # also ./ und nicht haushalt/. Mit dem gemeinsamen Konto hieße ./ die
-          # Domain-Wurzel und überschriebe deren .htaccess samt CSP.
-          server-dir: ./
+          # Das gemeinsame Konto der anderen Repos, dessen Login in der
+          # Domain-Wurzel beginnt. Nie ./ eintragen: Am 23.11.2026 stand hier
+          # ./ für ein eigenes Konto, die Secrets waren aber die des
+          # gemeinsamen, und der Lauf begann, in der Wurzel Ordner anzulegen;
+          # als Nächstes hätte er Portal, api/ und .htaccess gelöscht.
+          # haushalt/ ist mit jedem Konto ungefährlich.
+          server-dir: haushalt/
           # Kurz nach einer anderen Übertragung nimmt Hostinger die Verbindung
           # verzögert an; die 30 s Standard-Timeout reichen dann nicht.
           timeout: 120000
