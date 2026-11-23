@@ -68,16 +68,23 @@ jobs:
           HTACCESS
 
       - name: Nach haushalt/ spiegeln
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        # v4.4.0, auf den Commit gepinnt: Ein verschobener Tag soll nicht
+        # unbemerkt anderen Code an das FTP-Passwort bringen.
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
+          # Prüft das Zertifikat. FTP_HOST ist deshalb srv1973.hstgr.io: Das
+          # Zertifikat lautet auf *.hstgr.io, ftp.moosburg.eu passt nicht dazu.
+          security: strict
           local-dir: ./dist-buerger/
-          server-dir: haushalt/
-
-          # Alle Projekte teilen sich ein FTP-Konto. Kurz nach einer anderen
-          # Übertragung nimmt Hostinger die Verbindung verzögert an, und die
-          # 30 s Standard-Timeout der Action reichen dann nicht.
+          # Eigenes FTP-Konto, in hPanel auf das Verzeichnis haushalt
+          # beschränkt, wie beim Klimaportal: Das Login beginnt schon dort,
+          # also ./ und nicht haushalt/. Mit dem gemeinsamen Konto hieße ./ die
+          # Domain-Wurzel und überschriebe deren .htaccess samt CSP.
+          server-dir: ./
+          # Kurz nach einer anderen Übertragung nimmt Hostinger die Verbindung
+          # verzögert an; die 30 s Standard-Timeout reichen dann nicht.
           timeout: 120000
