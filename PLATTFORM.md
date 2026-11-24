@@ -5,7 +5,7 @@ Domain steht im Repo `moosburg-eu` (BRIEFING.md, README.md).
 
 ## Stand
 
-- Erste öffentliche Variante, **noch nicht freigegeben**: nirgends verlinkt,
+- Erste öffentliche Variante, seit 24.11.2026 online, **noch nicht freigegeben**: nirgends verlinkt,
   nicht in `sitemap.xml` oder `llms.txt` des Portals, `noindex` in `index.html`.
 - Deploy nur von Hand: Actions → „Deploy auf moosburg.eu/haushalt/“ → Run
   workflow (`.github/workflows/moosburg-eu.yml`).
@@ -66,10 +66,17 @@ Portal-Deploy den Ordner nicht anfasst.
 - **Bot-Schutz von Hostinger:** Automatisierte Abrufe bekommen teils eine
   JavaScript-Challenge. Ob Messenger dann die Vorschaukarten lesen können, ist
   ungeprüft; falls nicht, lässt sich der Schutz im hPanel abschalten.
-- **Erster Deploy:** rund 4.700 HTML-Dateien und 358 Bilder per FTP, das dauert.
-  Danach überträgt die Action nur Geändertes. Bricht er beim ersten Ordner mit
-  `ECONNRESET (data socket)` ab, fehlt noch die Statusdatei der Action; beim
-  Klimaportal half ein Lauf mit `log-level: verbose`.
+- **Upload mit lftp statt der FTP-Deploy-Action:** Hostinger trennt eine
+  FTP-Verbindung nach 60 Minuten. Die Action legt jeden Ordner einzeln an, gut
+  0,8 s pro Ordner, und speichert ihren Stand erst am Ende. Bei rund 4.700
+  Ordnern (eine Vorschaukarte je Haushaltsstelle) riss der erste Deploy am
+  23.11.2026 deshalb die Stunde, und jeder neue Versuch begann von vorn. `lftp`
+  lädt über sechs Verbindungen hoch und überträgt jedes Mal alles
+  (`--transfer-all`), weil Größe und Zeitstempel nicht zum Vergleich taugen:
+  Eine geänderte Zahl gleicher Länge sähe sonst unverändert aus. Ein Deploy
+  dauert so rund 22 Minuten (24.11.2026: 5.096 Dateien, 1.300 s). `--delete`
+  entfernt, was der Build nicht mehr enthält; das Konto reicht nur bis
+  `haushalt/`.
 
 ## Freigabe
 
