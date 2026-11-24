@@ -88,24 +88,46 @@ jobs:
             echo "Das Login liegt in der Domain-Wurzel. Abbruch."; exit 1
           fi
 
+      # lftp statt der FTP-Deploy-Action: Die Action legt jeden Ordner einzeln
+      # und nacheinander an, gut 0,8 s pro Ordner. Bei rund 4.700 Ordnern, einer
+      # Vorschaukarte je Haushaltsstelle, riss sie die Stunde, nach der Hostinger
+      # eine Verbindung trennt (23.11.2026), und weil sie ihren Stand erst am Ende
+      # speichert, begann jeder neue Versuch von vorn. lftp arbeitet mit mehreren
+      # Verbindungen gleichzeitig.
+      #
+      # --transfer-all lädt jedes Mal alles hoch: Größe und Zeitstempel taugen
+      # nicht zum Vergleich, eine geänderte Zahl gleicher Länge sähe sonst
+      # unverändert aus. --delete entfernt, was der Build nicht mehr enthält;
+      # das Konto reicht nur bis haushalt/, und „Ziel prüfen“ steht davor.
       - name: Nach haushalt/ spiegeln
-        # v4.4.0, auf den Commit gepinnt: Ein verschobener Tag soll nicht
-        # unbemerkt anderen Code an das FTP-Passwort bringen.
-        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          # Prüft das Zertifikat. FTP_HOST ist deshalb srv1973.hstgr.io: Das
-          # Zertifikat lautet auf *.hstgr.io, ftp.moosburg.eu passt nicht dazu.
-          security: strict
-          local-dir: ./dist-buerger/
-          # Eigenes FTP-Konto, in hPanel auf das Verzeichnis haushalt
-          # beschränkt, wie es das Audit vom November 2026 empfiehlt: Das Login
-          # beginnt schon dort. Der Schritt „Ziel prüfen“ stellt sicher, dass
-          # ./ nicht die Domain-Wurzel ist.
-          server-dir: ./
-          # Kurz nach einer anderen Übertragung nimmt Hostinger die Verbindung
-          # verzögert an; die 30 s Standard-Timeout reichen dann nicht.
-          timeout: 120000
+        timeout-minutes: 50
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
+          lftp --version | head -1
+          # Zertifikat und Hostname werden geprüft; FTP_HOST ist deshalb
+          # srv1973.hstgr.io, das Zertifikat lautet auf *.hstgr.io.
+          cat > spiegeln.lftp <<EOF
+          set cmd:fail-exit yes
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate true
+          set net:timeout 60
+          set net:max-retries 5
+          set net:reconnect-interval-base 5
+          set mirror:parallel-directories true
+          open --env-password -u "$FTP_USER" "ftp://$FTP_HOST"
+          mirror --reverse --delete --transfer-all --parallel=6 --no-perms --verbose=1 dist-buerger/ ./
+          EOF
+          start=$(date +%s)
+          if ! lftp -f spiegeln.lftp > spiegeln.log 2>&1; then
+            tail -40 spiegeln.log; exit 1
+          fi
+          echo "Dauer: $(( $(date +%s) - start )) s"
+          echo "Ordner angelegt: $(grep -c '^Making directory' spiegeln.log || true)"
+          echo "Dateien übertragen: $(grep -c '^Transferring file' spiegeln.log || true)"
+          echo "Entfernt: $(grep -c '^Removing' spiegeln.log || true)"
+          tail -5 spiegeln.log
