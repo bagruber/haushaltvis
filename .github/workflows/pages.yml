@@ -44,6 +44,7 @@ jobs:
       - name: Chromium bereitstellen
         run: pnpm exec playwright-core install --with-deps chromium
 
+      - run: pnpm test
       - run: pnpm run build
         env:
           SITE_URL: https://bagruber.github.io

@@ -41,6 +41,7 @@ jobs:
 
       # Schneiden vor den Karten, damit auch die Karten nur das Beschlossene
       # kennen; danach noch einmal prüfen, über alles, was hochgeht.
+      - run: pnpm test
       - name: Bürgerversion bauen und prüfen
         env:
           VITE_VARIANTE: buerger
