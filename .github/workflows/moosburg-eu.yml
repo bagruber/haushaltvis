@@ -57,11 +57,15 @@ jobs:
       # Ordner mit index.html, die liefert der Server selbst; alle übrigen
       # ohne Dateiendung gehen an die App. Mit Endung nicht: eine fehlende
       # .json soll 404 sein, nicht die App-Schale mit 200.
+      # Eine eigene RewriteEngine schaltet die Regeln der Domain für diesen
+      # Ordner ab. Deren Sperre für Pfade mit führendem Punkt (etwa eine
+      # mitgebaute .env) steht deshalb hier noch einmal.
       - name: SPA-Fallback für Apache
         run: |
           cat > dist-buerger/.htaccess <<'HTACCESS'
           RewriteEngine On
           RewriteBase /haushalt/
+          RewriteRule (^|/)\.(?!well-known/) - [F,L]
           RewriteCond %{REQUEST_FILENAME} !-f
           RewriteCond %{REQUEST_FILENAME} !-d
           RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{2,5}$
